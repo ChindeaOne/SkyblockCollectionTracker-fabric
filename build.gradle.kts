@@ -1,0 +1,189 @@
+import sct.GitVersion
+
+plugins {
+    id("com.gradleup.shadow") version "8.3.4"
+    id("fabric-loom") version "1.13-SNAPSHOT"
+    kotlin("jvm") version "2.0.0"
+    id("com.google.devtools.ksp") version "2.0.0-1.0.24"
+    kotlin("plugin.power-assert") version "2.0.0"
+    `maven-publish`
+}
+
+version = GitVersion.setVersionfromGit(project)
+group = project.property("maven_group").toString()
+
+base {
+    archivesName.set(project.property("archives_base_name").toString())
+}
+
+repositories {
+    mavenCentral()
+
+    maven("https://jitpack.io")
+
+    // Fabric
+    exclusiveContent {
+        forRepository {
+            maven("https://maven.fabricmc.net")
+        }
+        filter {
+            includeGroup("net.fabricmc")
+            includeGroup("net.fabricmc.fabric-api")
+        }
+    }
+
+    // Mixin
+//    exclusiveContent {
+//        forRepository {
+//            maven("https://repo.spongepowered.org/repository/maven-public")
+//        }
+//        filter {
+//            includeGroup("org.spongepowered")
+//        }
+//    }
+
+    // DevAuth
+    exclusiveContent {
+        forRepository {
+            maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+        }
+        filter {
+            includeGroup("me.djtheredstoner")
+        }
+    }
+
+    // ModMenu
+    exclusiveContent {
+        forRepository {
+            maven(url = "https://maven.terraformersmc.com/releases")
+        }
+
+        filter {
+            includeGroup("com.terraformersmc")
+            includeGroup("dev.emi")
+        }
+    }
+
+    // Moulconfig
+    exclusiveContent {
+        forRepository {
+            maven("https://maven.notenoughupdates.org/releases")
+        }
+        filter {
+            includeGroup("org.notenoughupdates")
+            includeGroup("org.notenoughupdates.moulconfig")
+        }
+    }
+
+    maven {
+        url = uri("https://maven.notenoughupdates.org/releases")
+        content {
+            includeGroup("org.notenoughupdates.moulconfig")
+        }
+    }
+}
+
+loom {
+    mods {
+        create("skyblockcollectiontracker") {
+            sourceSet(sourceSets.getByName("main"))
+        }
+    }
+}
+
+val shadowModImpl: Configuration by configurations.creating {
+    configurations.modImplementation.get().extendsFrom(this)
+}
+fabricApi {
+    configureDataGeneration {
+        client.set(true)
+    }
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
+    mappings(loom.officialMojangMappings())
+    modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
+
+    // Fabric API
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_kotlin_version")}")
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+
+    modImplementation("com.terraformersmc:modmenu:${project.property("mod_menu_version")}")
+
+    shadowModImpl("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
+    include("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            languageVersion = "2.0"
+            enableLanguageFeature("BreakContinueInInlineLambdas")
+        }
+    }
+}
+
+tasks.processResources {
+    inputs.property("version", project.version)
+
+    filesMatching("fabric.mod.json") {
+        expand("version" to project.version)
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(21)
+}
+
+tasks.withType(JavaCompile::class) {
+    options.encoding = "UTF-8"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.jar {
+    val archivesNameValue = base.archivesName.get()
+    inputs.property("archivesName", archivesNameValue)
+
+    from("LICENSE") {
+        rename { "${it}_${archivesNameValue}" }
+    }
+}
+
+val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+    archiveClassifier.set("")
+    dependsOn(tasks.shadowJar)
+    inputFile.set(tasks.shadowJar.get().archiveFile)
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+}
+
+tasks.shadowJar {
+    destinationDirectory.set(layout.buildDirectory.dir("intermediates"))
+    archiveClassifier.set("non-obfuscated-with-deps")
+    configurations = listOf(shadowModImpl)
+
+    doLast {
+        configurations.forEach {
+            println("Copying dependencies into mod: ${it.files}")
+        }
+    }
+    exclude("META-INF/versions/**")
+    relocate("io.github.notenoughupdates.moulconfig", "io.github.chindeaone.collectiontracker.deps.moulconfig")
+//    relocate("io.github.chindeaone.implementation", "io.github.chindeaone.collectiontracker.deps.implementation")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = project.property("archives_base_name").toString()
+            from(components["java"])
+        }
+    }
+
+    repositories {}
+}

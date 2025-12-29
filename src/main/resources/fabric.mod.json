@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "skyblockcollectiontracker",
+	"version": "${version}",
+	"name": "SkyblockCollectionTracker",
+	"description": "A Minecraft mod that tracks Hypixel Skyblock collections.",
+	"authors": [
+		"Chindea_YTB"
+	],
+	"contact": {
+		"sources": "https://github.com/ChindeaOne/SkyblockCollectionTracker"
+	},
+	"license": "LGPL-2.1",
+    "icon": "assets/skyblockcollectiontracker/logo.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			{
+				"value": "io.github.chindeaone.collectiontracker.SkyblockCollectionTracker",
+				"adapter": "kotlin"
+			}
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.18.1",
+		"minecraft": "1.21.8",
+		"java": ">=21",
+		"fabric-api": "*",
+		"fabric-language-kotlin": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
