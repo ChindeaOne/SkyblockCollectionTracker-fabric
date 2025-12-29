@@ -16,7 +16,7 @@
 	"entrypoints": {
 		"main": [
 			{
-				"value": "io.github.chindeaone.collectiontracker.SkyblockCollectionTracker",
+				"value": "io.github.chindeaone.collectiontracker.ModLoader",
 				"adapter": "kotlin"
 			}
 		]
