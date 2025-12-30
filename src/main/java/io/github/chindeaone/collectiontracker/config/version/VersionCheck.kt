@@ -14,7 +14,7 @@ class VersionCheck(option: ProcessedOption) : GuiOptionEditor(option) {
         val width = width - 20
 
         val widthRemaining = width - 10
-        val currentVersion = "Version " + "§a" + SkyblockCollectionTracker.VERSION
+        val currentVersion = "§aVersion " + SkyblockCollectionTracker.VERSION
 
         // Render the current version in green
         context.pushMatrix()
