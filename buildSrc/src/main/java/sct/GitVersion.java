@@ -1,7 +1,6 @@
 package sct;
 
 import org.gradle.api.Project;
-import org.gradle.process.ExecResult;
 import org.gradle.process.ExecSpec;
 
 import java.io.ByteArrayOutputStream;
@@ -13,7 +12,7 @@ public class GitVersion {
     public static String setVersionfromGit(Project project) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        ExecResult result = project.exec((ExecSpec execSpec) -> {
+        project.exec((ExecSpec execSpec) -> {
             execSpec.commandLine("git", "describe", "--tags", "--abbrev=0");
             execSpec.setStandardOutput(baos);
             execSpec.setIgnoreExitValue(true);
