@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 import sct.GitVersion
 
 plugins {
@@ -94,6 +95,11 @@ loom {
 val shadowModImpl: Configuration by configurations.creating {
     configurations.modImplementation.get().extendsFrom(this)
 }
+
+val shadowImpl: Configuration by configurations.creating {
+    configurations.implementation.get().extendsFrom(this)
+}
+
 fabricApi {
     configureDataGeneration {
         client.set(true)
@@ -113,7 +119,10 @@ dependencies {
     modImplementation("com.terraformersmc:modmenu:${project.property("mod_menu_version")}")
 
     shadowModImpl("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
-    include("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
+    shadowImpl("com.github.ChindeaOne:modrinthautoupdater:${project.property("modrinthautoupdater_version")}") {
+        exclude(group = "gson")
+    }
+//    include("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
 }
 
 kotlin {
@@ -130,6 +139,18 @@ tasks.processResources {
 
     filesMatching("fabric.mod.json") {
         expand("version" to project.version)
+    }
+    filesMatching("assets/skyblockcollectiontracker/url.properties") {
+        expand(
+            "TOKEN_URL" to (System.getenv("TOKEN_URL") ?: ""),
+            "TRACKED_COLLECTION_URL" to (System.getenv("TRACKED_COLLECTION_URL") ?: ""),
+            "AVAILABLE_COLLECTIONS_URL" to (System.getenv("AVAILABLE_COLLECTIONS_URL") ?: ""),
+            "AVAILABLE_GEMSTONES_URL" to (System.getenv("AVAILABLE_GEMSTONES_URL") ?: ""),
+            "NPC_PRICES_URL" to (System.getenv("NPC_PRICES_URL") ?: ""),
+            "BAZAAR_URL" to (System.getenv("BAZAAR_URL") ?: ""),
+            "STATUS_URL" to (System.getenv("STATUS_URL") ?: ""),
+            "AGENT" to (System.getenv("AGENT") ?: "")
+        )
     }
 }
 
@@ -174,7 +195,7 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     relocate("io.github.notenoughupdates.moulconfig", "io.github.chindeaone.collectiontracker.deps.moulconfig")
-//    relocate("io.github.chindeaone.implementation", "io.github.chindeaone.collectiontracker.deps.implementation")
+    relocate("io.github.chindeaone.implementation", "io.github.chindeaone.collectiontracker.deps.implementation")
 }
 
 publishing {
