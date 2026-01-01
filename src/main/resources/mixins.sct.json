@@ -1,0 +1,11 @@
+{
+  "package": "io.github.chindeaone.collectiontracker.mixins",
+  "refmap": "mixins.sct.refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AccessorGuiContainer"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

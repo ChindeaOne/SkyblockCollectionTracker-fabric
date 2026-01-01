@@ -1,4 +1,3 @@
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 import sct.GitVersion
 
 plugins {
@@ -34,14 +33,14 @@ repositories {
     }
 
     // Mixin
-//    exclusiveContent {
-//        forRepository {
-//            maven("https://repo.spongepowered.org/repository/maven-public")
-//        }
-//        filter {
-//            includeGroup("org.spongepowered")
-//        }
-//    }
+    exclusiveContent {
+        forRepository {
+            maven("https://repo.spongepowered.org/repository/maven-public")
+        }
+        filter {
+            includeGroup("org.spongepowered")
+        }
+    }
 
     // DevAuth
     exclusiveContent {
@@ -89,6 +88,11 @@ loom {
         create("skyblockcollectiontracker") {
             sourceSet(sourceSets.getByName("main"))
         }
+    }
+    @Suppress("UnstableApiUsage")
+    mixin {
+        useLegacyMixinAp.set(true)
+        defaultRefmapName.set("mixins.sct.refmap.json")
     }
 }
 
