@@ -11,9 +11,7 @@ import net.minecraft.network.chat.Component;
 public class DummyOverlay extends Screen {
 
     private boolean draggingSingle = false;
-    private boolean draggingList = false;
     private int dragOffsetX, dragOffsetY;
-    private int dragOffsetListX, dragOffsetListY;
     private AbstractContainerScreen<?> oldScreen = null;
 
     public DummyOverlay(AbstractContainerScreen<?> oldScreen) {
@@ -50,14 +48,10 @@ public class DummyOverlay extends Screen {
 
         // Draw both single and list dummy overlays
         RenderUtils.INSTANCE.drawRectDummy(context);
-        RenderUtils.INSTANCE.drawRectDummyList(context);
 
         // Update dragging positions
         if (draggingSingle) {
             RenderUtils.INSTANCE.getPosition().setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY);
-        }
-        if (draggingList) {
-            RenderUtils.INSTANCE.getPositionList().setPosition(mouseX - dragOffsetListX, mouseY - dragOffsetListY);
         }
     }
 
@@ -76,12 +70,6 @@ public class DummyOverlay extends Screen {
             return true;
         }
 
-        if (isMouseOverOverlayList(mx, my)) {
-            float next = RenderUtils.INSTANCE.getPositionList().getScale() + (verticalAmount > 0 ? scaleChange : -scaleChange);
-            RenderUtils.INSTANCE.getPositionList().setScaling(clamp(next));
-            return true;
-        }
-
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
@@ -90,13 +78,6 @@ public class DummyOverlay extends Screen {
         if (mouseButton == 0) {
             int mx = (int) mouseX;
             int my = (int) mouseY;
-
-            if (isMouseOverOverlayList(mx, my)) {
-                draggingList = true;
-                dragOffsetListX = mx - RenderUtils.INSTANCE.getPositionList().getX();
-                dragOffsetListY = my - RenderUtils.INSTANCE.getPositionList().getY();
-                return true;
-            }
 
             if (isMouseOverOverlay(mx, my)) {
                 draggingSingle = true;
@@ -111,7 +92,6 @@ public class DummyOverlay extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int state) {
         draggingSingle = false;
-        draggingList = false;
         return super.mouseReleased(mouseX, mouseY, state);
     }
 
@@ -121,15 +101,6 @@ public class DummyOverlay extends Screen {
         int w = RenderUtils.INSTANCE.getPosition().getWidth();
         int h = RenderUtils.INSTANCE.getPosition().getHeight();
         float s = RenderUtils.INSTANCE.getPosition().getScale();
-        return mouseX >= x && mouseX <= x + Math.round(w * s) && mouseY >= y && mouseY <= y + Math.round(h * s);
-    }
-
-    private boolean isMouseOverOverlayList(int mouseX, int mouseY) {
-        int x = RenderUtils.INSTANCE.getPositionList().getX();
-        int y = RenderUtils.INSTANCE.getPositionList().getY();
-        int w = RenderUtils.INSTANCE.getPositionList().getWidth();
-        int h = RenderUtils.INSTANCE.getPositionList().getHeight();
-        float s = RenderUtils.INSTANCE.getPositionList().getScale();
         return mouseX >= x && mouseX <= x + Math.round(w * s) && mouseY >= y && mouseY <= y + Math.round(h * s);
     }
 

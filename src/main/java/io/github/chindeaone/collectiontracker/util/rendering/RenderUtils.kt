@@ -16,7 +16,6 @@ object RenderUtils {
 
     var overlay: Overlay = SkyblockCollectionTracker.configManager.config!!.overlay
     var position: Position = overlay.overlaySingle.overlayPosition
-    val positionList: Position = overlay.overlayList.overlayPosition
 
     var maxWidth: Int = 0
     var textHeight: Int = 0
@@ -25,6 +24,9 @@ object RenderUtils {
     const val WHITE: Int = 0xFFFFFFFF.toInt()
 
     private fun getDimensions() {
+        maxWidth = 0
+        textHeight = 0
+
         val overlayLines = TextUtils.getStrings()
 
         if (overlayLines.isEmpty()) {
@@ -199,35 +201,5 @@ object RenderUtils {
                 context.drawString(fr, TextUtils.uptimeString(), x, y, color, true)
             }
         }
-    }
-
-    fun drawRectDummyList(
-        context: GuiGraphics,
-    ) {
-        getDimensions()
-
-        context.pose().pushMatrix()
-        context.pose().translate(positionList.x.toFloat(), positionList.y.toFloat())
-        context.pose().scale(positionList.scale, positionList.scale)
-
-        context.fill(
-            0, 0, positionList.width, positionList.height, -0x7fbfbfc0
-        )
-
-        val overlayText = Component.literal("Move the overlay list")
-            .withStyle(ChatFormatting.GREEN)
-
-        val textScale = 0.9f
-        val centerX = positionList.width / 2.0f
-        val yTop = (positionList.height - fr.lineHeight * textScale) / 2f
-
-        context.pose().pushMatrix()
-        context.pose().scale(textScale, textScale)
-        context.drawCenteredString(fr, overlayText, (centerX / textScale).toInt(), (yTop / textScale).toInt(), WHITE)
-        context.pose().popMatrix()
-
-        context.pose().popMatrix()
-
-        drawStaticText(context)
     }
 }
