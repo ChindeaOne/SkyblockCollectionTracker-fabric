@@ -10,9 +10,6 @@ import java.util.*;
 public class CollectionList {
 
     public static void sendCollectionList() {
-        System.out.println(HypixelUtils.isOnSkyblock());
-        System.out.println(HypixelUtils.INSTANCE.isInHypixel());
-
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
 

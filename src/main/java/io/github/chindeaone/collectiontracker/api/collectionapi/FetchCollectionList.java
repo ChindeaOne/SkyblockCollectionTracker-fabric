@@ -66,7 +66,6 @@ public class FetchCollectionList {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
-        System.out.println("[SCT]: Fetching collection list from " + SkyblockCollectionTracker.MC_VERSION);
         String gameVersion = SkyblockCollectionTracker.MC_VERSION;
 
         conn.setRequestProperty("X-GAME-VERSION", gameVersion);
