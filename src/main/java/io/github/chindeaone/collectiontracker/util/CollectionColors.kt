@@ -20,6 +20,9 @@ object CollectionColors {
         put("leather", 0xFF8B4513.toInt()) // Brown
         put("porkchop", 0xFFFFC0CB.toInt()) // Pink
         put("feather", 0xFFFFFFFF.toInt()) // White
+        put("moonflower", 0xFF0F55BD.toInt()) // Dark Blue
+        put("sunflower", 0xFFFFD700.toInt()) // Gold
+        put("wild rose", 0xFFF52F3F.toInt()) // Red
 
         // Mining
         put("lapis lazuli", 0xFF2F4FEC.toInt()) // Royal Blue
@@ -74,6 +77,17 @@ object CollectionColors {
 
         // Foraging
         put("oak", 0xFFD69243.toInt()) // Wood Brown
+        put("birch", 0xFFEEE8AA.toInt()) // Pale Goldenrod
+        put("spruce", 0xFF7E4F21.toInt()) // Dark Brown
+        put("jungle", 0xFFCF7E2F.toInt()) // Brown
+        put("acacia", 0xFFFF4500.toInt()) // Orange Red
+        put("dark oak", 0xFF5C4033.toInt()) // Dark Brown
+        put("mangrove", 0xFF622020.toInt()) // Brownish
+        put("fig", 0xFF413733.toInt()) // Dark Grayish Brown
+        put("tender wood", 0xFF513C36.toInt()) // Brownish
+        put("vinesap", 0xFF726A24.toInt()) // Olive Green
+        put("lushlilac", 0xFFBA55D3.toInt()) // Medium Orchid
+        put("sea lumies", 0xFF7CA854.toInt()) // Moss Green
 
         // Fishing
         put("lily pad", 0xFF008000.toInt()) // Green
