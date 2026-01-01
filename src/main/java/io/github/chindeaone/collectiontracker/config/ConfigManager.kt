@@ -4,19 +4,12 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.screenToOpen
 import io.github.chindeaone.collectiontracker.config.error.ConfigError
 import io.github.chindeaone.collectiontracker.config.version.VersionManager
-import io.github.notenoughupdates.moulconfig.gui.GuiContext
-import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
-import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
-import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.Component
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -47,12 +40,11 @@ class ConfigManager {
     }
 
     private var configDirectory = File("config/sct")
-    private lateinit var configFile: File
+    private var configFile: File
     var config: ModConfig? = null
     private var lastSaveTime = 0L
 
     lateinit var processor: MoulConfigProcessor<ModConfig>
-    private val editor by lazy { MoulConfigEditor(processor) }
 
     init {
         configDirectory.mkdirs()

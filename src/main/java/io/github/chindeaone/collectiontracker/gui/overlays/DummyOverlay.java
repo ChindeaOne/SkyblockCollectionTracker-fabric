@@ -72,13 +72,13 @@ public class DummyOverlay extends Screen {
 
         if (isMouseOverOverlay(mx, my)) {
             float next = RenderUtils.INSTANCE.getPosition().getScale() + (verticalAmount > 0 ? scaleChange : -scaleChange);
-            RenderUtils.INSTANCE.getPosition().setScaling(clamp(next, 0.1f, 10.0f));
+            RenderUtils.INSTANCE.getPosition().setScaling(clamp(next));
             return true;
         }
 
         if (isMouseOverOverlayList(mx, my)) {
             float next = RenderUtils.INSTANCE.getPositionList().getScale() + (verticalAmount > 0 ? scaleChange : -scaleChange);
-            RenderUtils.INSTANCE.getPositionList().setScaling(clamp(next, 0.1f, 10.0f));
+            RenderUtils.INSTANCE.getPositionList().setScaling(clamp(next));
             return true;
         }
 
@@ -133,7 +133,7 @@ public class DummyOverlay extends Screen {
         return mouseX >= x && mouseX <= x + Math.round(w * s) && mouseY >= y && mouseY <= y + Math.round(h * s);
     }
 
-    private static float clamp(float v, float min, float max) {
-        return Math.max(min, Math.min(max, v));
+    private static float clamp(float v) {
+        return Math.max((float) 0.1, Math.min((float) 10.0, v));
     }
 }

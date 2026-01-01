@@ -6,7 +6,6 @@ import io.github.chindeaone.collectiontracker.config.categories.Overlay
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import io.github.chindeaone.collectiontracker.util.CollectionColors
-import io.github.chindeaone.collectiontracker.util.rendering.ScaleUtils.scaleFactor
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font

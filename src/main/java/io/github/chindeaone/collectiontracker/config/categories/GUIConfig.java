@@ -8,5 +8,6 @@ public class GUIConfig {
 
     @ConfigOption(name = "Edit GUI Location", desc = "Allows the player to change the position of the overlays.")
     @ConfigEditorButton(buttonText = "Edit")
+    @SuppressWarnings("unused")
     public Runnable positions = GuiManager::openGuiPositionEditor;
 }

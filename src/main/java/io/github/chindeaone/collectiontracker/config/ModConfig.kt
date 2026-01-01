@@ -1,11 +1,11 @@
 package io.github.chindeaone.collectiontracker.config
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.categories.*
-import io.github.notenoughupdates.moulconfig.Config;
+import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
-import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 
 class ModConfig : Config() {
@@ -29,12 +29,11 @@ class ModConfig : Config() {
 
 
     override fun getTitle() : StructuredText {
-        val modName = "SkyblockCollectionTracker";
-        return StructuredText.of("$modName by §3Chindea_YTB§r, config by §5Moulberry §rand §5nea89");
+        val modName = "SkyblockCollectionTracker"
+        return StructuredText.of("$modName by §3Chindea_YTB§r, config by §5Moulberry §rand §5nea89")
     }
 
     override fun saveNow() {
-        SkyblockCollectionTracker.configManager.save();
+        SkyblockCollectionTracker.configManager.save()
     }
-
 }

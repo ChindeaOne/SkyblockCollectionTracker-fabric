@@ -8,5 +8,4 @@ object ScaleUtils {
 
     val height get() = mc.window.height
     val width get() = mc.window.width
-    val scaleFactor get() = mc.window.guiScale.toInt()
 }
