@@ -1,9 +1,15 @@
 package io.github.chindeaone.collectiontracker.commands;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
+import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
+import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
 public class CommandRegistry {
 
@@ -27,9 +33,51 @@ public class CommandRegistry {
                             .executes(context -> {
                                 CollectionList.sendCollectionList();
                                 return 1;
-                             })
+                            })
+                    )
+                    // /sct track <collection>
+                    .then(ClientCommandManager.literal("track")
+                            .executes(context -> {
+                                ChatUtils.INSTANCE.sendMessage("Use: /sct track <collection>",true);
+                                return 1;
+                            })
+                            .then(ClientCommandManager.argument("collection", StringArgumentType.greedyString())
+                                    .suggests(COLLECTION_SUGGESTIONS)
+                                    .executes(context -> {
+                                        StartTracker.startTracking(StringArgumentType.getString(context, "collection").trim());
+                                        return 1;
+                                    })
+                            )
+                    )
+                    // /sct stop
+                    .then(ClientCommandManager.literal("stop")
+                            .executes(context -> {
+                                TrackingHandlerClass.stopTrackingManual();
+                                return 1;
+                            })
+                    )
+                    // /sct pause
+                    .then(ClientCommandManager.literal("pause")
+                            .executes(context -> {
+                                TrackingHandlerClass.pauseTracking();
+                                return 1;
+                            })
+                    )
+                    // /sct resume
+                    .then(ClientCommandManager.literal("resume")
+                            .executes(context -> {
+                                TrackingHandlerClass.resumeTracking();
+                                return 1;
+                            })
                     )
             );
         });
     }
+
+    private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_SUGGESTIONS = (context, builder) -> {
+        for (String c : CollectionsManager.getAllCollections()) {
+            builder.suggest(c);
+        }
+        return builder.buildFuture();
+    };
 }

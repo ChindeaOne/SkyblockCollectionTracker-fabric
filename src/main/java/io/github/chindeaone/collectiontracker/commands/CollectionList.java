@@ -14,7 +14,7 @@ public class CollectionList {
         System.out.println(HypixelUtils.INSTANCE.isInHypixel());
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player == null) return;
+        if (mc.player == null) return;
 
         ChatUtils.INSTANCE.sendMessage("§aList of all collections available:", true);
         ChatUtils.INSTANCE.sendMessage("", false);
@@ -56,3 +56,4 @@ public class CollectionList {
 
     }
 }
+

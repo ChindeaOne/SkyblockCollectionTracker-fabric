@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.util
 
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -60,19 +61,19 @@ object ServerUtils {
                 currentCheckInterval = COOLDOWN_CHECK_INTERVAL
             }
 
-//            if (!TrackingHandlerClass.isTracking) {
-//                if (trackingTimeoutFuture == null) {
-//                    trackingTimeoutFuture = executorService.schedule({
-//                        permanentlyDisabled = true
-//                        logger.error("[SCT]: Disabled server checks due to mod not being used.")
-//                    }, TRACKING_CHECK_INTERVAL.toLong(), java.util.concurrent.TimeUnit.MILLISECONDS)
-//                }
-//            } else {
-//                trackingTimeoutFuture?.cancel(false)
-//                trackingTimeoutFuture = null
-//            }
-//
-//            TrackingHandlerClass.stopTracking()
+            if (!TrackingHandlerClass.isTracking) {
+                if (trackingTimeoutFuture == null) {
+                    trackingTimeoutFuture = executorService.schedule({
+                        permanentlyDisabled = true
+                        logger.error("[SCT]: Disabled server checks due to mod not being used.")
+                    }, TRACKING_CHECK_INTERVAL.toLong(), java.util.concurrent.TimeUnit.MILLISECONDS)
+                }
+            } else {
+                trackingTimeoutFuture?.cancel(false)
+                trackingTimeoutFuture = null
+            }
+
+            TrackingHandlerClass.stopTracking()
         }
     }
 }
