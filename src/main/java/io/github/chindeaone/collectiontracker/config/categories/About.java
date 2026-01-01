@@ -10,7 +10,7 @@ public class About {
 
     public enum UpdateType {
         NONE,
-        FULL,
+        RELEASE,
         BETA
     }
 

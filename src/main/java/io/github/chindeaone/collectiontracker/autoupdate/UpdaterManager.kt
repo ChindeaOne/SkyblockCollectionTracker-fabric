@@ -29,7 +29,7 @@ object UpdaterManager {
     private fun setUpdateStream(): String {
         val currentStream = SkyblockCollectionTracker.configManager.config!!.about.update
         return when (currentStream) {
-            About.UpdateType.FULL -> "release"
+            About.UpdateType.RELEASE -> "release"
             About.UpdateType.BETA -> "beta"
             else -> "none"
         }
