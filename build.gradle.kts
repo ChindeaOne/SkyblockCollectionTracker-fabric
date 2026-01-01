@@ -126,7 +126,7 @@ dependencies {
     shadowImpl("com.github.ChindeaOne:modrinthautoupdater:${project.property("modrinthautoupdater_version")}") {
         exclude(group = "gson")
     }
-//    include("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
+    include("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
 }
 
 kotlin {
@@ -198,6 +198,7 @@ tasks.shadowJar {
         }
     }
     exclude("META-INF/versions/**")
+    mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "io.github.chindeaone.collectiontracker.deps.moulconfig")
     relocate("io.github.chindeaone.implementation", "io.github.chindeaone.collectiontracker.deps.implementation")
 }
