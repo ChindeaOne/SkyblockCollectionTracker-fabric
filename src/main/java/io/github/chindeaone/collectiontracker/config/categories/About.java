@@ -7,6 +7,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class About {
+
+    public enum UpdateType {
+        NONE,
+        FULL,
+        BETA
+    }
+
     @ConfigOption(name = "Current Version", desc = "This is the SkyblockCollectionTracker version you are currently running")
     @VersionDisplay
     public transient Void currentVersion = null;
@@ -21,11 +28,9 @@ public class About {
             name = "Update Stream",
             desc = "Choose which type of notifications you want to receive about newer versions of the mod."
     )
-    @ConfigEditorDropdown(
-            values = {"None", "Full releases", "Beta releases"}
-    )
-    public int update = 0;
+    @ConfigEditorDropdown
+    public UpdateType update = UpdateType.NONE; //Default to no updates
 
     @Expose
-    public boolean hasCheckedUpdate = false;
+    public boolean hasCheckedUpdate = true;
 }

@@ -7,6 +7,8 @@ import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
+import io.github.chindeaone.collectiontracker.config.categories.About
+import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import io.github.chindeaone.collectiontracker.util.ServerUtils.serverStatus
 import net.minecraft.client.Minecraft
 import net.minecraft.world.scores.DisplaySlot
@@ -33,7 +35,7 @@ object Hypixel {
         skyblock = false
         playerLoaded = false
         serverStatus = false
-//        TrackingHandlerClass.stopTracking()
+        TrackingHandlerClass.stopTracking()
     }
 
     private fun checkServer() {
@@ -59,8 +61,6 @@ object Hypixel {
                 if (playerLoaded) {
                     serverStatus = ServerStatus.checkServer()
 
-//                    setConfigForNewVersion()
-
                     if (!serverStatus) {
                         ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. We apologize for the inconvenience.")
                         logger.warn("[SCT]: The API server is currently under maintenance.")
@@ -74,9 +74,9 @@ object Hypixel {
 
                     logger.info("[SCT]: Update stream status: {}", SkyblockCollectionTracker.configManager.config!!.about.update)
 
-                    if (SkyblockCollectionTracker.configManager.config!!.about.update != 0) {
+                    if (!SkyblockCollectionTracker.configManager.config!!.about.update.equals(About.UpdateType.NONE)) {
                         CompletableFuture.runAsync {
-                            RepoUtils.checkForUpdates(SkyblockCollectionTracker.configManager.config!!.about.update)
+                            RepoUtils.checkForUpdates(toInt(SkyblockCollectionTracker.configManager.config!!.about.update.toString()))
                         }.thenAcceptAsync  {
                             if (RepoUtils.latestVersion != null) {
 
@@ -109,6 +109,15 @@ object Hypixel {
         skyblock = inSkyblock
     }
 
+    private fun toInt(updateType: String): Int {
+        val typeInt = when(updateType) {
+            "RELEASE" -> 1
+            "BETA" -> 2
+            else -> 0
+        }
+        return typeInt
+    }
+
     private fun fetchData() {
         // Request collection data
         if (!FetchCollectionList.hasCollectionList) {
@@ -132,13 +141,6 @@ object Hypixel {
             }
         }
     }
-
-//    private fun setConfigForNewVersion() {
-//        val scale = SkyblockCollectionTracker.configManager.config!!.overlay.overlaySingle.overlayPosition.scale
-//        if(scale == 0.0f){
-//            SkyblockCollectionTracker.configManager.config!!.overlay.overlaySingle.overlayPosition.setScaling(1.0f)
-//        }
-//    }
 
     private fun loadPlayerData() {
         val client = Minecraft.getInstance()

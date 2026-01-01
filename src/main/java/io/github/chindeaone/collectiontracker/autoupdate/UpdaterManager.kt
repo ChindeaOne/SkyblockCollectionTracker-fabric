@@ -4,6 +4,7 @@ import io.github.chindeaone.UpdateContext
 import io.github.chindeaone.UpdateSetup
 import io.github.chindeaone.UpdateTarget
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.config.categories.About
 import java.util.concurrent.CompletableFuture
 
 object UpdaterManager {
@@ -28,8 +29,8 @@ object UpdaterManager {
     private fun setUpdateStream(): String {
         val currentStream = SkyblockCollectionTracker.configManager.config!!.about.update
         return when (currentStream) {
-            1 -> "release"
-            2 -> "beta"
+            About.UpdateType.FULL -> "release"
+            About.UpdateType.BETA -> "beta"
             else -> "none"
         }
     }
