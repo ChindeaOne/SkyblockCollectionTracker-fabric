@@ -75,15 +75,11 @@ class ConfigManager {
 
     private fun tryReadConfig() {
         try {
-            val inputStreamReader = InputStreamReader(FileInputStream(configFile), StandardCharsets.UTF_8)
-            val bufferedReader = BufferedReader(inputStreamReader)
-
-            val builder = StringBuilder()
-            for (line in bufferedReader.lines()) {
-                builder.append(line)
-                builder.append("\n")
+            InputStreamReader(FileInputStream(configFile), StandardCharsets.UTF_8).use { isr ->
+                JsonReader(isr).use { reader ->
+                    config = gson.fromJson(reader, ModConfig::class.java)
+                }
             }
-            config = gson.fromJson(builder.toString(), ModConfig::class.java)
         } catch (e: Exception) {
             throw ConfigError("Could not load config", e)
         }
