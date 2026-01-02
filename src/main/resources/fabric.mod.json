@@ -3,7 +3,7 @@
 	"id": "skyblockcollectiontracker",
 	"version": "${version}",
 	"name": "SkyblockCollectionTracker",
-	"description": "A Minecraft mod that tracks Hypixel Skyblock collections.",
+	"description": "A Minecraft mod that tracks collections in Hypixel Skyblock.",
 	"authors": [
 		"Chindea_YTB"
 	],
