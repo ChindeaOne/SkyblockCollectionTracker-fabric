@@ -42,3 +42,5 @@ replay_*.log
 # devauth
 .devauth/*
 !.devauth/config.toml
+
+/src/main/java/io/github/chindeaone/collectiontracker/TODO
