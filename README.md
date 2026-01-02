@@ -7,17 +7,11 @@
 
 ---
 
-## Acknowledgments
-
-**Huge thanks to:** nea89, Ninjune, Moulberry, hannibal2 and the SkyHanni team. Full credits and acknowledgments can be found [here](CREDITS.md).
-
----
-
 ## Installation
 
-1. Download the latest version from [here](https://github.com/ChindeaYTB/SkyblockCollectionTracker/releases).
+1. Download the latest version from [here](https://github.com/ChindeaYTB/SkyblockCollectionTracker-fabric/releases).
 2. Add the mod to your mods folder (`.minecraft/mods`).
-3. Make sure you have the [Fabric API](https://modrinth.com/mod/fabric-api/versions) in your Minecraft mods folder.
+3. Make sure you have the [Fabric API](https://modrinth.com/mod/fabric-api/versions) and [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) in your Minecraft mods folder.
 4. Run Minecraft with the [Fabric installer](https://fabricmc.net/use/installer/) selected.
 5. Use `/sct help` to get started.
 
@@ -41,5 +35,11 @@
 - **Auto Updater**
     - Implements [modrinthautoupdater](https://github.com/ChindeaYTB/modrinthautoupdater), a similar library to [libautoupdate](https://github.com/nea89o/libautoupdate).
     - The mod updates after closing the game.
+---
+
+## Credits
+
+All credits can be found [here](CREDITS.md).
+
 ---
 

@@ -8,7 +8,8 @@
 		"Chindea_YTB"
 	],
 	"contact": {
-		"sources": "https://github.com/ChindeaOne/SkyblockCollectionTracker"
+		"sources": "https://github.com/ChindeaOne/SkyblockCollectionTracker-fabric",
+		"issues": "https://github.com/ChindeaOne/SkyblockCollectionTracker-fabric/issues"
 	},
 	"license": "LGPL-2.1",
     "icon": "assets/skyblockcollectiontracker/logo.png",
@@ -30,8 +31,5 @@
 		"java": ">=21",
 		"fabric-api": "*",
 		"fabric-language-kotlin": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }

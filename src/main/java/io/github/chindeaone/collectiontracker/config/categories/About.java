@@ -20,7 +20,7 @@ public class About {
     public transient Void currentVersion = null;
 
     @Expose
-    @ConfigOption(name = "§aInfo", desc = "This mod is meant to track (almost) any collection that exists. You can also use it as a money tracker.")
+    @ConfigOption(name = "§aInfo", desc = "This mod is meant to track all collection that exists. You can also use it as a money tracker.")
     @ConfigEditorInfoText()
     public boolean info = true;
 
