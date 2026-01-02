@@ -32,7 +32,6 @@ import org.lwjgl.glfw.GLFW
 
 object CommissionsKeybinds {
 
-    var currentlyOpenChestName = ""
     private var lastClick = -1L
     private val keybinds: List<Int> get() = listOf(
         SkyblockCollectionTracker.configManager.config!!.mining.commissions.commission1,
@@ -65,7 +64,6 @@ object CommissionsKeybinds {
         attachListener(screen.menu)
 
         val title = screen.title.string
-        currentlyOpenChestName = title
 
         if (!title.contains("Commissions", ignoreCase = true)) return
 
