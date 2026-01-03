@@ -113,7 +113,7 @@ object CommissionsKeybinds {
     private fun isKeyDown(client: Minecraft, keyCode: Int): Boolean {
         if (keyCode == 0) return false
 
-        val window = client.window.window
+        val window = client.window.handle()
         return if (keyCode < 0) {
             val mouseButton = keyCode + 100
             GLFW.glfwGetMouseButton(window, mouseButton) == GLFW.GLFW_PRESS
