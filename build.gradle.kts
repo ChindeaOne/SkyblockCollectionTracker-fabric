@@ -84,11 +84,6 @@ repositories {
 }
 
 loom {
-    mods {
-        create("skyblockcollectiontracker") {
-            sourceSet(sourceSets.getByName("main"))
-        }
-    }
     @Suppress("UnstableApiUsage")
     mixin {
         useLegacyMixinAp.set(true)
