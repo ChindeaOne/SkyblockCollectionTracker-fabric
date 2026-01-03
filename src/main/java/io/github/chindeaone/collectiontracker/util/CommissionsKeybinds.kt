@@ -33,6 +33,8 @@ import org.lwjgl.glfw.GLFW
 object CommissionsKeybinds {
 
     private var lastClick = -1L
+    private var openedAt = 0L
+
     private val keybinds: List<Int> get() = listOf(
         SkyblockCollectionTracker.configManager.config!!.mining.commissions.commission1,
         SkyblockCollectionTracker.configManager.config!!.mining.commissions.commission2,
@@ -43,7 +45,7 @@ object CommissionsKeybinds {
 
     private var attachedMenu: AbstractContainerMenu? = null
     private val wasDown = HashMap<Int, Boolean>()
-    private const val CLICK_DEBOUNCE_MS = 200L
+    private const val CLICK_DEBOUNCE_MS = 100L
 
     private val menuListener = object : ContainerListener {
         override fun slotChanged(menu: AbstractContainerMenu, slotId: Int, stack: ItemStack) = Unit
@@ -63,11 +65,12 @@ object CommissionsKeybinds {
 
         attachListener(screen.menu)
 
-        val title = screen.title.string
+        val now = System.currentTimeMillis()
+        if (now - openedAt < CLICK_DEBOUNCE_MS) return
 
+        val title = screen.title.string
         if (!title.contains("Commissions", ignoreCase = true)) return
 
-        val now = System.currentTimeMillis()
         if (now - lastClick < CLICK_DEBOUNCE_MS) return
 
         val slotToClick = resolveCommissionSlot(client) ?: return
@@ -83,7 +86,7 @@ object CommissionsKeybinds {
             screen.menu.containerId,
             slotToClick,
             0,
-            ClickType.PICKUP,
+            ClickType.PICKUP_ALL,
             player
         )
 
@@ -125,6 +128,8 @@ object CommissionsKeybinds {
         attachedMenu = menu
         menu.addSlotListener(menuListener)
         wasDown.clear()
+        openedAt = System.currentTimeMillis()
+        lastClick = openedAt
     }
 
     private fun detachListener() {
