@@ -12,7 +12,17 @@ object ChatUtils {
         val text = if (prefix) "$PREFIX$message" else message
         Minecraft.getInstance().player?.displayClientMessage(Component.literal(text), false)
     }
+
     fun sendMessage() {
         sendMessage("", prefix = false)
+    }
+
+    fun sendComponent(component: Component, prefix: Boolean = true) {
+        val finalComponent = if (prefix) {
+            Component.literal(PREFIX).append(component)
+        } else {
+            component
+        }
+        Minecraft.getInstance().player?.displayClientMessage(finalComponent, false)
     }
 }
