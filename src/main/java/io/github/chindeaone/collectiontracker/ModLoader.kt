@@ -6,9 +6,11 @@ package io.github.chindeaone.collectiontracker
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.modules
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
+import io.github.chindeaone.collectiontracker.gui.overlays.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.util.CommissionsKeybinds
 import io.github.chindeaone.collectiontracker.util.Hypixel
 import io.github.chindeaone.collectiontracker.util.ServerUtils
+import io.github.chindeaone.collectiontracker.util.tab.TabData
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
@@ -39,6 +41,7 @@ class ModLoader: ModInitializer {
         val overlayId = ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, tickCounter ->
             CollectionOverlay.render(context, tickCounter)
+            CommissionsOverlay.render(context, tickCounter)
         }
     }
 
@@ -49,6 +52,7 @@ class ModLoader: ModInitializer {
             ServerUtils.onClientTick(client)
             Hypixel.onTick(client)
             CommissionsKeybinds.onClientTick(client)
+            TabData.tickAndUpdateWidget()
         }
     }
 
