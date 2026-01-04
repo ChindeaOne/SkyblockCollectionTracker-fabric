@@ -2,10 +2,15 @@ package io.github.chindeaone.collectiontracker.commands;
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
-import io.github.chindeaone.collectiontracker.util.HypixelUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class CollectionList {
 
@@ -45,12 +50,16 @@ public class CollectionList {
     private static void sendCategoryMessage(String color, String category, List<String> collections) {
         ChatUtils.INSTANCE.sendMessage("   " + color + category + " Collections:", false);
         for (String collection : collections) {
-            String message = "   " + color + "- " + collection;
-//            message.setChatStyle(new ChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/sct track " + collection)));
-            ChatUtils.INSTANCE.sendMessage(message, false);
+            MutableComponent message = Component.literal("   " + color + "- " + collection);
+
+            message.withStyle(style -> style
+                    .withClickEvent(new ClickEvent.RunCommand("/sct track " + collection))
+                    .withHoverEvent(new HoverEvent.ShowText(Component.literal("§eClick to track the " + color + collection + "§e collection!")))
+            );
+
+            ChatUtils.INSTANCE.sendComponent(message, false);
         }
         ChatUtils.INSTANCE.sendMessage();
-
     }
 }
 
