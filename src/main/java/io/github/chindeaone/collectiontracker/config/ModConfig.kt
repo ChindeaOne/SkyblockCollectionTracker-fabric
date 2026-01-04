@@ -27,7 +27,6 @@ class ModConfig : Config() {
     @Accordion
     val mining: Mining = Mining()
 
-
     override fun getTitle() : StructuredText {
         val modName = "SkyblockCollectionTracker"
         return StructuredText.of("$modName by §3Chindea_YTB§r, config by §5Moulberry §rand §5nea89")
