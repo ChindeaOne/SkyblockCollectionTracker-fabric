@@ -136,6 +136,39 @@ public class TextUtils {
         }
     }
 
+    public static List<String> formattedCommissions = new ArrayList<>();
+
+    public static List<String> updateCommissions() {
+        List<String> raw = io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget.INSTANCE.getRawCommissions();
+        if (raw.isEmpty()) return null;
+
+        formattedCommissions.clear();
+        CommissionFormat.Area detectedArea = null;
+
+        for (String line : raw) {
+            String formatted = line;
+            String lowerLine = line.toLowerCase();
+            for (CommissionFormat.CommissionType type : CommissionFormat.INSTANCE.getCOMMISSIONS()) {
+                String typeNameLower = type.getName().toLowerCase();
+                if (lowerLine.contains(typeNameLower)) {
+                    formatted = type.getFormat().invoke(line);
+                    if (detectedArea == null) detectedArea = type.getArea();
+                    break;
+                }
+            }
+            formattedCommissions.add(formatted);
+        }
+
+        if (detectedArea != null) {
+            switch (detectedArea) {
+                case DWARVEN_MINES -> formattedCommissions.addFirst("§2§l" + detectedArea.getDisplayName());
+                case CRYSTAL_HOLLOWS -> formattedCommissions.addFirst("§5§l" + detectedArea.getDisplayName());
+                case GLACITE_TUNNELS -> formattedCommissions.addFirst("§3§l" + detectedArea.getDisplayName());
+            }
+        }
+        return formattedCommissions;
+    }
+
     private static String formatBazaarItemName(String name) {
         String[] words = name.split("_");
         StringBuilder formatted = new StringBuilder();
