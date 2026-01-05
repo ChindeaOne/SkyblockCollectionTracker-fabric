@@ -7,26 +7,23 @@ import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
-public abstract class GitVersion {
+public abstract class GitBranch {
 
     @Inject
     protected ExecOperations getExecOperations() {
         return null;
     }
 
-    public String setVersionfromGit(Project project) {
+    public String getGitBranchName(Project project) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        assert getExecOperations() != null;
         getExecOperations().exec(execSpec -> {
             execSpec.setWorkingDir(project.getRootDir());
-            execSpec.commandLine("git", "describe", "--tags", "--abbrev=0");
+            execSpec.commandLine("git", "rev-parse", "--abbrev-ref", "HEAD");
             execSpec.setStandardOutput(baos);
             execSpec.setIgnoreExitValue(true);
         });
 
-        String out = baos.toString(StandardCharsets.UTF_8).trim();
-        if (out.startsWith("v")) out = out.substring(1);
-        return out;
+        return baos.toString(StandardCharsets.UTF_8).trim();
     }
 }
