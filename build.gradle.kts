@@ -1,3 +1,5 @@
+import net.fabricmc.loom.task.RemapJarTask
+import sct.GitBranch
 import sct.GitVersion
 
 plugins {
@@ -9,7 +11,12 @@ plugins {
     `maven-publish`
 }
 
-version = GitVersion.setVersionfromGit(project)
+val gitVersion = objects.newInstance(GitVersion::class)
+val gitBranch = objects.newInstance(GitBranch::class)
+
+version = gitVersion.setVersionfromGit(project)
+val mcBranch: String = gitBranch.getGitBranchName(project)?.trim()?.takeIf { it.isNotBlank() } ?: "unknown"
+
 group = project.property("maven_group").toString()
 
 base {
@@ -175,11 +182,21 @@ tasks.jar {
     }
 }
 
-val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+val remapJar by tasks.named<RemapJarTask>("remapJar") {
     archiveClassifier.set("")
     dependsOn(tasks.shadowJar)
     inputFile.set(tasks.shadowJar.get().archiveFile)
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+}
+
+tasks.withType<Jar>().configureEach {
+    val name = base.archivesName.get()
+    archiveFileName.set("$name-${project.version}-mc$mcBranch.jar")
+}
+
+tasks.withType<RemapJarTask>().configureEach {
+    val name = base.archivesName.get()
+    archiveFileName.set("$name-${project.version}-mc$mcBranch.jar")
 }
 
 tasks.shadowJar {
