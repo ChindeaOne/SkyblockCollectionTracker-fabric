@@ -4,6 +4,8 @@ import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.KeyboardEvent
+import io.github.notenoughupdates.moulconfig.gui.MouseEvent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 
 class VersionCheck(option: ProcessedOption) : GuiOptionEditor(option) {
@@ -31,11 +33,11 @@ class VersionCheck(option: ProcessedOption) : GuiOptionEditor(option) {
         return 55
     }
 
-    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
+    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int, mouseEvent: MouseEvent): Boolean {
         return false
     }
 
-    override fun keyboardInput(): Boolean {
+    override fun keyboardInput(keyboardEvent: KeyboardEvent): Boolean {
         return false
     }
 }
