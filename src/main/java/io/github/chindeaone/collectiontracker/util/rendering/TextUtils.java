@@ -163,7 +163,7 @@ public class TextUtils {
             switch (detectedArea) {
                 case DWARVEN_MINES -> formattedCommissions.addFirst("§2§l" + detectedArea.getDisplayName());
                 case CRYSTAL_HOLLOWS -> formattedCommissions.addFirst("§5§l" + detectedArea.getDisplayName());
-                case GLACITE_TUNNELS -> formattedCommissions.addFirst("§3§l" + detectedArea.getDisplayName());
+                case GLACITE_TUNNELS -> formattedCommissions.addFirst("§b§l" + detectedArea.getDisplayName());
             }
         }
         return formattedCommissions;
