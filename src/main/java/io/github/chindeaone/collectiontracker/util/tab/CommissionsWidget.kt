@@ -12,6 +12,16 @@ object CommissionsWidget {
     private var firstInfoSeenTime: Long = 0L
 
     fun onTabWidgetsUpdate() {
+        val areaWidget = TabWidget.AREA
+        if (areaWidget.isPresent) {
+            if (!areaWidget.lines.any { it.contains("Dwarven Mines") || it.contains("Crystal Hollows") || it.contains("Mineshaft") }) {
+                // not in an area with commissions
+                rawCommissions = emptyList()
+                lastCommissionSet = null
+                return
+            }
+        }
+
         val widget = TabWidget.COMMISSIONS
         val now = System.currentTimeMillis()
 
@@ -26,7 +36,7 @@ object CommissionsWidget {
                 firstInfoSeenTime = now
             }
 
-            if (now - firstInfoSeenTime < 1_000L) {
+            if (now - firstInfoSeenTime < 5_000L) {
                 return // Wait for the 1-second buffer
             }
 
