@@ -15,7 +15,7 @@ import net.minecraft.network.chat.Component
 object RenderUtils {
 
     var config: ModConfig = SkyblockCollectionTracker.configManager.config!!
-    var position: Position = config.overlay.overlaySingle.overlayPosition
+    var position: Position = config.trackingOverlay.overlaySingle.overlayPosition
     var commissionsPosition: Position = config.mining.commissionsOverlay.commissionsOverlayPosition
 
     var maxWidth: Int = 0
@@ -51,7 +51,7 @@ object RenderUtils {
         context.pose().translate(position.x.toFloat(), position.y.toFloat())
         context.pose().scale(position.scale, position.scale)
 
-        if (SkyblockCollectionTracker.configManager.config!!.overlay.overlayTextColor) {
+        if (SkyblockCollectionTracker.configManager.config!!.trackingOverlay.overlayTextColor) {
             renderColors(context)
         } else {
             renderStrings(context)
