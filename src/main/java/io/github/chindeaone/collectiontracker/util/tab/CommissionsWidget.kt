@@ -41,10 +41,11 @@ object CommissionsWidget {
             }
 
             // disable the overlay if the widget is not found
-            ChatUtils.sendMessage("§cCommissions widget not found. Please enable it using /widget.", true)
+            ChatUtils.sendMessage("§cWarning: Commissions widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the commissions trackingOverlay config in your mod.", true)
             SkyblockCollectionTracker.configManager.config!!.mining.commissionsOverlay.enableCommissionsOverlay = false
             return
         }
+
         firstInfoSeenTime = 0L
 
         if (now < nextAllowedTime) return
