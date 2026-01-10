@@ -24,7 +24,6 @@ class ModLoader: ModInitializer {
     override fun onInitialize() {
         eventRegistration()
 
-        SkyblockCollectionTracker.preInit()
         SkyblockCollectionTracker.init()
         loadedClasses.clear()
 

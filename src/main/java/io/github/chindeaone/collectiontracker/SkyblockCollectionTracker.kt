@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker
 
 import io.github.chindeaone.collectiontracker.config.ConfigManager
-import io.github.chindeaone.collectiontracker.util.ModulesLoader
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.SharedConstants
 import net.minecraft.client.Minecraft
@@ -11,12 +10,6 @@ import java.util.logging.Logger
 object SkyblockCollectionTracker {
 
     val logger: Logger = Logger.getLogger("SkyblockCollectionTracker")
-
-    fun preInit() {
-        ModulesLoader.modules.forEach { ModLoader.loadModule(it) }
-
-        logger.info("[SCT]: Skyblock Collection Tracker pre-initialization complete.")
-    }
 
     fun init() {
         configManager = ConfigManager()
