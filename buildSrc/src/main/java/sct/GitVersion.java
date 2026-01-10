@@ -27,6 +27,10 @@ public abstract class GitVersion {
 
         String out = baos.toString(StandardCharsets.UTF_8).trim();
         if (out.startsWith("v")) out = out.substring(1);
+
+        int plusIndex = out.indexOf("+");
+        if (plusIndex != -1) out = out.substring(0, plusIndex);
+
         return out;
     }
 }
