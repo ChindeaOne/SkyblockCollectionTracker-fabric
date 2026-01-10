@@ -32,7 +32,6 @@ object SkyblockCollectionTracker {
     var shouldCloseScreen: Boolean = true
     private var screenTicks = 0
 
-    val modules: MutableList<Any> = ArrayList()
     lateinit var configManager: ConfigManager
 
     const val NAMESPACE: String = "sct"
