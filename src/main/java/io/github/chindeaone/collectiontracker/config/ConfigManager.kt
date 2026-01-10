@@ -6,22 +6,15 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import io.github.chindeaone.collectiontracker.config.error.ConfigError
 import io.github.chindeaone.collectiontracker.config.version.VersionManager
-import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
+import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.UUID
+import java.util.*
 
 class ConfigManager {
 

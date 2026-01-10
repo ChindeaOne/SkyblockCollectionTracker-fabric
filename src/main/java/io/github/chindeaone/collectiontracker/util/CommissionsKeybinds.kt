@@ -32,8 +32,7 @@ import net.minecraft.world.item.ItemStack
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.lwjgl.glfw.GLFW
-import java.util.Collections
-import java.util.WeakHashMap
+import java.util.*
 
 object CommissionsKeybinds {
 
