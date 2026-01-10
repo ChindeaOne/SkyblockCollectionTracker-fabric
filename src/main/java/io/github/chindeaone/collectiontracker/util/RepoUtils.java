@@ -25,7 +25,7 @@ public class RepoUtils {
     private static final Logger logger = LogManager.getLogger(RepoUtils.class);
     public static String latestVersion;
 
-    public static void checkForUpdates(int updateSetting) {
+    public static void checkForUpdates(String updateSetting) {
         try {
             String currentVersion = SkyblockCollectionTracker.VERSION;
             URI uri = URI.create(API_URL);
@@ -34,11 +34,6 @@ public class RepoUtils {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
 
-            if (connection.getResponseCode() != 200) {
-                logger.error("[SCT]: Failed to check for updates. HTTP Response Code: {}", connection.getResponseCode());
-                return;
-            }
-
             if (connection.getResponseCode() == 403) {
                 // GitHub API rate limit exceeded
                 ChatUtils.INSTANCE.sendMessage("Unfortunately, the GitHub API rate limit has been exceeded. The mod will not be able to update right now.", true);
@@ -46,46 +41,57 @@ public class RepoUtils {
                 return;
             }
 
+            if (connection.getResponseCode() != 200) {
+                logger.error("[SCT]: Failed to check for updates. HTTP Response Code: {}", connection.getResponseCode());
+                return;
+            }
+
             JsonArray releases = getJsonArray(connection);
 
-            String latestStable = null;
-            String latestBeta = null;
+            String latestStableTag = null;
+            String latestBetaTag = null;
 
             for (JsonElement element : releases) {
                 JsonObject release = element.getAsJsonObject();
                 boolean isPreRelease = release.get("prerelease").getAsBoolean();
                 String versionTag = release.get("tag_name").getAsString();
 
-                if (!isPreRelease && (latestStable == null || isNewerVersion(versionTag, latestStable))) {
-                    latestStable = versionTag;
+                if (!isPreRelease && (latestStableTag == null || isNewerReleaseTag(versionTag, latestStableTag))) {
+                    latestStableTag = versionTag;
                 }
 
-                if (isPreRelease && (latestBeta == null || isNewerVersion(versionTag, latestBeta))) {
-                    latestBeta = versionTag;
+                if (isPreRelease && (latestBetaTag == null || isNewerReleaseTag(versionTag, latestBetaTag))) {
+                    latestBetaTag = versionTag;
                 }
             }
 
-            String selectedVersion = null;
+//            Testing only
+//            latestStableTag = "v1.0.8+1.21.10";
+//            latestBetaTag = "v1.0.9-beta2+1.21.10";
 
-            if (updateSetting == 1) {
-                selectedVersion = latestStable;
-            } else if (updateSetting == 2) {
-                if (latestStable != null && latestBeta != null) {
-                    selectedVersion = isNewerVersion(latestStable, latestBeta) ? latestStable : latestBeta;
+            String selectedTag = null;
+
+            if (updateSetting.equals("RELEASE")) {
+                selectedTag = latestStableTag;
+            } else if (updateSetting.equals("BETA")) {
+                if (latestStableTag != null && latestBetaTag != null) {
+                    selectedTag = isNewerReleaseTag(latestStableTag, latestBetaTag) ? latestStableTag : latestBetaTag;
                 } else {
-                    selectedVersion = latestStable != null ? latestStable : latestBeta;
+                    selectedTag = latestStableTag != null ? latestStableTag : latestBetaTag;
                 }
             }
 
             // Stable-only logic
-            if (updateSetting == 1 && selectedVersion != null && selectedVersion.contains("-")) {
+            if (updateSetting.equals("RELEASE") && selectedTag != null && normalizeComparableVersion(selectedTag).contains("-")) {
                 latestVersion = null;
                 return;
             }
 
             // Compare to current
-            if (selectedVersion != null && isNewerVersion(selectedVersion, currentVersion)) {
-                latestVersion = selectedVersion;
+            if (selectedTag != null) {
+                String selectedComparable = normalizeComparableVersion(selectedTag);
+                if (isNewerReleaseTag(selectedComparable, currentVersion)) latestVersion = selectedComparable;
+                else latestVersion = null;
             } else {
                 latestVersion = null;
             }
@@ -112,6 +118,21 @@ public class RepoUtils {
             JsonElement jsonElement = JsonParser.parseString(response.toString());
             return jsonElement.getAsJsonArray();
         }
+    }
+
+    private static boolean isNewerReleaseTag(String candidateTag, String currectTag) {
+        String c = normalizeComparableVersion(candidateTag);
+        String cur = normalizeComparableVersion(currectTag);
+        return isNewerVersion(c, cur);
+    }
+
+    private static String normalizeComparableVersion(String raw) {
+        if (raw == null) return "";
+        String v = raw.trim();
+        if (v.startsWith("v") || v.startsWith("V")) v = v.substring(1);
+        int plus = v.indexOf('+');
+        if (plus >= 0) v = v.substring(0, plus);
+        return v;
     }
 
     private record Version(List<Integer> numericParts, String preLabel, int preNumber) implements Comparable<Version> {

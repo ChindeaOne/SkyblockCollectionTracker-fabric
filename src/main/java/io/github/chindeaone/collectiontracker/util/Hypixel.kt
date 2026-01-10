@@ -76,7 +76,7 @@ object Hypixel {
 
                     if (!SkyblockCollectionTracker.configManager.config!!.about.update.equals(About.UpdateType.NONE)) {
                         CompletableFuture.runAsync {
-                            RepoUtils.checkForUpdates(toInt(SkyblockCollectionTracker.configManager.config!!.about.update.toString()))
+                            RepoUtils.checkForUpdates(SkyblockCollectionTracker.configManager.config!!.about.update.toString())
                         }.thenAcceptAsync  {
                             if (RepoUtils.latestVersion != null) {
 
@@ -107,15 +107,6 @@ object Hypixel {
         val inSkyblock = checkScoreboard()
         if (inSkyblock == skyblock) return
         skyblock = inSkyblock
-    }
-
-    private fun toInt(updateType: String): Int {
-        val typeInt = when(updateType) {
-            "RELEASE" -> 1
-            "BETA" -> 2
-            else -> 0
-        }
-        return typeInt
     }
 
     private fun fetchData() {
