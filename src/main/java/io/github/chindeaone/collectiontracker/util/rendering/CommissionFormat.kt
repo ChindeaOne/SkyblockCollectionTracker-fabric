@@ -17,11 +17,25 @@ object CommissionFormat {
     private fun formatLine(line: String): String {
         var formatted = "§3$line§r"
 
-        // Format completion: DONE or 100% -> §a (Green), others -> §c (Red)
+        // Format completion: DONE-> §a (Green), 66%-> §e (Yellow), 33%-> §6 (Orange), else §c (Red)
         val completionRegex = Regex("(?i)DONE|\\d+(?:\\.\\d+)?%", RegexOption.IGNORE_CASE)
-        formatted = formatted.replace(completionRegex) {
-            val color = if (it.value.equals("DONE", ignoreCase = true)) "§a" else "§c"
-            "$color${it.value}§r"
+        formatted = formatted.replace(completionRegex) {match ->
+            val raw = match.value
+
+            val color = when {
+                raw.equals("DONE", ignoreCase = true) -> "§a"
+                raw.endsWith("%") -> {
+                    val pct = raw.removeSuffix("%").toFloatOrNull()
+                    when {
+                        pct == null -> "§c"
+                        pct >= 66f -> "§e"
+                        pct >= 33f -> "§6"
+                        else -> "§c"
+                    }
+                }
+                else -> "§c"
+            }
+            "$color$raw§r"
         }
 
         return formatted
