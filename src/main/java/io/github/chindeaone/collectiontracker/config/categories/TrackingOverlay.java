@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class Overlay {
+public class TrackingOverlay {
 
     @Expose
     @ConfigOption(name = "Simple Overlay", desc = "")

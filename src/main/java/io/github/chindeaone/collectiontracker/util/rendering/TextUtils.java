@@ -26,7 +26,7 @@ public class TextUtils {
 
     public static void updateStats() {
         ModConfig config = Objects.requireNonNull(SkyblockCollectionTracker.configManager.getConfig());
-        OverlaySingle overlay = config.getOverlay().overlaySingle;
+        OverlaySingle overlay = config.getTrackingOverlay().overlaySingle;
 
         if (startTime == 0) {
             startTime = System.currentTimeMillis();
