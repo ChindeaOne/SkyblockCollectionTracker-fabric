@@ -26,6 +26,7 @@ class ModLoader: ModInitializer {
         SkyblockCollectionTracker.init()
 
         CommandRegistry.init()
+        CommissionsKeybinds.initKeyGuards()
     }
 
     private fun eventRegistration() {
