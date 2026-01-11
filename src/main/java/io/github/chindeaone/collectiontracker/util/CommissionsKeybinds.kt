@@ -60,6 +60,11 @@ object CommissionsKeybinds {
         override fun dataChanged(menu: AbstractContainerMenu, property: Int, value: Int) = Unit
     }
 
+    fun initKeyGuards() {
+        // Cancels vanilla hotbar swap while in the commissions container
+        keybindCancelEvent()
+    }
+
     fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock || !SkyblockCollectionTracker.configManager.config!!.mining.commissions.enableCommissionsKeybinds) {
             detachListener()
@@ -70,9 +75,6 @@ object CommissionsKeybinds {
             detachListener()
             return
         }
-
-        // Cancels vanilla hotbar swap while in the commissions container
-        keybindCancelEvent()
 
         attachListener(screen.menu)
 
