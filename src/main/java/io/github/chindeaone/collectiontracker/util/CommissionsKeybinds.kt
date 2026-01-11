@@ -49,7 +49,7 @@ object CommissionsKeybinds {
 
     private var attachedMenu: AbstractContainerMenu? = null
     private val wasDown = HashMap<Int, Boolean>()
-    private const val CLICK_DEBOUNCE_MS = 100L
+    private const val CLICK_DEBOUNCE_MS = 200L
 
     private var keyGuardActive = false
     private val guardedScreens: MutableSet<Screen> =
