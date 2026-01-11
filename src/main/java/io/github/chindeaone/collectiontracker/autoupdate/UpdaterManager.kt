@@ -1,10 +1,10 @@
 package io.github.chindeaone.collectiontracker.autoupdate
 
-import io.github.chindeaone.UpdateContext
-import io.github.chindeaone.UpdateSetup
-import io.github.chindeaone.UpdateTarget
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.categories.About
+import io.github.chindeaone.modrinthautoupdater.UpdateContext
+import io.github.chindeaone.modrinthautoupdater.UpdateSetup
+import io.github.chindeaone.modrinthautoupdater.UpdateTarget
 import java.util.concurrent.CompletableFuture
 
 object UpdaterManager {
@@ -22,7 +22,7 @@ object UpdaterManager {
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdaterManager::class.java)
     )
 
-    init{
+    init {
         context.cleanup()
     }
 
@@ -44,8 +44,8 @@ object UpdaterManager {
         }
     }
 
-    private fun queueUpdate(){
-        activePromise = CompletableFuture.supplyAsync{
+    private fun queueUpdate() {
+        activePromise = CompletableFuture.supplyAsync {
             potentialUpdate!!.prepareUpdate()
         }.thenAcceptAsync {
             potentialUpdate!!.executeUpdate()
