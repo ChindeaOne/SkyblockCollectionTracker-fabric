@@ -74,8 +74,11 @@ public class CommandRegistry {
     }
 
     private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_SUGGESTIONS = (context, builder) -> {
+        String arg = builder.getRemaining().toLowerCase();
         for (String c : CollectionsManager.getAllCollections()) {
-            builder.suggest(c);
+            if (c.toLowerCase().startsWith(arg)) {
+                builder.suggest(c);
+            }
         }
         return builder.buildFuture();
     };
