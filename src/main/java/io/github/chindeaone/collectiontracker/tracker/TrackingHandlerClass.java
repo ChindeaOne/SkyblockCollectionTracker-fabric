@@ -81,8 +81,8 @@ public class TrackingHandlerClass {
             startTime = 0;
             lastTime = 0;
             // Reset collection tracking
-            previousCollection = -1;
-            sessionStartCollection = -1;
+            previousCollection = -1L;
+            sessionStartCollection = -1L;
             // Clear profit map
             moneyPerHourBazaar.clear();
 
@@ -110,17 +110,17 @@ public class TrackingHandlerClass {
             if (!Hypixel.INSTANCE.getServer()) {
                 logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
             } else if (afk) {
-                afk = false;
-                logger.info("[SCT]: Tracking stopped because the player went AFK.");
+                logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down");
             }
+            afk = false;
 
             // Reset uptime
             lastTrackTime = System.currentTimeMillis();
             startTime = 0;
             lastTime = 0;
             // Reset collection tracking
-            previousCollection = -1;
-            sessionStartCollection = -1;
+            previousCollection = -1L;
+            sessionStartCollection = -1L;
             // Clear profit map
             moneyPerHourBazaar.clear();
             CollectionOverlay.stopTracking();

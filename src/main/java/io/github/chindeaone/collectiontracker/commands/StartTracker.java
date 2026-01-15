@@ -9,6 +9,7 @@ import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.HypixelUtils;
 import io.github.chindeaone.collectiontracker.util.PlayerData;
+import io.github.chindeaone.collectiontracker.util.ServerUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,6 +30,11 @@ public class StartTracker {
                 ChatUtils.INSTANCE.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
                 return;
             }
+            // Re-enable API server checks if they were permanently disabled
+            if (ServerUtils.INSTANCE.getPermanentlyDisabled()) {
+                ServerUtils.INSTANCE.clearState();
+            }
+
             try {
                 if (!ServerStatus.checkServer()) {
                     ChatUtils.INSTANCE.sendMessage("§cYou can't use any tracking commands at the moment.", true);
