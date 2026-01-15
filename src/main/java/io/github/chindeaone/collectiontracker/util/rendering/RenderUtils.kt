@@ -233,17 +233,18 @@ object RenderUtils {
             y += fr.lineHeight
         }
         if (color != null) {
-            val splitIndex = TextUtils.uptimeString().lastIndexOf(": ")
+            val uptimeString = TextUtils.uptimeString()
+            val splitIndex = uptimeString.lastIndexOf(": ")
             if (splitIndex != -1) {
-                val prefix = TextUtils.uptimeString().substring(0, splitIndex + 2)
-                val numberPart = TextUtils.uptimeString().substring(splitIndex + 2)
+                val prefix = uptimeString.substring(0, splitIndex + 2)
+                val numberPart = uptimeString.substring(splitIndex + 2)
 
                 context.drawString(fr, prefix, x, y, color, true)
 
                 val prefixWidth = fr.width(prefix)
                 context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
             } else {
-                context.drawString(fr, TextUtils.uptimeString(), x, y, color, true)
+                context.drawString(fr, uptimeString, x, y, color, true)
             }
         }
     }
