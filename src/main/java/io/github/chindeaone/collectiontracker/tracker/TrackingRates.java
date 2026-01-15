@@ -24,9 +24,13 @@ public class TrackingRates {
 
     public static final Logger logger = LogManager.getLogger(TrackingRates.class);
 
-    public static float previousCollection = -1;
-    public static float sessionStartCollection = -1;
+    public static long previousCollection = -1L;
+    public static long sessionStartCollection = -1L;
     public static boolean afk = false;
+
+    private static int unchangedStreak = 0;
+    private static final int THRESHOLD = 2; // Number of checks before considering AFK
+    private static int additionalUptime = 0;
 
     public static float collectionAmount;
     public static float collectionPerHour;
@@ -41,25 +45,37 @@ public class TrackingRates {
 
         JsonObject jsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
 
-        float currentCollection = jsonObject.entrySet().iterator().next().getValue().getAsFloat();
+        long currentCollection = jsonObject.entrySet().iterator().next().getValue().getAsLong();
+        logger.info("New collection amount fetched: {} " , currentCollection);
 
         // Set starting collection
-        if (sessionStartCollection == -1) {
+        if (sessionStartCollection == -1L) {
             sessionStartCollection = currentCollection;
 
         }
         // Set player as AFK, else update previousCollection
         if (currentCollection == previousCollection) {
-            afk = true;
-            if (TrackingHandlerClass.isTracking) {
-                TrackingHandlerClass.stopTracking();
+            unchangedStreak++;
+            if (unchangedStreak >= THRESHOLD) {
+                afk = true;
+                if (TrackingHandlerClass.isTracking) {
+                    TrackingHandlerClass.stopTracking();
+                }
+                unchangedStreak = 0;
+                return;
             }
-            return;
         } else {
             previousCollection = currentCollection;
+            unchangedStreak = 0;
+            additionalUptime = 0;
         }
 
-        long uptime = getUptimeInSeconds();
+        // Add additional uptime for failed request
+        if (unchangedStreak > 0) {
+            additionalUptime =  unchangedStreak * 180;
+        }
+
+        long uptime = getUptimeInSeconds() + additionalUptime;
         float collectedSinceStart = currentCollection - sessionStartCollection;
 
         float bazaarPrice;
