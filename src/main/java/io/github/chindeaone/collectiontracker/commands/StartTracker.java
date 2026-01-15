@@ -36,7 +36,7 @@ public class StartTracker {
             }
 
             try {
-                if (!ServerStatus.checkServer()) {
+                if (!ServerUtils.INSTANCE.getServerStatus()) {
                     ChatUtils.INSTANCE.sendMessage("§cYou can't use any tracking commands at the moment.", true);
                     return;
                 }
