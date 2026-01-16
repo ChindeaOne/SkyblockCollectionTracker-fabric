@@ -18,7 +18,6 @@ import java.util.Map;
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
 import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.getUptimeInSeconds;
-import static io.github.chindeaone.collectiontracker.util.rendering.TextUtils.updateStats;
 
 public class TrackingRates {
 
@@ -70,7 +69,6 @@ public class TrackingRates {
 
         // Add additional uptime for failed request
         if (unchangedStreak > 0) {
-            updateStats();
             return;
         }
 
@@ -82,7 +80,7 @@ public class TrackingRates {
         float superEnchantedPrice;
 
         float priceNPC = NpcPrices.getNpcPrice(collection);
-        moneyMade.put("NPC", uptime > 0 ? (float) Math.floor((priceNPC * collectedSinceStart)) : 0);
+        moneyMade.put("NPC", uptime > 0 ? (float) Math.floor(priceNPC * collectedSinceStart) : 0);
 
         if(!CollectionsManager.isRiftCollection(collection) && BazaarCollectionsManager.hasBazaarData) {
             switch (collectionType) {
@@ -121,8 +119,5 @@ public class TrackingRates {
         collectionPerHour = uptime > 0 ? (float) Math.floor((collectedSinceStart / uptime) * 3600) : 0;
         collectionMade = (float) Math.floor(collectedSinceStart);
         moneyPerHourNPC = uptime > 0 ? (float) Math.floor(priceNPC * collectedSinceStart / (uptime / 3600.0f)) : 0;
-
-        // Update overlay stats
-        updateStats();
     }
 }
