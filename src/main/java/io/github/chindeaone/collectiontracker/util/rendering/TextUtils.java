@@ -210,22 +210,22 @@ public class TextUtils {
     private static String handleBazaarItem() {
         switch (collectionType) {
             case "normal" -> {
-                return "Item: " + formatBazaarItemName(collection);
+                return "Bazaar item: " + formatBazaarItemName(collection);
             }
 
             case "enchanted" -> {
                 if (bazaarType.equals(BazaarType.ENCHANTED_VERSION)) {
-                    return "Item: " + formatBazaarItemName(BazaarCollectionsManager.enchantedRecipe.keySet().iterator().next());
+                    return "Bazaar item: " + formatBazaarItemName(BazaarCollectionsManager.enchantedRecipe.keySet().iterator().next());
                 } else {
                     if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
                         config.getBazaar().bazaarConfig.bazaarType = BazaarType.ENCHANTED_VERSION;
                         return null;
-                    } else return "Item: " + formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keySet().iterator().next());
+                    } else return "Bazaar item : " + formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keySet().iterator().next());
                 }
             }
 
             case "gemstone" -> {
-                return "Variant: " + bazaarConfig.gemstoneVariant.toString();
+                return "Bazaar variant: " + bazaarConfig.gemstoneVariant.toString();
             }
 
             default -> { return null; }
