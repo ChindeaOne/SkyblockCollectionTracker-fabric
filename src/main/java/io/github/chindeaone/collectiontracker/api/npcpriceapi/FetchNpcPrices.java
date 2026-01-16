@@ -24,7 +24,7 @@ public class FetchNpcPrices {
 
     public static void fetchPrices() {
         try {
-            URI uri = URI.create(URLManager.STATUS_URL);
+            URI uri = URI.create(URLManager.NPC_PRICES_URL);
             URL url = uri.toURL();
             HttpURLConnection conn = getHttpURLConnection(url);
 
