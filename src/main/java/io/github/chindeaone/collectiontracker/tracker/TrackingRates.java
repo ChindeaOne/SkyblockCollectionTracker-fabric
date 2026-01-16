@@ -82,7 +82,7 @@ public class TrackingRates {
         float superEnchantedPrice;
 
         float priceNPC = NpcPrices.getNpcPrice(collection);
-        moneyMade.put("NPC", uptime > 0 ? (float) Math.floor(priceNPC * collectedSinceStart) : 0);
+        moneyMade.put("NPC", uptime > 0 ? (float) Math.floor((priceNPC * collectedSinceStart)) : 0);
 
         if(!CollectionsManager.isRiftCollection(collection) && BazaarCollectionsManager.hasBazaarData) {
             switch (collectionType) {
@@ -96,19 +96,19 @@ public class TrackingRates {
                     superEnchantedPrice = BazaarPrices.superEnchantedPrice;
 
                     moneyPerHourBazaar.put("Enchanted version", uptime > 0 ? (float) Math.floor(enchantedPrice * (collectedSinceStart / BazaarCollectionsManager.enchantedRecipe.values().iterator().next()) / (uptime / 3600.0f)) : 0);
-                    moneyMade.put("Enchanted version", uptime > 0 ? (float) Math.floor(enchantedPrice * collectedSinceStart) : 0);
+                    moneyMade.put("Enchanted version", uptime > 0 ? (float) Math.floor(enchantedPrice * (collectedSinceStart / BazaarCollectionsManager.enchantedRecipe.values().iterator().next())) : 0);
                     if(superEnchantedPrice == 0.0f){
                         moneyPerHourBazaar.put("Super Enchanted version", -1.0f);
                         moneyMade.put("Super Enchanted version", -1.0f);
                     } else {
                         moneyPerHourBazaar.put("Super Enchanted version", uptime > 0 ? (float) Math.floor(superEnchantedPrice * (collectedSinceStart / BazaarCollectionsManager.superEnchantedRecipe.values().iterator().next()) / (uptime / 3600.0f)) : 0);
-                        moneyMade.put("Super Enchanted version", uptime > 0 ? (float) Math.floor(superEnchantedPrice * collectedSinceStart) : 0);
+                        moneyMade.put("Super Enchanted version", uptime > 0 ? (float) Math.floor(superEnchantedPrice * (collectedSinceStart / BazaarCollectionsManager.superEnchantedRecipe.values().iterator().next())) : 0);
                     }
                     break;
                 case "gemstone":
                     for (String key : GemstonePrices.gemstonePrices.keySet()) {
                         moneyPerHourBazaar.put(key, uptime > 0 ? (float) Math.floor(GemstonePrices.getPrice(key) * (collectedSinceStart / GemstonePrices.recipes.get(key)) / (uptime / 3600.0f)) : 0);
-                        moneyMade.put(key, uptime > 0 ? (float) Math.floor(GemstonePrices.getPrice(key) * collectedSinceStart) : 0);
+                        moneyMade.put(key, uptime > 0 ? (float) Math.floor(GemstonePrices.getPrice(key) * (collectedSinceStart / GemstonePrices.recipes.get(key))) : 0);
                     }
                     break;
                 default:
