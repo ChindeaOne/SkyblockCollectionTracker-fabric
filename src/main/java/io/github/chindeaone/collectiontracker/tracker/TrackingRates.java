@@ -30,11 +30,11 @@ public class TrackingRates {
 
     private static int unchangedStreak = 0;
     private static final int THRESHOLD = 2; // Number of checks before considering AFK
-    private static int additionalUptime = 0;
 
     public static float collectionAmount;
     public static float collectionPerHour;
     public static float collectionMade;
+    public static Map<String, Float> moneyMade = new  HashMap<>();
     public static float moneyPerHourNPC;
     public static Map<String, Float> moneyPerHourBazaar = new HashMap<>();
 
@@ -46,7 +46,6 @@ public class TrackingRates {
         JsonObject jsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
 
         long currentCollection = jsonObject.entrySet().iterator().next().getValue().getAsLong();
-        logger.info("New collection amount fetched: {} " , currentCollection);
 
         // Set starting collection
         if (sessionStartCollection == -1L) {
@@ -67,15 +66,15 @@ public class TrackingRates {
         } else {
             previousCollection = currentCollection;
             unchangedStreak = 0;
-            additionalUptime = 0;
         }
 
         // Add additional uptime for failed request
         if (unchangedStreak > 0) {
-            additionalUptime =  unchangedStreak * 180;
+            updateStats();
+            return;
         }
 
-        long uptime = getUptimeInSeconds() + additionalUptime;
+        long uptime = getUptimeInSeconds();
         float collectedSinceStart = currentCollection - sessionStartCollection;
 
         float bazaarPrice;
@@ -83,27 +82,33 @@ public class TrackingRates {
         float superEnchantedPrice;
 
         float priceNPC = NpcPrices.getNpcPrice(collection);
+        moneyMade.put("NPC", uptime > 0 ? (float) Math.floor(priceNPC * collectedSinceStart) : 0);
 
         if(!CollectionsManager.isRiftCollection(collection) && BazaarCollectionsManager.hasBazaarData) {
             switch (collectionType) {
                 case "normal":
                     bazaarPrice = BazaarPrices.normalPrice;
                     moneyPerHourBazaar.put(collectionType, uptime > 0 ? (float) Math.floor(bazaarPrice * (collectedSinceStart / 160) / (uptime / 3600.0f)) : 0);
+                    moneyMade.put(collectionType, uptime > 0 ? (float) Math.floor(bazaarPrice * collectedSinceStart) : 0);
                     break;
                 case "enchanted":
                     enchantedPrice = BazaarPrices.enchantedPrice;
                     superEnchantedPrice = BazaarPrices.superEnchantedPrice;
 
                     moneyPerHourBazaar.put("Enchanted version", uptime > 0 ? (float) Math.floor(enchantedPrice * (collectedSinceStart / BazaarCollectionsManager.enchantedRecipe.values().iterator().next()) / (uptime / 3600.0f)) : 0);
+                    moneyMade.put("Enchanted version", uptime > 0 ? (float) Math.floor(enchantedPrice * collectedSinceStart) : 0);
                     if(superEnchantedPrice == 0.0f){
                         moneyPerHourBazaar.put("Super Enchanted version", -1.0f);
+                        moneyMade.put("Super Enchanted version", -1.0f);
                     } else {
                         moneyPerHourBazaar.put("Super Enchanted version", uptime > 0 ? (float) Math.floor(superEnchantedPrice * (collectedSinceStart / BazaarCollectionsManager.superEnchantedRecipe.values().iterator().next()) / (uptime / 3600.0f)) : 0);
+                        moneyMade.put("Super Enchanted version", uptime > 0 ? (float) Math.floor(superEnchantedPrice * collectedSinceStart) : 0);
                     }
                     break;
                 case "gemstone":
                     for (String key : GemstonePrices.gemstonePrices.keySet()) {
                         moneyPerHourBazaar.put(key, uptime > 0 ? (float) Math.floor(GemstonePrices.getPrice(key) * (collectedSinceStart / GemstonePrices.recipes.get(key)) / (uptime / 3600.0f)) : 0);
+                        moneyMade.put(key, uptime > 0 ? (float) Math.floor(GemstonePrices.getPrice(key) * collectedSinceStart) : 0);
                     }
                     break;
                 default:

@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import io.github.chindeaone.collectiontracker.util.CollectionColors
+import io.github.chindeaone.collectiontracker.util.rendering.TextUtils.getExtraStrings
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -15,7 +16,7 @@ import net.minecraft.network.chat.Component
 object RenderUtils {
 
     var config: ModConfig = SkyblockCollectionTracker.configManager.config!!
-    var position: Position = config.trackingOverlay.overlaySingle.overlayPosition
+    var position: Position = config.trackingOverlay.singleOverlay.overlayPosition
     var commissionsPosition: Position = config.mining.commissionsOverlay.commissionsOverlayPosition
 
     var maxWidth: Int = 0
@@ -23,6 +24,7 @@ object RenderUtils {
 
     private val fr: Font get() = Minecraft.getInstance().font
     const val WHITE: Int = 0xFFFFFFFF.toInt()
+    const val YELLOW: Int = 0xFFFFFF55.toInt()
 
     private fun getDimensions() {
         maxWidth = 0
@@ -154,7 +156,7 @@ object RenderUtils {
 
             context.pose().pushMatrix()
             context.pose().scale(textScale, textScale)
-            context.drawString(fr, positionText, (positionX / textScale).toInt(), (positionY / textScale).toInt(), WHITE, true)
+            context.drawString(fr, positionText, (positionX / textScale).toInt(), (positionY / textScale).toInt(), YELLOW, true)
             context.pose().popMatrix()
         }
     }
@@ -169,34 +171,34 @@ object RenderUtils {
         var y = 0
 
         for (line in overlayLines) {
-            val splitIndex = line.lastIndexOf(": ")
-            if (splitIndex != -1) {
-                val prefix = line.substring(0, splitIndex + 2)
-                val numberPart = line.substring(splitIndex + 2)
-
-                context.drawString(fr, prefix, x, y, 0xFF55FF55.toInt(), true)
-
-                val prefixWidth = fr.width(prefix)
-                context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
-            } else {
-                context.drawString(fr, line, x, y, WHITE, true)
-            }
-
+            drawHelper(line, context, x, y, 0xFF55FF55.toInt())
             y += fr.lineHeight
         }
 
-        val uptimeString = TextUtils.uptimeString()
-        val splitIndex = uptimeString.lastIndexOf(": ")
-        if (splitIndex != -1) {
-            val prefix = uptimeString.substring(0, splitIndex + 2)
-            val numberPart = uptimeString.substring(splitIndex + 2)
+        val extraOverlayLines = getExtraStrings()
+        if (extraOverlayLines.isEmpty()) return
 
-            context.drawString(fr, prefix, x, y, 0xFF55FF55.toInt(), true)
+        y += 2 * fr.lineHeight // Add a line break before extra lines
+        for (line in extraOverlayLines) {
+            drawHelper(line, context, x, y, 0xFF55FF55.toInt())
+            y += fr.lineHeight
+        }
+    }
+
+    private fun drawHelper(line: String, context: GuiGraphics, x: Int, y: Int, prefixColor: Int? = 0xFF55FF55.toInt()) {
+        val splitIndex = line.lastIndexOf(": ")
+        if (splitIndex != -1) {
+            val prefix = line.substring(0, splitIndex + 2)
+            val numberPart = line.substring(splitIndex + 2)
+
+            val colorToUse = prefixColor ?: WHITE
+            context.drawString(fr, prefix, x, y, colorToUse, true)
 
             val prefixWidth = fr.width(prefix)
             context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
         } else {
-            context.drawString(fr, uptimeString, x, y, WHITE, true)
+            val colorToUse = prefixColor ?: WHITE
+            context.drawString(fr, line, x, y, colorToUse, true)
         }
     }
 
@@ -213,39 +215,18 @@ object RenderUtils {
         val color = StartTracker.collection.let { CollectionColors.colors[it] }
 
         for (line in overlayLines) {
-            val splitIndex = line.lastIndexOf(": ")
-            if (splitIndex != -1) {
-                val prefix = line.substring(0, splitIndex + 2)
-                val numberPart = line.substring(splitIndex + 2)
-
-                if (color != null) {
-                    context.drawString(fr, prefix, x, y, color, true)
-                }
-
-                val prefixWidth = fr.width(prefix)
-                context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
-            } else {
-                if (color != null) {
-                    context.drawString(fr, line, x, y, color, true)
-                }
-            }
+            drawHelper(line, context, x, y, color)
 
             y += fr.lineHeight
         }
-        if (color != null) {
-            val uptimeString = TextUtils.uptimeString()
-            val splitIndex = uptimeString.lastIndexOf(": ")
-            if (splitIndex != -1) {
-                val prefix = uptimeString.substring(0, splitIndex + 2)
-                val numberPart = uptimeString.substring(splitIndex + 2)
 
-                context.drawString(fr, prefix, x, y, color, true)
+        val extraOverlayLines = getExtraStrings()
+        if (extraOverlayLines.isEmpty()) return
 
-                val prefixWidth = fr.width(prefix)
-                context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
-            } else {
-                context.drawString(fr, uptimeString, x, y, color, true)
-            }
+        y += 2 * fr.lineHeight // Add a line break before extra lines
+        for (line in extraOverlayLines) {
+            drawHelper(line, context, x, y, color)
+            y += fr.lineHeight
         }
     }
 

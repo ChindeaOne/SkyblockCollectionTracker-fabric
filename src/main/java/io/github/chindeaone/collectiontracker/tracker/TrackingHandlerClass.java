@@ -62,31 +62,11 @@ public class TrackingHandlerClass {
 
     public static void stopTrackingManual() {
         if (scheduler != null && !scheduler.isShutdown()) {
-            isTracking = false;
-            isPaused = false;
-            scheduler.shutdown();
-            try {
-                if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                    scheduler.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                scheduler.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
+            resetTrackingData();
+
             ChatUtils.INSTANCE.sendMessage("§cStopped tracking!", true);
             logger.info("[SCT]: Tracking stopped.");
 
-            // Reset uptime
-            lastTrackTime = System.currentTimeMillis();
-            startTime = 0;
-            lastTime = 0;
-            // Reset collection tracking
-            previousCollection = -1L;
-            sessionStartCollection = -1L;
-            // Clear profit map
-            moneyPerHourBazaar.clear();
-
-            CollectionOverlay.stopTracking();
         } else {
             ChatUtils.INSTANCE.sendMessage("§cNo tracking active!", true);
             logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
@@ -95,17 +75,7 @@ public class TrackingHandlerClass {
 
     public static void stopTracking() {
         if (scheduler != null && !scheduler.isShutdown()) {
-            isTracking = false;
-            isPaused = false;
-            scheduler.shutdown();
-            try {
-                if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                    scheduler.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                scheduler.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
+            resetTrackingData();
 
             if (!Hypixel.INSTANCE.getServer()) {
                 logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
@@ -114,19 +84,36 @@ public class TrackingHandlerClass {
             }
             afk = false;
 
-            // Reset uptime
-            lastTrackTime = System.currentTimeMillis();
-            startTime = 0;
-            lastTime = 0;
-            // Reset collection tracking
-            previousCollection = -1L;
-            sessionStartCollection = -1L;
-            // Clear profit map
-            moneyPerHourBazaar.clear();
-            CollectionOverlay.stopTracking();
         } else {
             logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
         }
+    }
+
+    private static void resetTrackingData() {
+        isTracking = false;
+        isPaused = false;
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        // Reset uptime
+        lastTrackTime = System.currentTimeMillis();
+        startTime = 0;
+        lastTime = 0;
+        // Reset collection tracking
+        previousCollection = -1L;
+        sessionStartCollection = -1L;
+        // Clear profit map
+        moneyPerHourBazaar.clear();
+        moneyMade.clear();
+
+        CollectionOverlay.stopTracking();
     }
 
     public static void pauseTracking() {
