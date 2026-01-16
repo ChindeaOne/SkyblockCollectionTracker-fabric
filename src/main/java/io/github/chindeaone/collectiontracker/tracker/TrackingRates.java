@@ -12,8 +12,8 @@ import io.github.chindeaone.collectiontracker.config.ModConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
@@ -30,12 +30,12 @@ public class TrackingRates {
     private static int unchangedStreak = 0;
     private static final int THRESHOLD = 2; // Number of checks before considering AFK
 
-    public static float collectionAmount;
-    public static float collectionPerHour;
-    public static float collectionMade;
-    public static Map<String, Float> moneyMade = new  HashMap<>();
-    public static float moneyPerHourNPC;
-    public static Map<String, Float> moneyPerHourBazaar = new HashMap<>();
+    public static volatile float collectionAmount;
+    public static volatile float collectionPerHour;
+    public static volatile float collectionMade;
+    public static Map<String, Float> moneyMade = new ConcurrentHashMap<>();
+    public static volatile float moneyPerHourNPC;
+    public static Map<String, Float> moneyPerHourBazaar = new ConcurrentHashMap<>();
 
     public static void calculateRates(String jsonResponse) {
         // Set bazaar config
