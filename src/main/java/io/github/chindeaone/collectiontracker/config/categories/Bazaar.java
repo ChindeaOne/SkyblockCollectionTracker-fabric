@@ -10,7 +10,7 @@ public class Bazaar {
     @Expose
     @ConfigOption(
             name = "Toggle Bazaar",
-            desc = "Enable or disable the Bazaar feature."
+            desc = "Enable or disable Bazaar features."
     )
     @Accordion
     public BazaarConfig bazaarConfig = new BazaarConfig();

@@ -11,7 +11,7 @@ public class CommissionsOverlay {
     @Expose
     @ConfigOption(
             name = "Enable Commissions Overlay",
-            desc = "Toggles the display of the commissions overlay on the screen")
+            desc = "Toggles an overlay for mining commissions.")
     @ConfigEditorBoolean
     public boolean enableCommissionsOverlay = false;
 
