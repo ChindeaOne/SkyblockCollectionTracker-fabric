@@ -12,6 +12,5 @@ public class CommandHelper {
         ChatUtils.INSTANCE.sendMessage("§a◆/sct pause => Pauses tracking.", false);
         ChatUtils.INSTANCE.sendMessage("§a◆/sct resume => Resumes tracking.", false);
         ChatUtils.INSTANCE.sendMessage("§a◆/sct collections => Shows all collections available.", false);
-        ChatUtils.INSTANCE.sendMessage("§a◆/sct multitrack => Tracks multiple collections at once.", false);
     }
 }
