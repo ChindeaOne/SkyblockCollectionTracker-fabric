@@ -167,38 +167,37 @@ object RenderUtils {
         val overlayLines = TextUtils.getStrings()
         if (overlayLines.isEmpty()) return
 
-        val x = 0
         var y = 0
 
         for (line in overlayLines) {
-            drawHelper(line, context, x, y, 0xFF55FF55.toInt())
+            drawHelper(line, context, y, 0xFF55FF55.toInt())
             y += fr.lineHeight
         }
 
         val extraOverlayLines = getExtraStrings()
         if (extraOverlayLines.isEmpty()) return
 
-        y += 2 * fr.lineHeight // Add a line break before extra lines
+        y += fr.lineHeight
         for (line in extraOverlayLines) {
-            drawHelper(line, context, x, y, 0xFF55FF55.toInt())
+            drawHelper(line, context, y, 0xFF55FF55.toInt())
             y += fr.lineHeight
         }
     }
 
-    private fun drawHelper(line: String, context: GuiGraphics, x: Int, y: Int, prefixColor: Int? = 0xFF55FF55.toInt()) {
+    private fun drawHelper(line: String, context: GuiGraphics, y: Int, prefixColor: Int? = 0xFF55FF55.toInt()) {
         val splitIndex = line.lastIndexOf(": ")
         if (splitIndex != -1) {
             val prefix = line.substring(0, splitIndex + 2)
             val numberPart = line.substring(splitIndex + 2)
 
             val colorToUse = prefixColor ?: WHITE
-            context.drawString(fr, prefix, x, y, colorToUse, true)
+            context.drawString(fr, prefix, 0, y, colorToUse, true)
 
             val prefixWidth = fr.width(prefix)
-            context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
+            context.drawString(fr, numberPart,  prefixWidth, y, WHITE, true)
         } else {
             val colorToUse = prefixColor ?: WHITE
-            context.drawString(fr, line, x, y, colorToUse, true)
+            context.drawString(fr, line, 0, y, colorToUse, true)
         }
     }
 
@@ -209,13 +208,12 @@ object RenderUtils {
         val overlayLines = TextUtils.getStrings()
         if (overlayLines.isEmpty()) return
 
-        val x = 0
         var y = 0
 
         val color = StartTracker.collection.let { CollectionColors.colors[it] }
 
         for (line in overlayLines) {
-            drawHelper(line, context, x, y, color)
+            drawHelper(line, context, y, color)
 
             y += fr.lineHeight
         }
@@ -223,9 +221,9 @@ object RenderUtils {
         val extraOverlayLines = getExtraStrings()
         if (extraOverlayLines.isEmpty()) return
 
-        y += 2 * fr.lineHeight // Add a line break before extra lines
+        y += fr.lineHeight
         for (line in extraOverlayLines) {
-            drawHelper(line, context, x, y, color)
+            drawHelper(line, context, y, color)
             y += fr.lineHeight
         }
     }
@@ -233,11 +231,10 @@ object RenderUtils {
     private fun renderCommissions(context: GuiGraphics) {
         val displayCommissionSet = TextUtils.updateCommissions() ?: return
 
-        val x = 0
         var y = 0
 
         for (line in displayCommissionSet) {
-            context.drawString(fr, line, x, y, WHITE, true)
+            context.drawString(fr, line, 0, y, WHITE, true)
             y += fr.lineHeight
         }
     }
