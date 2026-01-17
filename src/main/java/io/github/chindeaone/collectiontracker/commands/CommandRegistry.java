@@ -70,6 +70,13 @@ public class CommandRegistry {
                             return 1;
                         })
                 )
+                // sct restart
+                .then(ClientCommandManager.literal("restart")
+                        .executes(context -> {
+                            TrackingHandlerClass.restartTracking();
+                            return 1;
+                        })
+                )
         ));
     }
 
