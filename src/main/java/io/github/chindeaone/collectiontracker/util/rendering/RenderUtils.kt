@@ -27,15 +27,14 @@ object RenderUtils {
     const val YELLOW: Int = 0xFFFFFF55.toInt()
 
     private fun getDimensions() {
+        if (!TrackingHandlerClass.isTracking) {
+            return
+        }
+
         maxWidth = 0
         textHeight = 0
 
         val overlayLines = TextUtils.getStrings()
-
-        if (overlayLines.isEmpty()) {
-            position.setDimensions(0, 0)
-            return
-        }
 
         for (line in overlayLines) {
             val lineWidth: Int = fr.width(line)
@@ -75,7 +74,7 @@ object RenderUtils {
     }
 
     private fun getCommissionsDimensions(): Pair<Int, Int> {
-        val lines = TextUtils.updateCommissions() ?: return Pair(0, 0)
+        val lines = TextUtils.updateCommissions() ?: return Pair(commissionsPosition.width, commissionsPosition.height)
         var maxW = 0
         for (line in lines) {
             val w = fr.width(line)
@@ -95,13 +94,17 @@ object RenderUtils {
 
         context.fill(0, 0, commissionsPosition.width, commissionsPosition.height, -0x7fbfbfc0)
 
-        val text = Component.literal("Move Commissions")
+        val text = Component.literal("Move Commissions Overlay")
             .withStyle(ChatFormatting.AQUA)
 
+        val textScale = 0.8f
         val centerX = commissionsPosition.width / 2.0f
         val centerY = (commissionsPosition.height - fr.lineHeight) / 2f
 
-        context.drawCenteredString(fr, text, centerX.toInt(), centerY.toInt(), WHITE)
+        context.pose().pushMatrix()
+        context.pose().scale(textScale, textScale)
+        context.drawCenteredString(fr, text, (centerX / textScale).toInt(), (centerY / textScale).toInt(), WHITE)
+        context.pose().popMatrix()
 
         context.pose().popMatrix()
     }
@@ -120,10 +123,10 @@ object RenderUtils {
             0, 0, position.width, position.height, -0x7fbfbfc0
         )
 
-        val overlayText = Component.literal("Move the overlay")
+        val overlayText = Component.literal("Move Tracking Overlay")
             .withStyle(ChatFormatting.GREEN)
 
-        val textScale = 0.9f
+        val textScale = 0.8f
         val centerX = position.width / 2.0f
         val yTop = (position.height - fr.lineHeight * textScale) / 2f
 
@@ -187,8 +190,8 @@ object RenderUtils {
     private fun drawHelper(line: String, context: GuiGraphics, y: Int, prefixColor: Int? = 0xFF55FF55.toInt()) {
         val splitIndex = line.lastIndexOf(": ")
         if (splitIndex != -1) {
-            val prefix = line.substring(0, splitIndex + 2)
-            val numberPart = line.substring(splitIndex + 2)
+            val prefix = line.substring(0, splitIndex)
+            val numberPart = line.substring(splitIndex)
 
             val colorToUse = prefixColor ?: WHITE
             context.drawString(fr, prefix, 0, y, colorToUse, true)
