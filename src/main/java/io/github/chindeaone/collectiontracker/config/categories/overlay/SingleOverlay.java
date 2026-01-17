@@ -18,7 +18,8 @@ public class SingleOverlay {
         COLLECTION_SESSION("§aGold collection (session)§f: 10.000M"),
         COLL_PER_HOUR("§aColl/h§f: Calculating..."),
         MONEY_PER_HOUR("§a$/h (NPC/Bazaar)§f: 100k/h"),
-        MONEY_MADE("§a$ made (NPC/Bazaar)§f: 1.000M");
+        MONEY_MADE("§a$ made (NPC/Bazaar)§f: 1.000M"),
+        COLLECTION_SINCE_LAST("§aCollected since last§f: 200k");
 
         private final String text;
 
@@ -43,7 +44,8 @@ public class SingleOverlay {
             OverlayText.COLLECTION_SESSION,
             OverlayText.COLL_PER_HOUR,
             OverlayText.MONEY_PER_HOUR,
-            OverlayText.MONEY_MADE
+            OverlayText.MONEY_MADE,
+            OverlayText.COLLECTION_SINCE_LAST
     ));
 
     @Expose
@@ -57,8 +59,7 @@ public class SingleOverlay {
     public enum OverlayExtraText {
 
         BAZAAR_ITEM("§aItem/Variant§f: Enchanted gold"),
-        BAZAAR_PRICE("§aItem/Variant price§f: 100k"),
-        COLLECTION_SINCE_LAST("§aCollected since last§f: 200k");
+        BAZAAR_PRICE("§aItem/Variant price§f: 100k");
 
         private final String text;
 
@@ -76,8 +77,7 @@ public class SingleOverlay {
     @ConfigEditorDraggableList
     public List<OverlayExtraText> extraStatsText = new ArrayList<>(Arrays.asList(
             OverlayExtraText.BAZAAR_ITEM,
-            OverlayExtraText.BAZAAR_PRICE,
-            OverlayExtraText.COLLECTION_SINCE_LAST
+            OverlayExtraText.BAZAAR_PRICE
     ));
 
     @Expose
