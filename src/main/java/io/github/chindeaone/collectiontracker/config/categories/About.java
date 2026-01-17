@@ -20,7 +20,9 @@ public class About {
     public transient Void currentVersion = null;
 
     @Expose
-    @ConfigOption(name = "§aInfo", desc = "§eThis mod is meant to track (almost) all collections in Hypixel Skyblock.")
+    @ConfigOption(
+            name = "§aInfo",
+            desc = "§eThis mod is meant to track (almost) all collections in Hypixel Skyblock.")
     @ConfigEditorInfoText()
     public boolean info = true;
 
