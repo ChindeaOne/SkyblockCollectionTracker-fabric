@@ -15,6 +15,8 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
 class ConfigManager {
 
@@ -32,6 +34,8 @@ class ConfigManager {
             }.nullSafe()).enableComplexMapKeySerialization().create()
     }
 
+    private val logger: Logger = LogManager.getLogger(ConfigManager::class)
+
     private var configDirectory = File("config/sct")
     private var configFile: File
     var config: ModConfig? = null
@@ -44,12 +48,12 @@ class ConfigManager {
         configFile = File(configDirectory, "config.json")
 
         if (configFile.isFile) {
-            println("Trying to load the config")
+            logger.info("Trying to load the config")
             tryReadConfig()
         }
 
         if (config == null) {
-            println("Creating a clean config.")
+            logger.info("Creating a clean config.")
             config = ModConfig()
         }
 
