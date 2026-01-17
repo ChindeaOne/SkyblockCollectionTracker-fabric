@@ -23,4 +23,13 @@ public class Tracking {
     @SerializedName("overlayTextColor")
     @ConfigEditorBoolean
     public boolean overlayTextColor = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Tracking Rates at the end",
+            desc = "§eShow tracking rates summary in chat when stopping a tracking session."
+    )
+    @SerializedName("showTrackingRatesAtEndOfSession")
+    @ConfigEditorBoolean
+    public boolean showTrackingRatesAtEndOfSession = true;
 }
