@@ -199,6 +199,7 @@ public class TextUtils {
             switch (id) {
                 case BAZAAR_ITEM -> addIfNotNullExtra(handleBazaarItem());
                 case BAZAAR_PRICE -> addIfNotNullExtra(handleBazaarPrice());
+                case COLLECTION_SINCE_LAST -> addIfNotNullExtra(handleCollectionSinceLast());
             }
         }
     }
@@ -220,7 +221,7 @@ public class TextUtils {
                     if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
                         config.getBazaar().bazaarConfig.bazaarType = BazaarType.ENCHANTED_VERSION;
                         return null;
-                    } else return "Bazaar item : " + formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keySet().iterator().next());
+                    } else return "Bazaar item: " + formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keySet().iterator().next());
                 }
             }
 
@@ -255,6 +256,12 @@ public class TextUtils {
 
             default -> { return null; }
         }
+    }
+
+    private static String handleCollectionSinceLast() {
+        return collectionSinceLast > 0
+                ? formatCollectionName(collection) + " collection since last: " + formatNumber(collectionSinceLast)
+                : formatCollectionName(collection) + " collection since last: Calculating...";
     }
 
     public static List<String> updateCommissions() {

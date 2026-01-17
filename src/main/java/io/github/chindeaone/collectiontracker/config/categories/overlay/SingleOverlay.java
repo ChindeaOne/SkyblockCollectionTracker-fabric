@@ -14,11 +14,11 @@ import java.util.List;
 public class SingleOverlay {
 
     public enum OverlayText {
-        COLLECTION("§aGold collection §f> 200.000M"),
-        COLLECTION_SESSION("§aGold collection (session) §f> 10.000M"),
-        COLL_PER_HOUR("§aColl/h §f> Calculating..."),
-        MONEY_PER_HOUR("§a$/h (NPC/Bazaar) §f> 100k/h"),
-        MONEY_MADE("§a$ made (NPC/Bazaar) §f> 1.000M");
+        COLLECTION("§aGold collection§f: 200.000M"),
+        COLLECTION_SESSION("§aGold collection (session)§f: 10.000M"),
+        COLL_PER_HOUR("§aColl/h§f: Calculating..."),
+        MONEY_PER_HOUR("§a$/h (NPC/Bazaar)§f: 100k/h"),
+        MONEY_MADE("§a$ made (NPC/Bazaar)§f: 1.000M");
 
         private final String text;
 
@@ -56,8 +56,9 @@ public class SingleOverlay {
 
     public enum OverlayExtraText {
 
-        BAZAAR_ITEM("§aItem/Variant: Enchanted gold"),
-        BAZAAR_PRICE("§aItem/Variant bazaar price: 100k");
+        BAZAAR_ITEM("§aItem/Variant§f: Enchanted gold"),
+        BAZAAR_PRICE("§aItem/Variant price§f: 100k"),
+        COLLECTION_SINCE_LAST("§aCollected since last§f: 200k");
 
         private final String text;
 
@@ -75,7 +76,8 @@ public class SingleOverlay {
     @ConfigEditorDraggableList
     public List<OverlayExtraText> extraStatsText = new ArrayList<>(Arrays.asList(
             OverlayExtraText.BAZAAR_ITEM,
-            OverlayExtraText.BAZAAR_PRICE
+            OverlayExtraText.BAZAAR_PRICE,
+            OverlayExtraText.COLLECTION_SINCE_LAST
     ));
 
     @Expose

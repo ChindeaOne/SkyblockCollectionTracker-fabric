@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
 import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.getUptimeInSeconds;
+import static io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay.overlayDirty;
 
 public class TrackingRates {
 
@@ -33,8 +34,10 @@ public class TrackingRates {
     public static volatile float collectionAmount;
     public static volatile float collectionPerHour;
     public static volatile float collectionMade;
-    public static Map<String, Float> moneyMade = new ConcurrentHashMap<>();
+    public static volatile float collectionSinceLast;
     public static volatile float moneyPerHourNPC;
+
+    public static Map<String, Float> moneyMade = new ConcurrentHashMap<>();
     public static Map<String, Float> moneyPerHourBazaar = new ConcurrentHashMap<>();
 
     public static void calculateRates(String jsonResponse) {
@@ -119,5 +122,9 @@ public class TrackingRates {
         collectionPerHour = uptime > 0 ? (float) Math.floor((collectedSinceStart / uptime) * 3600) : 0;
         collectionMade = (float) Math.floor(collectedSinceStart);
         moneyPerHourNPC = uptime > 0 ? (float) Math.floor(priceNPC * collectedSinceStart / (uptime / 3600.0f)) : 0;
+        collectionSinceLast = previousCollection != -1L ? (float) Math.floor(currentCollection - previousCollection) : 0;
+
+        // Trigger overlay update
+        overlayDirty = true;
     }
 }
