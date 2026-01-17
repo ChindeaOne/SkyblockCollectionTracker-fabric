@@ -1,11 +1,26 @@
 package io.github.chindeaone.collectiontracker.util
 
-import kotlin.collections.contains
+import java.util.*
 
 object StringUtils {
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
     private val colorChars = "abcdefABCDEF0123456789".toSet()
+
+    fun formatBazaarItemName(name: String): String {
+        val words = name.split("_".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val formatted = java.lang.StringBuilder()
+
+        for (i in words.indices) {
+            val word = words[i].lowercase(Locale.getDefault())
+            if (i == 0) {
+                formatted.append(word.get(0).uppercaseChar()).append(word.substring(1))
+            } else {
+                formatted.append(" ").append(word)
+            }
+        }
+        return formatted.toString()
+    }
 
     // Method taken from Skyhanni
     fun CharSequence.removeColor(keepFormatting: Boolean = false): String {
