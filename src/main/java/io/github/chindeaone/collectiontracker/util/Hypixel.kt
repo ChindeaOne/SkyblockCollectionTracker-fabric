@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture
 
 object Hypixel {
 
-    private val scoreboardTitlePattern = Regex("SK[YI]BLOCK(?: CO-OP| GUEST)?")
+    private val scoreboardTitlePattern = Regex("SK[YI]BLOCK(?: CO-OP| GUEST)?(?: [♲☀Ⓑ])?")
 
     var server = false
     var skyblock = false
@@ -146,9 +146,8 @@ object Hypixel {
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
-    fun getScoreboardTitle(): String? {
+    private fun getScoreboardTitle(): String? {
         val world =Minecraft.getInstance().level ?: return null
-
         val objective = world.scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR) ?: return null
         val displayName = objective.displayName?.string ?: return null
         return displayName
