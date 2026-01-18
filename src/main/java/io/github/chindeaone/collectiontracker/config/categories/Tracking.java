@@ -26,7 +26,7 @@ public class Tracking {
 
     @Expose
     @ConfigOption(
-            name = "Tracking Rates at the end",
+            name = "Tracking Summary",
             desc = "§eShow tracking rates summary in chat when stopping a tracking session."
     )
     @SerializedName("showTrackingRatesAtEndOfSession")
