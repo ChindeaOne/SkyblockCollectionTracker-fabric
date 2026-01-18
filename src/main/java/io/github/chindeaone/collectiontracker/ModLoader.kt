@@ -3,7 +3,6 @@
 */
 package io.github.chindeaone.collectiontracker
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.modules
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.CommissionsOverlay
@@ -24,11 +23,10 @@ class ModLoader: ModInitializer {
     override fun onInitialize() {
         eventRegistration()
 
-        SkyblockCollectionTracker.preInit()
         SkyblockCollectionTracker.init()
-        loadedClasses.clear()
 
         CommandRegistry.init()
+        CommissionsKeybinds.initKeyGuards()
     }
 
     private fun eventRegistration() {
@@ -53,15 +51,6 @@ class ModLoader: ModInitializer {
             Hypixel.onTick(client)
             CommissionsKeybinds.onClientTick(client)
             TabData.tickAndUpdateWidget()
-        }
-    }
-
-    companion object {
-        private val loadedClasses = mutableSetOf<String>()
-
-        fun loadModule(obj: Any) {
-            if (!loadedClasses.add(obj.javaClass.name)) throw IllegalStateException("Module ${obj.javaClass.name} is already loaded")
-            modules.add(obj)
         }
     }
 }

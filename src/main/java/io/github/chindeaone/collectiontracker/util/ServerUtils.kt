@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 
 object ServerUtils {
 
@@ -15,14 +16,14 @@ object ServerUtils {
 
     private const val NORMAL_CHECK_INTERVAL = 6000  // 5 minutes
     private const val COOLDOWN_CHECK_INTERVAL = 12000  // 10 minutes
-    private const val TRACKING_CHECK_INTERVAL = 18000  // 15 minutes
+    private const val TRACKING_CHECK_INTERVAL = 3_600_000  // 1 hour
 
     private var tickCounter = 0
     private var currentCheckInterval = NORMAL_CHECK_INTERVAL
     private var consecutiveFailures = 0
 
     @Volatile
-    private var permanentlyDisabled = false
+    var permanentlyDisabled = false
     private var trackingTimeoutFuture: ScheduledFuture<*>? = null
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
@@ -36,6 +37,12 @@ object ServerUtils {
             tickCounter = 0
             executorService.submit { checkServerStatusPeriodically() }
         }
+    }
+
+    fun clearState() {
+        trackingTimeoutFuture?.cancel(false)
+        trackingTimeoutFuture = null
+        permanentlyDisabled = false
     }
 
     private fun checkServerStatusPeriodically() {
@@ -66,7 +73,7 @@ object ServerUtils {
                     trackingTimeoutFuture = executorService.schedule({
                         permanentlyDisabled = true
                         logger.error("[SCT]: Disabled server checks due to mod not being used.")
-                    }, TRACKING_CHECK_INTERVAL.toLong(), java.util.concurrent.TimeUnit.MILLISECONDS)
+                    }, TRACKING_CHECK_INTERVAL.toLong(), TimeUnit.MILLISECONDS)
                 }
             } else {
                 trackingTimeoutFuture?.cancel(false)

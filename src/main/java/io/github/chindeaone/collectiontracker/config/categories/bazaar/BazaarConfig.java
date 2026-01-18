@@ -23,21 +23,23 @@ public class BazaarConfig {
     @Expose
     @ConfigOption(
             name = "Use Bazaar Prices",
-            desc = "Toggle to use bazaar prices instead of NPC prices"
+            desc = "Toggle to use bazaar prices instead of NPC prices."
     )
     @ConfigEditorBoolean
     public boolean useBazaar = false;
 
     @Expose
     @ConfigOption(
-            name = "Select Bazaar Type",
-            desc = "Select which type of bazaar version for the collection to use"
+            name = "Select Bazaar Version",
+            desc = "Select the version you want to use for pricing."
     )
     @ConfigEditorDropdown
     public BazaarType bazaarType = BazaarType.ENCHANTED_VERSION; // Default to ENCHANTED_VERSION
 
     @Expose
-    @ConfigOption(name = "Gemstone variants", desc = "Choose which gemstone variants to track.")
+    @ConfigOption
+            (name = "Select Gemstone Variant",
+            desc = "Select the variant you want to use for pricing.")
     @ConfigEditorDropdown
     public GemstoneVariant gemstoneVariant = GemstoneVariant.FINE; // Default to FINE variant
 }

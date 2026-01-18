@@ -70,12 +70,22 @@ public class CommandRegistry {
                             return 1;
                         })
                 )
+                // sct restart
+                .then(ClientCommandManager.literal("restart")
+                        .executes(context -> {
+                            TrackingHandlerClass.restartTracking();
+                            return 1;
+                        })
+                )
         ));
     }
 
     private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_SUGGESTIONS = (context, builder) -> {
+        String arg = builder.getRemaining().toLowerCase();
         for (String c : CollectionsManager.getAllCollections()) {
-            builder.suggest(c);
+            if (c.toLowerCase().startsWith(arg)) {
+                builder.suggest(c);
+            }
         }
         return builder.buildFuture();
     };

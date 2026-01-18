@@ -11,7 +11,8 @@ object CollectionColors {
         put("pumpkin", 0xFFFF8C00.toInt()) // Dark Orange
         put("wheat", 0xFFDAA520.toInt()) // Goldenrod
         put("seeds", 0xFF80DE09.toInt()) // Light green
-        put("mushroom", 0xFFE33948.toInt()) // Pinkish Red
+        put("red mushroom", 0xFFE33948.toInt()) // Pinkish Red
+        put("brown mushroom", 0xFF8B4513.toInt()) // Brown
         put("raw rabbit", 0xFFF5F5DC.toInt()) // Beige
         put("nether wart", 0xFF8B0000.toInt()) // Dark Red
         put("mutton", 0xFFDA3E3E.toInt()) // Reddish

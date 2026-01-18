@@ -4,7 +4,9 @@ import net.minecraft.client.Minecraft
 
 object PlayerData {
 
-    val playerUUID: String get() = Minecraft.getInstance().player?.uuid.toString().replace("-", "")
+    val playerUUID: String
+        get() = Minecraft.getInstance().player?.uuid.toString().replace("-", "")
 
-    val playerName: String get() = Minecraft.getInstance().player?.name.toString()
+    val playerName: String
+        get() = Minecraft.getInstance().player?.gameProfile?.name ?: "Unknown"
 }

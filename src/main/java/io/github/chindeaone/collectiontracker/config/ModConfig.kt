@@ -16,18 +16,18 @@ class ModConfig : Config() {
     @SerializedName("about")
     val about: About = About()
     @Expose
-    @Category(name = "GUI", desc = "Change the location of GUI")
+    @Category(name = "GUI", desc = "GUI config")
     val gui: GUIConfig = GUIConfig()
     @Expose
-    @Category(name = "Tracking Overlay", desc = "Overlay settings")
+    @Category(name = "Tracking", desc = "Overlay config")
     @SerializedName("trackingOverlay")
-    val trackingOverlay: TrackingOverlay = TrackingOverlay()
+    val trackingOverlay: Tracking = Tracking()
     @Expose
-    @Category(name = "Bazaar", desc = "Toggle bazaar prices")
+    @Category(name = "Bazaar", desc = "Bazaar config")
     @SerializedName("bazaar")
     val bazaar: Bazaar = Bazaar()
     @Expose
-    @Category(name = "Mining", desc = "Mining related settings")
+    @Category(name = "Mining", desc = "Mining config")
     @SerializedName("mining")
     @Accordion
     val mining: Mining = Mining()

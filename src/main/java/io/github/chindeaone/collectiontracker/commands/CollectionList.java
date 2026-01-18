@@ -46,7 +46,7 @@ public class CollectionList {
     }
 
     private static void sendCategoryMessage(String color, String category, List<String> collections) {
-        ChatUtils.INSTANCE.sendMessage("   " + color + category + " Collections:", false);
+        ChatUtils.INSTANCE.sendMessage(" " + color + category + " Collections:", false);
         for (String collection : collections) {
             MutableComponent message = Component.literal("   " + color + "- " + collection);
 

@@ -20,17 +20,19 @@ public class About {
     public transient Void currentVersion = null;
 
     @Expose
-    @ConfigOption(name = "§aInfo", desc = "This mod is meant to track all collection that exists. You can also use it as a money tracker.")
+    @ConfigOption(
+            name = "§aInfo",
+            desc = "§eThis mod is meant to track (almost) all collections in Hypixel Skyblock.")
     @ConfigEditorInfoText()
     public boolean info = true;
 
     @Expose
     @ConfigOption(
-            name = "Update Stream",
-            desc = "Choose which type of notifications you want to receive about newer versions of the mod."
+            name = "§bUpdate Stream",
+            desc = "Choose update checks: NONE = no update checks; RELEASE = check stable releases only; BETA = include beta updates."
     )
     @ConfigEditorDropdown
-    public UpdateType update = UpdateType.NONE; //Default to no updates
+    public UpdateType update = UpdateType.RELEASE; //Default to RELEASE updates
 
     @Expose
     public boolean hasCheckedUpdate = true;

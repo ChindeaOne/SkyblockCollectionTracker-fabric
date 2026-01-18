@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import io.github.chindeaone.collectiontracker.util.CollectionColors
+import io.github.chindeaone.collectiontracker.util.rendering.TextUtils.getExtraStrings
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -15,7 +16,7 @@ import net.minecraft.network.chat.Component
 object RenderUtils {
 
     var config: ModConfig = SkyblockCollectionTracker.configManager.config!!
-    var position: Position = config.trackingOverlay.overlaySingle.overlayPosition
+    var position: Position = config.trackingOverlay.singleOverlay.overlayPosition
     var commissionsPosition: Position = config.mining.commissionsOverlay.commissionsOverlayPosition
 
     var maxWidth: Int = 0
@@ -23,17 +24,17 @@ object RenderUtils {
 
     private val fr: Font get() = Minecraft.getInstance().font
     const val WHITE: Int = 0xFFFFFFFF.toInt()
+    const val YELLOW: Int = 0xFFFFFF55.toInt()
 
     private fun getDimensions() {
+        if (!TrackingHandlerClass.isTracking) {
+            return
+        }
+
         maxWidth = 0
         textHeight = 0
 
         val overlayLines = TextUtils.getStrings()
-
-        if (overlayLines.isEmpty()) {
-            position.setDimensions(0, 0)
-            return
-        }
 
         for (line in overlayLines) {
             val lineWidth: Int = fr.width(line)
@@ -73,7 +74,7 @@ object RenderUtils {
     }
 
     private fun getCommissionsDimensions(): Pair<Int, Int> {
-        val lines = TextUtils.updateCommissions() ?: return Pair(0, 0)
+        val lines = TextUtils.updateCommissions() ?: return Pair(commissionsPosition.width, commissionsPosition.height)
         var maxW = 0
         for (line in lines) {
             val w = fr.width(line)
@@ -93,13 +94,17 @@ object RenderUtils {
 
         context.fill(0, 0, commissionsPosition.width, commissionsPosition.height, -0x7fbfbfc0)
 
-        val text = Component.literal("Move Commissions")
+        val text = Component.literal("Move Commissions Overlay")
             .withStyle(ChatFormatting.AQUA)
 
+        val textScale = 0.8f
         val centerX = commissionsPosition.width / 2.0f
         val centerY = (commissionsPosition.height - fr.lineHeight) / 2f
 
-        context.drawCenteredString(fr, text, centerX.toInt(), centerY.toInt(), WHITE)
+        context.pose().pushMatrix()
+        context.pose().scale(textScale, textScale)
+        context.drawCenteredString(fr, text, (centerX / textScale).toInt(), (centerY / textScale).toInt(), WHITE)
+        context.pose().popMatrix()
 
         context.pose().popMatrix()
     }
@@ -118,10 +123,10 @@ object RenderUtils {
             0, 0, position.width, position.height, -0x7fbfbfc0
         )
 
-        val overlayText = Component.literal("Move the overlay")
+        val overlayText = Component.literal("Move Tracking Overlay")
             .withStyle(ChatFormatting.GREEN)
 
-        val textScale = 0.9f
+        val textScale = 0.8f
         val centerX = position.width / 2.0f
         val yTop = (position.height - fr.lineHeight * textScale) / 2f
 
@@ -154,7 +159,7 @@ object RenderUtils {
 
             context.pose().pushMatrix()
             context.pose().scale(textScale, textScale)
-            context.drawString(fr, positionText, (positionX / textScale).toInt(), (positionY / textScale).toInt(), WHITE, true)
+            context.drawString(fr, positionText, (positionX / textScale).toInt(), (positionY / textScale).toInt(), YELLOW, true)
             context.pose().popMatrix()
         }
     }
@@ -165,38 +170,37 @@ object RenderUtils {
         val overlayLines = TextUtils.getStrings()
         if (overlayLines.isEmpty()) return
 
-        val x = 0
         var y = 0
 
         for (line in overlayLines) {
-            val splitIndex = line.lastIndexOf(": ")
-            if (splitIndex != -1) {
-                val prefix = line.substring(0, splitIndex + 2)
-                val numberPart = line.substring(splitIndex + 2)
-
-                context.drawString(fr, prefix, x, y, 0xFF55FF55.toInt(), true)
-
-                val prefixWidth = fr.width(prefix)
-                context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
-            } else {
-                context.drawString(fr, line, x, y, WHITE, true)
-            }
-
+            drawHelper(line, context, y, 0xFF55FF55.toInt())
             y += fr.lineHeight
         }
 
-        val uptimeString = TextUtils.uptimeString()
-        val splitIndex = uptimeString.lastIndexOf(": ")
-        if (splitIndex != -1) {
-            val prefix = uptimeString.substring(0, splitIndex + 2)
-            val numberPart = uptimeString.substring(splitIndex + 2)
+        val extraOverlayLines = getExtraStrings()
+        if (extraOverlayLines.isEmpty()) return
 
-            context.drawString(fr, prefix, x, y, 0xFF55FF55.toInt(), true)
+        y += fr.lineHeight
+        for (line in extraOverlayLines) {
+            drawHelper(line, context, y, 0xFF55FF55.toInt())
+            y += fr.lineHeight
+        }
+    }
+
+    private fun drawHelper(line: String, context: GuiGraphics, y: Int, prefixColor: Int? = 0xFF55FF55.toInt()) {
+        val splitIndex = line.lastIndexOf(": ")
+        if (splitIndex != -1) {
+            val prefix = line.substring(0, splitIndex)
+            val numberPart = line.substring(splitIndex)
+
+            val colorToUse = prefixColor ?: WHITE
+            context.drawString(fr, prefix, 0, y, colorToUse, true)
 
             val prefixWidth = fr.width(prefix)
-            context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
+            context.drawString(fr, numberPart,  prefixWidth, y, WHITE, true)
         } else {
-            context.drawString(fr, uptimeString, x, y, WHITE, true)
+            val colorToUse = prefixColor ?: WHITE
+            context.drawString(fr, line, 0, y, colorToUse, true)
         }
     }
 
@@ -207,55 +211,33 @@ object RenderUtils {
         val overlayLines = TextUtils.getStrings()
         if (overlayLines.isEmpty()) return
 
-        val x = 0
         var y = 0
 
         val color = StartTracker.collection.let { CollectionColors.colors[it] }
 
         for (line in overlayLines) {
-            val splitIndex = line.lastIndexOf(": ")
-            if (splitIndex != -1) {
-                val prefix = line.substring(0, splitIndex + 2)
-                val numberPart = line.substring(splitIndex + 2)
-
-                if (color != null) {
-                    context.drawString(fr, prefix, x, y, color, true)
-                }
-
-                val prefixWidth = fr.width(prefix)
-                context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
-            } else {
-                if (color != null) {
-                    context.drawString(fr, line, x, y, color, true)
-                }
-            }
+            drawHelper(line, context, y, color)
 
             y += fr.lineHeight
         }
-        if (color != null) {
-            val splitIndex = TextUtils.uptimeString().lastIndexOf(": ")
-            if (splitIndex != -1) {
-                val prefix = TextUtils.uptimeString().substring(0, splitIndex + 2)
-                val numberPart = TextUtils.uptimeString().substring(splitIndex + 2)
 
-                context.drawString(fr, prefix, x, y, color, true)
+        val extraOverlayLines = getExtraStrings()
+        if (extraOverlayLines.isEmpty()) return
 
-                val prefixWidth = fr.width(prefix)
-                context.drawString(fr, numberPart, (x + prefixWidth), y, WHITE, true)
-            } else {
-                context.drawString(fr, TextUtils.uptimeString(), x, y, color, true)
-            }
+        y += fr.lineHeight
+        for (line in extraOverlayLines) {
+            drawHelper(line, context, y, color)
+            y += fr.lineHeight
         }
     }
 
     private fun renderCommissions(context: GuiGraphics) {
         val displayCommissionSet = TextUtils.updateCommissions() ?: return
 
-        val x = 0
         var y = 0
 
         for (line in displayCommissionSet) {
-            context.drawString(fr, line, x, y, WHITE, true)
+            context.drawString(fr, line, 0, y, WHITE, true)
             y += fr.lineHeight
         }
     }

@@ -15,6 +15,8 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
 class ConfigManager {
 
@@ -32,24 +34,26 @@ class ConfigManager {
             }.nullSafe()).enableComplexMapKeySerialization().create()
     }
 
+    private val logger: Logger = LogManager.getLogger(ConfigManager::class)
+
     private var configDirectory = File("config/sct")
     private var configFile: File
     var config: ModConfig? = null
     private var lastSaveTime = 0L
 
-    lateinit var processor: MoulConfigProcessor<ModConfig>
+    var processor: MoulConfigProcessor<ModConfig>
 
     init {
         configDirectory.mkdirs()
         configFile = File(configDirectory, "config.json")
 
         if (configFile.isFile) {
-            println("Trying to load the config")
+            logger.info("Trying to load the config")
             tryReadConfig()
         }
 
         if (config == null) {
-            println("Creating a clean config.")
+            logger.info("Creating a clean config.")
             config = ModConfig()
         }
 
@@ -73,9 +77,58 @@ class ConfigManager {
                     config = gson.fromJson(reader, ModConfig::class.java)
                 }
             }
+            // Remove null entries
+            config?.let { removeNulls(it) }
         } catch (e: Exception) {
             throw ConfigError("Could not load config", e)
         }
+    }
+
+    private fun removeNulls(root: Any?) {
+        if (root == null) return
+        val visited = Collections.newSetFromMap(IdentityHashMap<Any, Boolean>())
+
+        fun remove(obj: Any?) {
+            if (obj == null) return
+
+            val cls = obj.javaClass
+            if (cls.isPrimitive || cls.packageName.startsWith("java.") || cls.isEnum) return
+            if (!visited.add(obj)) return
+
+            for (field in cls.declaredFields) {
+                try {
+                    field.isAccessible = true
+                    val value = field.get(obj) ?: continue
+
+                    when (value) {
+                        is MutableList<*> -> {
+                            @Suppress("UNCHECKED_CAST")
+                            val list = value as MutableList<Any?>
+                            val it = list.iterator()
+                            while (it.hasNext()) {
+                                if (it.next() == null) it.remove()
+                            }
+                            for (el in list) remove(el)
+                        }
+
+                        is Collection<*> -> {
+                            for (el in value) remove(el)
+                        }
+
+                        is Map<*, *> -> {
+                            for (entry in value.values) remove(entry)
+                        }
+
+                        else -> {
+                            remove(value)
+                        }
+                    }
+                } catch (_: Exception) {
+                    // Ignore
+                }
+            }
+        }
+        remove(root)
     }
 
     fun save() {

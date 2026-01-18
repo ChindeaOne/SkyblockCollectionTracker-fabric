@@ -8,9 +8,6 @@ public class CollectionsManager {
     public static String collectionSource;
     public static String collectionType = null;
 
-    public static Set<String> collectionList = new LinkedHashSet<>();
-    public static List<String> collectionSourceList = new ArrayList<>();
-
     public static boolean isValidCollection(String collectionName) {
         for (Set<String> collectionSet : collections.values()) {
             if (collectionSet.contains(collectionName)) {
@@ -41,13 +38,5 @@ public class CollectionsManager {
         return collections
                 .getOrDefault("Rift", Collections.emptySet())
                 .contains(collectionName);
-    }
-
-    public static void setCollectionSource(String collectionSource) {
-        if (isCollection(collectionSource)) {
-            collectionSourceList.add("collection");
-        } else {
-            collectionSourceList.add("sacks");
-        }
     }
 }

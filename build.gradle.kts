@@ -202,7 +202,7 @@ tasks.withType<RemapJarTask>().configureEach {
 tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("intermediates"))
     archiveClassifier.set("non-obfuscated-with-deps")
-    configurations = listOf(shadowModImpl)
+    configurations = listOf(shadowImpl, shadowModImpl)
 
     doLast {
         configurations.forEach {
@@ -212,7 +212,7 @@ tasks.shadowJar {
     exclude("META-INF/versions/**")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "io.github.chindeaone.collectiontracker.deps.moulconfig")
-    relocate("io.github.chindeaone.implementation", "io.github.chindeaone.collectiontracker.deps.implementation")
+    relocate("io.github.chindeaone.modrinthautoupdater", "io.github.chindeaone.collectiontracker.deps.modrinthautoupdater")
 }
 
 publishing {
