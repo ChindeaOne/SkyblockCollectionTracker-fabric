@@ -3,7 +3,6 @@ package io.github.chindeaone.collectiontracker.util
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import kotlin.text.append
 
 object ChatUtils {
 
