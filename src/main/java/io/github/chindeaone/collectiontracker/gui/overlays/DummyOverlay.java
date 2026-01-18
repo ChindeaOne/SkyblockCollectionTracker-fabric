@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public class DummyOverlay extends Screen {
@@ -99,10 +100,10 @@ public class DummyOverlay extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (mouseButton == 0) {
-            int mx = (int) mouseX;
-            int my = (int) mouseY;
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
+        if (event.button() == 0) {
+            int mx = (int) event.x();
+            int my = (int) event.y();
 
             if (isMouseOverOverlay(mx, my)) {
                 draggingSingle = true;
@@ -117,14 +118,14 @@ public class DummyOverlay extends Screen {
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
+        return super.mouseClicked(event, doubled);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int state) {
+    public boolean mouseReleased(MouseButtonEvent event) {
         draggingSingle = false;
         draggingCommissions = false;
-        return super.mouseReleased(mouseX, mouseY, state);
+        return super.mouseReleased(event);
     }
 
     private boolean isMouseOverOverlay(int mouseX, int mouseY) {
