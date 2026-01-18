@@ -22,8 +22,6 @@ public class CommandHelper {
             "§a◆/sct collections"
     );
 
-    private static MutableComponent message;
-
     public static void showCommands() {
 
         List<MutableComponent> components = buildCommandComponents();
