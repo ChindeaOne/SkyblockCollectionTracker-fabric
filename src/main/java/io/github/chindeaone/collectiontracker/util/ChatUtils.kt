@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.util
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
 
 object ChatUtils {
 
@@ -27,6 +28,8 @@ object ChatUtils {
         Minecraft.getInstance().player?.displayClientMessage(finalComponent, false)
     }
 
+    fun String.asComponent(): Component = Component.literal(this)
+
     private fun Component.centerText(width: Int = Minecraft.getInstance().gui.chat.width): Component {
         val textWidth = Minecraft.getInstance().font.width(this)
         val spaceWidth = Minecraft.getInstance().font.width(Component.literal(" "))
@@ -50,7 +53,23 @@ object ChatUtils {
         return component
     }
 
-    fun String.asComponent(): Component = Component.literal(this)
+    fun sendCommands(
+        title: String,
+        commands: List<MutableComponent>
+    ) {
+        val divider = fillChat()
+        val displayTitle = title.asComponent().centerText()
+
+        sendMessage()
+        sendComponent(divider, prefix = false)
+        sendComponent(displayTitle, prefix = false)
+        sendComponent(divider, prefix = false)
+
+        for (command in commands) sendComponent(command, prefix = false)
+
+        sendComponent(divider, prefix = false)
+        sendMessage()
+    }
 
     fun sendSummary(
         title: String,
