@@ -11,7 +11,6 @@ import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.Hypixel;
 import io.github.chindeaone.collectiontracker.util.PlayerData;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
-import io.github.chindeaone.collectiontracker.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
