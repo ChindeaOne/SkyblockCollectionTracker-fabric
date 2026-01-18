@@ -132,7 +132,7 @@ object CommissionsKeybinds {
 
     private fun isKeyDown(client: Minecraft, keyCode: Int): Boolean {
         if (keyCode == 0) return false
-        val window = client.window.window
+        val window = client.window.handle()
         return if (keyCode < 0) {
             val mouseButton = keyCode + 100
             GLFW.glfwGetMouseButton(window, mouseButton) == GLFW.GLFW_PRESS
@@ -174,15 +174,19 @@ object CommissionsKeybinds {
     }
 
     private fun registerKeyGuards(screen: Screen) {
-        ScreenKeyboardEvents.allowKeyPress(screen).register(ScreenKeyboardEvents.AllowKeyPress { s, keyCode, _, _ ->
+        ScreenKeyboardEvents.allowKeyPress(screen).register(ScreenKeyboardEvents.AllowKeyPress { s, event ->
             val container = s as? AbstractContainerScreen<*> ?: return@AllowKeyPress true
             if (!shouldBlockNumberKeys(container)) return@AllowKeyPress true
+
+            val keyCode = event.key
             keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
         })
 
-        ScreenKeyboardEvents.allowKeyRelease(screen).register(ScreenKeyboardEvents.AllowKeyRelease { s, keyCode, _, _ ->
+        ScreenKeyboardEvents.allowKeyRelease(screen).register(ScreenKeyboardEvents.AllowKeyRelease { s, event ->
             val container = s as? AbstractContainerScreen<*> ?: return@AllowKeyRelease true
             if (!shouldBlockNumberKeys(container)) return@AllowKeyRelease true
+
+            val keyCode = event.key
             keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
         })
     }
