@@ -225,7 +225,7 @@ public class TrackingHandlerClass {
 
         if (CollectionsManager.isRiftCollection(StartTracker.collection)) {
             lines.add(String.format("   §7Elapsed time: §f%s", getUptimeInWords()));
-            ChatUtils.INSTANCE.sendSummary("Tracking Summary", lines, "§e§l", "§6§l", "§6§m", '=', 10);
+            ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
             return;
         }
 
@@ -306,7 +306,6 @@ public class TrackingHandlerClass {
 
                             lines.add(String.format("   §6Best: §f$%s/h", compactFloat(highD)) );
                             lines.add(String.format("   §6Worst: §f$%s/h", compactFloat(lowD)) );
-                            lines.add(String.format("   §aItem used for Bazaar pricing: §f%s", StringUtils.INSTANCE.formatBazaarItemName(BazaarCollectionsManager.enchantedRecipe.keySet().iterator().next())));
                         } else {
                             Float low = lowestRatesPerHourBazaar.get("Super Enchanted version");
                             Float high = highestRatesPerHourBazaar.get("Super Enchanted version");
@@ -316,7 +315,6 @@ public class TrackingHandlerClass {
 
                             lines.add(String.format("   §6Best Rate: §f$%s/h", compactFloat(highD)));
                             lines.add(String.format("   §6Worst Rate: §f$%s/h", compactFloat(lowD)));
-                            lines.add(String.format("   §aItem used for Bazaar pricing: §f%s", StringUtils.INSTANCE.formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keySet().iterator().next())));
                         }
                     }
                     case "gemstone" -> {
@@ -329,13 +327,12 @@ public class TrackingHandlerClass {
 
                         lines.add(String.format("   §6Best: §f$%s/h", compactFloat(highD)));
                         lines.add(String.format("   §6Worst: §f$%s/h", compactFloat(lowD)));
-                        lines.add(String.format("   §aVariant used for Bazaar pricing: §f%s", config.getBazaar().bazaarConfig.gemstoneVariant.toString()));
                     }
                 }
             }
         }
 
-        ChatUtils.INSTANCE.sendSummary("Tracking Summary", lines, "§e§l", "§6§l", "§6§m", '=', 10);
+        ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
     }
 
     public static long getUptimeInSeconds() {
