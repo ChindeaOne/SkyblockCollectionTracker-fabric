@@ -7,6 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+//? if = 1.21.10{
+import net.minecraft.client.input.MouseButtonEvent;
+//? }
 import net.minecraft.network.chat.Component;
 
 public class DummyOverlay extends Screen {
@@ -98,7 +101,9 @@ public class DummyOverlay extends Screen {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-    @Override
+    //? if = 1.21.8{
+    
+    /*@Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         if (mouseButton == 0) {
             int mx = (int) mouseX;
@@ -126,6 +131,37 @@ public class DummyOverlay extends Screen {
         draggingCommissions = false;
         return super.mouseReleased(mouseX, mouseY, state);
     }
+     
+    *///? } else {
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
+        if (event.button() == 0) {
+            int mx = (int) event.x();
+            int my = (int) event.y();
+
+            if (isMouseOverOverlay(mx, my)) {
+                draggingSingle = true;
+                dragOffsetX = mx - RenderUtils.INSTANCE.getPosition().getX();
+                dragOffsetY = my - RenderUtils.INSTANCE.getPosition().getY();
+                return true;
+            }
+            if (isMouseOverCommissionsOverlay(mx, my)) {
+                draggingCommissions = true;
+                dragOffsetX = mx - RenderUtils.INSTANCE.getCommissionsPosition().getX();
+                dragOffsetY = my - RenderUtils.INSTANCE.getCommissionsPosition().getY();
+                return true;
+            }
+        }
+        return super.mouseClicked(event, doubled);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        draggingSingle = false;
+        draggingCommissions = false;
+        return super.mouseReleased(event);
+    }
+    //? }
 
     private boolean isMouseOverOverlay(int mouseX, int mouseY) {
         int x = RenderUtils.INSTANCE.getPosition().getX();

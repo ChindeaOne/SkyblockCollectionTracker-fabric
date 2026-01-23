@@ -132,7 +132,11 @@ object CommissionsKeybinds {
 
     private fun isKeyDown(client: Minecraft, keyCode: Int): Boolean {
         if (keyCode == 0) return false
-        val window = client.window.window
+        //? if =1.21.8 {
+        /*val window = client.window.window
+        *///?} else
+        val window = client.window.handle()
+
         return if (keyCode < 0) {
             val mouseButton = keyCode + 100
             GLFW.glfwGetMouseButton(window, mouseButton) == GLFW.GLFW_PRESS
@@ -174,7 +178,9 @@ object CommissionsKeybinds {
     }
 
     private fun registerKeyGuards(screen: Screen) {
-        ScreenKeyboardEvents.allowKeyPress(screen).register(ScreenKeyboardEvents.AllowKeyPress { s, keyCode, _, _ ->
+        //? if =1.21.8 {
+        
+        /*ScreenKeyboardEvents.allowKeyPress(screen).register(ScreenKeyboardEvents.AllowKeyPress { s, keyCode, _, _ ->
             val container = s as? AbstractContainerScreen<*> ?: return@AllowKeyPress true
             if (!shouldBlockNumberKeys(container)) return@AllowKeyPress true
             keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
@@ -185,6 +191,23 @@ object CommissionsKeybinds {
             if (!shouldBlockNumberKeys(container)) return@AllowKeyRelease true
             keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
         })
+        *///?} else {
+        ScreenKeyboardEvents.allowKeyPress(screen).register(ScreenKeyboardEvents.AllowKeyPress { s, event ->
+            val container = s as? AbstractContainerScreen<*> ?: return@AllowKeyPress true
+            if (!shouldBlockNumberKeys(container)) return@AllowKeyPress true
+
+            val keyCode = event.key
+            keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
+        })
+
+        ScreenKeyboardEvents.allowKeyRelease(screen).register(ScreenKeyboardEvents.AllowKeyRelease { s, event ->
+            val container = s as? AbstractContainerScreen<*> ?: return@AllowKeyRelease true
+            if (!shouldBlockNumberKeys(container)) return@AllowKeyRelease true
+
+            val keyCode = event.key
+            keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
+        })
+        //?}
     }
 
     private fun shouldBlockNumberKeys(screen: AbstractContainerScreen<*>): Boolean {

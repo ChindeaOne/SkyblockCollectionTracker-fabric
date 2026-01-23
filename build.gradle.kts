@@ -1,10 +1,9 @@
 import net.fabricmc.loom.task.RemapJarTask
-import sct.GitBranch
 import sct.GitVersion
 
 plugins {
-    id("com.gradleup.shadow") version "8.3.4"
-    id("fabric-loom") version "1.13-SNAPSHOT"
+    id("com.gradleup.shadow") version "9.3.1"
+    id("net.fabricmc.fabric-loom-remap")
     kotlin("jvm") version "2.0.0"
     id("com.google.devtools.ksp") version "2.0.0-1.0.24"
     kotlin("plugin.power-assert") version "2.0.0"
@@ -12,15 +11,12 @@ plugins {
 }
 
 val gitVersion = objects.newInstance(GitVersion::class)
-val gitBranch = objects.newInstance(GitBranch::class)
-
 version = gitVersion.setVersionfromGit(project)
-val mcBranch: String = gitBranch.getGitBranchName(project)?.trim()?.takeIf { it.isNotBlank() } ?: "unknown"
 
 group = project.property("maven_group").toString()
 
 base {
-    archivesName.set(project.property("archives_base_name").toString())
+    archivesName.set("${project.property("archives_base_name")}-mc${sc.current.version}")
 }
 
 repositories {
@@ -113,7 +109,7 @@ fabricApi {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
+    minecraft("com.mojang:minecraft:${sc.current.version}")
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
 
@@ -142,9 +138,13 @@ kotlin {
 
 tasks.processResources {
     inputs.property("version", project.version)
+    inputs.property("minecraft_version", sc.current.version)
 
     filesMatching("fabric.mod.json") {
-        expand("version" to project.version)
+        expand(
+            "version" to project.version,
+            "minecraft_version" to sc.current.version
+        )
     }
     filesMatching("assets/skyblockcollectiontracker/url.properties") {
         expand(
@@ -184,19 +184,12 @@ tasks.jar {
 
 val remapJar by tasks.named<RemapJarTask>("remapJar") {
     archiveClassifier.set("")
+
+    archiveFileName.set("${project.property("archives_base_name")}-${project.version}+mc${sc.current.version}.jar")
+
     dependsOn(tasks.shadowJar)
     inputFile.set(tasks.shadowJar.get().archiveFile)
-    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
-}
-
-tasks.withType<Jar>().configureEach {
-    val name = base.archivesName.get()
-    archiveFileName.set("$name-${project.version}-mc$mcBranch.jar")
-}
-
-tasks.withType<RemapJarTask>().configureEach {
-    val name = base.archivesName.get()
-    archiveFileName.set("$name-${project.version}-mc$mcBranch.jar")
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs/${sc.current.version}"))
 }
 
 tasks.shadowJar {
@@ -205,7 +198,7 @@ tasks.shadowJar {
     configurations = listOf(shadowImpl, shadowModImpl)
 
     doLast {
-        configurations.forEach {
+        listOf(shadowImpl, shadowModImpl).forEach {
             println("Copying dependencies into mod: ${it.files}")
         }
     }

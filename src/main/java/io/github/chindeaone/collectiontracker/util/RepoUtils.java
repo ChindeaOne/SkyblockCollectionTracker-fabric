@@ -65,10 +65,6 @@ public class RepoUtils {
                 }
             }
 
-//            Testing only
-//            latestStableTag = "v1.0.8+1.21.10";
-//            latestBetaTag = "v1.0.9-beta2+1.21.10";
-
             String selectedTag = null;
 
             if (updateSetting.equals("RELEASE")) {
@@ -129,6 +125,7 @@ public class RepoUtils {
     private static String normalizeComparableVersion(String raw) {
         if (raw == null) return "";
         String v = raw.trim();
+        // Remove leading 'v' and any build metadata in case it's present
         if (v.startsWith("v") || v.startsWith("V")) v = v.substring(1);
         int plus = v.indexOf('+');
         if (plus >= 0) v = v.substring(0, plus);
