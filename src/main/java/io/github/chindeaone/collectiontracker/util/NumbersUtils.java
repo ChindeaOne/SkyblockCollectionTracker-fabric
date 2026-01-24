@@ -4,42 +4,27 @@ import java.util.Locale;
 
 public class NumbersUtils {
 
-    public static String formatNumber(float number) {
-        number = (float) Math.floor(number);
+    // Shared units (future-proofed for larger numbers)
+    private static final String[] UNITS = {"", "k", "M", "B", "T"};
 
-        if (number < 1_000) {
-            return String.valueOf((int) number);
-        } else if (number < 1_000_000) {
-            return String.format("%.2fk", number / 1_000.0);
-        } else if (number < 1_000_000_000) {
-            return String.format("%.2fM", number / 1_000_000.0);
-        } else {
-            return String.format("%.2fB", number / 1_000_000_000.0);
-        }
-    }
+    /**
+     * Compactly formats a long value using units (k, M, B, T).
+     * For values < 1000 returns a plain integer string, otherwise returns with 2 decimals and unit suffix.
+     */
+    public static String formatNumber(long number) {
+        if (number == 0) return "0";
 
-    public static String compactFloat(float value) {
-        if (Float.isNaN(value)) return "0";
-        if (value == -1f) return "N/A";
-
-        double v = value;
-        String sign = "";
-        if (v < 0) {
-            sign = "-";
-            v = Math.abs(v);
+        if (number < 1000) {
+            return String.format(Locale.US, "%d", number);
         }
 
-        if (v < 1000.0) {
-            return sign + String.format(Locale.US, "%.0f", v);
+        double compactNumber = (double) number;
+        int index = 0;
+        while (compactNumber >= 1000.0 && index < UNITS.length - 1) {
+            compactNumber /= 1000.0;
+            index++;
         }
 
-        final String[] units = {"", "k", "M", "B", "T"};
-        int unitIndex = 0;
-        while (v >= 1000.0 && unitIndex < units.length - 1) {
-            v /= 1000.0;
-            unitIndex++;
-        }
-
-        return sign + String.format(Locale.US, "%.2f%s", v, units[unitIndex]);
+        return String.format(Locale.US, "%.2f%s", compactNumber, UNITS[index]);
     }
 }

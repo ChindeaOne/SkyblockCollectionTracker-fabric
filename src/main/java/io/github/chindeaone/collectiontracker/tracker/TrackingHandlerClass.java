@@ -21,12 +21,12 @@ import java.util.concurrent.TimeUnit;
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.tracker.DataFetcher.scheduler;
 import static io.github.chindeaone.collectiontracker.tracker.TrackingRates.*;
-import static io.github.chindeaone.collectiontracker.util.NumbersUtils.compactFloat;
+import static io.github.chindeaone.collectiontracker.util.NumbersUtils.formatNumber;
 
 public class TrackingHandlerClass {
 
     private static final Logger logger = LogManager.getLogger(TrackingHandlerClass.class);
-    private static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(15); // 15 seconds cooldown
+    private static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10 seconds cooldown
 
     public static boolean isTracking = false;
     public static boolean isPaused = false;
@@ -94,6 +94,7 @@ public class TrackingHandlerClass {
             if (!Hypixel.INSTANCE.getServer()) {
                 logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
             } else if (afk) {
+                ChatUtils.INSTANCE.sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true);
                 logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down");
             }
             afk = false;
@@ -147,6 +148,8 @@ public class TrackingHandlerClass {
             scheduler.shutdownNow();
             Thread.currentThread().interrupt();
         }
+        // Clear cached data
+        DataFetcher.clearAllCache();
 
         // Reset uptime
         long now = System.currentTimeMillis();
@@ -169,9 +172,9 @@ public class TrackingHandlerClass {
 
     private static void resetLowestHighestRates() {
         highestCollectionPerHour = 0;
-        lowestCollectionPerHour = Float.MAX_VALUE;
+        lowestCollectionPerHour = Long.MAX_VALUE;
         highestRatePerHourNPC = 0;
-        lowestRatePerHourNPC = Float.MAX_VALUE;
+        lowestRatePerHourNPC = Long.MAX_VALUE;
         lowestRatesPerHourBazaar.clear();
         highestRatesPerHourBazaar.clear();
     }
@@ -220,7 +223,7 @@ public class TrackingHandlerClass {
 
         java.util.List<String> lines = new java.util.ArrayList<>();
         lines.add(String.format("   §aCollection tracked: §f%s", collectionDisplay));
-        lines.add(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, compactFloat(collectionMade), compactFloat(collectionPerHour)));
+        lines.add(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour)));
 
         if (CollectionsManager.isRiftCollection(StartTracker.collection)) {
             lines.add(String.format("   §7Elapsed time: §f%s", getUptimeInWords()));
@@ -234,32 +237,38 @@ public class TrackingHandlerClass {
         boolean useBazaar = config.getBazaar().bazaarConfig.useBazaar;
         BazaarType bazaarType = config.getBazaar().bazaarConfig.bazaarType;
         if (!useBazaar) {
-            float npcMoney = moneyMade.get("NPC");
-            lines.add(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", compactFloat(npcMoney), compactFloat(moneyPerHourNPC)));
+            long npcMoney = moneyMade.get("NPC");
+            lines.add(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
         } else {
             switch (collectionType) {
                 case "normal" -> {
-                    float bazMoney = moneyMade.get(collectionType);
-                    float bazRate = moneyPerHourBazaar.get(collectionType);
-                    lines.add(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", compactFloat(bazMoney), compactFloat(bazRate)));
+                    long bazMoney = moneyMade.get(collectionType);
+                    long bazRate = moneyPerHourBazaar.get(collectionType);
+                    lines.add(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate)));
                 }
                 case "enchanted" -> {
                     String key = SkyblockCollectionTracker.configManager.getConfig().getBazaar().bazaarConfig.bazaarType.equals(io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType.ENCHANTED_VERSION)
                             ? "Enchanted version" : "Super Enchanted version";
-                    float money = moneyMade.get(key);
-                    float rate = moneyPerHourBazaar.get(key);
-                    lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", compactFloat(money), compactFloat(rate)));
+                    long money = moneyMade.get(key);
+                    long rate = moneyPerHourBazaar.get(key);
+                    lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate)));
                 }
                 case "gemstone" -> {
                     String variant = SkyblockCollectionTracker.configManager.getConfig().getBazaar().bazaarConfig.gemstoneVariant.toString();
-                    float gMoney = moneyMade.get(variant);
-                    float gRate = moneyPerHourBazaar.get(variant);
-                    lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", compactFloat(gMoney), compactFloat(gRate)));
+                    long gMoney = moneyMade.get(variant);
+                    long gRate = moneyPerHourBazaar.get(variant);
+                    lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate)));
                 }
             }
         }
 
         lines.add(String.format("   §7Elapsed time: §f%s", getUptimeInWords()));
+
+        // If no 2nd fetching cycle, skip best/worst rates
+        if (getUptimeInSeconds() < 200) {
+            ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
+            return;
+        }
 
         lines.add("");
         lines.add("   §eBest/Worst Rates:");
@@ -267,65 +276,53 @@ public class TrackingHandlerClass {
 
         // Collection extremes
         if (highestCollectionPerHour > 0) {
-            lines.add(String.format("   §6Best collection rate: §f%s coll/h", compactFloat(highestCollectionPerHour)));
+            lines.add(String.format("   §6Best collection rate: §f%s coll/h", formatNumber(highestCollectionPerHour)));
         }
-        if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Float.MAX_VALUE) {
-            lines.add(String.format("   §6Lowest collection rate: §f%s coll/h", compactFloat(lowestCollectionPerHour)));
+        if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Long.MAX_VALUE) {
+            lines.add(String.format("   §6Lowest collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour)));
         }
 
         if (!useBazaar) {
             // NPC money extremes
             if (highestRatePerHourNPC > 0) {
-                lines.add(String.format("   §6Best NPC money rate: §f$%s/h", compactFloat(highestRatePerHourNPC)));
+                lines.add(String.format("   §6Best NPC money rate: §f$%s/h", formatNumber(highestRatePerHourNPC)));
             }
-            if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Float.MAX_VALUE) {
-                lines.add(String.format("   §6Lowest NPC money rate: §f$%s/h", compactFloat(lowestRatePerHourNPC)));
+            if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
+                lines.add(String.format("   §6Lowest NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC)));
             }
         } else {
             // Bazaar extremes per variant
             if (!moneyPerHourBazaar.isEmpty()) {
                 switch (collectionType) {
                     case "normal" -> {
-                        Float low = lowestRatesPerHourBazaar.get("normal");
-                        Float high = highestRatesPerHourBazaar.get("normal");
+                        long low = lowestRatesPerHourBazaar.getOrDefault("normal", 0L);
+                        long high = highestRatesPerHourBazaar.getOrDefault("normal", 0L);
 
-                        float lowD = (low == null || low <= 0f) ? 0.0f : low;
-                        float highD = (high == null || high <= 0f) ? 0.0f : high;
-
-                        lines.add(String.format("   §6Best: §f$%s/h", compactFloat(highD)) );
-                        lines.add(String.format("   §6Worst: §f$%s/h", compactFloat(lowD)) );
+                        lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)) );
+                        lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)) );
                     }
                     case "enchanted" -> {
                         if (bazaarType.equals(BazaarType.ENCHANTED_VERSION)) {
-                            Float low = lowestRatesPerHourBazaar.get("Enchanted version");
-                            Float high = highestRatesPerHourBazaar.get("Enchanted version");
+                            long low = lowestRatesPerHourBazaar.getOrDefault("Enchanted version", 0L);
+                            long high = highestRatesPerHourBazaar.getOrDefault("Enchanted version", 0L);
 
-                            float lowD = (low == null || low <= 0f) ? 0.0f : low;
-                            float highD = (high == null || high <= 0f) ? 0.0f : high;
-
-                            lines.add(String.format("   §6Best: §f$%s/h", compactFloat(highD)) );
-                            lines.add(String.format("   §6Worst: §f$%s/h", compactFloat(lowD)) );
+                            lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)) );
+                            lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)) );
                         } else {
-                            Float low = lowestRatesPerHourBazaar.get("Super Enchanted version");
-                            Float high = highestRatesPerHourBazaar.get("Super Enchanted version");
+                            long low = lowestRatesPerHourBazaar.getOrDefault("Super Enchanted version", 0L);
+                            long high = highestRatesPerHourBazaar.getOrDefault("Super Enchanted version", 0L);
 
-                            float lowD = (low == null || low <= 0f) ? 0.0f : low;
-                            float highD = (high == null || high <= 0f) ? 0.0f : high;
-
-                            lines.add(String.format("   §6Best Rate: §f$%s/h", compactFloat(highD)));
-                            lines.add(String.format("   §6Worst Rate: §f$%s/h", compactFloat(lowD)));
+                            lines.add(String.format("   §6Best Rate: §f$%s/h", formatNumber(high)));
+                            lines.add(String.format("   §6Worst Rate: §f$%s/h", formatNumber(low)));
                         }
                     }
                     case "gemstone" -> {
                         String variant = SkyblockCollectionTracker.configManager.getConfig().getBazaar().bazaarConfig.gemstoneVariant.toString();
-                        Float low = lowestRatesPerHourBazaar.get(variant);
-                        Float high = highestRatesPerHourBazaar.get(variant);
+                        long low = lowestRatesPerHourBazaar.getOrDefault(variant, 0L);
+                        long high = highestRatesPerHourBazaar.getOrDefault(variant, 0L);
 
-                        float lowD = (low == null || low <= 0f) ? 0.0f : low;
-                        float highD = (high == null || high <= 0f) ? 0.0f : high;
-
-                        lines.add(String.format("   §6Best: §f$%s/h", compactFloat(highD)));
-                        lines.add(String.format("   §6Worst: §f$%s/h", compactFloat(lowD)));
+                        lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)));
+                        lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)));
                     }
                 }
             }
