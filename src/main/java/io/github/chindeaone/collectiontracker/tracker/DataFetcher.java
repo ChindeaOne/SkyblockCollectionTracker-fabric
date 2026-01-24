@@ -8,9 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -21,20 +21,21 @@ import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClas
 public class DataFetcher {
 
     private static final Logger logger = LogManager.getLogger(DataFetcher.class);
-    private static final Map<CacheKey, String> collectionCache = new HashMap<>();
-    private static final Map<CacheKey, Long> cacheTimestamps = new HashMap<>();
-    private static final long CACHE_LIFESPAN = 150000; // 2.5 minutes
+    private static final Map<CacheKey, String> collectionCache = new ConcurrentHashMap<>();
+    private static final Map<CacheKey, Long> cacheTimestamps = new ConcurrentHashMap<>();
+    private static final long CACHE_LIFESPAN_MS = 180_000L; // default 3 minutes
     public static ScheduledExecutorService scheduler;
 
     public static void scheduleCollectionDataFetch() {
-        int period = 180; // Default
+        int period = 200; // Default (3 minutes 20 seconds)
         List<String> timeConsumingCollections = Arrays.asList("cropie", "squash", "refined mineral", "glossy gemstone");
 
         if (timeConsumingCollections.contains(collection)) {
             period = 600;
         }
+
         scheduler.scheduleAtFixedRate(DataFetcher::fetchData, 1, period, TimeUnit.SECONDS);
-        logger.info("[SCT]: Data fetching scheduled to run every 180 seconds");
+        logger.info("[SCT]: Data fetching scheduled to run every {} seconds", period);
     }
 
     public static void fetchData() {
@@ -68,12 +69,19 @@ public class DataFetcher {
         CacheKey cacheKey = new CacheKey(playerUUID, collection);
         Long lastFetched = cacheTimestamps.get(cacheKey);
 
-        if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < CACHE_LIFESPAN) {
-            logger.info("[SCT]: Returning cached data for player with UUID: {} and collection: {}", playerUUID, collection);
+        if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < CACHE_LIFESPAN_MS) {
+            long elapsed = System.currentTimeMillis() - lastFetched;
+            logger.info("[SCT]: Returning cached data for player with UUID: {} and collection: {} (last fetched {} ms ago)", playerUUID, collection, elapsed);
             return collectionCache.get(cacheKey);
         }
 
-        logger.info("[SCT]: Cache expired or missing. Fetching new data for player with UUID: {} and collection: {}", playerUUID, collection);
+        if (lastFetched != null) {
+            long elapsed = System.currentTimeMillis() - lastFetched;
+            logger.info("[SCT]: Cache expired for player {} collection {} (last fetched {} ms ago). Fetching new data.", playerUUID, collection, elapsed);
+        } else {
+            logger.info("[SCT]: No cache present for player {} collection {}. Fetching data.", playerUUID, collection);
+        }
+
         String jsonData = HypixelApiFetcher.fetchJsonData(playerUUID, TokenManager.getToken(), collection);
 
         if (jsonData != null) {
@@ -83,15 +91,12 @@ public class DataFetcher {
         return jsonData;
     }
 
+    public static void clearAllCache() {
+        collectionCache.clear();
+        cacheTimestamps.clear();
+        logger.info("[SCT]: All collection data caches have been cleared.");
+    }
+
     private record CacheKey(String uuid, String collection) {
-
-        @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                CacheKey cacheKey = (CacheKey) o;
-                return uuid.equals(cacheKey.uuid) && collection.equals(cacheKey.collection);
-            }
-
     }
 }
