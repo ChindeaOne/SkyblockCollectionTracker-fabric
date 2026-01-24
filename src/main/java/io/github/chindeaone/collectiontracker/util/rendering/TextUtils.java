@@ -59,7 +59,7 @@ public class TextUtils {
                 case COLL_PER_HOUR -> addIfNotNull(handleCollectionPerHour());
                 case MONEY_PER_HOUR -> addIfNotNull(handleMoneyPerHour());
                 case MONEY_MADE -> addIfNotNull(handleMoneyMade());
-                case COLLECTION_SINCE_LAST -> addIfNotNullExtra(handleCollectionSinceLast());
+                case COLLECTION_SINCE_LAST -> addIfNotNull(handleCollectionSinceLast());
             }
         }
     }
@@ -102,7 +102,7 @@ public class TextUtils {
             return "$/h (NPC): " + formatNumberOrPlaceholder(moneyPerHourNPC);
         }
 
-        float localMoneyPerHour;
+        long localMoneyPerHour;
         switch (collectionType) {
             case "normal" -> {
                 localMoneyPerHour = moneyPerHourBazaar.get(collectionType);
@@ -113,8 +113,8 @@ public class TextUtils {
                     localMoneyPerHour = moneyPerHourBazaar.get("Enchanted version");
                     return "$/h (Bazaar): " + formatNumberOrPlaceholder(localMoneyPerHour);
                 } else {
-                    localMoneyPerHour = moneyPerHourBazaar.getOrDefault("Super Enchanted version", -1.0f);
-                    if (localMoneyPerHour == -1.0f) {
+                    localMoneyPerHour = moneyPerHourBazaar.getOrDefault("Super Enchanted version", -1L);
+                    if (localMoneyPerHour == -1L) {
                         config.getBazaar().bazaarConfig.bazaarType = BazaarType.ENCHANTED_VERSION;
                         return null;
                     } else return "$/h (Bazaar): " + formatNumberOrPlaceholder(localMoneyPerHour);
@@ -140,11 +140,11 @@ public class TextUtils {
         hasNpcPrice = NpcPrices.getNpcPrice(collection) != -1;
 
         if (!bazaarConfig.useBazaar && hasNpcPrice) {
-            float moneyMadeNPC = moneyMade.get("NPC");
+            long moneyMadeNPC = moneyMade.get("NPC");
             return "$ made (NPC): " + formatNumberOrPlaceholder(moneyMadeNPC);
         }
 
-        float localMoneyMade;
+        long localMoneyMade;
         switch (collectionType) {
             case "normal" -> {
                 localMoneyMade = moneyMade.get(collectionType);
@@ -155,8 +155,8 @@ public class TextUtils {
                     localMoneyMade = moneyMade.get("Enchanted version");
                     return "$ made (Bazaar): " + formatNumberOrPlaceholder(localMoneyMade);
                 } else {
-                    localMoneyMade = moneyMade.getOrDefault("Super Enchanted version", -1.0f);
-                    if (localMoneyMade == -1.0f) {
+                    localMoneyMade = moneyMade.getOrDefault("Super Enchanted version", -1L);
+                    if (localMoneyMade == -1L) {
                         config.getBazaar().bazaarConfig.bazaarType = BazaarType.ENCHANTED_VERSION;
                         return null;
                     } else return "$ made (Bazaar): " + formatNumberOrPlaceholder(localMoneyMade);
@@ -168,6 +168,12 @@ public class TextUtils {
             }
             default -> { return null; }
         }
+    }
+
+    private static String handleCollectionSinceLast() {
+        return collectionSinceLast > 0
+                ? formatCollectionName(collection) + " collection since last: " + formatNumber(collectionSinceLast)
+                : formatCollectionName(collection) + " collection since last: Calculating...";
     }
 
     public static void updateExtraStats() {
@@ -241,27 +247,21 @@ public class TextUtils {
             // Skip normal items
             case "enchanted" -> {
                 if (bazaarType.equals(BazaarType.ENCHANTED_VERSION)) {
-                    return  "Item price: " + formatNumber(BazaarPrices.enchantedPrice);
+                    return  "Item price: " + formatNumber((long) BazaarPrices.enchantedPrice);
                 } else {
                     if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
                         config.getBazaar().bazaarConfig.bazaarType = BazaarType.ENCHANTED_VERSION;
                         return null;
-                    } else return  "Item price: " + formatNumber(BazaarPrices.superEnchantedPrice);
+                    } else return  "Item price: " + formatNumber((long) BazaarPrices.superEnchantedPrice);
                 }
             }
 
             case "gemstone" -> {
-                return "Variant price: " + formatNumber(GemstonePrices.getPrice(bazaarConfig.gemstoneVariant.toString()));
+                return "Variant price: " + formatNumber((long) GemstonePrices.getPrice(bazaarConfig.gemstoneVariant.toString()));
             }
 
             default -> { return null; }
         }
-    }
-
-    private static String handleCollectionSinceLast() {
-        return collectionSinceLast > 0
-                ? formatCollectionName(collection) + " collection since last: " + formatNumber(collectionSinceLast)
-                : formatCollectionName(collection) + " collection since last: Calculating...";
     }
 
     public static List<String> updateCommissions() {
@@ -333,7 +333,7 @@ public class TextUtils {
         return formattedName.toString();
     }
 
-    private static String formatNumberOrPlaceholder(float value) {
+    private static String formatNumberOrPlaceholder(long value) {
         return value > 0 ? formatNumber(value) : "Calculating...";
     }
 }
