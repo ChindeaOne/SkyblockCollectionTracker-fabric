@@ -116,7 +116,7 @@ dependencies {
     // Fabric API
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_kotlin_version")}")
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
 
     modImplementation("com.terraformersmc:modmenu:${project.property("mod_menu_version")}")
 

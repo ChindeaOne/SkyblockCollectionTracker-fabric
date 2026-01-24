@@ -16,7 +16,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.Minecraft
-import net.minecraft.resources.ResourceLocation
+//? if = 1.21.11 {
+import net.minecraft.resources.Identifier
+//? } else {
+ /*import net.minecraft.resources.ResourceLocation 
+*///? }
 
 class ModLoader: ModInitializer {
 
@@ -36,7 +40,11 @@ class ModLoader: ModInitializer {
         })
         ClientPlayConnectionEvents.DISCONNECT.register{ _, _ -> Hypixel.onDisconnect() }
 
-        val overlayId = ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
+        //? if = 1.21.11 {
+        val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
+        //? } else {
+         /*val overlayId = ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay") 
+        *///? }
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, tickCounter ->
             CollectionOverlay.render(context, tickCounter)
             CommissionsOverlay.render(context, tickCounter)

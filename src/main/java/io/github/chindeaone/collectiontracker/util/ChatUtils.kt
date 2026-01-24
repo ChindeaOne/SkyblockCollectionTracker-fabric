@@ -2,6 +2,9 @@ package io.github.chindeaone.collectiontracker.util
 
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+//? if = 1.21.11 {
+import net.minecraft.client.gui.components.ChatComponent
+//? }
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 
@@ -30,7 +33,7 @@ object ChatUtils {
 
     fun String.asComponent(): Component = Component.literal(this)
 
-    private fun Component.centerText(width: Int = Minecraft.getInstance().gui.chat.width): Component {
+    private fun Component.centerText(width: Int = getWidth()): Component {
         val textWidth = Minecraft.getInstance().font.width(this)
         val spaceWidth = Minecraft.getInstance().font.width(Component.literal(" "))
         val paddingPixels = (width - textWidth) / 2
@@ -40,9 +43,10 @@ object ChatUtils {
         return Component.empty().apply {
             append(spaces.asComponent())
             append(this@centerText)
-        }    }
+        }
+    }
 
-    private fun fillChat(symbol: String = "-", style: ChatFormatting = ChatFormatting.GOLD, width: Int = Minecraft.getInstance().gui.chat.width): Component {
+    private fun fillChat(symbol: String = "-", style: ChatFormatting = ChatFormatting.GOLD, width: Int = getWidth()): Component {
         val symbolComponent = Component.literal(symbol).withStyle(style, ChatFormatting.STRIKETHROUGH)
         val symbolWidth = Minecraft.getInstance().font.width(symbolComponent)
         if (symbolWidth <= 0) return symbolComponent
@@ -51,6 +55,14 @@ object ChatUtils {
         val component = Component.literal("")
         repeat(repeat) { component.append(symbolComponent) }
         return component
+    }
+
+    private fun getWidth(): Int {
+        //? if = 1.21.11 {
+        return ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get())
+        //? } else {
+         /*return Minecraft.getInstance().gui.chat.width 
+        *///? }
     }
 
     fun sendCommands(
