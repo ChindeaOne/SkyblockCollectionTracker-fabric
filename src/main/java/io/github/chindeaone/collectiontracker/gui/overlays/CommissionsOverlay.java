@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class CommissionsOverlay {
@@ -17,7 +16,7 @@ public class CommissionsOverlay {
         visible = visibility;
     }
 
-    public static void render (GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static void render (GuiGraphics guiGraphics) {
         if (!isVisible() || !ConfigAccess.isCommissionsEnabled()) return;
 
         RenderUtils.INSTANCE.drawCommissions(guiGraphics);

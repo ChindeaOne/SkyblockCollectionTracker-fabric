@@ -3,7 +3,6 @@
 */
 package io.github.chindeaone.collectiontracker.util
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices

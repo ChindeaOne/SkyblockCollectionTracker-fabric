@@ -48,10 +48,10 @@ class ModLoader: ModInitializer {
         //? } else {
          /*val overlayId = ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay") 
         *///? }
-        HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, tickCounter ->
-            CollectionOverlay.render(context, tickCounter)
-            CommissionsOverlay.render(context, tickCounter)
-            MiningStatsOverlay.render(context, tickCounter)
+        HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, _ ->
+            CollectionOverlay.render(context)
+            CommissionsOverlay.render(context)
+            MiningStatsOverlay.render(context)
         }
     }
 

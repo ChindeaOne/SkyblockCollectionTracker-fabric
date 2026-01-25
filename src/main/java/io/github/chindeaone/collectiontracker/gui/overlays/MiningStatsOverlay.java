@@ -1,10 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.ConfigUtilsKt;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class MiningStatsOverlay {
@@ -19,7 +16,7 @@ public class MiningStatsOverlay {
         visible = visibility;
     }
 
-    public static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static void render(GuiGraphics guiGraphics) {
         if (!visible || !ConfigAccess.isMiningStatsEnabled()) return;
 
         RenderUtils.INSTANCE.drawStats(guiGraphics);

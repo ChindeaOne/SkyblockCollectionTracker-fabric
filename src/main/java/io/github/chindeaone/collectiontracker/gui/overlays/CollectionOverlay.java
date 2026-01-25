@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 
 import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.isTracking;
@@ -25,7 +24,7 @@ public class CollectionOverlay  {
         setVisible(false);
     }
 
-    public static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static void render(GuiGraphics guiGraphics) {
         if (!isTracking || !visible) return;
 
         if (overlayDirty) {

@@ -1,7 +1,5 @@
 package io.github.chindeaone.collectiontracker.util.tab
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.util.ChatUtils
 

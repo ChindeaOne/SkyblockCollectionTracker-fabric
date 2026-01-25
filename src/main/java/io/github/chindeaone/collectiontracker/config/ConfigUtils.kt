@@ -58,9 +58,6 @@ object ConfigAccess {
     fun isUsingBazaar(): Boolean = useBazaar
 
     @JvmStatic
-    fun getMiningStatsOverlay(): MiningStatsOverlay = miningStatsOverlay
-
-    @JvmStatic
     fun getKeybindConfig(): KeybindConfig = keybindConfig
 
     @JvmStatic
