@@ -3,7 +3,6 @@ package io.github.chindeaone.collectiontracker.util.tab
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.util.ChatUtils
 
-
 object CommissionsWidget {
     private var lastCommissionSet: List<String>? = null
     var rawCommissions: List<String> = emptyList()
@@ -37,11 +36,11 @@ object CommissionsWidget {
             }
 
             if (now - firstInfoSeenTime < 5_000L) {
-                return // Wait for the 1-second buffer
+                return // Wait for the 5s buffer
             }
 
             // disable the overlay if the widget is not found
-            ChatUtils.sendMessage("§cWarning: Commissions widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the commissions trackingOverlay config in your mod.", true)
+            ChatUtils.sendMessage("§cWarning: Commissions widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the commissions overlay config in your mod.", true)
             SkyblockCollectionTracker.configManager.config!!.mining.commissionsOverlay.enableCommissionsOverlay = false
             return
         }
@@ -50,7 +49,7 @@ object CommissionsWidget {
 
         if (now < nextAllowedTime) return
 
-        val currentRaw = parseCommissionWidget(widget.lines)
+        val currentRaw = TabData.parseWidgetData(widget.lines)
         if (currentRaw == null || currentRaw == lastCommissionSet) return
 
         rawCommissions = currentRaw
@@ -59,18 +58,4 @@ object CommissionsWidget {
 
         rawCommissions.joinToString(" | ") { it }
     }
-
-    private fun parseCommissionWidget(lines: List<String>): List<String>? {
-        if (lines.size < 2) return null
-
-        val body = lines.drop(1)
-            .map { it.stripMinecraftFormatting().trim() }
-            .filter { it.isNotEmpty() }
-            .take(4)
-
-        return body.ifEmpty { null }
-    }
-
-    private fun String.stripMinecraftFormatting(): String =
-        replace(Regex("§."), "")
 }
