@@ -13,6 +13,9 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.SingleOv
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.StringUtils;
 import io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget;
+import io.github.chindeaone.collectiontracker.util.tab.MiningStatsWidget;
+import io.github.chindeaone.collectiontracker.util.world.BlockWatcher;
+import io.github.chindeaone.collectiontracker.util.mining.MiningStatsParser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -28,14 +31,15 @@ import static io.github.chindeaone.collectiontracker.util.NumbersUtils.formatNum
 public class TextUtils {
 
     public static List<String> formattedCommissions = new ArrayList<>();
-    static List<String> overlayLines = new ArrayList<>();
-    static List<String> extraOverlayLines = new ArrayList<>();
-    static boolean hasNpcPrice;
+    public static List<String> formattedMiningStats = new ArrayList<>();
+    private final static List<String> overlayLines = new ArrayList<>();
+    private final static List<String> extraOverlayLines = new ArrayList<>();
+    private static boolean hasNpcPrice;
 
-    static ModConfig config = Objects.requireNonNull(SkyblockCollectionTracker.configManager.getConfig());
-    static BazaarConfig bazaarConfig;
-    static BazaarType bazaarType;
-    static SingleOverlay singleOverlay;
+    private static ModConfig config = Objects.requireNonNull(SkyblockCollectionTracker.configManager.getConfig());
+    private static BazaarConfig bazaarConfig;
+    private static BazaarType bazaarType;
+    private static SingleOverlay singleOverlay;
 
     public static void updateStats() {
         checkConfig();
@@ -293,6 +297,15 @@ public class TextUtils {
             }
         }
         return formattedCommissions;
+    }
+
+    public static List<String> updateMiningStats() {
+        List<String> raw = MiningStatsWidget.INSTANCE.getRawStats();
+        if (raw.isEmpty()) return null;
+
+        formattedMiningStats.clear();
+        formattedMiningStats.addAll(MiningStatsParser.parse(raw, BlockWatcher.INSTANCE.getMiningBlockType()));
+        return formattedMiningStats;
     }
 
     public static @NotNull List<String> getStrings() {

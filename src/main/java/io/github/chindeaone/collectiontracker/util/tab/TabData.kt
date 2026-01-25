@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.util.tab
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.util.HypixelUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
@@ -8,11 +9,12 @@ import net.minecraft.client.multiplayer.ClientLevel
 object TabData {
 
     private var tabCache: List<String> = emptyList()
-    private val isEnabled: Boolean get() = SkyblockCollectionTracker.configManager.config?.mining?.commissionsOverlay?.enableCommissionsOverlay ?: false
     private var world: ClientLevel? = null
 
-    fun tickAndUpdateWidget() {
-        val currentWorld = Minecraft.getInstance().level
+    private var config: ModConfig = SkyblockCollectionTracker.configManager.config!!
+
+    fun tickAndUpdateWidget(client: Minecraft) {
+        val currentWorld = client.level
         if (currentWorld == null) {
             world = null
             return
@@ -22,13 +24,16 @@ object TabData {
             world = currentWorld
         }
 
-        if (!HypixelUtils.isOnSkyblock || !isEnabled) return
+        if (!HypixelUtils.isOnSkyblock) return
+        if (!config.mining.miningStatsOverlay.enableMiningStatsOverlay && !config.mining.commissionsOverlay.enableCommissionsOverlay) return
         val newList = readTab() ?: return
         if (newList.isEmpty()) return
 
         tabCache = newList
         TabWidget.update(tabCache)
+
         CommissionsWidget.onTabWidgetsUpdate()
+        MiningStatsWidget.onTabWidgetsUpdate()
     }
 
     private fun readTab(): List<String>? {
@@ -44,4 +49,17 @@ object TabData {
 
         return if (result.size > 80) result.subList(0, 80) else result
     }
+
+    fun parseWidgetData(lines: List<String>): List<String>? {
+        if (lines.size < 2) return null
+
+        val body = lines.drop(1)
+            .map { it.stripMinecraftFormatting().trim() }
+            .filter { it.isNotEmpty() }
+
+        return body.ifEmpty { null }
+    }
+
+    private fun String.stripMinecraftFormatting(): String =
+        replace(Regex("§."), "")
 }
