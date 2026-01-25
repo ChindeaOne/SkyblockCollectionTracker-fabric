@@ -44,3 +44,4 @@ replay_*.log
 !.devauth/config.toml
 
 /src/main/java/io/github/chindeaone/collectiontracker/TODO
+/src/main/java/io/github/chindeaone/collectiontracker/Minecraft color codes
