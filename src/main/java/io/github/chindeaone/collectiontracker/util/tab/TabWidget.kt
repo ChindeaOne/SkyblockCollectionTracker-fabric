@@ -390,7 +390,10 @@ enum class TabWidget(private val headerRegex: String) {
             while (i < tabLines.size && bodyCount < maxBodyLines) {
                 val line = tabLines[i]
 
-                if (headerRegexes.any { it.containsMatchIn(line) }) break
+                if (headerRegexes.any { it.matches(line) }) break
+
+                val strippedLine = line.replace(Regex("^§r"), "")
+                if (!strippedLine.startsWith(" ")) break
 
                 if (line.replace(Regex("§."), "").trim().isNotEmpty()) {
                     out += line
