@@ -10,6 +10,8 @@ import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import io.github.chindeaone.collectiontracker.util.ServerUtils.serverStatus
@@ -73,11 +75,11 @@ object Hypixel {
                         logger.info("[SCT]: API data loaded successfully.")
                     }
 
-                    logger.info("[SCT]: Update stream status: {}", SkyblockCollectionTracker.configManager.config!!.about.update)
+                    logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
 
-                    if (!SkyblockCollectionTracker.configManager.config!!.about.update.equals(About.UpdateType.NONE)) {
+                    if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
                         CompletableFuture.runAsync {
-                            RepoUtils.checkForUpdates(SkyblockCollectionTracker.configManager.config!!.about.update.toString())
+                            RepoUtils.checkForUpdates(ConfigAccess.getUpdateType().toString())
                         }.thenAcceptAsync  {
                             if (RepoUtils.latestVersion != null) {
 
@@ -87,12 +89,12 @@ object Hypixel {
                                 logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
 
                                 UpdaterManager.update()
-                                SkyblockCollectionTracker.configManager.config!!.about.hasCheckedUpdate = false
+                                ConfigHelper.disableUpdateChecks()
 
                             } else {
-                                if(!SkyblockCollectionTracker.configManager.config!!.about.hasCheckedUpdate) {
+                                if(!ConfigAccess.hasCheckedUpdate()) {
                                     ChatUtils.sendMessage("§aThe mod has been updated successfully.")
-                                    SkyblockCollectionTracker.configManager.config!!.about.hasCheckedUpdate = true
+                                    ConfigHelper.enableUpdateChecks()
                                     logger.info("[SCT]: The mod has been updated successfully.")
                                 }
                                 logger.info("[SCT]: No new version found.")

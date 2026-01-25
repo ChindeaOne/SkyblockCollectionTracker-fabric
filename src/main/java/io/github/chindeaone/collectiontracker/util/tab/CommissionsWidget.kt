@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.util.tab
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.util.ChatUtils
 
 object CommissionsWidget {
@@ -41,7 +43,7 @@ object CommissionsWidget {
 
             // disable the overlay if the widget is not found
             ChatUtils.sendMessage("§cWarning: Commissions widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the commissions overlay config in your mod.", true)
-            SkyblockCollectionTracker.configManager.config!!.mining.commissionsOverlay.enableCommissionsOverlay = false
+            ConfigHelper.disableCommissions()
             return
         }
 

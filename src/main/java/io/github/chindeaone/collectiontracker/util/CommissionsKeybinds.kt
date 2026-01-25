@@ -19,7 +19,7 @@
 
 package io.github.chindeaone.collectiontracker.util
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.minecraft.client.Minecraft
@@ -40,10 +40,10 @@ object CommissionsKeybinds {
     private var openedAt = 0L
 
     private val keybinds: List<Int> get() = listOf(
-        SkyblockCollectionTracker.configManager.config!!.mining.commissions.commission1,
-        SkyblockCollectionTracker.configManager.config!!.mining.commissions.commission2,
-        SkyblockCollectionTracker.configManager.config!!.mining.commissions.commission3,
-        SkyblockCollectionTracker.configManager.config!!.mining.commissions.commission4,
+        ConfigAccess.getKeybindConfig().commission1,
+        ConfigAccess.getKeybindConfig().commission2,
+        ConfigAccess.getKeybindConfig().commission3,
+        ConfigAccess.getKeybindConfig().commission4
     )
     private val logger: Logger = LogManager.getLogger(CommissionsKeybinds::class.java)
 
@@ -66,7 +66,7 @@ object CommissionsKeybinds {
     }
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock || !SkyblockCollectionTracker.configManager.config!!.mining.commissions.enableCommissionsKeybinds) {
+        if (!HypixelUtils.isOnSkyblock || !ConfigAccess.isCommissionsKeybindsEnabled()) {
             detachListener()
             return
         }
@@ -212,7 +212,7 @@ object CommissionsKeybinds {
 
     private fun shouldBlockNumberKeys(screen: AbstractContainerScreen<*>): Boolean {
         if (!HypixelUtils.isOnSkyblock) return false
-        if (!SkyblockCollectionTracker.configManager.config!!.mining.commissions.enableCommissionsKeybinds) return false
+        if (!ConfigAccess.isCommissionsEnabled()) return false
         return screen.title.string.contains("Commissions", ignoreCase = true)
     }
 }

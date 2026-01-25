@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.DeltaTracker;
@@ -27,7 +26,7 @@ public class CollectionOverlay  {
     }
 
     public static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        if (!isTracking || !visible || SkyblockCollectionTracker.configManager.getConfig() == null) return;
+        if (!isTracking || !visible) return;
 
         if (overlayDirty) {
             try {

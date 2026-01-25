@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.api.bazaarapi.FetchBazaarPrice;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
+import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.HypixelUtils;
@@ -52,10 +53,9 @@ public class StartTracker {
                         CollectionsManager.collectionSource = "collection";
                     } else CollectionsManager.collectionSource = "sacks";
 
-                    assert SkyblockCollectionTracker.configManager.getConfig() != null;
                     // Check if the collection is a Rift collection
                     if (CollectionsManager.isRiftCollection(collection)) {
-                        SkyblockCollectionTracker.configManager.getConfig().getBazaar().bazaarConfig.useBazaar = false;
+                        ConfigHelper.disableBazaar();
                         TrackingHandlerClass.startTracking();
                     } else {
                         // Fetch bazaar data asynchronously

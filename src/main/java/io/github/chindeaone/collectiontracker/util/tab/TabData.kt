@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.util.tab
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.util.HypixelUtils
 import net.minecraft.client.Minecraft
@@ -10,8 +11,6 @@ object TabData {
 
     private var tabCache: List<String> = emptyList()
     private var world: ClientLevel? = null
-
-    private var config: ModConfig = SkyblockCollectionTracker.configManager.config!!
 
     fun tickAndUpdateWidget(client: Minecraft) {
         val currentWorld = client.level
@@ -25,7 +24,7 @@ object TabData {
         }
 
         if (!HypixelUtils.isOnSkyblock) return
-        if (!config.mining.miningStatsOverlay.enableMiningStatsOverlay && !config.mining.commissionsOverlay.enableCommissionsOverlay) return
+        if (!ConfigAccess.isMiningStatsEnabled() && !ConfigAccess.isCommissionsEnabled()) return
         val newList = readTab() ?: return
         if (newList.isEmpty()) return
 

@@ -17,11 +17,12 @@ import java.nio.file.StandardCopyOption
 import java.util.*
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import com.google.gson.Gson
 
 class ConfigManager {
 
     companion object {
-        val gson = GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation()
+        val gson: Gson = GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues().registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
                 override fun write(out: JsonWriter, value: UUID) {

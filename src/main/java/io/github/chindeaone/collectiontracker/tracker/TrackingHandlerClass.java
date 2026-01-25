@@ -1,10 +1,11 @@
 package io.github.chindeaone.collectiontracker.tracker;
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.commands.StartTracker;
-import io.github.chindeaone.collectiontracker.config.ModConfig;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess;
+import io.github.chindeaone.collectiontracker.config.ConfigHelper;
+import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
@@ -14,7 +15,6 @@ import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -62,8 +62,8 @@ public class TrackingHandlerClass {
         startTime = 0;
         lastTime = 0;
 
-        if (!BazaarCollectionsManager.hasBazaarData && Objects.requireNonNull(SkyblockCollectionTracker.configManager.getConfig()).getBazaar().bazaarConfig.useBazaar) {
-            SkyblockCollectionTracker.configManager.getConfig().getBazaar().bazaarConfig.useBazaar = false;
+        if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
+            ConfigHelper.disableBazaar();
             ChatUtils.INSTANCE.sendMessage("§eWarning! Bazaar data not available for " + StartTracker.collection + ". Using NPC prices instead.", true);
         }
 
@@ -134,7 +134,7 @@ public class TrackingHandlerClass {
     }
 
     private static void resetTrackingData(boolean restart) {
-        if (Objects.requireNonNull(SkyblockCollectionTracker.configManager.getConfig()).getTrackingOverlay().showTrackingRatesAtEndOfSession) sendRates();
+        if (ConfigAccess.isShowTrackingRatesAtEndOfSession()) sendRates();
 
         StartTracker.previousCollection = StartTracker.collection;
         isTracking = false;
@@ -231,11 +231,9 @@ public class TrackingHandlerClass {
             return;
         }
 
-        ModConfig config = SkyblockCollectionTracker.configManager.getConfig();
-        assert config != null;
+        boolean useBazaar = ConfigAccess.isUsingBazaar();
+        BazaarType bazaarType = ConfigAccess.getBazaarType();
 
-        boolean useBazaar = config.getBazaar().bazaarConfig.useBazaar;
-        BazaarType bazaarType = config.getBazaar().bazaarConfig.bazaarType;
         if (!useBazaar) {
             long npcMoney = moneyMade.get("NPC");
             lines.add(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
@@ -247,14 +245,14 @@ public class TrackingHandlerClass {
                     lines.add(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate)));
                 }
                 case "enchanted" -> {
-                    String key = SkyblockCollectionTracker.configManager.getConfig().getBazaar().bazaarConfig.bazaarType.equals(io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType.ENCHANTED_VERSION)
+                    String key = bazaarType.equals(BazaarConfig.BazaarType.ENCHANTED_VERSION)
                             ? "Enchanted version" : "Super Enchanted version";
                     long money = moneyMade.get(key);
                     long rate = moneyPerHourBazaar.get(key);
                     lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate)));
                 }
                 case "gemstone" -> {
-                    String variant = SkyblockCollectionTracker.configManager.getConfig().getBazaar().bazaarConfig.gemstoneVariant.toString();
+                    String variant = ConfigAccess.getGemstoneVariant().toString();
                     long gMoney = moneyMade.get(variant);
                     long gRate = moneyPerHourBazaar.get(variant);
                     lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate)));
@@ -317,7 +315,7 @@ public class TrackingHandlerClass {
                         }
                     }
                     case "gemstone" -> {
-                        String variant = SkyblockCollectionTracker.configManager.getConfig().getBazaar().bazaarConfig.gemstoneVariant.toString();
+                        String variant = ConfigAccess.getGemstoneVariant().toString();
                         long low = lowestRatesPerHourBazaar.getOrDefault(variant, 0L);
                         long high = highestRatesPerHourBazaar.getOrDefault(variant, 0L);
 

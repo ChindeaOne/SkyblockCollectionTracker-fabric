@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.util.tab
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.util.ChatUtils
 import io.github.chindeaone.collectiontracker.util.world.MiningMapping
 
@@ -46,7 +47,7 @@ object MiningStatsWidget {
 
             // disable the overlay if the widget is not found
             ChatUtils.sendMessage("§cWarning: Stats widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the stats overlay config in your mod.", true)
-            SkyblockCollectionTracker.configManager.config!!.mining.miningStatsOverlay.enableMiningStatsOverlay = false
+            ConfigHelper.disableMiningStats()
             return
         }
 

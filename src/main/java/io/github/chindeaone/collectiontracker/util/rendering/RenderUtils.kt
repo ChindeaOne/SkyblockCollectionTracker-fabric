@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.util.rendering
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.commands.StartTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
@@ -75,7 +76,7 @@ object RenderUtils {
         context.pose().translate(position.x.toFloat(), position.y.toFloat())
         context.pose().scale(position.scale, position.scale)
 
-        if (SkyblockCollectionTracker.configManager.config!!.trackingOverlay.overlayTextColor) {
+        if (ConfigAccess.isOverlayTextColorEnabled()) {
             renderColors(context)
         } else {
             renderStrings(context)
@@ -85,7 +86,7 @@ object RenderUtils {
     }
 
     fun drawCommissions(context: GuiGraphics) {
-        if (!config.mining.commissionsOverlay.enableCommissionsOverlay) return
+        if (!ConfigAccess.isCommissionsEnabled()) return
 
         context.pose().pushMatrix()
         context.pose().translate(commissionsPosition.x.toFloat(), commissionsPosition.y.toFloat())
@@ -97,7 +98,7 @@ object RenderUtils {
     }
 
     fun drawStats(context: GuiGraphics) {
-        if (!config.mining.miningStatsOverlay.enableMiningStatsOverlay) return
+        if (!ConfigAccess.isMiningStatsEnabled()) return
 
         context.pose().pushMatrix()
         context.pose().translate(statsPosition.x.toFloat(), statsPosition.y.toFloat())
