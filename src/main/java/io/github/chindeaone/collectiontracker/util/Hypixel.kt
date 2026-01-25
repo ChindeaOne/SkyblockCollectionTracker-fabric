@@ -1,3 +1,6 @@
+/*
+* This kotlin object is derived from the SkyHanni mod.
+*/
 package io.github.chindeaone.collectiontracker.util
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
@@ -51,7 +54,7 @@ object Hypixel {
         server = hypixel
     }
 
-    fun onTick(client: Minecraft) {
+    fun onTick() {
         if (!HypixelUtils.isInHypixel) {
             checkServer()
             if (HypixelUtils.isInHypixel && !playerLoaded) {

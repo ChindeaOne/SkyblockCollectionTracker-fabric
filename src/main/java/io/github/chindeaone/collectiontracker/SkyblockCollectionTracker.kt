@@ -23,7 +23,7 @@ object SkyblockCollectionTracker {
         screenTicks++
         if (screenTicks != 5) return
         shouldCloseScreen = true
-        Minecraft.getInstance().setScreen(screenToOpen)
+        client.setScreen(screenToOpen)
         screenTicks = 0
         this.screenToOpen = null
     }

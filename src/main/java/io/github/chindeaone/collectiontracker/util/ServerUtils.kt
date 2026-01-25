@@ -3,7 +3,6 @@ package io.github.chindeaone.collectiontracker.util
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
-import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.Executors
@@ -29,7 +28,7 @@ object ServerUtils {
     private val executorService = Executors.newSingleThreadScheduledExecutor()
     private val logger: Logger = LogManager.getLogger(ServerUtils::class.java)
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         if (permanentlyDisabled) return
 
         tickCounter++
