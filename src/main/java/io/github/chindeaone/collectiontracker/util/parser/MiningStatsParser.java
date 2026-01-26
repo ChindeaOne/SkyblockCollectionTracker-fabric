@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.util.mining;
+package io.github.chindeaone.collectiontracker.util.parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +27,10 @@ public class MiningStatsParser {
                 ctx.spread.parse(line);
             } else if (line.contains("Pristine")) {
                 ctx.pristine.parse(line);
-            } else if (line.contains("Breaking Power")) {
-                ctx.breakingPower.parse(line);
             } else if (line.contains("Mining Wisdom")) {
                 ctx.wisdom.parse(line);
+            } else if (line.contains("Breaking Power")) {
+                ctx.breakingPower.parse(line);
             }
         }
 
@@ -44,8 +44,8 @@ public class MiningStatsParser {
             if (!"0".equals(ctx.spread.value)) formatted.add(ctx.spread.format());
         }
 
-        if (!"0".equals(ctx.breakingPower.value)) formatted.add(ctx.breakingPower.format());
         if (!"0".equals(ctx.wisdom.value)) formatted.add(ctx.wisdom.format());
+        if (!"0".equals(ctx.breakingPower.value)) formatted.add(ctx.breakingPower.format());
 
         return formatted;
     }
@@ -93,8 +93,8 @@ public class MiningStatsParser {
         Stat speed = new Stat("Mining Speed", "⸕", "§6");
         Stat spread = new Stat("Mining Spread", "▚", "§e");
         Stat pristine = new Stat("Pristine", "✧", "§5");
-        Stat breakingPower = new Stat("Breaking Power", "Ⓟ", "§2");
         Stat wisdom = new Stat("Mining Wisdom", "☯", "§3");
+        Stat breakingPower = new Stat("Breaking Power", "Ⓟ", "§2");
 
         MiningContext(String blockType) {
             this.blockType = blockType;

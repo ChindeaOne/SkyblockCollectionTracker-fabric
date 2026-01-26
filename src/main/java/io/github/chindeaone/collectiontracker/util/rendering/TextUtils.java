@@ -15,7 +15,7 @@ import io.github.chindeaone.collectiontracker.util.StringUtils;
 import io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget;
 import io.github.chindeaone.collectiontracker.util.tab.MiningStatsWidget;
 import io.github.chindeaone.collectiontracker.util.world.BlockWatcher;
-import io.github.chindeaone.collectiontracker.util.mining.MiningStatsParser;
+import io.github.chindeaone.collectiontracker.util.parser.MiningStatsParser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
