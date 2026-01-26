@@ -1,24 +1,25 @@
 package io.github.chindeaone.collectiontracker.api.collectionapi;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.io.Reader;
 import java.net.URI;
-import java.net.URL;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collections;
 
 public class FetchCollectionList {
@@ -29,52 +30,44 @@ public class FetchCollectionList {
     public static void fetchCollectionList() {
         try {
             URI uri = URI.create(URLManager.AVAILABLE_COLLECTIONS_URL);
-            URL url = uri.toURL();
-            HttpURLConnection conn = getHttpURLConnection(url);
 
-            int responseCode = conn.getResponseCode();
-            if (responseCode == 200) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String inputLine;
-                StringBuilder content = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
-                }
-                in.close();
-                conn.disconnect();
+            HttpRequest request = HttpRequest.newBuilder(uri)
+                    .timeout(Duration.ofSeconds(5))
+                    .header("User-Agent", URLManager.AGENT)
+                    .header("X-GAME-VERSION", SkyblockCollectionTracker.MC_VERSION)
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
 
-                Gson gson = new Gson();
-                JsonObject root = gson.fromJson(content.toString(), JsonObject.class);
+            HttpResponse<InputStream> response = HTTP_CLIENT.send(
+                    request,
+                    HttpResponse.BodyHandlers.ofInputStream()
+            );
 
-                for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
-                    String category = entry.getKey();
-                    JsonArray itemsArray = entry.getValue().getAsJsonArray();
-                    Set<String> items = new HashSet<>();
-                    for (int i = 0; i < itemsArray.size(); i++) {
-                        items.add(itemsArray.get(i).getAsString());
+            if (response.statusCode() == 200) {
+                try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
+                    JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+
+                    for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
+                        String category = entry.getKey();
+                        JsonArray itemsArray = entry.getValue().getAsJsonArray();
+
+                        Set<String> items = new HashSet<>();
+                        for (JsonElement el : itemsArray) {
+                            items.add(el.getAsString());
+                        }
+
+                        collections.put(category, items);
                     }
-                    collections.put(category, items);
                 }
+
                 logger.info("[SCT]: Successfully received the collection list.");
+            } else {
+                logger.error("[SCT]: Failed to fetch collection list. HTTP {}", response.statusCode());
             }
-        } catch (Exception e) {
+
+        } catch (IOException | InterruptedException e) {
             logger.error("[SCT]: Error while receiving the collection list", e);
         }
-    }
-
-    private static @NotNull HttpURLConnection getHttpURLConnection(URL url) throws Exception {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-
-        String gameVersion = SkyblockCollectionTracker.MC_VERSION;
-
-        conn.setRequestProperty("X-GAME-VERSION", gameVersion);
-        conn.setRequestProperty("User-Agent", URLManager.AGENT);
-
-        conn.setConnectTimeout(5000); // 5 seconds
-        conn.setReadTimeout(5000); // 5 seconds
-
-        conn.setRequestProperty("Content-Type", "application/json");
-        return conn;
     }
 }

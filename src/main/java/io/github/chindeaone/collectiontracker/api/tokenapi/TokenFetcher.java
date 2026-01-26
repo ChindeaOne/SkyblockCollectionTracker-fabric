@@ -7,11 +7,16 @@ import io.github.chindeaone.collectiontracker.util.PlayerData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.io.Reader;
 import java.net.URI;
-import java.net.URL;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+
+import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
 
 public class TokenFetcher {
 
@@ -19,33 +24,30 @@ public class TokenFetcher {
 
     public String fetchToken() throws Exception {
         URI uri = URI.create(URLManager.TOKEN_URL);
-        URL url = uri.toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("X-UUID", PlayerData.INSTANCE.getPlayerUUID());
-        connection.setRequestProperty("User-Agent", URLManager.AGENT);
 
-        connection.setConnectTimeout(5000); // 5 seconds
-        connection.setReadTimeout(5000); // 5 seconds
+        HttpRequest request = HttpRequest.newBuilder(uri)
+                .timeout(Duration.ofSeconds(5))
+                .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                .header("User-Agent", URLManager.AGENT)
+                .header("Accept", "application/json")
+                .GET()
+                .build();
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                String inputLine;
-                StringBuilder content = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
-                }
+        HttpResponse<InputStream> response =
+                HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-                JsonObject jsonResponse = JsonParser.parseString(content.toString()).getAsJsonObject();
-                String token = jsonResponse.has("token") ? jsonResponse.get("token").getAsString() : null;
+        int status = response.statusCode();
 
-                logger.info("[SCT]: Successfully fetched token");
-                return token;
-            }
-        } else {
-            logger.error("[SCT]: Failed to fetch token, response code: {}", responseCode);
+        if (status != 200) {
+            logger.error("[SCT]: Failed to fetch token, response code: {}", status);
             return null;
+        }
+
+        try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
+            JsonObject jsonResponse = JsonParser.parseReader(reader).getAsJsonObject();
+            logger.info("[SCT]: Successfully fetched token");
+
+            return jsonResponse.getAsJsonPrimitive("token").getAsString();
         }
     }
 }
