@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.autoupdate
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.modrinthautoupdater.UpdateContext
 import io.github.chindeaone.modrinthautoupdater.UpdateSetup
@@ -14,7 +15,7 @@ object UpdaterManager {
     private val version = SkyblockCollectionTracker.MC_VERSION
 
     private val context = UpdateContext(
-        "sct",
+        SkyblockCollectionTracker.NAMESPACE,
         version,
         SkyblockCollectionTracker.VERSION,
         "none",
@@ -27,7 +28,7 @@ object UpdaterManager {
     }
 
     private fun setUpdateStream(): String {
-        val currentStream = SkyblockCollectionTracker.configManager.config!!.about.update
+        val currentStream = ConfigAccess.getUpdateType()
         return when (currentStream) {
             About.UpdateType.RELEASE -> "release"
             About.UpdateType.BETA -> "beta"
