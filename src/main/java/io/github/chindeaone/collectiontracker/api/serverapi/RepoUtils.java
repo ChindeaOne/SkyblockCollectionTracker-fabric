@@ -23,7 +23,7 @@ import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
 public class RepoUtils {
     private static final Logger logger = LogManager.getLogger(RepoUtils.class);
 
-    public static String latestVersion;
+    public static volatile String latestVersion;
     public static String latestReleaseTag;
     public static String latestBetaTag;
 
@@ -59,17 +59,27 @@ public class RepoUtils {
     }
 
     public static void setLatestVersion() {
+        // Normalize tags before comparison
+        latestReleaseTag = normalizeTags(latestReleaseTag);
+        latestBetaTag = normalizeTags(latestBetaTag);
+
         // If this is current version, skip check
         if (currentVersion.equals(latestReleaseTag) || currentVersion.equals(latestBetaTag)) {
+            latestVersion = null;
             return;
         }
 
         // Compare versions and set latestVersion accordingly
-        latestReleaseTag = normalizeTags(latestReleaseTag);
-        latestBetaTag = normalizeTags(latestBetaTag);
-
-        if (ConfigAccess.getUpdateType().equals(About.UpdateType.RELEASE)) latestVersion = latestReleaseTag;
-        else latestVersion = latestBetaTag;
+        if (ConfigAccess.getUpdateType().equals(About.UpdateType.RELEASE)) {
+            if (latestVersion == null || !latestVersion.equals(latestReleaseTag)) {
+                latestVersion = latestReleaseTag;
+            }
+        }
+        if (ConfigAccess.getUpdateType().equals(About.UpdateType.BETA)) {
+            if (latestVersion == null || !latestVersion.equals(latestBetaTag)) {
+                latestVersion = latestBetaTag;
+            }
+        }
     }
 
     private static String normalizeTags(String tag) {

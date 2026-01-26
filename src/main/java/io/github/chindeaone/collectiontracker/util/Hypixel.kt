@@ -83,18 +83,19 @@ object Hypixel {
                             RepoUtils.setLatestVersion()
                         }.thenAcceptAsync  {
                             if (RepoUtils.latestVersion != null) {
-
-                                ChatUtils.sendMessage(
-                                    ("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game.")
-                                )
+                                Minecraft.getInstance().execute {
+                                    ChatUtils.sendMessage(
+                                        "§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game."
+                                    )
+                                }
                                 logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
-
                                 UpdaterManager.update()
                                 ConfigHelper.disableUpdateChecks()
-
                             } else {
-                                if(!ConfigAccess.hasCheckedUpdate()) {
-                                    ChatUtils.sendMessage("§aThe mod has been updated successfully.")
+                                if (!ConfigAccess.hasCheckedUpdate()) {
+                                    Minecraft.getInstance().execute {
+                                        ChatUtils.sendMessage("§aThe mod has been updated successfully.")
+                                    }
                                     ConfigHelper.enableUpdateChecks()
                                     logger.info("[SCT]: The mod has been updated successfully.")
                                 }
