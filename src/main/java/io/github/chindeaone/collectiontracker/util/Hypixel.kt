@@ -6,6 +6,7 @@ package io.github.chindeaone.collectiontracker.util
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
+import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
@@ -78,7 +79,8 @@ object Hypixel {
 
                     if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
                         CompletableFuture.runAsync {
-                            RepoUtils.checkForUpdates(ConfigAccess.getUpdateType().toString())
+                            RepoUtils.checkGithubReleases()
+                            RepoUtils.setLatestVersion()
                         }.thenAcceptAsync  {
                             if (RepoUtils.latestVersion != null) {
 

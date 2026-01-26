@@ -2,6 +2,8 @@ package io.github.chindeaone.collectiontracker.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.Properties;
 
 public class URLManager {
@@ -12,6 +14,7 @@ public class URLManager {
     public static final String NPC_PRICES_URL;
     public static final String BAZAAR_URL;
     public static final String STATUS_URL;
+    public static final String GITHUB_URL;
     public static final String AGENT;
 
     static {
@@ -30,6 +33,12 @@ public class URLManager {
         NPC_PRICES_URL = props.getProperty("NPC_PRICES_URL");
         BAZAAR_URL = props.getProperty("BAZAAR_URL");
         STATUS_URL = props.getProperty("STATUS_URL");
+        GITHUB_URL = props.getProperty("GITHUB_URL");
         AGENT = props.getProperty("AGENT");
     }
+
+    public static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(5))
+            .version(HttpClient.Version.HTTP_2)
+            .build();
 }

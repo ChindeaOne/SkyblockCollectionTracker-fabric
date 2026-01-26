@@ -155,6 +155,7 @@ tasks.processResources {
             "NPC_PRICES_URL" to (System.getenv("NPC_PRICES_URL") ?: ""),
             "BAZAAR_URL" to (System.getenv("BAZAAR_URL") ?: ""),
             "STATUS_URL" to (System.getenv("STATUS_URL") ?: ""),
+            "GITHUB_URL" to (System.getenv("GITHUB_URL") ?: ""),
             "AGENT" to (System.getenv("AGENT") ?: "")
         )
     }
