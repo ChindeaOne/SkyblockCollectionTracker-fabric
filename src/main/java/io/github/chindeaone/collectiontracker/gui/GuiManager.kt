@@ -3,7 +3,6 @@ package io.github.chindeaone.collectiontracker.gui
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.configManager
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.screenToOpen
 import io.github.chindeaone.collectiontracker.config.ModConfig
-import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyOverlay
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
@@ -35,7 +34,7 @@ object GuiManager {
     @JvmStatic
     fun openGuiPositionEditor() {
 
-        CollectionOverlay.setVisible(false)
+        OverlayManager.setGlobalRendering(false)
 
         val current = Minecraft.getInstance().screen
         val old = current as? AbstractContainerScreen<*>

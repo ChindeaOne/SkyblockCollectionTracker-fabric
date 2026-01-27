@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.core.Position;
+import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.mixins.AccessorGuiContainer;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import net.minecraft.client.Minecraft;
@@ -17,11 +18,9 @@ import net.minecraft.network.chat.Component;
 
 public class DummyOverlay extends Screen {
 
-    private boolean draggingSingle = false;
-    private boolean draggingCommissions = false;
-    private boolean draggingStats = false;
+    private AbstractOverlay dragging;
     private int dragOffsetX, dragOffsetY;
-    private AbstractContainerScreen<?> oldScreen = null;
+    private final AbstractContainerScreen<?> oldScreen;
 
     public DummyOverlay(AbstractContainerScreen<?> oldScreen) {
         super(Component.empty());
@@ -29,30 +28,14 @@ public class DummyOverlay extends Screen {
     }
 
     @Override
-    protected void init() {
-        if (CollectionOverlay.isVisible()) {
-            CollectionOverlay.setVisible(false);
-        }
-        if (CommissionsOverlay.isVisible()) {
-            CommissionsOverlay.setVisible(false);
-        }
-        if (MiningStatsOverlay.isVisible()) {
-            MiningStatsOverlay.setVisible(false);
-        }
-        super.init();
-    }
-
-    @Override
     public void onClose() {
-        CollectionOverlay.setVisible(true);
-        CommissionsOverlay.setVisible(true);
-        MiningStatsOverlay.setVisible(true);
+        OverlayManager.setGlobalRendering(true);
         Minecraft.getInstance().setScreen(oldScreen);
     }
 
     @Override
     public void render(/*? if = 1.21.11 {*/@NotNull /*?}*/GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
-        if (CollectionOverlay.isVisible() || CommissionsOverlay.isVisible() || MiningStatsOverlay.isVisible()) {
+        if (!OverlayManager.isInEditorMode()) {
             return;
         }
 
@@ -63,58 +46,44 @@ public class DummyOverlay extends Screen {
                     .invokeDrawGuiContainerBackgroundLayer_sct(context, partialTicks, -1, -1);
         }
 
+        AbstractOverlay hovered = null;
         // Draw all dummies
-        RenderUtils.INSTANCE.drawRectDummy(context);
-        RenderUtils.INSTANCE.drawCommissionsDummy(context);
-        RenderUtils.INSTANCE.drawStatsDummy(context);
+        for (AbstractOverlay overlay : OverlayManager.all()) {
+            overlay.updateDimensions();
 
-        Position activePos = null;
+            RenderUtils.INSTANCE.drawDummyFrame(context,overlay.position(), overlay.overlayLabel());
+
+            if (isMouseOver(mouseX, mouseY, overlay.position())) {
+                hovered = overlay;
+            }
+        }
 
         // Update dragging positions
-        if (draggingSingle) {
-            RenderUtils.INSTANCE.getPosition().setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY);
-        }
-        if (draggingCommissions) {
-            RenderUtils.INSTANCE.getCommissionsPosition().setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY);
-        }
-        if (draggingStats) {
-            RenderUtils.INSTANCE.getStatsPosition().setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY);
+        if (dragging != null) {
+            dragging.position().setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY);
         }
 
-        if (isMouseOverOverlay(mouseX, mouseY)) {
-            activePos = RenderUtils.INSTANCE.getPosition();
-        } else if (isMouseOverCommissionsOverlay(mouseX, mouseY)) {
-            activePos = RenderUtils.INSTANCE.getCommissionsPosition();
-        } else if (isMouseOverStatsOverlay(mouseX, mouseY)) {
-            activePos = RenderUtils.INSTANCE.getStatsPosition();
-        }
-
-        RenderUtils.INSTANCE.drawStaticText(context, activePos);
+        RenderUtils.INSTANCE.drawEditorHudText(context, hovered != null ? hovered.position() : null);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (!OverlayManager.isInEditorMode()) return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+
         if (verticalAmount == 0) return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
 
         int mx = (int) mouseX;
         int my = (int) mouseY;
 
-        float scaleChange = 0.05f;
+        for (AbstractOverlay overlay : OverlayManager.all()) {
+            Position pos = overlay.position();
 
-        if (isMouseOverOverlay(mx, my)) {
-            float next = RenderUtils.INSTANCE.getPosition().getScale() + (verticalAmount > 0 ? scaleChange : -scaleChange);
-            RenderUtils.INSTANCE.getPosition().setScaling(clamp(next));
-            return true;
-        }
-        if (isMouseOverCommissionsOverlay(mx, my)) {
-            float next = RenderUtils.INSTANCE.getCommissionsPosition().getScale() + (verticalAmount > 0 ? scaleChange : -scaleChange);
-            RenderUtils.INSTANCE.getCommissionsPosition().setScaling(clamp(next));
-            return true;
-        }
-        if (isMouseOverStatsOverlay(mx, my)) {
-            float next = RenderUtils.INSTANCE.getStatsPosition().getScale() + (verticalAmount > 0 ? scaleChange : -scaleChange);
-            RenderUtils.INSTANCE.getStatsPosition().setScaling(clamp(next));
-            return true;
+            if (isMouseOver(mx, my, pos)) {
+                float scaleChange = 0.05f;
+                float next = pos.getScale() + (verticalAmount > 0 ? scaleChange : -scaleChange);
+                pos.setScaling(clamp(next));
+                return true;
+            }
         }
 
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
@@ -127,23 +96,13 @@ public class DummyOverlay extends Screen {
             int mx = (int) mouseX;
             int my = (int) mouseY;
 
-            if (isMouseOverOverlay(mx, my)) {
-                draggingSingle = true;
-                dragOffsetX = mx - RenderUtils.INSTANCE.getPosition().getX();
-                dragOffsetY = my - RenderUtils.INSTANCE.getPosition().getY();
-                return true;
-            }
-            if (isMouseOverCommissionsOverlay(mx, my)) {
-                draggingCommissions = true;
-                dragOffsetX = mx - RenderUtils.INSTANCE.getCommissionsPosition().getX();
-                dragOffsetY = my - RenderUtils.INSTANCE.getCommissionsPosition().getY();
-                return true;
-            }
-            if (isMouseOverStatsOverlay(mx, my)) {
-                draggingStats = true;
-                dragOffsetX = mx - RenderUtils.INSTANCE.getStatsPosition().getX();
-                dragOffsetY = my - RenderUtils.INSTANCE.getStatsPosition().getY();
-                return true;
+            for (AbstractOverlay overlay : OverlayManager.all()) {
+                if (isMouseOver(mx, my, overlay.position())) {
+                    dragging = overlay;
+                    dragOffsetX = mx - overlay.position().getX();
+                    dragOffsetY = my - overlay.position().getY();
+                    return true;
+                }
             }
         }
         return super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -151,8 +110,7 @@ public class DummyOverlay extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int state) {
-        draggingSingle = false;
-        draggingCommissions = false;
+        dragging = null;
         return super.mouseReleased(mouseX, mouseY, state);
     }
      
@@ -163,23 +121,13 @@ public class DummyOverlay extends Screen {
             int mx = (int) event.x();
             int my = (int) event.y();
 
-            if (isMouseOverOverlay(mx, my)) {
-                draggingSingle = true;
-                dragOffsetX = mx - RenderUtils.INSTANCE.getPosition().getX();
-                dragOffsetY = my - RenderUtils.INSTANCE.getPosition().getY();
-                return true;
-            }
-            if (isMouseOverCommissionsOverlay(mx, my)) {
-                draggingCommissions = true;
-                dragOffsetX = mx - RenderUtils.INSTANCE.getCommissionsPosition().getX();
-                dragOffsetY = my - RenderUtils.INSTANCE.getCommissionsPosition().getY();
-                return true;
-            }
-            if (isMouseOverStatsOverlay(mx, my)) {
-                draggingStats = true;
-                dragOffsetX = mx - RenderUtils.INSTANCE.getStatsPosition().getX();
-                dragOffsetY = my - RenderUtils.INSTANCE.getStatsPosition().getY();
-                return true;
+            for (AbstractOverlay overlay : OverlayManager.all()) {
+                if (isMouseOver(mx, my, overlay.position())) {
+                    dragging = overlay;
+                    dragOffsetX = mx - overlay.position().getX();
+                    dragOffsetY = my - overlay.position().getY();
+                    return true;
+                }
             }
         }
         return super.mouseClicked(event, doubled);
@@ -187,38 +135,19 @@ public class DummyOverlay extends Screen {
 
     @Override
     public boolean mouseReleased(/*? if = 1.21.11 {*/@NotNull /*?}*/MouseButtonEvent event) {
-        draggingSingle = false;
-        draggingCommissions = false;
-        draggingStats = false;
+        dragging = null;
         return super.mouseReleased(event);
     }
     //? }
 
-    private boolean isMouseOverOverlay(int mouseX, int mouseY) {
-        int x = RenderUtils.INSTANCE.getPosition().getX();
-        int y = RenderUtils.INSTANCE.getPosition().getY();
-        int w = RenderUtils.INSTANCE.getPosition().getWidth();
-        int h = RenderUtils.INSTANCE.getPosition().getHeight();
-        float s = RenderUtils.INSTANCE.getPosition().getScale();
-        return mouseX >= x && mouseX <= x + Math.round(w * s) && mouseY >= y && mouseY <= y + Math.round(h * s);
-    }
-
-    private boolean isMouseOverCommissionsOverlay(int mouseX, int mouseY) {
-        int x = RenderUtils.INSTANCE.getCommissionsPosition().getX();
-        int y = RenderUtils.INSTANCE.getCommissionsPosition().getY();
-        int w = RenderUtils.INSTANCE.getCommissionsPosition().getWidth();
-        int h = RenderUtils.INSTANCE.getCommissionsPosition().getHeight();
-        float s = RenderUtils.INSTANCE.getCommissionsPosition().getScale();
-        return mouseX >= x && mouseX <= x + Math.round(w * s) && mouseY >= y && mouseY <= y + Math.round(h * s);
-    }
-
-    private boolean isMouseOverStatsOverlay(int mouseX, int mouseY) {
-        int x = RenderUtils.INSTANCE.getStatsPosition().getX();
-        int y = RenderUtils.INSTANCE.getStatsPosition().getY();
-        int w = RenderUtils.INSTANCE.getStatsPosition().getWidth();
-        int h = RenderUtils.INSTANCE.getStatsPosition().getHeight();
-        float s = RenderUtils.INSTANCE.getStatsPosition().getScale();
-        return mouseX >= x && mouseX <= x + Math.round(w * s) && mouseY >= y && mouseY <= y + Math.round(h * s);
+    private boolean isMouseOver(int mouseX, int mouseY, Position pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int w = pos.getWidth();
+        int h = pos.getHeight();
+        float s = pos.getScale();
+        return mouseX >= x && mouseX <= x + Math.round(w * s)
+                && mouseY >= y && mouseY <= y + Math.round(h * s);
     }
 
     private static float clamp(float v) {

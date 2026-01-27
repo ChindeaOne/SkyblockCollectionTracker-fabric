@@ -1,24 +1,66 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
+import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
+import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
-public class CommissionsOverlay {
+import java.util.List;
 
-    private static boolean visible = true;
+public class CommissionsOverlay implements AbstractOverlay{
 
-    public static boolean isVisible() {
-        return visible;
+    private final Position position = ConfigAccess.getCommissionsPosition();
+    private boolean renderingAllowed  = true;
+
+    @Override
+    public String overlayLabel() {
+        return "Commissions Overlay";
     }
 
-    public static void setVisible(boolean visibility) {
-        visible = visibility;
+    @Override
+    public Position position() {
+        return this.position;
     }
 
-    public static void render (GuiGraphics guiGraphics) {
-        if (!isVisible() || !ConfigAccess.isCommissionsEnabled()) return;
+    @Override
+    public boolean isEnabled() {
+        return ConfigAccess.isCommissionsEnabled();
+    }
 
-        RenderUtils.INSTANCE.drawCommissions(guiGraphics);
+    @Override
+    public boolean isRenderingAllowed() {
+        return renderingAllowed;
+    }
+
+    @Override
+    public void setRenderingAllowed(boolean allowed) {
+        this.renderingAllowed = allowed;
+    }
+
+    @Override
+    public void render(GuiGraphics context) {
+        List<String> lines = TextUtils.updateCommissions();
+
+        if (lines.isEmpty()) return;
+
+        RenderUtils.drawOverlayFrame(context, position, () ->
+            RenderUtils.renderStrings(context, lines)
+        );
+    }
+
+    @Override
+    public void updateDimensions() {
+        List<String> lines = TextUtils.updateCommissions();
+        if (lines.isEmpty()) return;
+
+        Font fr = Minecraft.getInstance().font;
+        int maxW = 0;
+        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
+        int h = fr.lineHeight * lines.size();
+
+        position.setDimensions(maxW, h);
     }
 }

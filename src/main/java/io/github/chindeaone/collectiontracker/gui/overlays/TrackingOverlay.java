@@ -2,6 +2,8 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
+import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
+import io.github.chindeaone.collectiontracker.tracker.TrackingRenderData;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -10,24 +12,23 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.List;
 
-public class MiningStatsOverlay implements AbstractOverlay{
+public class TrackingOverlay implements AbstractOverlay{
 
-    private final Position position = ConfigAccess.getMiningStatsPosition();
+    private final Position position = ConfigAccess.getTrackingPosition();
     private boolean renderingAllowed  = true;
 
     @Override
     public String overlayLabel() {
-        return "Mining Stats Overlay";
+        return "Tracking Overlay";
     }
 
-    @Override
-    public Position position() {
+    @Override public Position position() {
         return this.position;
     }
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isMiningStatsEnabled();
+        return TrackingHandlerClass.isTracking;
     }
 
     @Override
@@ -42,18 +43,19 @@ public class MiningStatsOverlay implements AbstractOverlay{
 
     @Override
     public void render(GuiGraphics context) {
-        List<String> lines = TextUtils.updateMiningStats();
+        if (!isEnabled()) return;
 
-        if (lines.isEmpty()) return;
+        TrackingRenderData data = TextUtils.getRenderData();
+        if (data.mainLines.isEmpty()) return;
 
         RenderUtils.drawOverlayFrame(context, position, () ->
-            RenderUtils.renderStrings(context, lines)
+            RenderUtils.renderTrackingStringsWithColor(context, data.mainLines, data.extraLines, ConfigAccess.isOverlayTextColorEnabled())
         );
     }
 
     @Override
     public void updateDimensions() {
-        List<String> lines = TextUtils.updateMiningStats();
+        List<String> lines = TextUtils.getRenderData().mainLines;
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;

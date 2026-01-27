@@ -1,13 +1,8 @@
 package io.github.chindeaone.collectiontracker.util.rendering
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.commands.StartTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import io.github.chindeaone.collectiontracker.util.CollectionColors
-import io.github.chindeaone.collectiontracker.util.rendering.TextUtils.getExtraStrings
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -16,182 +11,76 @@ import net.minecraft.network.chat.Component
 
 object RenderUtils {
 
-    var config: ModConfig = SkyblockCollectionTracker.configManager.config!!
-    var position: Position = config.trackingOverlay.singleOverlay.overlayPosition
-    var commissionsPosition: Position = config.mining.commissionsOverlay.commissionsOverlayPosition
-    var statsPosition: Position = config.mining.miningStatsOverlay.miningStatsOverlayPosition
-
-    var maxWidth: Int = 0
-    var textHeight: Int = 0
-
     private val fr: Font get() = Minecraft.getInstance().font
+    private const val DUMMY_BG = -0x7fbfbfc0
     const val WHITE: Int = 0xFFFFFFFF.toInt()
     const val YELLOW: Int = 0xFFFFFF55.toInt()
 
-    private fun getDimensions() {
-        if (!TrackingHandlerClass.isTracking) {
-            return
-        }
+    @JvmStatic
+    fun drawOverlayFrame(context: GuiGraphics, pos: Position, drawContext: Runnable) {
+        context.pose().pushMatrix()
+        context.pose().translate(pos.x.toFloat(), pos.y.toFloat())
+        context.pose().scale(pos.scale, pos.scale)
 
-        maxWidth = 0
-        textHeight = 0
+        drawContext.run()
 
-        val overlayLines = TextUtils.getStrings()
-
-        for (line in overlayLines) {
-            val lineWidth: Int = fr.width(line)
-            if (lineWidth > maxWidth) maxWidth = lineWidth
-        }
-
-        textHeight = fr.lineHeight * (overlayLines.size + 1)
-        position.setDimensions(maxWidth, textHeight)
+        context.pose().popMatrix()
     }
 
-    private fun getCommissionsDimensions(): Pair<Int, Int> {
-        val lines = TextUtils.updateCommissions() ?: return Pair(commissionsPosition.width, commissionsPosition.height)
-        var maxW = 0
+    fun drawDummyFrame(context: GuiGraphics, pos: Position, label: String) {
+        drawOverlayFrame(context, pos) {
+            context.fill(0, 0, pos.width, pos.height, DUMMY_BG)
+
+            val overlayText = Component.literal(label)
+                .withStyle(ChatFormatting.GREEN)
+
+            val textScale = 0.8f
+            val centerX = pos.width / 2f
+            val yTop = (pos.height - fr.lineHeight * textScale) / 2f
+
+            context.pose().pushMatrix()
+            context.pose().scale(textScale, textScale)
+            context.drawCenteredString(fr, overlayText, (centerX / textScale).toInt(), (yTop / textScale).toInt(), WHITE)
+            context.pose().popMatrix()
+        }
+    }
+
+    @JvmStatic
+    fun renderTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
+        var y = 0
+
+        val color: Int = if (withColor) StartTracker.collection.let { CollectionColors.colors[it] as Int } else WHITE
+
         for (line in lines) {
-            val w = fr.width(line)
-            if (w > maxW) maxW = w
+            drawHelper(line, context, y, color)
+            y += fr.lineHeight
         }
-        val h = fr.lineHeight * lines.size
-        return Pair(maxW, h)
+
+        if (extraLines.isNotEmpty()) {
+            y += fr.lineHeight
+            for (line in extraLines) {
+                drawHelper(line, context, y, color)
+                y += fr.lineHeight
+            }
+        }
     }
 
-    private fun getStatsDimensions(): Pair<Int, Int> {
-        val lines = TextUtils.updateMiningStats() ?: return Pair(statsPosition.width, statsPosition.height)
-        var maxW = 0
+    @JvmStatic
+    fun renderStrings(context: GuiGraphics, lines: List<String>) {
+        var y = 0
+
         for (line in lines) {
-            val w = fr.width(line)
-            if (w > maxW) maxW = w
+            context.drawString(fr, line, 0, y, WHITE, true)
+            y += fr.lineHeight
         }
-        val h = fr.lineHeight * lines.size
-        return Pair(maxW, h)
     }
 
-    fun drawRect(context: GuiGraphics) {
-        if (TrackingHandlerClass.startTime == 0L) return
+    fun drawEditorHudText(context: GuiGraphics, activePosition: Position?) {
+        val textScale = 0.8f
 
-        context.pose().pushMatrix()
-        context.pose().translate(position.x.toFloat(), position.y.toFloat())
-        context.pose().scale(position.scale, position.scale)
-
-        if (ConfigAccess.isOverlayTextColorEnabled()) {
-            renderColors(context)
-        } else {
-            renderStrings(context)
-        }
-
-        context.pose().popMatrix()
-    }
-
-    fun drawCommissions(context: GuiGraphics) {
-        if (!ConfigAccess.isCommissionsEnabled()) return
-
-        context.pose().pushMatrix()
-        context.pose().translate(commissionsPosition.x.toFloat(), commissionsPosition.y.toFloat())
-        context.pose().scale(commissionsPosition.scale, commissionsPosition.scale)
-
-        renderCommissions(context)
-
-        context.pose().popMatrix()
-    }
-
-    fun drawStats(context: GuiGraphics) {
-        if (!ConfigAccess.isMiningStatsEnabled()) return
-
-        context.pose().pushMatrix()
-        context.pose().translate(statsPosition.x.toFloat(), statsPosition.y.toFloat())
-        context.pose().scale(statsPosition.scale, statsPosition.scale)
-
-        renderStats(context)
-
-        context.pose().popMatrix()
-    }
-
-    fun drawRectDummy(
-        context: GuiGraphics
-    ) {
-        getDimensions()
-
-        context.pose().pushMatrix()
-
-        context.pose().translate(position.x.toFloat(), position.y.toFloat())
-        context.pose().scale(position.scale, position.scale)
-
-        context.fill(
-            0, 0, position.width, position.height, -0x7fbfbfc0
-        )
-
-        val overlayText = Component.literal("Move Tracking Overlay")
+        val resizeText = Component.literal("Use mouse wheel to resize the overlay")
             .withStyle(ChatFormatting.GREEN)
 
-        val textScale = 0.8f
-        val centerX = position.width / 2.0f
-        val yTop = (position.height - fr.lineHeight * textScale) / 2f
-
-        context.pose().pushMatrix()
-        context.pose().scale(textScale, textScale)
-        context.drawCenteredString(fr, overlayText, (centerX / textScale).toInt(), (yTop / textScale).toInt(), WHITE)
-        context.pose().popMatrix()
-
-        context.pose().popMatrix()
-    }
-
-    fun drawStatsDummy(context: GuiGraphics) {
-        val (w, h) = getStatsDimensions()
-        statsPosition.setDimensions(w, h)
-
-        context.pose().pushMatrix()
-        context.pose().translate(statsPosition.x.toFloat(), statsPosition.y.toFloat())
-        context.pose().scale(statsPosition.scale, statsPosition.scale)
-
-        context.fill(0, 0, statsPosition.width, statsPosition.height, -0x7fbfbfc0)
-
-        val text = Component.literal("Move Stats Overlay")
-            .withStyle(ChatFormatting.AQUA)
-
-        val textScale = 0.8f
-        val centerX = statsPosition.width / 2.0f
-        val centerY = (statsPosition.height - fr.lineHeight) / 2f
-
-        context.pose().pushMatrix()
-        context.pose().scale(textScale, textScale)
-        context.drawCenteredString(fr, text, (centerX / textScale).toInt(), (centerY / textScale).toInt(), WHITE)
-        context.pose().popMatrix()
-
-        context.pose().popMatrix()
-    }
-
-    fun drawCommissionsDummy(context: GuiGraphics) {
-        val (w, h) = getCommissionsDimensions()
-        commissionsPosition.setDimensions(w, h)
-
-        context.pose().pushMatrix()
-        context.pose().translate(commissionsPosition.x.toFloat(), commissionsPosition.y.toFloat())
-        context.pose().scale(commissionsPosition.scale, commissionsPosition.scale)
-
-        context.fill(0, 0, commissionsPosition.width, commissionsPosition.height, -0x7fbfbfc0)
-
-        val text = Component.literal("Move Commissions Overlay")
-            .withStyle(ChatFormatting.AQUA)
-
-        val textScale = 0.8f
-        val centerX = commissionsPosition.width / 2.0f
-        val centerY = (commissionsPosition.height - fr.lineHeight) / 2f
-
-        context.pose().pushMatrix()
-        context.pose().scale(textScale, textScale)
-        context.drawCenteredString(fr, text, (centerX / textScale).toInt(), (centerY / textScale).toInt(), WHITE)
-        context.pose().popMatrix()
-
-        context.pose().popMatrix()
-    }
-
-    fun drawStaticText(context: GuiGraphics, activePosition: Position?) {
-        val textScale = 0.8f
-
-        val resizeText = Component.literal("Use the mouse wheel to resize the overlay").withStyle(ChatFormatting.GREEN)
         val textWidth = fr.width(resizeText)
         val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
         val textY = 10f
@@ -214,92 +103,18 @@ object RenderUtils {
         }
     }
 
-    private fun renderStrings(
-        context: GuiGraphics
-    ) {
-        val overlayLines = TextUtils.getStrings()
-        if (overlayLines.isEmpty()) return
-
-        var y = 0
-
-        for (line in overlayLines) {
-            drawHelper(line, context, y, 0xFF55FF55.toInt())
-            y += fr.lineHeight
-        }
-
-        val extraOverlayLines = getExtraStrings()
-        if (extraOverlayLines.isEmpty()) return
-
-        y += fr.lineHeight
-        for (line in extraOverlayLines) {
-            drawHelper(line, context, y, 0xFF55FF55.toInt())
-            y += fr.lineHeight
-        }
-    }
-
-    private fun renderColors(
-        context: GuiGraphics
-    ) {
-
-        val overlayLines = TextUtils.getStrings()
-        if (overlayLines.isEmpty()) return
-
-        var y = 0
-
-        val color = StartTracker.collection.let { CollectionColors.colors[it] }
-
-        for (line in overlayLines) {
-            drawHelper(line, context, y, color)
-
-            y += fr.lineHeight
-        }
-
-        val extraOverlayLines = getExtraStrings()
-        if (extraOverlayLines.isEmpty()) return
-
-        y += fr.lineHeight
-        for (line in extraOverlayLines) {
-            drawHelper(line, context, y, color)
-            y += fr.lineHeight
-        }
-    }
-
-    private fun renderCommissions(context: GuiGraphics) {
-        val displayCommissionSet = TextUtils.updateCommissions() ?: return
-
-        var y = 0
-
-        for (line in displayCommissionSet) {
-            context.drawString(fr, line, 0, y, WHITE, true)
-            y += fr.lineHeight
-        }
-    }
-
-    private fun renderStats(context: GuiGraphics) {
-        val statsLines = TextUtils.updateMiningStats() ?: return
-
-        var y = 0
-
-        for (line in statsLines) {
-            context.drawString(fr, line, 0, y, WHITE, true)
-            y += fr.lineHeight
-        }
-    }
-
-    private fun drawHelper(line: String, context: GuiGraphics, y: Int, prefixColor: Int? = 0xFF55FF55.toInt()) {
+    private fun drawHelper(line: String, context: GuiGraphics, y: Int, prefixColor: Int) {
         val splitIndex = line.lastIndexOf(": ")
         if (splitIndex != -1) {
             val prefix = line.substring(0, splitIndex)
             val numberPart = line.substring(splitIndex)
 
-            val colorToUse = prefixColor ?: WHITE
-            context.drawString(fr, prefix, 0, y, colorToUse, true)
+            context.drawString(fr, prefix, 0, y, prefixColor, true)
 
             val prefixWidth = fr.width(prefix)
             context.drawString(fr, numberPart,  prefixWidth, y, WHITE, true)
         } else {
-            val colorToUse = prefixColor ?: WHITE
-            context.drawString(fr, line, 0, y, colorToUse, true)
+            context.drawString(fr, line, 0, y, prefixColor, true)
         }
     }
 }

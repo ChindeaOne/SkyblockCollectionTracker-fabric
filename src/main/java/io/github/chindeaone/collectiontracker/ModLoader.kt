@@ -4,9 +4,10 @@
 package io.github.chindeaone.collectiontracker
 
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
-import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
+import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.MiningStatsOverlay
+import io.github.chindeaone.collectiontracker.gui.overlays.TrackingOverlay
 import io.github.chindeaone.collectiontracker.util.CommissionsKeybinds
 import io.github.chindeaone.collectiontracker.util.Hypixel
 import io.github.chindeaone.collectiontracker.util.ServerUtils
@@ -27,13 +28,20 @@ import net.minecraft.resources.Identifier
 class ModLoader: ModInitializer {
 
     override fun onInitialize() {
-        eventRegistration()
-
         SkyblockCollectionTracker.init()
+        
+        overlayRegistration()
+        eventRegistration()
 
         CommandRegistry.init()
 
         CommissionsKeybinds.initKeyGuards()
+    }
+
+    private fun overlayRegistration() {
+        OverlayManager.add(TrackingOverlay())
+        OverlayManager.add(MiningStatsOverlay())
+        OverlayManager.add(CommissionsOverlay())
     }
 
     private fun eventRegistration() {
@@ -49,9 +57,15 @@ class ModLoader: ModInitializer {
          /*val overlayId = ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay") 
         *///? }
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, _ ->
-            CollectionOverlay.render(context)
-            CommissionsOverlay.render(context)
-            MiningStatsOverlay.render(context)
+            // Avoid rendering in editor mode
+            if(OverlayManager.isInEditorMode()) return@attachElementBefore
+
+            for (overlay in OverlayManager.all()) {
+                if (overlay.shouldRender()) {
+                    overlay.updateDimensions()
+                    overlay.render(context)
+                }
+            }
         }
     }
 
