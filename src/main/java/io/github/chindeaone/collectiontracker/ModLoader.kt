@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.gui.overlays.MiningStatsOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.TrackingOverlay
 import io.github.chindeaone.collectiontracker.util.CommissionsKeybinds
 import io.github.chindeaone.collectiontracker.util.Hypixel
+import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.util.ServerUtils
 import io.github.chindeaone.collectiontracker.util.tab.TabData
 import io.github.chindeaone.collectiontracker.util.world.BlockWatcher
@@ -29,7 +30,7 @@ class ModLoader: ModInitializer {
 
     override fun onInitialize() {
         SkyblockCollectionTracker.init()
-        
+
         overlayRegistration()
         eventRegistration()
 
@@ -74,10 +75,11 @@ class ModLoader: ModInitializer {
             // Call every onTick here
             SkyblockCollectionTracker.onTick(client)
             ServerUtils.onClientTick()
-            Hypixel.onTick()
+            Hypixel.onTick(client)
             CommissionsKeybinds.onClientTick(client)
             TabData.tickAndUpdateWidget(client)
             BlockWatcher.onClientTick(client)
+            ScoreboardUtils.onTick(client)
         }
     }
 }
