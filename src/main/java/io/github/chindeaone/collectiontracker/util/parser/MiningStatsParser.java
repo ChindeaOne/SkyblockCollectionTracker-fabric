@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.util.parser;
 
+import io.github.chindeaone.collectiontracker.util.ScoreboardUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -29,6 +31,10 @@ public class MiningStatsParser {
                 ctx.pristine.parse(line);
             } else if (line.contains("Mining Wisdom")) {
                 ctx.wisdom.parse(line);
+            } else if (line.contains("Cold Resistance")) {
+                ctx.cold.parse(line);
+            } else if (line.contains("Heat Resistance")) {
+                ctx.heat.parse(line);
             } else if (line.contains("Breaking Power")) {
                 ctx.breakingPower.parse(line);
             }
@@ -45,6 +51,8 @@ public class MiningStatsParser {
         }
 
         if (!"0".equals(ctx.wisdom.value)) formatted.add(ctx.wisdom.format());
+        if (!"0".equals(ctx.cold.value) && ScoreboardUtils.isColdStatRelevant() ) formatted.add(ctx.cold.format());
+        if (!"0".equals(ctx.heat.value) && ScoreboardUtils.isHeatStatRelevant()) formatted.add(ctx.heat.format());
         if (!"0".equals(ctx.breakingPower.value)) formatted.add(ctx.breakingPower.format());
 
         return formatted;
@@ -94,6 +102,8 @@ public class MiningStatsParser {
         Stat spread = new Stat("Mining Spread", "▚", "§e");
         Stat pristine = new Stat("Pristine", "✧", "§5");
         Stat wisdom = new Stat("Mining Wisdom", "☯", "§3");
+        Stat cold = new Stat("Cold Resistance", "❄", "§b");
+        Stat heat = new Stat("Heat Resistance", "♨", "§c");
         Stat breakingPower = new Stat("Breaking Power", "Ⓟ", "§2");
 
         MiningContext(String blockType) {

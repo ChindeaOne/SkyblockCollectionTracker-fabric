@@ -27,6 +27,10 @@ object MiningMapping {
         "Mining Spread",
         "Gemstone Spread",
         "Pristine",
+        // Location specific stats
+        "Cold Resistance",
+        "Heat Resistance",
+        // why not
         "Breaking Power"
     )
 
