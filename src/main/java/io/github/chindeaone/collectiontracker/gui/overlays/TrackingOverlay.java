@@ -46,16 +46,16 @@ public class TrackingOverlay implements AbstractOverlay{
         if (!isEnabled()) return;
 
         TrackingRenderData data = TextUtils.getRenderData();
-        if (data.mainLines.isEmpty()) return;
+        if (data.mainLines().isEmpty()) return;
 
         RenderUtils.drawOverlayFrame(context, position, () ->
-            RenderUtils.renderTrackingStringsWithColor(context, data.mainLines, data.extraLines, ConfigAccess.isOverlayTextColorEnabled())
+            RenderUtils.renderTrackingStringsWithColor(context, data.mainLines(), data.extraLines(), ConfigAccess.isOverlayTextColorEnabled())
         );
     }
 
     @Override
     public void updateDimensions() {
-        List<String> lines = TextUtils.getRenderData().mainLines;
+        List<String> lines = TextUtils.getRenderData().mainLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;
