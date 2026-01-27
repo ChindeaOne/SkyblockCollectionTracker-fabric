@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.util.tab
 
-enum class TabWidget(private val headerRegex: String) {
+enum class TabWidget(headerRegex: String) {
     // Thank you Skyhanni for all the widgets' regexes
     PLAYER_LIST(
         // language=RegExp
@@ -24,7 +24,7 @@ enum class TabWidget(private val headerRegex: String) {
     ),
     FAIRY_SOULS(
         // language=RegExp
-        "Fairy Souls: (?:§.)*(?<got>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)",
+        "Fairy Souls: (?:§.)*(?<got>\\d+)(?:§.)*/(?:§.)*(?<max>\\d+)",
     ),
     PROFILE(
         // language=RegExp
@@ -32,11 +32,11 @@ enum class TabWidget(private val headerRegex: String) {
     ),
     SB_LEVEL(
         // language=RegExp
-        "SB Level(?:§.)*: (?:§.)*\\[(?:§.)*(?<level>\\d+)(?:§.)*\\] (?:§.)*(?<xp>\\d+).*",
+        "SB Level(?:§.)*: (?:§.)*\\[(?:§.)*(?<level>\\d+)(?:§.)*] (?:§.)*(?<xp>\\d+).*",
     ),
     BANK(
         // language=RegExp
-        "Bank: (?:§.)*(?<amount>[^§]+)(?:(?:§.)* \\/ (?:§.)*(?<personal>.*))?",
+        "Bank: (?:§.)*(?<amount>[^§]+)(?:(?:§.)* / (?:§.)*(?<personal>.*))?",
     ),
     INTEREST(
         // language=RegExp
@@ -232,7 +232,7 @@ enum class TabWidget(private val headerRegex: String) {
     ),
     PEST_TRAPS(
         // language=RegExp
-        "(?:§.)*Pest Traps: (?:§.)*(?<count>\\d+)\\/(?<max>\\d+)",
+        "(?:§.)*Pest Traps: (?:§.)*(?<count>\\d+)/(?<max>\\d+)",
     ),
     FULL_TRAPS(
         /**
@@ -346,7 +346,7 @@ enum class TabWidget(private val headerRegex: String) {
     ),
     ;
 
-    private val pattern: Regex = Regex("^\\s*(?:$headerRegex)\\s*$")
+    private val pattern: Regex = Regex("^\\s*($headerRegex)\\s*$")
 
     var lines: List<String> = emptyList()
         private set

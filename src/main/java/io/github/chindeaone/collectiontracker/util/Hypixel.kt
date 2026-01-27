@@ -17,7 +17,6 @@ import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import io.github.chindeaone.collectiontracker.util.ServerUtils.serverStatus
 import io.github.chindeaone.collectiontracker.util.StringUtils.removeColor
 import net.minecraft.client.Minecraft
-import net.minecraft.world.scores.DisplaySlot
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
@@ -56,11 +55,11 @@ object Hypixel {
         server = hypixel
     }
 
-    fun onTick() {
+    fun onTick(client: Minecraft) {
         if (!HypixelUtils.isInHypixel) {
             checkServer()
             if (HypixelUtils.isInHypixel && !playerLoaded) {
-                loadPlayerData()
+                loadPlayerData(client)
                 if (playerLoaded) {
                     serverStatus = ServerStatus.checkServer()
 
@@ -109,7 +108,7 @@ object Hypixel {
             }
         }
 
-        val inSkyblock = checkScoreboard()
+        val inSkyblock = checkScoreboard(client)
         if (inSkyblock == skyblock) return
         skyblock = inSkyblock
     }
@@ -138,8 +137,7 @@ object Hypixel {
         }
     }
 
-    private fun loadPlayerData() {
-        val client = Minecraft.getInstance()
+    private fun loadPlayerData(client: Minecraft) {
         if (client.player != null) {
             playerLoaded = true
             PlayerData.playerUUID
@@ -147,16 +145,9 @@ object Hypixel {
         }
     }
 
-    private fun checkScoreboard(): Boolean {
-        val displayName = getScoreboardTitle() ?: return false
+    private fun checkScoreboard(client: Minecraft): Boolean {
+        val displayName = ScoreboardUtils.getScoreboardTitle(client) ?: return false
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
-    }
-
-    private fun getScoreboardTitle(): String? {
-        val world =Minecraft.getInstance().level ?: return null
-        val objective = world.scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR) ?: return null
-        val displayName = objective.displayName?.string ?: return null
-        return displayName
     }
 }
