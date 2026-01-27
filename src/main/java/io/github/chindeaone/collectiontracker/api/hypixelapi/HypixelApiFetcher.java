@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
+import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionSource;
 
 public class HypixelApiFetcher {
 
@@ -57,9 +58,10 @@ public class HypixelApiFetcher {
     private static HttpRequest buildCollectionRequest(String uuid, String token, String collection) {
         return HttpRequest.newBuilder(URI.create(URLManager.TRACKED_COLLECTION_URL))
                 .timeout(Duration.ofSeconds(5))
-                .header("X-UUID", uuid)
                 .header("Authorization", "Bearer " + token)
+                .header("X-UUID", uuid)
                 .header("X-COLLECTION", collection)
+                .header("X-SOURCE", collectionSource)
                 .header("User-Agent", URLManager.AGENT)
                 .header("Accept", "application/json")
                 .GET()
