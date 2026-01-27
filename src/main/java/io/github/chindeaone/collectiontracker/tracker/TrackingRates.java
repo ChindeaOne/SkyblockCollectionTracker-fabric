@@ -9,6 +9,7 @@ import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
 import io.github.chindeaone.collectiontracker.config.ModConfig;
+import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
-import static io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay.overlayDirty;
 import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.getUptimeInSeconds;
 
 public class TrackingRates {
@@ -165,8 +165,8 @@ public class TrackingRates {
 
         fillBazaarExtremesFromCurrent(); // Ensure extremes are initialized
 
-        // Trigger overlay update
-        overlayDirty = true;
+        // Trigger tracking overlay update
+        TextUtils.rebuildTrackingRenderData();
     }
 
     private static void fillBazaarExtremesFromCurrent() {

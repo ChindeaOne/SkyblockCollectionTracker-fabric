@@ -10,15 +10,17 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SingleOverlay;
+import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
+import io.github.chindeaone.collectiontracker.tracker.TrackingRenderData;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.StringUtils;
 import io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget;
 import io.github.chindeaone.collectiontracker.util.tab.MiningStatsWidget;
 import io.github.chindeaone.collectiontracker.util.world.BlockWatcher;
 import io.github.chindeaone.collectiontracker.util.parser.MiningStatsParser;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
@@ -31,37 +33,57 @@ public class TextUtils {
 
     public static List<String> formattedCommissions = new ArrayList<>();
     public static List<String> formattedMiningStats = new ArrayList<>();
-    private final static List<String> overlayLines = new ArrayList<>();
-    private final static List<String> extraOverlayLines = new ArrayList<>();
     private static boolean hasNpcPrice;
 
-    public static void updateStats() {
+    private static volatile TrackingRenderData RENDER_DATA = TrackingRenderData.EMPTY;
+
+    public static TrackingRenderData getRenderData() {
+        return RENDER_DATA;
+    }
+
+    public static void rebuildTrackingRenderData() {
+
+        List<String> main = buildMainTrackingLines();
+        List<String> extra = buildExtraTrackingLines();
+
+        RENDER_DATA = new TrackingRenderData(
+                List.copyOf(main),
+                List.copyOf(extra)
+        );
+    }
+
+    public static List<String> buildMainTrackingLines() {
+        List<String> lines = new ArrayList<>();
+
         if (startTime == 0) {
             startTime = System.currentTimeMillis();
         }
 
         if (!isTracking) {
-            overlayLines.clear();
-            return;
+            return lines;
         }
 
-        overlayLines.clear();
-        if (ConfigAccess.getStatsText().isEmpty()) return;
+        if (ConfigAccess.getStatsText().isEmpty()) {
+            return lines;
+        }
 
         for (SingleOverlay.OverlayText id : ConfigAccess.getStatsText()) {
-            switch (id) {
-                case COLLECTION -> addIfNotNull(handleCollection());
-                case COLLECTION_SESSION -> addIfNotNull(handleCollectionSession());
-                case COLL_PER_HOUR -> addIfNotNull(handleCollectionPerHour());
-                case MONEY_PER_HOUR -> addIfNotNull(handleMoneyPerHour());
-                case MONEY_MADE -> addIfNotNull(handleMoneyMade());
-                case COLLECTION_SINCE_LAST -> addIfNotNull(handleCollectionSinceLast());
+            String line = switch (id) {
+                case COLLECTION -> handleCollection();
+                case COLLECTION_SESSION -> handleCollectionSession();
+                case COLL_PER_HOUR -> handleCollectionPerHour();
+                case MONEY_PER_HOUR -> handleMoneyPerHour();
+                case MONEY_MADE -> handleMoneyMade();
+                case COLLECTION_SINCE_LAST -> handleCollectionSinceLast();
+            };
+
+            if (line != null) {
+                lines.add(line);
             }
         }
-    }
-
-    private static void addIfNotNull(String line) {
-        if (line != null) overlayLines.add(line);
+        // Always add uptime
+        lines.add(uptimeString());
+        return lines;
     }
 
     private static String handleCollection() {
@@ -172,48 +194,28 @@ public class TextUtils {
                 : formatCollectionName(collection) + " collection since last: Calculating...";
     }
 
-    public static void updateExtraStats() {
-        if (CollectionsManager.isRiftCollection(collection) && ConfigAccess.isShowExtraStats()) {
-            ConfigHelper.disableExtraStats();
-            ChatUtils.INSTANCE.sendMessage("§cExtra stats are not available for Rift collections!", true);
-            extraOverlayLines.clear();
-            return;
-        }
+    public static List<String> buildExtraTrackingLines() {
+        if (!TrackingHandlerClass.isTracking) return List.of();
+        if (!ConfigAccess.isShowExtraStats()) return List.of();
+        if (!ConfigAccess.isUsingBazaar()) return List.of();
+        if (CollectionsManager.isRiftCollection(collection)) return List.of();
+        if (collectionType.equals("normal")) return List.of();
+        
+        List<String> lines = new ArrayList<>();
 
-        if (collectionType.equals("normal") && ConfigAccess.isShowExtraStats()) {
-            ConfigHelper.disableExtraStats();
-            ChatUtils.INSTANCE.sendMessage("§cExtra stats are redundant here!", true);
-            extraOverlayLines.clear();
-            return;
-        }
-
-        if (!ConfigAccess.isShowExtraStats() || !ConfigAccess.isUsingBazaar()) {
-            extraOverlayLines.clear();
-            return;
-        }
-
-        if (startTime == 0) {
-            startTime = System.currentTimeMillis();
-        }
-
-        if (!isTracking) {
-            extraOverlayLines.clear();
-            return;
-        }
-
-        extraOverlayLines.clear();
-
-        extraOverlayLines.add("§6§lExtra Stats:");
+        lines.add("§6§lExtra Stats:");
         for (SingleOverlay.OverlayExtraText id : ConfigAccess.getExtraStatsText()) {
-            switch (id) {
-                case BAZAAR_ITEM -> addIfNotNullExtra(handleBazaarItem());
-                case BAZAAR_PRICE -> addIfNotNullExtra(handleBazaarPrice());
+            String line = switch (id) {
+                case BAZAAR_ITEM -> handleBazaarItem();
+                case BAZAAR_PRICE -> handleBazaarPrice();
+            };
+
+            if (line != null) {
+                lines.add(line);
             }
         }
-    }
 
-    private static void addIfNotNullExtra(String line) {
-        if (line != null) extraOverlayLines.add(line);
+        return lines;
     }
 
     private static String handleBazaarItem() {
@@ -221,12 +223,12 @@ public class TextUtils {
             // Skip normal items
             case "enchanted" -> {
                 if (ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION)) {
-                    return "Bazaar item: " + StringUtils.INSTANCE.formatBazaarItemName(BazaarCollectionsManager.enchantedRecipe.keySet().iterator().next());
+                    return "Bazaar item: " + StringUtils.formatBazaarItemName(BazaarCollectionsManager.enchantedRecipe.keySet().iterator().next());
                 } else {
                     if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
                         ConfigHelper.setBazaarType(BazaarType.ENCHANTED_VERSION);
                         return null;
-                    } else return "Bazaar item: " + StringUtils.INSTANCE.formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keySet().iterator().next());
+                    } else return "Bazaar item: " + StringUtils.formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keySet().iterator().next());
                 }
             }
             case "gemstone" -> {
@@ -258,9 +260,11 @@ public class TextUtils {
         }
     }
 
+
+
     public static List<String> updateCommissions() {
         List<String> raw = CommissionsWidget.INSTANCE.getRawCommissions();
-        if (raw.isEmpty()) return null;
+        if (raw.isEmpty()) return Collections.emptyList();
 
         formattedCommissions.clear();
         CommissionFormat.Area detectedArea = null;
@@ -291,24 +295,11 @@ public class TextUtils {
 
     public static List<String> updateMiningStats() {
         List<String> raw = MiningStatsWidget.INSTANCE.getRawStats();
-        if (raw.isEmpty()) return null;
+        if (raw.isEmpty()) return Collections.emptyList();
 
         formattedMiningStats.clear();
         formattedMiningStats.addAll(MiningStatsParser.parse(raw, BlockWatcher.INSTANCE.getMiningBlockType()));
         return formattedMiningStats;
-    }
-
-    public static @NotNull List<String> getStrings() {
-        updateStats();
-        if (overlayLines.isEmpty()) return overlayLines;
-        List<String> lines = new ArrayList<>(overlayLines);
-        lines.add(uptimeString());
-        return lines;
-    }
-
-    public static @NotNull List<String> getExtraStrings() {
-        updateExtraStats();
-        return extraOverlayLines;
     }
 
     public static String uptimeString() {

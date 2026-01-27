@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
-import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.Hypixel;
 import io.github.chindeaone.collectiontracker.util.PlayerData;
@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
+import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
 import static io.github.chindeaone.collectiontracker.tracker.DataFetcher.scheduler;
 import static io.github.chindeaone.collectiontracker.tracker.TrackingRates.*;
 import static io.github.chindeaone.collectiontracker.util.NumbersUtils.formatNumber;
@@ -46,30 +47,48 @@ public class TrackingHandlerClass {
             ChatUtils.INSTANCE.sendMessage("§cPlease wait before tracking another collection!", true);
             return;
         } else {
-            ChatUtils.INSTANCE.sendMessage("§aTracking " + StartTracker.collection + " collection.", true);
+            ChatUtils.INSTANCE.sendMessage("§aTracking " + collection + " collection.", true);
         }
 
         if (scheduler == null || scheduler.isShutdown()) {
             scheduler = Executors.newScheduledThreadPool(1);
         }
 
-        lastTrackTime = now;
-        isTracking = true;
-        isPaused = false;
+        initTracking(now);
+        OverlayManager.setTrackingOverlayRendering(true);
 
-        CollectionOverlay.setVisible(true);
-
-        startTime = 0;
-        lastTime = 0;
-
-        if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
-            ConfigHelper.disableBazaar();
-            ChatUtils.INSTANCE.sendMessage("§eWarning! Bazaar data not available for " + StartTracker.collection + ". Using NPC prices instead.", true);
-        }
+        validateTrackingConfigOnStart();
 
         logger.info("[SCT]: Tracking started for player: {}", PlayerData.INSTANCE.getPlayerName());
 
         DataFetcher.scheduleCollectionDataFetch();
+    }
+
+    public static void initTracking(long now) {
+        lastTrackTime = now;
+
+        isTracking = true;
+        isPaused = false;
+
+        startTime = 0;
+        lastTime = 0;
+    }
+
+    public static void validateTrackingConfigOnStart() {
+        if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
+            ConfigHelper.disableBazaar();
+            ChatUtils.INSTANCE.sendMessage("§eWarning! Bazaar data not available for " + collection + ". Using NPC prices instead.", true);
+        }
+
+        if (CollectionsManager.isRiftCollection(collection) && ConfigAccess.isShowExtraStats()) {
+            ConfigHelper.disableExtraStats();
+            ChatUtils.INSTANCE.sendMessage("§cExtra stats are not available for Rift collections!", true);
+        }
+
+        if (collectionType.equals("normal") && ConfigAccess.isShowExtraStats()) {
+            ConfigHelper.disableExtraStats();
+            ChatUtils.INSTANCE.sendMessage("§cExtra stats are redundant here!", true);
+        }
     }
 
     public static void stopTrackingManual() {
@@ -82,7 +101,7 @@ public class TrackingHandlerClass {
 
         } else {
             ChatUtils.INSTANCE.sendMessage("§cNo tracking active!", true);
-            logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
+            logger.warn("[SCT]: Attempted to stop tracking manually, but no tracking is active.");
         }
     }
 
@@ -136,7 +155,7 @@ public class TrackingHandlerClass {
     private static void resetTrackingData(boolean restart) {
         if (ConfigAccess.isShowTrackingRatesAtEndOfSession()) sendRates();
 
-        StartTracker.previousCollection = StartTracker.collection;
+        StartTracker.previousCollection = collection;
         isTracking = false;
         isPaused = false;
         scheduler.shutdown();
@@ -167,7 +186,7 @@ public class TrackingHandlerClass {
         // Reset highest/lowest rates
         resetLowestHighestRates();
 
-        CollectionOverlay.stopTracking();
+        OverlayManager.setTrackingOverlayRendering(false);
     }
 
     private static void resetLowestHighestRates() {
@@ -218,14 +237,14 @@ public class TrackingHandlerClass {
     }
 
     private static void sendRates() {
-        assert StartTracker.collection != null;
-        String collectionDisplay = TextUtils.formatCollectionName(StartTracker.collection);
+        assert collection != null;
+        String collectionDisplay = TextUtils.formatCollectionName(collection);
 
         java.util.List<String> lines = new java.util.ArrayList<>();
         lines.add(String.format("   §aCollection tracked: §f%s", collectionDisplay));
         lines.add(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour)));
 
-        if (CollectionsManager.isRiftCollection(StartTracker.collection)) {
+        if (CollectionsManager.isRiftCollection(collection)) {
             lines.add(String.format("   §7Elapsed time: §f%s", getUptimeInWords()));
             ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
             return;

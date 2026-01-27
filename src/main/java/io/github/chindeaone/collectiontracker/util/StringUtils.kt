@@ -7,6 +7,7 @@ object StringUtils {
     private val formattingChars = "kmolnrKMOLNR".toSet()
     private val colorChars = "abcdefABCDEF0123456789".toSet()
 
+    @JvmStatic
     fun formatBazaarItemName(name: String): String {
         val words = name.split("_".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val formatted = java.lang.StringBuilder()
