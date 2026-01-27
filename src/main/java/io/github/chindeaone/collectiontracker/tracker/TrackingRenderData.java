@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.tracker;
 import java.util.List;
 
 /**
- * Data class for holding rendering liens for the tracking overlay.
+ * Data class for holding rendering lines for the tracking overlay.
  * @param mainLines
  * @param extraLines
  */
