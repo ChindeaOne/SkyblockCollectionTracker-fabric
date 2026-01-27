@@ -9,11 +9,17 @@ import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindCo
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SingleOverlay
+import io.github.chindeaone.collectiontracker.config.core.Position
 
 /**
  * Global accessors for the configuration.
  */
 val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config!!
+
+// Position Config Accessor
+val trackingPosition: Position get() = modConfig.trackingOverlay.singleOverlay.overlayPosition
+val miningStatsPosition: Position get() = modConfig.mining.miningStatsOverlay.miningStatsOverlayPosition
+val commissionsPosition: Position get() = modConfig.mining.commissionsOverlay.commissionsOverlayPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -44,6 +50,15 @@ val showExtraStats: Boolean get() = singleOverlay.showExtraStats
  * Accessors for configuration sections.
  */
 object ConfigAccess {
+
+    @JvmStatic
+    fun getTrackingPosition(): Position = trackingPosition
+
+    @JvmStatic
+    fun getMiningStatsPosition(): Position = miningStatsPosition
+
+    @JvmStatic
+    fun getCommissionsPosition(): Position = commissionsPosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
