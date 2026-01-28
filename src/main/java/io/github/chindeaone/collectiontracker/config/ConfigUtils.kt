@@ -35,13 +35,14 @@ val gemstoneVariant: BazaarConfig.GemstoneVariant get() = bazaarConfig.gemstoneV
 // Mining Config Accessors
 val miningConfig: Mining get() = modConfig.mining
 // Overlays
-val keybindConfig: KeybindConfig get() = miningConfig.commissions
+val keybindConfig: KeybindConfig get() = miningConfig.commissionsOverlay.commissions
 val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
 val singleOverlay: SingleOverlay get() = trackingConfig.singleOverlay
+val enableSacksTracking: Boolean get() = trackingConfig.enableSacksTracking
 val statsText: List<SingleOverlay.OverlayText> get() = singleOverlay.statsText
 val extraStatsText: List<SingleOverlay.OverlayExtraText> get() = singleOverlay.extraStatsText
 val showExtraStats: Boolean get() = singleOverlay.showExtraStats
@@ -101,6 +102,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getExtraStatsText(): List<SingleOverlay.OverlayExtraText> = extraStatsText
+
+    @JvmStatic
+    fun isSacksTrackingEnabled(): Boolean = enableSacksTracking
 }
 
 /**

@@ -32,4 +32,14 @@ public class Tracking {
     @SerializedName("showTrackingRatesAtEndOfSession")
     @ConfigEditorBoolean
     public boolean showTrackingRatesAtEndOfSession = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Sacks Tracking",
+            desc = "Toggle this to use Hypixel's sacks messages instead of api calls when tracking.\n§cIt's a WIP feature and it may not display accurate rates."
+    )
+    @SerializedName("enableSacksTracking")
+    @ConfigEditorBoolean
+    public boolean enableSacksTracking = false;
+
 }
