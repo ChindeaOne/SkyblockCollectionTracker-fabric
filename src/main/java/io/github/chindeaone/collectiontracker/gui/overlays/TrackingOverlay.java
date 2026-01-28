@@ -3,7 +3,6 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
-import io.github.chindeaone.collectiontracker.tracker.TrackingRenderData;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -14,6 +13,7 @@ import java.util.List;
 
 public class TrackingOverlay implements AbstractOverlay{
 
+    public static volatile boolean trackingDirty = false;
     private final Position position = ConfigAccess.getTrackingPosition();
     private boolean renderingAllowed  = true;
 
@@ -43,19 +43,21 @@ public class TrackingOverlay implements AbstractOverlay{
 
     @Override
     public void render(GuiGraphics context) {
-        if (!isEnabled()) return;
+        if (!isEnabled() || !trackingDirty) return;
 
-        TrackingRenderData data = TextUtils.getRenderData();
-        if (data.mainLines().isEmpty()) return;
+        List<String> mainLines = TextUtils.getStrings();
+        List<String> extraLines = TextUtils.getExtraStrings();
+
+        if (mainLines.isEmpty()) return;
 
         RenderUtils.drawOverlayFrame(context, position, () ->
-            RenderUtils.renderTrackingStringsWithColor(context, data.mainLines(), data.extraLines(), ConfigAccess.isOverlayTextColorEnabled())
+            RenderUtils.renderTrackingStringsWithColor(context, mainLines, extraLines, ConfigAccess.isOverlayTextColorEnabled())
         );
     }
 
     @Override
     public void updateDimensions() {
-        List<String> lines = TextUtils.getRenderData().mainLines();
+        List<String> lines = TextUtils.getStrings();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;
