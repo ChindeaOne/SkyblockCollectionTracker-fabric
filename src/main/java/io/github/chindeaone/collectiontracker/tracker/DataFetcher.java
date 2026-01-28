@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.tracker;
 
+import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.util.PlayerData;
@@ -57,8 +58,10 @@ public class DataFetcher {
                 return;
             }
 
+            long collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().getValue().getAsLong();
+
             logger.info("[SCT]: Data successfully fetched or retrieved and displayed for player with UUID: {} and collection: {}", playerUUID, collection);
-            TrackingRates.calculateRates(jsonData);
+            TrackingRates.calculateRates(collectionData, false);
 
         } catch (Exception e) {
             logger.error("[SCT]: Error fetching data from the Hypixel API: {}", e.getMessage(), e);

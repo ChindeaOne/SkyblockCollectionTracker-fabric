@@ -12,10 +12,12 @@ import io.github.chindeaone.collectiontracker.util.CommissionsKeybinds
 import io.github.chindeaone.collectiontracker.util.Hypixel
 import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.util.ServerUtils
+import io.github.chindeaone.collectiontracker.util.chat.ChatListener
 import io.github.chindeaone.collectiontracker.util.tab.TabData
 import io.github.chindeaone.collectiontracker.util.world.BlockWatcher
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
@@ -50,7 +52,8 @@ class ModLoader: ModInitializer {
             if (client.player == null) return@EndTick
             TickDispatcher.onEndClientTick(client)
         })
-        ClientPlayConnectionEvents.DISCONNECT.register{ _, _ -> Hypixel.onDisconnect() }
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
+        ClientReceiveMessageEvents.ALLOW_GAME.register { message, _ -> ChatListener.handle(message)}
 
         //? if = 1.21.11 {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
@@ -63,7 +66,6 @@ class ModLoader: ModInitializer {
 
             for (overlay in OverlayManager.all()) {
                 if (overlay.shouldRender()) {
-                    overlay.updateDimensions()
                     overlay.render(context)
                 }
             }
