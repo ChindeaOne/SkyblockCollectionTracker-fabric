@@ -88,15 +88,18 @@ public class TrackingHandlerClass {
     public static void stopTracking() {
         if (scheduler != null && !scheduler.isShutdown()) {
 
-            resetTrackingData(false);
-
             if (!Hypixel.INSTANCE.getServer()) {
                 logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
             } else if (afk) {
                 ChatUtils.INSTANCE.sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true);
                 logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down");
+            } else {
+                ChatUtils.INSTANCE.sendMessage("§cAPI server is down. Stopping the tracker.", true);
+                logger.info("[SCT]: Tracking stopped because the API server is down.");
             }
             afk = false;
+
+            resetTrackingData(false);
 
         } else {
             logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
@@ -165,9 +168,8 @@ public class TrackingHandlerClass {
         lastTime = 0;
 
         // Reset collection tracking
-        apiCollection = -1L;
+        lastApiCollection = -1L;
         sacksCollectionGained = 0L;
-        previousCollection = -1L;
         sessionStartCollection = -1L;
 
         // Clear profit map
