@@ -274,7 +274,7 @@ public class TrackingHandlerClass {
 
         // If no 2nd fetching cycle or first sacks message, skip best/worst rates
         int uptimeSeconds = (int) getUptimeInSeconds();
-        if ((uptimeSeconds < 30 && ConfigAccess.isSacksTrackingEnabled()) || (uptimeSeconds < 200 && uptimeSeconds > 30)) {
+        if ((uptimeSeconds < 30 && ConfigAccess.isSacksTrackingEnabled()) || (uptimeSeconds < 200 && uptimeSeconds > 30 && !ConfigAccess.isSacksTrackingEnabled())) {
             ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
             return;
         }
