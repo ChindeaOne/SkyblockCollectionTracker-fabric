@@ -36,7 +36,7 @@ public class SingleOverlay {
     @Expose
     @ConfigOption(
             name = "Overlay Text",
-            desc = "§eDrag the lines of text to change the appearance of the overlay."
+            desc = "Drag the lines of text to change the appearance of the overlay."
     )
     @ConfigEditorDraggableList
     public List<OverlayText> statsText = new ArrayList<>(Arrays.asList(
@@ -51,7 +51,7 @@ public class SingleOverlay {
     @Expose
     @ConfigOption(
             name = "Extra Stats",
-            desc = "§eShow extra stats in the overlay."
+            desc = "Show extra stats in the overlay."
     )
     @ConfigEditorBoolean
     public boolean showExtraStats = false;
@@ -72,7 +72,7 @@ public class SingleOverlay {
     @Expose
     @ConfigOption(
             name = "Overlay Extra Text",
-            desc = "§eDrag the lines of text to change the appearance of the extra stats of the overlay.\n§cDoesn't work if 'Extra Stats' is disabled!"
+            desc = "Drag the lines of text to change the appearance of the extra stats of the overlay.\n§eDoesn't work if 'Extra Stats' is disabled!"
     )
     @ConfigEditorDraggableList
     public List<OverlayExtraText> extraStatsText = new ArrayList<>(Arrays.asList(
