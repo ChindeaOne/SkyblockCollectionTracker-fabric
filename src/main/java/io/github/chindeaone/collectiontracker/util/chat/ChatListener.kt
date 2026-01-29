@@ -33,9 +33,11 @@ object ChatListener {
 
         val match = SACKS_PATTERN.find(message)
         if (match != null) {
-            val items = match.groupValues[1].toIntOrNull() ?: 0
+            val itemsStr = match.groupValues[1].replace(",", "") // Remove commas
+            val items = itemsStr.toIntOrNull() ?: 0
+            val timeframe = match.groupValues[2].toIntOrNull() ?: 0
 
-            SacksTrackingManager.onChatCollection(items.toLong())
+            SacksTrackingManager.onChatCollection(items, timeframe)
         }
     }
 }
