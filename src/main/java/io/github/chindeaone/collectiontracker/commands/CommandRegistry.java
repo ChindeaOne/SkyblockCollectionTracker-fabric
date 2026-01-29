@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.commands;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
@@ -29,12 +30,23 @@ public class CommandRegistry {
                         })
                 )
                 // /sct collections -> shows the list of collections
-                .then(ClientCommandManager.literal("collections")
-                        .executes(context -> {
-                            CollectionList.sendCollectionList();
-                            return 1;
-                        })
-                )
+                        .then(ClientCommandManager.literal("collections")
+
+                                // /sct collections -> opens first category (page 1)
+                                .executes(context -> {
+                                    CollectionList.sendCollectionList(1);
+                                    return 1;
+                                })
+
+                                // /sct collections <page>
+                                .then(ClientCommandManager.argument("page", IntegerArgumentType.integer(1))
+                                        .executes(context -> {
+                                            int page = IntegerArgumentType.getInteger(context, "page");
+                                            CollectionList.sendCollectionList(page);
+                                            return 1;
+                                        })
+                                )
+                        )
                 // /sct track <collection>
                 .then(ClientCommandManager.literal("track")
                         .executes(context -> {

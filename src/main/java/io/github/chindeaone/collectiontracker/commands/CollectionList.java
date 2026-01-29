@@ -3,61 +3,58 @@ package io.github.chindeaone.collectiontracker.commands;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
 
 import java.util.*;
 
 public class CollectionList {
 
-    public static void sendCollectionList() {
+    private static final int PAGE_SIZE = 15; // Max collections per page
+
+    private record Page(String category, String color, List<String> collections) {}
+
+    public static void sendCollectionList(int page) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
-
-        ChatUtils.INSTANCE.sendMessage("§aList of all collections available:", true);
-        ChatUtils.INSTANCE.sendMessage("", false);
 
         Map<String, String> categoryColors = new HashMap<>();
         categoryColors.put("Farming", "§a");
         categoryColors.put("Mining", "§9");
         categoryColors.put("Combat", "§4");
-        categoryColors.put("Foraging", "§6");
+        categoryColors.put("Foraging", "§2");
         categoryColors.put("Fishing", "§3");
         categoryColors.put("Rift", "§5");
         categoryColors.put("Sacks", "§8");
 
-        Map<String, List<String>> categorizedCollections = new LinkedHashMap<>();
+        // Ordered categories
+        List<Map.Entry<String, Set<String>>> categories =
+                new ArrayList<>(CollectionsManager.collections.entrySet());
 
-        for (Map.Entry<String, Set<String>> entry : CollectionsManager.collections.entrySet()) {
-            String category = entry.getKey();
-            Set<String> items = entry.getValue();
-
-            List<String> sortedItems = new ArrayList<>(items);
-            categorizedCollections.put(category, sortedItems);
-        }
-
-        for (Map.Entry<String, List<String>> entry : categorizedCollections.entrySet()) {
+        List<Page> pages = new ArrayList<>();
+        for (Map.Entry<String, Set<String>> entry : categories) {
             String category = entry.getKey();
             String color = categoryColors.getOrDefault(category, "§f");
-            sendCategoryMessage(color, category, entry.getValue());
+
+            List<String> allCollections = new ArrayList<>(entry.getValue());
+            if (allCollections.isEmpty()) {
+                pages.add(new Page(category, color, Collections.emptyList()));
+                continue;
+            }
+
+            for (int i = 0; i < allCollections.size(); i += PAGE_SIZE) {
+                int end = Math.min(i + PAGE_SIZE, allCollections.size());
+                List<String> sub = allCollections.subList(i, end);
+                pages.add(new Page(category, color, new ArrayList<>(sub)));
+            }
         }
-    }
 
-    private static void sendCategoryMessage(String color, String category, List<String> collections) {
-        ChatUtils.INSTANCE.sendMessage(" " + color + category + " Collections:", false);
-        for (String collection : collections) {
-            MutableComponent message = Component.literal("   " + color + "- " + collection);
+        if (pages.isEmpty()) return;
 
-            message.withStyle(style -> style
-                    .withClickEvent(new ClickEvent.RunCommand("/sct track " + collection))
-                    .withHoverEvent(new HoverEvent.ShowText(Component.literal("§eClick to track the " + color + collection + "§e collection!")))
-            );
+        int totalPages = pages.size();
+        page = Mth.clamp(page, 1, totalPages);
 
-            ChatUtils.INSTANCE.sendComponent(message, false);
-        }
-        ChatUtils.INSTANCE.sendMessage();
+        Page current = pages.get(page - 1);
+
+        ChatUtils.INSTANCE.sendCategoryPage(current.category, current.color, current.collections, page, totalPages);
     }
 }
-
