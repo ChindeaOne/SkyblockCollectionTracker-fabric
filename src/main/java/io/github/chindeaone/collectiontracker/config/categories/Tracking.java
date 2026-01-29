@@ -36,7 +36,7 @@ public class Tracking {
     @Expose
     @ConfigOption(
             name = "Sacks Tracking",
-            desc = "Toggle this to use Hypixel's sacks messages instead of api calls when tracking.\n§cIt's a WIP feature and it may not display accurate rates."
+            desc = "§bWIP! §rToggle this to use Hypixel's sacks messages instead of api calls when tracking.\n§eRecommended to use only if you have a lot of sacks!"
     )
     @SerializedName("enableSacksTracking")
     @ConfigEditorBoolean

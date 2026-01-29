@@ -11,7 +11,7 @@ public class MiningStatsOverlay {
     @Expose
     @ConfigOption(
             name = "Enable Mining Stats Overlay",
-            desc = "Toggles an overlay for mining stats.")
+            desc = "Toggles an overlay for mining stats.\n§eYou need to have mining stats (e.g. Mining Speed, Mining Fortune etc) in your stats widget for this to work.")
     @ConfigEditorBoolean
     public boolean enableMiningStatsOverlay = false;
 
