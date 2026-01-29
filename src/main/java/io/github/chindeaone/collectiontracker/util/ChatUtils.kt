@@ -75,6 +75,7 @@ object ChatUtils {
         sendComponent(divider, prefix = false)
         sendComponent(displayTitle, prefix = false)
         sendComponent(divider, prefix = false)
+        sendEmptyMessage()
 
         for (command in commands) sendComponent(command, prefix = false)
 

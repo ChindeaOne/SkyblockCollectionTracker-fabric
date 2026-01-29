@@ -13,7 +13,7 @@ public class CommandHelper {
     public static final String title = "§6§lSkyblock Collection Tracker §7- §eCommands";
     private static final List<String> commandLines = List.of(
             "§a◆/sct",
-            "§a/sct help",
+            "§a◆/sct help",
             "§a◆/sct track",
             "§a◆/sct stop",
             "§a◆/sct pause",
