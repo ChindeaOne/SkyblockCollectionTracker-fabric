@@ -58,27 +58,35 @@ public class RepoUtils {
         }
     }
 
-    public static void setLatestVersion() {
-        // Normalize tags before comparison
+    @SuppressWarnings("ConstantConditions")
+    public static void checkLatestVersion() {
         latestReleaseTag = normalizeTags(latestReleaseTag);
         latestBetaTag = normalizeTags(latestBetaTag);
 
-        // If this is current version, skip check
-        if (currentVersion.equals(latestReleaseTag) || currentVersion.equals(latestBetaTag)) {
+        String chosenTag = (ConfigAccess.getUpdateType() == About.UpdateType.BETA)
+                ? latestBetaTag
+                : latestReleaseTag;
+
+        // If already on that same version -> no update
+        if (currentVersion.equals(chosenTag)) {
             latestVersion = null;
             return;
         }
 
-        // Compare versions and set latestVersion accordingly
-        if (ConfigAccess.getUpdateType().equals(About.UpdateType.RELEASE)) {
-            if (latestVersion == null || !latestVersion.equals(latestReleaseTag)) {
-                latestVersion = latestReleaseTag;
+        // Prevent downgrades
+        int baseCompare = compareBaseVersion(chosenTag);
+
+        if (baseCompare > 0) {
+            // Target has higher major/minor/patch -> update
+            latestVersion = chosenTag;
+        } else if (baseCompare == 0) {
+            // Same base version (ex: 1.0.9-beta2 → 1.0.9)
+            if (!currentVersion.equals(chosenTag)) {
+                latestVersion = chosenTag;
             }
-        }
-        if (ConfigAccess.getUpdateType().equals(About.UpdateType.BETA)) {
-            if (latestVersion == null || !latestVersion.equals(latestBetaTag)) {
-                latestVersion = latestBetaTag;
-            }
+        } else {
+            // Target is older -> don't update
+            latestVersion = null;
         }
     }
 
@@ -92,5 +100,17 @@ public class RepoUtils {
             tag = tag.substring(0, plusIndex);
         }
         return tag;
+    }
+
+    private static int compareBaseVersion(String v1) {
+        String[] a = v1.split("-", 2)[0].split("\\.");
+        String[] b = RepoUtils.currentVersion.split("-", 2)[0].split("\\.");
+
+        for (int i = 0; i < 3; i++) {
+            int n1 = Integer.parseInt(a[i]);
+            int n2 = Integer.parseInt(b[i]);
+            if (n1 != n2) return Integer.compare(n1, n2);
+        }
+        return 0; // same major.minor.patch
     }
 }

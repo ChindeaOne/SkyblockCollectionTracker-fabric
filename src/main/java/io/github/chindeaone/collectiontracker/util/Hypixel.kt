@@ -79,7 +79,7 @@ object Hypixel {
                     if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
                         CompletableFuture.runAsync {
                             RepoUtils.checkGithubReleases()
-                            RepoUtils.setLatestVersion()
+                            RepoUtils.checkLatestVersion()
                         }.thenAcceptAsync  {
                             if (RepoUtils.latestVersion != null) {
                                 Minecraft.getInstance().execute {
