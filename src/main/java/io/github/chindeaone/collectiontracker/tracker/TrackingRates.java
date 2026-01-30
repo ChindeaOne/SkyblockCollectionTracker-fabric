@@ -1,15 +1,11 @@
 package io.github.chindeaone.collectiontracker.tracker;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
-import io.github.chindeaone.collectiontracker.config.ModConfig;
-import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
+import io.github.chindeaone.collectiontracker.gui.overlays.TrackingOverlay;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,8 +25,12 @@ public class TrackingRates {
     public static volatile long collectionPerHour;
     public static volatile long collectionMade;
     public static volatile long collectionSinceLast;
-    public static volatile long previousCollection = -1L;
     public static volatile long sessionStartCollection = -1L;
+
+    // Sacks tracking data
+    public static volatile long lastApiCollection = -1L;
+    public static volatile long sacksCollectionGained = 0L;
+
     // Highest and lowest rates
     public static volatile long highestCollectionPerHour = 0;
     public static volatile long lowestCollectionPerHour = Long.MAX_VALUE;
@@ -54,27 +54,43 @@ public class TrackingRates {
     public static Map<String, Long> lowestRatesPerHourBazaar = new ConcurrentHashMap<>();
     public static Map<String, Long> highestRatesPerHourBazaar = new ConcurrentHashMap<>();
 
-    public static void calculateRates(String jsonResponse) {
-        // Set bazaar config
-        ModConfig config = SkyblockCollectionTracker.configManager.getConfig();
-        assert config != null;
+    public static synchronized void calculateRates(long value, boolean isUsingSacks) {
+        long currentCollection;
 
-        JsonObject jsonObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
+        // If using sacks, adjust currentCollection accordingly
+        if (isUsingSacks) {
+            if (lastApiCollection == -1L) {
+                return; // wait for the next API call (should never happen but just in case)
+            }
+            // 'value' here is what you gained from sacks since last check
+            sacksCollectionGained += value; // update sacks gained
+            currentCollection = lastApiCollection + sacksCollectionGained; // increase current collection
 
-        long currentCollection = jsonObject.entrySet().iterator().next().getValue().getAsLong();
-        logger.info("[SCT]: Current collection for '{}' is {}", collection, currentCollection);
+            collectionSinceLast = value; // what you gained is exactly the 'value'
+
+            logger.info("[SCT]: Current collection for '{}' (using sacks) is {}", collection, currentCollection);
+            logger.info("[SCT]: Change in collection detected (using sacks). Old collection: '{}'. New collection: '{}'.", currentCollection - value, currentCollection);
+        } else {
+            // 'value' here is the actual collection value from API
+            sacksCollectionGained = 0L; // reset sacks gained
+            currentCollection = value; // set current collection to API value
+
+            collectionSinceLast = lastApiCollection != -1L ? Math.max(0, currentCollection - lastApiCollection) : 0; // calculate since last from API
+
+            logger.info("[SCT]: Current collection for '{}' is {}", collection, currentCollection);
+            logger.info("[SCT]: Change in collection detected. Old collection: '{}'. New collection: '{}'.", lastApiCollection, currentCollection);
+        }
+
+        logger.info("[SCT]: Collection since last check is {}.", collectionSinceLast);
 
         // Set starting collection
         if (sessionStartCollection == -1L) {
             sessionStartCollection = currentCollection;
+            unchangedStreak = 0;
         }
-        collectionSinceLast = previousCollection != -1L ? currentCollection - previousCollection : 0;
-
-        logger.info("[SCT]: Change in collection detected. Old collection: '{}'. New collection: '{}'.", previousCollection, currentCollection);
-        logger.info("[SCT]: Collection since last check is {}.", collectionSinceLast);
 
         // Set player as AFK, else update previousCollection
-        if (currentCollection == previousCollection) {
+        if (currentCollection == lastApiCollection) {
             logger.info("[SCT]: No change in collection detected. Incrementing unchanged streak.");
             unchangedStreak++;
             if (unchangedStreak >= THRESHOLD) {
@@ -86,7 +102,7 @@ public class TrackingRates {
                 return;
             }
         } else {
-            previousCollection = currentCollection;
+            lastApiCollection = currentCollection;
             unchangedStreak = 0;
         }
 
@@ -166,7 +182,7 @@ public class TrackingRates {
         fillBazaarExtremesFromCurrent(); // Ensure extremes are initialized
 
         // Trigger tracking overlay update
-        TextUtils.rebuildTrackingRenderData();
+        TrackingOverlay.trackingDirty = true;
     }
 
     private static void fillBazaarExtremesFromCurrent() {

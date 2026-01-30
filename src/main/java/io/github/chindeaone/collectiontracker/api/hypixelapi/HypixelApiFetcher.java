@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.api.hypixelapi;
 
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
+import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,6 +47,7 @@ public class HypixelApiFetcher {
                 }
             } else {
                 logger.error("[SCT]: Failed to fetch data. Server responded with code: {}", response.statusCode());
+                TrackingHandlerClass.stopTracking();
             }
 
         } catch (Exception e) {

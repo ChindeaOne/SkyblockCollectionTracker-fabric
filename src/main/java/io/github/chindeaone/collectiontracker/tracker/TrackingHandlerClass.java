@@ -1,13 +1,12 @@
 package io.github.chindeaone.collectiontracker.tracker;
 
-import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.commands.StartTracker;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
+import io.github.chindeaone.collectiontracker.gui.overlays.TrackingOverlay;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.Hypixel;
 import io.github.chindeaone.collectiontracker.util.PlayerData;
@@ -57,8 +56,6 @@ public class TrackingHandlerClass {
         initTracking(now);
         OverlayManager.setTrackingOverlayRendering(true);
 
-        validateTrackingConfigOnStart();
-
         logger.info("[SCT]: Tracking started for player: {}", PlayerData.INSTANCE.getPlayerName());
 
         DataFetcher.scheduleCollectionDataFetch();
@@ -70,25 +67,8 @@ public class TrackingHandlerClass {
         isTracking = true;
         isPaused = false;
 
-        startTime = 0;
+        startTime = now;
         lastTime = 0;
-    }
-
-    public static void validateTrackingConfigOnStart() {
-        if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
-            ConfigHelper.disableBazaar();
-            ChatUtils.INSTANCE.sendMessage("§eWarning! Bazaar data not available for " + collection + ". Using NPC prices instead.", true);
-        }
-
-        if (CollectionsManager.isRiftCollection(collection) && ConfigAccess.isShowExtraStats()) {
-            ConfigHelper.disableExtraStats();
-            ChatUtils.INSTANCE.sendMessage("§cExtra stats are not available for Rift collections!", true);
-        }
-
-        if (collectionType.equals("normal") && ConfigAccess.isShowExtraStats()) {
-            ConfigHelper.disableExtraStats();
-            ChatUtils.INSTANCE.sendMessage("§cExtra stats are redundant here!", true);
-        }
     }
 
     public static void stopTrackingManual() {
@@ -108,15 +88,18 @@ public class TrackingHandlerClass {
     public static void stopTracking() {
         if (scheduler != null && !scheduler.isShutdown()) {
 
-            resetTrackingData(false);
-
             if (!Hypixel.INSTANCE.getServer()) {
                 logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
             } else if (afk) {
                 ChatUtils.INSTANCE.sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true);
                 logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down");
+            } else {
+                ChatUtils.INSTANCE.sendMessage("§cAPI server is down. Stopping the tracker.", true);
+                logger.info("[SCT]: Tracking stopped because the API server is down.");
             }
             afk = false;
+
+            resetTrackingData(false);
 
         } else {
             logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
@@ -155,9 +138,8 @@ public class TrackingHandlerClass {
     private static void resetTrackingData(boolean restart) {
         if (ConfigAccess.isShowTrackingRatesAtEndOfSession()) sendRates();
 
+        resetVariables();
         StartTracker.previousCollection = collection;
-        isTracking = false;
-        isPaused = false;
         scheduler.shutdown();
         try {
             if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
@@ -175,18 +157,27 @@ public class TrackingHandlerClass {
         if (!restart) lastTrackTime = now;
         else lastTrackTime = now - COOLDOWN_MILLIS;
 
+        OverlayManager.setTrackingOverlayRendering(false);
+        TrackingOverlay.trackingDirty = false;
+    }
+
+    private static void resetVariables() {
+        isTracking = false;
+        isPaused = false;
         startTime = 0;
         lastTime = 0;
+
         // Reset collection tracking
-        previousCollection = -1L;
+        lastApiCollection = -1L;
+        sacksCollectionGained = 0L;
         sessionStartCollection = -1L;
+
         // Clear profit map
         moneyPerHourBazaar.clear();
         moneyMade.clear();
+
         // Reset highest/lowest rates
         resetLowestHighestRates();
-
-        OverlayManager.setTrackingOverlayRendering(false);
     }
 
     private static void resetLowestHighestRates() {
@@ -281,8 +272,9 @@ public class TrackingHandlerClass {
 
         lines.add(String.format("   §7Elapsed time: §f%s", getUptimeInWords()));
 
-        // If no 2nd fetching cycle, skip best/worst rates
-        if (getUptimeInSeconds() < 200) {
+        // If no 2nd fetching cycle or first sacks message, skip best/worst rates
+        int uptimeSeconds = (int) getUptimeInSeconds();
+        if ((uptimeSeconds < 30 && ConfigAccess.isSacksTrackingEnabled()) || (uptimeSeconds < 200 && uptimeSeconds > 30 && !ConfigAccess.isSacksTrackingEnabled())) {
             ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
             return;
         }

@@ -14,6 +14,7 @@ object RenderUtils {
     private val fr: Font get() = Minecraft.getInstance().font
     private const val DUMMY_BG = -0x7fbfbfc0
     const val WHITE: Int = 0xFFFFFFFF.toInt()
+    const val GREEN: Int = 0xFF55FF55.toInt()
     const val YELLOW: Int = 0xFFFFFF55.toInt()
 
     @JvmStatic
@@ -49,7 +50,7 @@ object RenderUtils {
     fun renderTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
         var y = 0
 
-        val color: Int = if (withColor) StartTracker.collection.let { CollectionColors.colors[it] as Int } else WHITE
+        val color: Int = if (withColor) StartTracker.collection.let { CollectionColors.colors[it] as Int } else GREEN
 
         for (line in lines) {
             drawHelper(line, context, y, color)
