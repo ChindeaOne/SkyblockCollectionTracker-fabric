@@ -23,7 +23,7 @@ public class About {
     @ConfigOption(
             name = "§aInfo",
             desc = "§eThis mod is meant to track (almost) all collections in Hypixel Skyblock.")
-    @ConfigEditorInfoText()
+    @ConfigEditorInfoText
     public boolean info = true;
 
     @Expose

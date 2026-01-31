@@ -50,5 +50,6 @@ public class Tracking {
                     "However, for now, API calls will still be used, and every API call will update the rates according to the API data, meaning rates can jump around."
     )
     @ConfigEditorInfoText
+    @SuppressWarnings("unused")
     public boolean sacksInfo = true;
 }
