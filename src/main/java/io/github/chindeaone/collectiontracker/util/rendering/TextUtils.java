@@ -175,6 +175,10 @@ public class TextUtils {
             ChatUtils.INSTANCE.sendMessage("§cExtra stats are not available for Rift collections!", true);
             extraOverlayLines.clear();
             return;
+        } else if (CollectionsManager.isRiftCollection(collection)) {
+            ConfigHelper.disableExtraStats();
+            extraOverlayLines.clear();
+            return;
         }
 
         if (collectionType.equals("normal") && ConfigAccess.isShowExtraStats()) {
