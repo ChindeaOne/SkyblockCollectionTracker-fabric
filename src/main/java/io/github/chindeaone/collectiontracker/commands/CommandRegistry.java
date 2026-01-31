@@ -46,6 +46,22 @@ public class CommandRegistry {
                                             return 1;
                                         })
                                 )
+                                // /sct collections <category>
+                                .then(ClientCommandManager.argument("category", StringArgumentType.word())
+                                        .suggests(CATEGORY_SUGGESTIONS)
+                                        .executes(context -> {
+                                            String input = StringArgumentType.getString(context, "category");
+                                            Integer page = CollectionList.getPageForCategory(input);
+
+                                            if (page == null) {
+                                                ChatUtils.INSTANCE.sendMessage("§cUnknown category.", true);
+                                            } else {
+                                                CollectionList.sendCollectionList(page);
+                                            }
+                                            return 1;
+                                        })
+                                )
+
                         )
                 // /sct track <collection>
                 .then(ClientCommandManager.literal("track")
@@ -97,6 +113,16 @@ public class CommandRegistry {
         for (String c : CollectionsManager.getAllCollections()) {
             if (c.toLowerCase().startsWith(arg)) {
                 builder.suggest(c);
+            }
+        }
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<FabricClientCommandSource> CATEGORY_SUGGESTIONS = (context, builder) -> {
+        String arg = builder.getRemaining().toLowerCase();
+        for (String category : CollectionsManager.collections.keySet()) {
+            if (category.toLowerCase().startsWith(arg)) {
+                builder.suggest(category);
             }
         }
         return builder.buildFuture();

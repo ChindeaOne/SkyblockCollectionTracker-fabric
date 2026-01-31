@@ -18,13 +18,13 @@ public class CollectionList {
         if (mc.player == null) return;
 
         Map<String, String> categoryColors = new HashMap<>();
-        categoryColors.put("Farming", "§a");
-        categoryColors.put("Mining", "§9");
-        categoryColors.put("Combat", "§4");
-        categoryColors.put("Foraging", "§2");
-        categoryColors.put("Fishing", "§3");
-        categoryColors.put("Rift", "§5");
-        categoryColors.put("Sacks", "§8");
+        categoryColors.put("Farming", "§a"); // Green
+        categoryColors.put("Mining", "§b"); // Aqua
+        categoryColors.put("Combat", "§4"); // Dark red
+        categoryColors.put("Foraging", "§2"); // Dark green
+        categoryColors.put("Fishing", "§3"); // Dark aqua
+        categoryColors.put("Rift", "§5"); // Dark purple
+        categoryColors.put("Miscellaneous", "§8"); // Dark gray
 
         // Ordered categories
         List<Map.Entry<String, Set<String>>> categories =
@@ -56,5 +56,27 @@ public class CollectionList {
         Page current = pages.get(page - 1);
 
         ChatUtils.INSTANCE.sendCategoryPage(current.category, current.color, current.collections, page, totalPages);
+    }
+
+    public static Integer getPageForCategory(String categoryInput) {
+        Map<String, Set<String>> collectionsMap = CollectionsManager.collections;
+
+        int pageIndex = 1;
+
+        for (Map.Entry<String, Set<String>> entry : collectionsMap.entrySet()) {
+            String category = entry.getKey();
+            List<String> allCollections = new ArrayList<>(entry.getValue());
+
+            int pagesForThisCategory = Math.max(1,
+                    (int) Math.ceil(allCollections.size() / (double) PAGE_SIZE));
+
+            if (category.equalsIgnoreCase(categoryInput)) {
+                return pageIndex; // first page of this category
+            }
+
+            pageIndex += pagesForThisCategory;
+        }
+
+        return null;
     }
 }
