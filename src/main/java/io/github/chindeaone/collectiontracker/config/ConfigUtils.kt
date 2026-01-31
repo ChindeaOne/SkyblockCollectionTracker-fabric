@@ -46,6 +46,7 @@ val enableSacksTracking: Boolean get() = trackingConfig.enableSacksTracking
 val statsText: List<SingleOverlay.OverlayText> get() = singleOverlay.statsText
 val extraStatsText: List<SingleOverlay.OverlayExtraText> get() = singleOverlay.extraStatsText
 val showExtraStats: Boolean get() = singleOverlay.showExtraStats
+val explicitValues: Boolean get() = singleOverlay.explicitValues
 
 /**
  * Accessors for configuration sections.
@@ -102,6 +103,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getExtraStatsText(): List<SingleOverlay.OverlayExtraText> = extraStatsText
+
+    @JvmStatic
+    fun isExplicitValues(): Boolean = explicitValues
 
     @JvmStatic
     fun isSacksTrackingEnabled(): Boolean = enableSacksTracking

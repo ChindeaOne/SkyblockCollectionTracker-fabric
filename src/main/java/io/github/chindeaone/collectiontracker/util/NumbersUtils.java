@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.util;
 
+import io.github.chindeaone.collectiontracker.config.ConfigAccess;
+
 import java.util.Locale;
 
 public class NumbersUtils {
@@ -13,6 +15,11 @@ public class NumbersUtils {
      */
     public static String formatNumber(long number) {
         if (number == 0) return "0";
+
+        if (ConfigAccess.isExplicitValues()) {
+            // Add commas for thousands separators
+            return String.format(Locale.US, "%,d", number);
+        }
 
         if (number < 1000) {
             return String.format(Locale.US, "%d", number);

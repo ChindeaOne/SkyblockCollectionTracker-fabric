@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.config.categories.overlay;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import io.github.chindeaone.collectiontracker.config.core.ConfigLink;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -79,6 +80,15 @@ public class SingleOverlay {
             OverlayExtraText.BAZAAR_ITEM,
             OverlayExtraText.BAZAAR_PRICE
     ));
+
+    @Expose
+    @ConfigOption(
+            name = "Explicit values",
+            desc = "Show full values instead of rounded values in the overlay and summary."
+    )
+    @SerializedName("explicitValues")
+    @ConfigEditorBoolean
+    public boolean explicitValues = false;
 
     @Expose
     @ConfigLink(owner = SingleOverlay.class, field = "singleStatsOverlay")
