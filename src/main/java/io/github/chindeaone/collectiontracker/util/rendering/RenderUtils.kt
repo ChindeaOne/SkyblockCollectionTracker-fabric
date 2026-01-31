@@ -50,8 +50,7 @@ object RenderUtils {
     fun renderTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
         var y = 0
 
-        val color: Int = if (withColor) StartTracker.collection.let { CollectionColors.colors[it] as Int } else GREEN
-
+        val color: Int = if (withColor)  (CollectionColors.colors[StartTracker.collection]) ?: GREEN  else GREEN
         for (line in lines) {
             drawHelper(line, context, y, color)
             y += fr.lineHeight

@@ -37,11 +37,6 @@ public class TextUtils {
     private static boolean hasNpcPrice;
 
     public static void updateTrackingLines() {
-        if (!isTracking) {
-            overlayLines.clear();
-            return;
-        }
-
         overlayLines.clear();
         if (ConfigAccess.getStatsText().isEmpty()) return;
 
@@ -87,13 +82,19 @@ public class TextUtils {
             return null;
         }
 
-        if (CollectionsManager.isRiftCollection(collection)) return null;
+        if (collectionType == null) return null; // no collection type (probably rift collection)
 
-        hasNpcPrice = NpcPrices.getNpcPrice(collection) != -1;
+        hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
         if (!ConfigAccess.isUsingBazaar() && hasNpcPrice) {
+            if (CollectionsManager.isRiftCollection(collection)) {
+                // Use motes instead of money for rift collections
+                return "Motes/h: " + formatNumberOrPlaceholder(moneyPerHourNPC);
+            }
             return "$/h (NPC): " + formatNumberOrPlaceholder(moneyPerHourNPC);
         }
+
+        if (!ConfigAccess.isUsingBazaar()) return null;
 
         long localMoneyPerHour;
         switch (collectionType) {
@@ -128,14 +129,21 @@ public class TextUtils {
             return null;
         }
 
-        if (CollectionsManager.isRiftCollection(collection)) return null;
+        if (collectionType == null) return null; // no collection type (probably rift collection)
 
-        hasNpcPrice = NpcPrices.getNpcPrice(collection) != -1;
+
+        hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
         if (!ConfigAccess.isUsingBazaar() && hasNpcPrice) {
             long moneyMadeNPC = moneyMade.get("NPC");
+            if (CollectionsManager.isRiftCollection(collection)) {
+                // Use motes instead of money for rift collections
+                return "Motes made: " + formatNumberOrPlaceholder(moneyMadeNPC);
+            }
             return "$ made (NPC): " + formatNumberOrPlaceholder(moneyMadeNPC);
         }
+
+        if (!ConfigAccess.isUsingBazaar()) return null;
 
         long localMoneyMade;
         switch (collectionType) {
@@ -169,14 +177,16 @@ public class TextUtils {
                 : formatCollectionName(collection) + " collection since last: Calculating...";
     }
 
+    // Only if it has bazaar data and is enabled
     public static void updateTrackingExtraLines() {
-        if (CollectionsManager.isRiftCollection(collection) && ConfigAccess.isShowExtraStats()) {
-            ConfigHelper.disableExtraStats();
-            ChatUtils.INSTANCE.sendMessage("§cExtra stats are not available for Rift collections!", true);
+        if (!ConfigAccess.isShowExtraStats()) {
             extraOverlayLines.clear();
             return;
-        } else if (CollectionsManager.isRiftCollection(collection)) {
+        }
+
+        if (!BazaarCollectionsManager.hasBazaarData) {
             ConfigHelper.disableExtraStats();
+            ChatUtils.INSTANCE.sendMessage("§cNo Bazaar data available for extra stats!", true);
             extraOverlayLines.clear();
             return;
         }
@@ -188,12 +198,9 @@ public class TextUtils {
             return;
         }
 
-        if (!ConfigAccess.isShowExtraStats() || !ConfigAccess.isUsingBazaar()) {
-            extraOverlayLines.clear();
-            return;
-        }
-
-        if (!isTracking) {
+        if (ConfigAccess.isShowExtraStats() && !ConfigAccess.isUsingBazaar()) {
+            ConfigHelper.disableExtraStats();
+            ChatUtils.INSTANCE.sendMessage("§cDisabled extra stats since you don't use Bazaar prices!", true);
             extraOverlayLines.clear();
             return;
         }
@@ -238,19 +245,28 @@ public class TextUtils {
             // Skip normal items
             case "enchanted" -> {
                 if (ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION)) {
+                    if (BazaarPrices.enchantedPrice == 0) {
+                        return "Item price: Unknown price";
+                    }
                     return  "Item price: " + formatNumber((long) BazaarPrices.enchantedPrice);
                 } else {
                     if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
                         ConfigHelper.setBazaarType(BazaarType.ENCHANTED_VERSION);
                         return null;
-                    } else return  "Item price: " + formatNumber((long) BazaarPrices.superEnchantedPrice);
+                    } else {
+                        if (BazaarPrices.superEnchantedPrice == 0) {
+                            return "Item price: Unknown price";
+                        }
+                    }
+                    return  "Item price: " + formatNumber((long) BazaarPrices.superEnchantedPrice);
                 }
             }
-
             case "gemstone" -> {
+                if (GemstonePrices.getPrice(ConfigAccess.getGemstoneVariant().toString()) == 0) {
+                    return "Variant price: Unknown price";
+                }
                 return "Variant price: " + formatNumber((long) GemstonePrices.getPrice(ConfigAccess.getGemstoneVariant().toString()));
             }
-
             default -> { return null; }
         }
     }

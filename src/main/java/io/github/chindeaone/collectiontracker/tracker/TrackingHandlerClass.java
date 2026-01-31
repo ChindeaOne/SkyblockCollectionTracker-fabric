@@ -1,7 +1,8 @@
 package io.github.chindeaone.collectiontracker.tracker;
 
+import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
-import io.github.chindeaone.collectiontracker.commands.StartTracker;
+import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
@@ -139,7 +140,6 @@ public class TrackingHandlerClass {
         if (ConfigAccess.isShowTrackingRatesAtEndOfSession()) sendRates();
 
         resetVariables();
-        StartTracker.previousCollection = collection;
         scheduler.shutdown();
         try {
             if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
@@ -154,11 +154,19 @@ public class TrackingHandlerClass {
 
         // Reset uptime
         long now = System.currentTimeMillis();
-        if (!restart) lastTrackTime = now;
+        if (!restart) {
+            lastTrackTime = now;
+            clearFetchedData();
+        }
         else lastTrackTime = now - COOLDOWN_MILLIS;
 
         OverlayManager.setTrackingOverlayRendering(false);
         TrackingOverlay.trackingDirty = false;
+    }
+
+    private static void clearFetchedData() {
+        CollectionsManager.resetCollections();
+        BazaarCollectionsManager.resetBazaarData();
     }
 
     private static void resetVariables() {
@@ -235,18 +243,14 @@ public class TrackingHandlerClass {
         lines.add(String.format("   §aCollection tracked: §f%s", collectionDisplay));
         lines.add(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour)));
 
-        if (CollectionsManager.isRiftCollection(collection)) {
-            lines.add(String.format("   §7Elapsed time: §f%s", getUptimeInWords()));
-            ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
-            return;
-        }
-
         boolean useBazaar = ConfigAccess.isUsingBazaar();
         BazaarType bazaarType = ConfigAccess.getBazaarType();
 
         if (!useBazaar) {
             long npcMoney = moneyMade.get("NPC");
-            lines.add(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
+            if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
+                lines.add(String.format("   §6Motes: §f$%s   §6Rate: §f%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
+            } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
         } else {
             switch (collectionType) {
                 case "normal" -> {
@@ -274,7 +278,7 @@ public class TrackingHandlerClass {
 
         // If no 2nd fetching cycle or first sacks message, skip best/worst rates
         int uptimeSeconds = (int) getUptimeInSeconds();
-        if ((uptimeSeconds < 30 && ConfigAccess.isSacksTrackingEnabled()) || (uptimeSeconds < 200 && uptimeSeconds > 30 && !ConfigAccess.isSacksTrackingEnabled())) {
+        if ((uptimeSeconds < 30 && ConfigAccess.isSacksTrackingEnabled()) || (uptimeSeconds < 200 && uptimeSeconds > 30 && !ConfigAccess.isSacksTrackingEnabled() || (uptimeSeconds < 200 && uptimeSeconds > 30 && ConfigAccess.isSacksTrackingEnabled() && sacksCollectionGained == 0))) {
             ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
             return;
         }
@@ -294,10 +298,14 @@ public class TrackingHandlerClass {
         if (!useBazaar) {
             // NPC money extremes
             if (highestRatePerHourNPC > 0) {
-                lines.add(String.format("   §6Best NPC money rate: §f$%s/h", formatNumber(highestRatePerHourNPC)));
+                if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
+                    lines.add(String.format("   §6Best motes rate: §f%s/h", formatNumber(highestRatePerHourNPC)));
+                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(String.format("   §6Best NPC money rate: §f$%s/h", formatNumber(highestRatePerHourNPC)));
             }
             if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
-                lines.add(String.format("   §6Lowest NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC)));
+                if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
+                    lines.add(String.format("   §6Lowest motes rate: §f%s/h", formatNumber(lowestRatePerHourNPC)));
+                } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(String.format("   §6Lowest NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC)));
             }
         } else {
             // Bazaar extremes per variant
@@ -336,7 +344,6 @@ public class TrackingHandlerClass {
                 }
             }
         }
-
         ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
     }
 
@@ -386,4 +393,3 @@ public class TrackingHandlerClass {
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 }
-

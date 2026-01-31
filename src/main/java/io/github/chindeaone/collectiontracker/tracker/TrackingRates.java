@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.tracker;
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
-import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
@@ -122,7 +121,7 @@ public class TrackingRates {
         moneyMade.put("NPC", uptime > 0 ? (long) Math.floor(priceNPC * (double) collectedSinceStart) : 0);
 
         long computed;
-        if (!CollectionsManager.isRiftCollection(collection) && BazaarCollectionsManager.hasBazaarData) {
+        if (BazaarCollectionsManager.hasBazaarData) {
             switch (collectionType) {
                 case "normal" -> {
                     bazaarPrice = BazaarPrices.normalPrice;
