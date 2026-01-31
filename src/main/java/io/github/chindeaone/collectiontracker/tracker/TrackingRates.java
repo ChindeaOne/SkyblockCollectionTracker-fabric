@@ -160,7 +160,7 @@ public class TrackingRates {
 
         // Update values
         collectionAmount = currentCollection;
-        collectionPerHour = uptime > 0 ? (collectedSinceStart / uptime) * 3600 : 0;
+        collectionPerHour = uptime > 0 ? (long) Math.floor(collectedSinceStart / (uptime / 3600.0)) : 0;
         collectionMade = collectedSinceStart;
         moneyPerHourNPC = uptime > 0 ? (long) Math.floor(priceNPC * collectedSinceStart / (uptime / 3600.0)) : 0;
 
