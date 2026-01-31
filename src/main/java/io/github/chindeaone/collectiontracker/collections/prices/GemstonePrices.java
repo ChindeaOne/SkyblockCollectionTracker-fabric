@@ -14,7 +14,6 @@ public class GemstonePrices {
 
     public static void setPrices(String json) {
         Gson gson = new Gson();
-        gemstonePrices.clear(); // Clear existing prices before setting new ones
         gemstonePrices.putAll(gson.fromJson(json, new TypeToken<Map<String, Float>>() {}.getType()));
         setRecipes();
         BazaarCollectionsManager.hasBazaarData = true;
@@ -40,5 +39,10 @@ public class GemstonePrices {
 
     public static float getPrice(String gemstoneVariant) {
         return gemstonePrices.get(gemstoneVariant);
+    }
+
+    public static void resetPrices() {
+        gemstonePrices.clear();
+        recipes.clear();
     }
 }

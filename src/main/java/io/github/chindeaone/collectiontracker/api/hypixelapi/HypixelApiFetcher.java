@@ -53,7 +53,6 @@ public class HypixelApiFetcher {
         } catch (Exception e) {
             logger.error("[SCT]: An error occurred while fetching data from the server", e);
         }
-
         return null;
     }
 

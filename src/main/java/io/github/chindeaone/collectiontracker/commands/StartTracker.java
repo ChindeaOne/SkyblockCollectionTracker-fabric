@@ -20,7 +20,6 @@ import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClas
 public class StartTracker {
 
     public static String collection = "";
-    public static String previousCollection = "";
 
     public static Logger logger = LogManager.getLogger(StartTracker.class);
 
@@ -52,18 +51,9 @@ public class StartTracker {
                         CollectionsManager.collectionSource = "collection";
                     } else CollectionsManager.collectionSource = "sacks";
 
-                    // Check if the collection is a Rift collection
-                    if (CollectionsManager.isRiftCollection(collection)) {
-                        ConfigHelper.disableBazaar();
-                        TrackingHandlerClass.startTracking();
-                    } else {
-                        // Fetch bazaar data asynchronously
-                        if (!collection.equals(previousCollection)) {
-                            CompletableFuture.runAsync(() ->
-                                            FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
-                                    .thenRun(TrackingHandlerClass::startTracking);
-                        } else TrackingHandlerClass.startTracking();
-                    }
+                    // Fetch bazaar data asynchronously
+                    CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
+                            .thenRun(TrackingHandlerClass::startTracking);
                 } else {
                     ChatUtils.INSTANCE.sendMessage("§cAlready tracking a collection.", true);
                 }

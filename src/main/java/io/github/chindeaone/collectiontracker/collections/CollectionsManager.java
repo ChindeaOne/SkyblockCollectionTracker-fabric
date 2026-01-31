@@ -6,7 +6,7 @@ public class CollectionsManager {
 
     public static Map<String, Set<String>> collections = new HashMap<>();
     public static String collectionSource;
-    public static String collectionType = null;
+    public static String collectionType;
 
     public static boolean isValidCollection(String collectionName) {
         for (Set<String> collectionSet : collections.values()) {
@@ -38,5 +38,10 @@ public class CollectionsManager {
         return collections
                 .getOrDefault("Rift", Collections.emptySet())
                 .contains(collectionName);
+    }
+
+    public static void resetCollections() {
+        collectionSource = null;
+        collectionType = null;
     }
 }

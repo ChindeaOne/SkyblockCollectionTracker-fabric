@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.collections.prices;
 
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -15,8 +14,6 @@ public class BazaarPrices {
     public static float superEnchantedPrice = 0.0f;
 
     public static void setPrices(String json, String type) {
-        resetPrices();
-
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 
         Iterator<Map.Entry<String, JsonElement>> iterator = jsonObject.entrySet().iterator();
@@ -39,10 +36,9 @@ public class BazaarPrices {
         }
     }
 
-    private static void resetPrices() {
+    public static void resetPrices() {
         normalPrice = 0.0f;
         enchantedPrice = 0.0f;
         superEnchantedPrice = 0.0f;
     }
-
 }

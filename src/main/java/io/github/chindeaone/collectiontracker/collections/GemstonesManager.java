@@ -13,5 +13,4 @@ public class GemstonesManager {
         }
         return false;
     }
-
 }

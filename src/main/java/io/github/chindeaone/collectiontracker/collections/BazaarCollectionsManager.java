@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
+import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,5 +44,13 @@ public class BazaarCollectionsManager {
             BazaarPrices.setPrices(prices.toString(), type);
         }
         hasBazaarData = true;
+    }
+
+    public static void resetBazaarData() {
+        hasBazaarData = false;
+        enchantedRecipe.clear();
+        superEnchantedRecipe.clear();
+        BazaarPrices.resetPrices();
+        GemstonePrices.resetPrices();
     }
 }
