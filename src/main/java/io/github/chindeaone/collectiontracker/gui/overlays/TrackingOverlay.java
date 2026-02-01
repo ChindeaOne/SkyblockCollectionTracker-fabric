@@ -57,6 +57,7 @@ public class TrackingOverlay implements AbstractOverlay{
 
     @Override
     public void updateDimensions() {
+        if (!isEnabled()) return;
         List<String> lines = TextUtils.getStrings();
         if (lines.isEmpty()) return;
 
