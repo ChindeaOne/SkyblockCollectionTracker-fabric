@@ -78,6 +78,23 @@ public class TrackingRates {
 
             logger.info("[SCT]: Current collection for '{}' is {}", collection, currentCollection);
             logger.info("[SCT]: Change in collection detected. Old collection: '{}'. New collection: '{}'.", lastApiCollection, currentCollection);
+
+            // Set player as AFK, else update previousCollection
+            if (currentCollection == lastApiCollection) {
+                logger.info("[SCT]: No change in collection detected. Incrementing unchanged streak.");
+                unchangedStreak++;
+                if (unchangedStreak >= THRESHOLD) {
+                    afk = true;
+                    if (TrackingHandlerClass.isTracking) {
+                        TrackingHandlerClass.stopTracking();
+                    }
+                    unchangedStreak = 0;
+                    return;
+                }
+            } else {
+                lastApiCollection = currentCollection;
+                unchangedStreak = 0;
+            }
         }
 
         logger.info("[SCT]: Collection since last check is {}.", collectionSinceLast);
@@ -85,23 +102,6 @@ public class TrackingRates {
         // Set starting collection
         if (sessionStartCollection == -1L) {
             sessionStartCollection = currentCollection;
-            unchangedStreak = 0;
-        }
-
-        // Set player as AFK, else update previousCollection
-        if (currentCollection == lastApiCollection) {
-            logger.info("[SCT]: No change in collection detected. Incrementing unchanged streak.");
-            unchangedStreak++;
-            if (unchangedStreak >= THRESHOLD) {
-                afk = true;
-                if (TrackingHandlerClass.isTracking) {
-                    TrackingHandlerClass.stopTracking();
-                }
-                unchangedStreak = 0;
-                return;
-            }
-        } else {
-            lastApiCollection = currentCollection;
             unchangedStreak = 0;
         }
 
