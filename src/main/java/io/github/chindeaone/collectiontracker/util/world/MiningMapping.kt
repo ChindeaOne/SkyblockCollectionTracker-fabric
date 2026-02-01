@@ -2,18 +2,29 @@ package io.github.chindeaone.collectiontracker.util.world
 
 object MiningMapping {
 
+    // Areas where you can mine
     val miningAreas = listOf(
         // actual mining ares
         "Dwarven Mines",
         "Crystal Hollows",
         "Mineshaft",
         "Gold Mines",
+        "Deep Caverns",
         // other areas where you can mine
         "The End",
         "Crimson Isle",
         "Spider's Den",
         "The Farming Islands",
         "Jerry's Workshop"
+    )
+
+    // Mining specific islands
+    val miningIslands = listOf(
+        "Dwarven Mines",
+        "Crystal Hollows",
+        "Mineshaft",
+        "Gold Mines",
+        "Deep Caverns"
     )
 
     val miningStats = listOf(
@@ -32,6 +43,45 @@ object MiningMapping {
         "Heat Resistance",
         // why not
         "Breaking Power"
+    )
+
+    @JvmStatic
+    val miningBlocksPerArea: Map<String, Set<String>> = mapOf(
+        "ores" to setOf(
+            "Dwarven Mines",
+            "Crystal Hollows",
+            "Mineshaft",
+            "Gold Mines",
+            "Deep Caverns",
+            "Crimson Isle", // for quartz and sulphur
+        ),
+        "pure_ores" to setOf(
+            "Dwarven Mines",
+            "Crystal Hollows", // in MOD
+        ),
+        "blocks" to setOf(
+            "Dwarven Mines", // stone, cobblestone
+            "Crystal Hollows", // hard stone
+            "Mineshaft", // hard stone
+            "Gold Mines", // stone, cobblestone
+            "Deep Caverns", // stone, cobblestone
+            "The End", // for end stone and obsidian
+            "Crimson Isle", // for red sand, mycelium, netherrack, glowstone
+            "Spider's Den", // for gravel
+            "Jerry's Workshop", // for ice
+            "The Farming Islands" // for sand
+        ),
+        "dwarven_metals" to setOf(
+            "Dwarven Mines",
+            "Crystal Hollows",
+            "Mineshaft"
+        ),
+        "gemstones" to setOf(
+            "Dwarven Mines",
+            "Crystal Hollows",
+            "Mineshaft",
+            "Crimson Isle" // for opal
+        )
     )
 
     val miningBlockPerType = mapOf(

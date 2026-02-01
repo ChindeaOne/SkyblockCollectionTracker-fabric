@@ -10,10 +10,18 @@ public class MiningStatsOverlay {
 
     @Expose
     @ConfigOption(
-            name = "Enable Mining Stats Overlay",
+            name = "Mining Stats Overlay",
             desc = "Toggles an overlay for mining stats.\n§eYou need to have mining stats (e.g. Mining Speed, Mining Fortune etc) in your stats widget for this to work.")
     @ConfigEditorBoolean
     public boolean enableMiningStatsOverlay = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Only in Mining Islands",
+            desc = "If enabled, the mining stats overlay will only show when you are in any Mining Islands."
+    )
+    @ConfigEditorBoolean
+    public boolean miningStatsOverlayInMiningIslandsOnly = false;
 
     @Expose
     @ConfigLink(owner = MiningStatsOverlay.class, field = "miningStatsOverlay")

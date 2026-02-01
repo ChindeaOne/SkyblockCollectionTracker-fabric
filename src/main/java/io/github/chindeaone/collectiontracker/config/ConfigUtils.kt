@@ -38,6 +38,8 @@ val miningConfig: Mining get() = modConfig.mining
 val keybindConfig: KeybindConfig get() = miningConfig.commissionsOverlay.commissions
 val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
+val enableMiningStatsOverlay: Boolean get() = miningStatsOverlay.enableMiningStatsOverlay
+val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsOverlay.miningStatsOverlayInMiningIslandsOnly
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
@@ -93,7 +95,10 @@ object ConfigAccess {
     fun isCommissionsKeybindsEnabled(): Boolean = keybindConfig.enableCommissionsKeybinds
 
     @JvmStatic
-    fun isMiningStatsEnabled(): Boolean = miningStatsOverlay.enableMiningStatsOverlay
+    fun isMiningStatsEnabled(): Boolean = enableMiningStatsOverlay
+
+    @JvmStatic
+    fun isMiningStatsOverlayInMiningIslandsOnly(): Boolean = miningStatsOverlayInMiningIslandsOnly
 
     @JvmStatic
     fun getStatsText(): List<SingleOverlay.OverlayText> = statsText

@@ -1,13 +1,19 @@
 package io.github.chindeaone.collectiontracker.util.parser;
 
 import io.github.chindeaone.collectiontracker.util.ScoreboardUtils;
+import io.github.chindeaone.collectiontracker.util.tab.MiningStatsWidget;
+import io.github.chindeaone.collectiontracker.util.world.MiningMapping;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MiningStatsParser {
+
+    private static String lastDisplayedSpecificFortune = "";
+    private static int lastDisplayedSpecificFortuneValue = 0;
 
     private MiningStatsParser() {}
 
@@ -69,12 +75,13 @@ public class MiningStatsParser {
 
     private static void processFortuneLine(String line, MiningContext ctx) {
         int value = extractFortune(line);
+
         if (line.contains("Mining Fortune")) {
             ctx.globalFortune = value;
             return;
         }
 
-        if (ctx.blockType == null) return;
+        if (!ctx.shouldShowSpecificFortune()) return;
 
         boolean match = switch (ctx.blockType) {
             case "dwarven_metals" -> line.contains("Dwarven Metal Fortune");
@@ -87,12 +94,18 @@ public class MiningStatsParser {
         if (match) {
             ctx.specificFortune = value;
             ctx.specificFortuneName = ctx.getFortuneLabel();
+
+            // Update last displayed specific fortune
+            lastDisplayedSpecificFortune = ctx.specificFortuneName;
+            lastDisplayedSpecificFortuneValue = ctx.specificFortune;
         }
     }
 
     private static class MiningContext {
         final String blockType;
+        final String island;
         final boolean isGemstone;
+        final boolean allowSpecificFortune;
 
         int globalFortune = 0;
         int specificFortune = 0;
@@ -108,10 +121,19 @@ public class MiningStatsParser {
 
         MiningContext(String blockType) {
             this.blockType = blockType;
+            this.island = MiningStatsWidget.INSTANCE.getCurrentMiningIsland();
             this.isGemstone = "gemstones".equals(blockType);
+
             if (isGemstone) {
                 this.spread = new Stat("Gemstone Spread", "▚", "§e");
             }
+
+            Set<String> allowed = MiningMapping.getMiningBlocksPerArea().get(blockType);
+            this.allowSpecificFortune = allowed != null && island != null && allowed.contains(island);
+        }
+
+        boolean shouldShowSpecificFortune() {
+            return allowSpecificFortune;
         }
 
         String getFortuneLabel() {
@@ -126,9 +148,21 @@ public class MiningStatsParser {
 
         String formatTotalFortune() {
             String symbol = "☘";
-            String label = specificFortuneName.isEmpty() ? "Mining Fortune" : specificFortuneName;
             int total = globalFortune + specificFortune;
-            return "§a" + label + ": §6" + symbol + total + " §7(" + globalFortune + "+" + specificFortune + ")";
+
+            // Show specific fortune if available
+            if (!specificFortuneName.isEmpty()) {
+                return "§a" + specificFortuneName + ": §6" + symbol + total +
+                        " §7(" + globalFortune + "+" + specificFortune + ")";
+            }
+            // Fallback to last displayed specific fortune
+            if (!lastDisplayedSpecificFortune.isEmpty()) {
+                return "§a" + lastDisplayedSpecificFortune + ": §6" + symbol + (total + lastDisplayedSpecificFortuneValue) +
+                        " §7(" + globalFortune + "+" + lastDisplayedSpecificFortuneValue +")";
+            }
+
+            // Fallback to mining fortune
+            return "§aMining Fortune: §6" + symbol + total;
         }
 
         private static class Stat {

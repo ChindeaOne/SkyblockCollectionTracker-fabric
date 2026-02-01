@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.util.tab
 
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.util.ChatUtils
 import io.github.chindeaone.collectiontracker.util.world.MiningMapping
@@ -8,22 +9,36 @@ object MiningStatsWidget {
 
     private var lastStats: List<String>? = null
     var rawStats: List<String> = emptyList()
+    var currentMiningIsland: String? = null
+        private set
 
     private var nextAllowedTime: Long = 0L
     private var firstInfoSeenTime: Long = 0L
 
     fun onTabWidgetsUpdate() {
+        // Check if the player is in a mining area
         val areaWidget = TabWidget.AREA
+
         if (areaWidget.isPresent) {
-            val areaNames = MiningMapping.miningAreas
-            val inMiningArea = areaWidget.lines.any { line ->
-                areaNames.any { name -> line.contains(name, ignoreCase = true) }
+            currentMiningIsland = if (ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly()) {
+                areaWidget.lines.firstNotNullOfOrNull { line ->
+                    MiningMapping.miningIslands.firstOrNull { name ->
+                        line.contains(name, ignoreCase = true)
+                    }
+                }
+            } else areaWidget.lines.firstNotNullOfOrNull { line ->
+                MiningMapping.miningAreas.firstOrNull { name ->
+                    line.contains(name, ignoreCase = true)
+                }
             }
 
-            if (!inMiningArea) {
+            if (currentMiningIsland == null) {
                 rawStats = emptyList()
                 return
             }
+        } else {
+            rawStats = emptyList()
+            return
         }
 
         val widget = TabWidget.STATS
