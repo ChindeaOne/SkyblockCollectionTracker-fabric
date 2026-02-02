@@ -151,7 +151,7 @@ object ChatUtils {
             title.append(Component.literal("§7<< "))
         }
 
-        title.append(Component.literal("§6§lSkyblockCollectionTracker Collections §7($page/$totalPages)"))
+        title.append(Component.literal("§6§lSkyblockCollectionTracker §7- §eCollections §7($page/$totalPages)"))
 
         if (page < totalPages) {
             title.append(

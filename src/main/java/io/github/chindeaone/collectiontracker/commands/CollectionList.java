@@ -19,10 +19,10 @@ public class CollectionList {
 
         Map<String, String> categoryColors = new HashMap<>();
         categoryColors.put("Farming", "§a"); // Green
-        categoryColors.put("Mining", "§b"); // Aqua
-        categoryColors.put("Combat", "§4"); // Dark red
+        categoryColors.put("Mining", "§6"); // Gold
+        categoryColors.put("Combat", "§c"); // Red
         categoryColors.put("Foraging", "§2"); // Dark green
-        categoryColors.put("Fishing", "§3"); // Dark aqua
+        categoryColors.put("Fishing", "§b"); // Aqua
         categoryColors.put("Rift", "§5"); // Dark purple
         categoryColors.put("Miscellaneous", "§8"); // Dark gray
 
