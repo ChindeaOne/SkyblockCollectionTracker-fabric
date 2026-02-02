@@ -111,6 +111,8 @@ object CollectionColors {
         put("hemovibe", 0xFFDC1414.toInt()) // Crimson
         put("half-eaten carrot", 0xFFFFA500.toInt()) // Orange
         put("timite", 0xFF4682B4.toInt()) // Steel Blue
+        put("youngite", 0xFF32D7E6.toInt()) // Light Blue
+        put("obsolite", 0xFF8565BA.toInt()) // Purple
 
         // Sacks
         put("cropie", 0xFFD36827.toInt()) // Wheat Brown
