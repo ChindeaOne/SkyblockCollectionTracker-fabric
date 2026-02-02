@@ -53,6 +53,7 @@ public class CommissionsOverlay implements AbstractOverlay{
 
     @Override
     public void updateDimensions() {
+        if (!isEnabled()) return;
         List<String> lines = TextUtils.updateCommissions();
         if (lines.isEmpty()) return;
 

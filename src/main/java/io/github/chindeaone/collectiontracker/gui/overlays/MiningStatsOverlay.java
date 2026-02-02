@@ -53,6 +53,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
 
     @Override
     public void updateDimensions() {
+        if (!isEnabled()) return;
         List<String> lines = TextUtils.updateMiningStats();
         if (lines.isEmpty()) return;
 
