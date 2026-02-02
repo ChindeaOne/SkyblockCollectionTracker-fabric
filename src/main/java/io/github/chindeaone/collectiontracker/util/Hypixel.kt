@@ -64,7 +64,7 @@ object Hypixel {
                     serverStatus = ServerStatus.checkServer()
 
                     if (!serverStatus) {
-                        ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. We apologize for the inconvenience.")
+                        ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
                         logger.warn("[SCT]: The API server is currently under maintenance.")
                     } else {
                         if (TokenManager.getToken() == null) {
@@ -113,7 +113,7 @@ object Hypixel {
         skyblock = inSkyblock
     }
 
-    private fun fetchData() {
+    fun fetchData() {
         // Request collection data
         if (!FetchCollectionList.hasCollectionList) {
             CompletableFuture.runAsync {

@@ -1,10 +1,14 @@
 package io.github.chindeaone.collectiontracker.util
 
+import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
+import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
+import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -60,6 +64,8 @@ object ServerUtils {
             if (TokenManager.getToken() == null) {
                 TokenManager.fetchAndStoreToken()
             }
+            checkIfDataWasFetched()
+
         } else {
             logger.warn("[SCT]: Server is not alive.")
             consecutiveFailures++
@@ -80,6 +86,13 @@ object ServerUtils {
             }
 
             TrackingHandlerClass.stopTracking()
+        }
+    }
+
+    private fun checkIfDataWasFetched() {
+        if (!FetchGemstoneList.hasGemstoneList && !FetchNpcPrices.hasNpcPrice && !FetchCollectionList.hasCollectionList) {
+            CompletableFuture.runAsync { Hypixel.fetchData() }
+            logger.info("[SCT]: API data loaded successfully.")
         }
     }
 }
