@@ -13,7 +13,7 @@ object RenderUtils {
 
     private val fr: Font get() = Minecraft.getInstance().font
     private const val DUMMY_BG = -0x7fbfbfc0
-    const val WHITE: Int = 0xFFFFFFFF.toInt()
+    const val WHITE: Int = 0xFFEBEBFA.toInt() // Crystal-white
     const val GREEN: Int = 0xFF55FF55.toInt()
     const val YELLOW: Int = 0xFFFFFF55.toInt()
 
@@ -28,6 +28,7 @@ object RenderUtils {
         context.pose().popMatrix()
     }
 
+    @JvmStatic
     fun drawDummyFrame(context: GuiGraphics, pos: Position, label: String) {
         drawOverlayFrame(context, pos) {
             context.fill(0, 0, pos.width, pos.height, DUMMY_BG)
@@ -75,6 +76,7 @@ object RenderUtils {
         }
     }
 
+    @JvmStatic
     fun drawEditorHudText(context: GuiGraphics, activePosition: Position?) {
         val textScale = 0.8f
 

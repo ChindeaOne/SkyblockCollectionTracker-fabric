@@ -51,7 +51,7 @@ public class DummyOverlay extends Screen {
         for (AbstractOverlay overlay : OverlayManager.all()) {
             overlay.updateDimensions();
 
-            RenderUtils.INSTANCE.drawDummyFrame(context,overlay.position(), overlay.overlayLabel());
+            RenderUtils.drawDummyFrame(context,overlay.position(), overlay.overlayLabel());
 
             if (isMouseOver(mouseX, mouseY, overlay.position())) {
                 hovered = overlay;
@@ -63,7 +63,7 @@ public class DummyOverlay extends Screen {
             dragging.position().setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY);
         }
 
-        RenderUtils.INSTANCE.drawEditorHudText(context, hovered != null ? hovered.position() : null);
+        RenderUtils.drawEditorHudText(context, hovered != null ? hovered.position() : null);
     }
 
     @Override

@@ -17,7 +17,7 @@ public class MiningStatsOverlay {
 
     @Expose
     @ConfigOption(
-            name = "Only in Mining Islands",
+            name = "Only in mining specific areas",
             desc = "If enabled, the mining stats overlay will only show when you are in any Mining Islands."
     )
     @ConfigEditorBoolean
@@ -25,5 +25,5 @@ public class MiningStatsOverlay {
 
     @Expose
     @ConfigLink(owner = MiningStatsOverlay.class, field = "miningStatsOverlay")
-    public Position miningStatsOverlayPosition = new Position(240, 50);
+    public Position miningStatsOverlayPosition = new Position(50, 150);
 }

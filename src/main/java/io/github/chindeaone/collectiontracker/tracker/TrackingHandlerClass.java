@@ -43,7 +43,7 @@ public class TrackingHandlerClass {
     public static void startTracking() {
         long now = System.currentTimeMillis();
 
-        if ((now - lastTrackTime) < COOLDOWN_MILLIS) {
+        if (now - lastTrackTime < COOLDOWN_MILLIS) {
             ChatUtils.INSTANCE.sendMessage("§cPlease wait before tracking another collection!", true);
             return;
         } else {
@@ -276,9 +276,8 @@ public class TrackingHandlerClass {
 
         lines.add(String.format("   §7Elapsed time: §f%s", getUptimeInWords()));
 
-        // If no 2nd fetching cycle or first sacks message, skip best/worst rates
-        int uptimeSeconds = (int) getUptimeInSeconds();
-        if ((uptimeSeconds < 30 && ConfigAccess.isSacksTrackingEnabled()) || (uptimeSeconds < 200 && uptimeSeconds > 30 && !ConfigAccess.isSacksTrackingEnabled() || (uptimeSeconds < 200 && uptimeSeconds > 30 && ConfigAccess.isSacksTrackingEnabled() && sacksCollectionGained == 0))) {
+        // If no collection update, skip best/worst rates
+        if (collectionMade == 0) {
             ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
             return;
         }

@@ -39,23 +39,24 @@ public class StartTracker {
                     return;
                 }
 
-                if (!isTracking && !isPaused) {
-                    collection = coll.toLowerCase();
-                    if (!CollectionsManager.isValidCollection(collection)) {
-                        ChatUtils.INSTANCE.sendMessage("§4" + collection + " collection is not supported! Use /sct collections to see all supported collections.", true);
-                        return;
-                    }
-                    // Set collection source
-                    if (CollectionsManager.isCollection(collection)) {
-                        CollectionsManager.collectionSource = "collection";
-                    } else CollectionsManager.collectionSource = "sacks";
-
-                    // Fetch bazaar data asynchronously
-                    CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
-                            .thenRun(TrackingHandlerClass::startTracking);
-                } else {
+                if (isTracking || isPaused) {
                     ChatUtils.INSTANCE.sendMessage("§cAlready tracking a collection.", true);
+                    return;
                 }
+
+                collection = coll.toLowerCase();
+                if (!CollectionsManager.isValidCollection(collection)) {
+                    ChatUtils.INSTANCE.sendMessage("§4" + collection + " collection is not supported! Use /sct collections to see all supported collections.", true);
+                    return;
+                }
+                // Set collection source
+                if (CollectionsManager.isCollection(collection)) {
+                    CollectionsManager.collectionSource = "collection";
+                } else CollectionsManager.collectionSource = "sacks";
+
+                // Fetch bazaar data asynchronously
+                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
+                        .thenRun(TrackingHandlerClass::startTracking);
 
             } catch (Exception e) {
                 ChatUtils.INSTANCE.sendMessage("§cAn error occurred while processing the command.", true);
