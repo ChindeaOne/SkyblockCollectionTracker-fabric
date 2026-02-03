@@ -74,17 +74,17 @@ public class FetchBazaarPrice {
                     }
 
                     CollectionsManager.collectionType = type;
-                    logger.info("Bazaar price found for type: {}", type);
+                    logger.info("[SCT]: Bazaar price found for type: {}", type);
                 }
 
             } else if (status == 404) {
-                logger.warn("Type '{}' not found for collection '{}'", type, collection);
+                logger.warn("[SCT]: Type '{}' not found for collection '{}'", type, collection);
             } else {
-                logger.warn("Server returned HTTP {} for type '{}'", status, type);
+                logger.warn("[SCT]: Server returned HTTP {} for type '{}'", status, type);
             }
 
         } catch (IOException | InterruptedException e) {
-            logger.error("Error fetching bazaar price for collection '{}': {}", collection, e.getMessage());
+            logger.error("[SCT]: Error fetching bazaar price for collection '{}': {}", collection, e.getMessage());
         }
     }
 }

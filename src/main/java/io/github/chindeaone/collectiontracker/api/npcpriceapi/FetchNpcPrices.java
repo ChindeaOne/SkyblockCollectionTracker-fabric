@@ -23,7 +23,7 @@ import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
 public class FetchNpcPrices {
 
     private static final Logger logger = LogManager.getLogger(FetchNpcPrices.class);
-    public static boolean hasNpcPrice = false;
+    public static volatile boolean hasNpcPrice = false;
 
     public static void fetchPrices() {
         try {
@@ -31,7 +31,6 @@ public class FetchNpcPrices {
 
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(5))
-                    .header("X-GAME-VERSION", SkyblockCollectionTracker.MC_VERSION)
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
                     .GET()
@@ -50,6 +49,7 @@ public class FetchNpcPrices {
                     );
 
                     NpcPrices.collectionPrices.putAll(prices);
+                    hasNpcPrice = true;
                     logger.info("[SCT]: Successfully received the npc prices.");
                 }
             } else {

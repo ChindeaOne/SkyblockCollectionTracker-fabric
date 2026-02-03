@@ -1,6 +1,11 @@
 package io.github.chindeaone.collectiontracker.api.serverapi;
 
 import io.github.chindeaone.collectiontracker.api.URLManager;
+import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList;
+import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList;
+import io.github.chindeaone.collectiontracker.api.colors.FetchColors;
+import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher;
+import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,5 +42,9 @@ public class ServerStatus {
             logger.error("[SCT]: Error checking server status", e);
             return false;
         }
+    }
+
+    public static synchronized boolean hasData() {
+        return FetchColors.hasColors && FetchNpcPrices.hasNpcPrice && FetchCollectionList.hasCollectionList && FetchGemstoneList.hasGemstoneList && SkillApiFetcher.hasSkills;
     }
 }

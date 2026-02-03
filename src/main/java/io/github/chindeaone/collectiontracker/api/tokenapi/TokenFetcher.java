@@ -48,6 +48,9 @@ public class TokenFetcher {
             logger.info("[SCT]: Successfully fetched token");
 
             return jsonResponse.getAsJsonPrimitive("token").getAsString();
+        } catch (Exception e) {
+            logger.error("[SCT]: An error occurred while parsing the token response", e);
+            return null;
         }
     }
 }

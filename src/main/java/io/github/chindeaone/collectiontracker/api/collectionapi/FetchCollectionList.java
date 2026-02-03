@@ -25,7 +25,7 @@ import static io.github.chindeaone.collectiontracker.collections.CollectionsMana
 public class FetchCollectionList {
 
     private static final Logger logger = LogManager.getLogger(FetchCollectionList.class);
-    public static boolean hasCollectionList = false;
+    public static volatile boolean hasCollectionList = false;
 
     public static void fetchCollectionList() {
         try {
@@ -34,7 +34,6 @@ public class FetchCollectionList {
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(5))
                     .header("User-Agent", URLManager.AGENT)
-                    .header("X-GAME-VERSION", SkyblockCollectionTracker.MC_VERSION)
                     .header("Accept", "application/json")
                     .GET()
                     .build();
@@ -56,11 +55,10 @@ public class FetchCollectionList {
                         for (JsonElement el : itemsArray) {
                             items.add(el.getAsString());
                         }
-
                         collections.put(category, items);
                     }
                 }
-
+                hasCollectionList = true;
                 logger.info("[SCT]: Successfully received the collection list.");
             } else {
                 logger.error("[SCT]: Failed to fetch collection list. HTTP {}", response.statusCode());

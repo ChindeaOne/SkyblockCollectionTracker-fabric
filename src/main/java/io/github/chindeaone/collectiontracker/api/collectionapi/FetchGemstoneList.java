@@ -22,7 +22,7 @@ import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
 public class FetchGemstoneList {
 
     private static final Logger logger = LogManager.getLogger(FetchGemstoneList.class);
-    public static boolean hasGemstoneList = false;
+    public static volatile boolean hasGemstoneList = false;
 
     public static void fetchGemstoneList() {
         try {
