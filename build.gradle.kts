@@ -156,6 +156,8 @@ tasks.processResources {
             "BAZAAR_URL" to (System.getenv("BAZAAR_URL") ?: ""),
             "STATUS_URL" to (System.getenv("STATUS_URL") ?: ""),
             "GITHUB_URL" to (System.getenv("GITHUB_URL") ?: ""),
+            "COLORS_URL" to (System.getenv("COLORS_URL") ?: ""),
+            "SKILLS_URL" to (System.getenv("SKILLS_URL") ?: ""),
             "AGENT" to (System.getenv("AGENT") ?: "")
         )
     }

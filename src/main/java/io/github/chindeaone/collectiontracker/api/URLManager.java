@@ -15,6 +15,8 @@ public class URLManager {
     public static final String BAZAAR_URL;
     public static final String STATUS_URL;
     public static final String GITHUB_URL;
+    public static final String COLORS_URL;
+    public static final String SKILLS_URL;
     public static final String AGENT;
 
     static {
@@ -34,6 +36,8 @@ public class URLManager {
         BAZAAR_URL = props.getProperty("BAZAAR_URL");
         STATUS_URL = props.getProperty("STATUS_URL");
         GITHUB_URL = props.getProperty("GITHUB_URL");
+        COLORS_URL = props.getProperty("COLORS_URL");
+        SKILLS_URL = props.getProperty("SKILLS_URL");
         AGENT = props.getProperty("AGENT");
     }
 
