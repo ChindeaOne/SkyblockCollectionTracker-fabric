@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.tracker;
+package io.github.chindeaone.collectiontracker.tracker.collection;
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig;
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
-import io.github.chindeaone.collectiontracker.gui.overlays.TrackingOverlay;
+import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.Hypixel;
 import io.github.chindeaone.collectiontracker.util.PlayerData;
@@ -19,14 +19,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
-import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
-import static io.github.chindeaone.collectiontracker.tracker.DataFetcher.scheduler;
-import static io.github.chindeaone.collectiontracker.tracker.TrackingRates.*;
+import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
+import static io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.scheduler;
+import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
 import static io.github.chindeaone.collectiontracker.util.NumbersUtils.formatNumber;
 
-public class TrackingHandlerClass {
+public class TrackingHandler {
 
-    private static final Logger logger = LogManager.getLogger(TrackingHandlerClass.class);
+    private static final Logger logger = LogManager.getLogger(TrackingHandler.class);
     private static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10 seconds cooldown
 
     public static boolean isTracking = false;
@@ -161,7 +161,7 @@ public class TrackingHandlerClass {
         else lastTrackTime = now - COOLDOWN_MILLIS;
 
         OverlayManager.setTrackingOverlayRendering(false);
-        TrackingOverlay.trackingDirty = false;
+        CollectionOverlay.trackingDirty = false;
     }
 
     private static void clearFetchedData() {

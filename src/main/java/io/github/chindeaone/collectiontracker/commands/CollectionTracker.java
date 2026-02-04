@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.commands;
 import io.github.chindeaone.collectiontracker.api.bazaarapi.FetchBazaarPrice;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
-import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.HypixelUtils;
 import io.github.chindeaone.collectiontracker.util.PlayerData;
@@ -13,14 +13,14 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 
-import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.isPaused;
-import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.isTracking;
+import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isPaused;
+import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking;
 
-public class StartTracker {
+public class CollectionTracker {
 
     public static String collection = "";
 
-    public static Logger logger = LogManager.getLogger(StartTracker.class);
+    public static Logger logger = LogManager.getLogger(CollectionTracker.class);
 
     public static void startTracking(String coll) {
         try {
@@ -56,8 +56,7 @@ public class StartTracker {
 
                 // Fetch bazaar data asynchronously
                 CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
-                        .thenRun(TrackingHandlerClass::startTracking);
-
+                        .thenRun(TrackingHandler::startTracking);
             } catch (Exception e) {
                 ChatUtils.INSTANCE.sendMessage("§cAn error occurred while processing the command.", true);
                 logger.error("Error processing command: ", e);

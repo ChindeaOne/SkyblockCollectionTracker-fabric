@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.List;
 
-public class TrackingOverlay implements AbstractOverlay{
+public class CollectionOverlay implements AbstractOverlay{
 
     public static volatile boolean trackingDirty = false;
     private final Position position = ConfigAccess.getTrackingPosition();
@@ -19,7 +19,7 @@ public class TrackingOverlay implements AbstractOverlay{
 
     @Override
     public String overlayLabel() {
-        return "Tracking Overlay";
+        return "Collection Overlay";
     }
 
     @Override public Position position() {
@@ -28,7 +28,7 @@ public class TrackingOverlay implements AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return TrackingHandlerClass.isTracking;
+        return TrackingHandler.isTracking;
     }
 
     @Override
@@ -45,8 +45,8 @@ public class TrackingOverlay implements AbstractOverlay{
     public void render(GuiGraphics context) {
         if (!isEnabled() || !trackingDirty) return;
 
-        List<String> mainLines = TextUtils.getStrings();
-        List<String> extraLines = TextUtils.getExtraStrings();
+        List<String> mainLines = TextUtils.getCollectionLines();
+        List<String> extraLines = TextUtils.getCollectionExtraLines();
 
         if (mainLines.isEmpty()) return;
 
@@ -58,7 +58,7 @@ public class TrackingOverlay implements AbstractOverlay{
     @Override
     public void updateDimensions() {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.getStrings();
+        List<String> lines = TextUtils.getCollectionLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;

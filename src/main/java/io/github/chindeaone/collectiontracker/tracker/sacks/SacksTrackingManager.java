@@ -2,13 +2,13 @@ package io.github.chindeaone.collectiontracker.tracker.sacks;
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
-import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
-import io.github.chindeaone.collectiontracker.tracker.TrackingRates;
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates;
 
 public class SacksTrackingManager {
 
     public static void onChatCollection(int amount, int timeframe) {
-        if (!TrackingHandlerClass.isTracking) return;
+        if (!TrackingHandler.isTracking) return;
 
         long updatedAmount = updateAmount(amount, timeframe);
         TrackingRates.calculateRates(updatedAmount, true);

@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.tracker;
+package io.github.chindeaone.collectiontracker.tracker.collection;
 
 import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher;
@@ -15,9 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
-import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.isPaused;
-import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.isTracking;
+import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
+import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isPaused;
+import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking;
 
 public class DataFetcher {
 
@@ -39,11 +39,11 @@ public class DataFetcher {
         logger.info("[SCT]: Data fetching scheduled to run every {} seconds", period);
     }
 
-    public static void fetchData() {
+    private static void fetchData() {
         try {
             if (!ServerUtils.INSTANCE.getServerStatus()) {
                 logger.warn("[SCT]: API server not online. Stopping the tracker.");
-                TrackingHandlerClass.stopTracking();
+                TrackingHandler.stopTracking();
                 return;
             }
 
@@ -68,7 +68,7 @@ public class DataFetcher {
         }
     }
 
-    public static String getData(String playerUUID, String collection) {
+    private static String getData(String playerUUID, String collection) {
         CacheKey cacheKey = new CacheKey(playerUUID, collection);
         Long lastFetched = cacheTimestamps.get(cacheKey);
 
@@ -100,6 +100,5 @@ public class DataFetcher {
         logger.info("[SCT]: All collection data caches have been cleared.");
     }
 
-    private record CacheKey(String uuid, String collection) {
-    }
+    private record CacheKey(String uuid, String collection) { }
 }

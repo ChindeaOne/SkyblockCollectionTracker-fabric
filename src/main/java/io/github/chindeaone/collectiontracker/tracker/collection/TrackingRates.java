@@ -1,10 +1,10 @@
-package io.github.chindeaone.collectiontracker.tracker;
+package io.github.chindeaone.collectiontracker.tracker.collection;
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
-import io.github.chindeaone.collectiontracker.gui.overlays.TrackingOverlay;
+import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
-import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
-import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.getUptimeInSeconds;
+import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
+import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.getUptimeInSeconds;
 
 public class TrackingRates {
 
@@ -85,8 +85,8 @@ public class TrackingRates {
                 unchangedStreak++;
                 if (unchangedStreak >= THRESHOLD) {
                     afk = true;
-                    if (TrackingHandlerClass.isTracking) {
-                        TrackingHandlerClass.stopTracking();
+                    if (TrackingHandler.isTracking) {
+                        TrackingHandler.stopTracking();
                     }
                     unchangedStreak = 0;
                     return;
@@ -181,7 +181,7 @@ public class TrackingRates {
         fillBazaarExtremesFromCurrent(); // Ensure extremes are initialized
 
         // Trigger tracking overlay update
-        TrackingOverlay.trackingDirty = true;
+        CollectionOverlay.trackingDirty = true;
     }
 
     private static void fillBazaarExtremesFromCurrent() {

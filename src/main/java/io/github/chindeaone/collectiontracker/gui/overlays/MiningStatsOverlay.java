@@ -42,7 +42,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
 
     @Override
     public void render(GuiGraphics context) {
-        List<String> lines = TextUtils.updateMiningStats();
+        List<String> lines = TextUtils.getMiningLines();
 
         if (lines.isEmpty()) return;
 
@@ -54,7 +54,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
     @Override
     public void updateDimensions() {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.updateMiningStats();
+        List<String> lines = TextUtils.getMiningLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;

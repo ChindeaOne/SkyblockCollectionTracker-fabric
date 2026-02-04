@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.util
 
 import com.google.gson.JsonObject
 
-object ColorsUtils {
+object ColorUtils {
     val skillColors: MutableMap<String, Int> = HashMap()
     val collectionColors: MutableMap<String, Int> = HashMap()
 

@@ -5,6 +5,7 @@ package io.github.chindeaone.collectiontracker.util
 
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
+import io.github.chindeaone.collectiontracker.api.colors.FetchColors
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
@@ -13,7 +14,8 @@ import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.About
-import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.util.ServerUtils.serverStatus
 import io.github.chindeaone.collectiontracker.util.StringUtils.removeColor
 import net.minecraft.client.Minecraft
@@ -37,7 +39,8 @@ object Hypixel {
         skyblock = false
         playerLoaded = false
         serverStatus = false
-        TrackingHandlerClass.stopTracking()
+        TrackingHandler.stopTracking()
+        SkillTrackingHandler.stopTracking()
     }
 
     private fun checkServer() {
@@ -114,26 +117,15 @@ object Hypixel {
     }
 
     fun fetchData() {
-        // Request collection data
-        if (!FetchCollectionList.hasCollectionList) {
-            CompletableFuture.runAsync {
-                FetchCollectionList.fetchCollectionList()
-                FetchCollectionList.hasCollectionList = true
-            }
-        }
-        // Request NPC prices
-        if (!FetchNpcPrices.hasNpcPrice) {
-            CompletableFuture.runAsync {
-                FetchNpcPrices.fetchPrices()
-                FetchNpcPrices.hasNpcPrice = true
-            }
-        }
-        // Request gemstone list
-        if(!FetchGemstoneList.hasGemstoneList) {
-            CompletableFuture.runAsync {
-                FetchGemstoneList.fetchGemstoneList()
-                FetchGemstoneList.hasGemstoneList = true
-            }
+        if (!ServerStatus.hasData()) {
+            // Request collection data
+            FetchCollectionList.fetchCollectionList()
+            // Request NPC prices
+            FetchNpcPrices.fetchPrices()
+            // Request gemstone list
+            FetchGemstoneList.fetchGemstoneList()
+            // Request colors data
+            FetchColors.fetchColorsData()
         }
     }
 

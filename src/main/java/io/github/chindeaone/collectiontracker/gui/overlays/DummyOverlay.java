@@ -57,7 +57,6 @@ public class DummyOverlay extends Screen {
                 hovered = overlay;
             }
         }
-
         // Update dragging positions
         if (dragging != null) {
             dragging.position().setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY);

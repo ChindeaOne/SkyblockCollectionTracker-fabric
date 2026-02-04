@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.util
 
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
-import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
@@ -69,7 +69,7 @@ object ServerUtils {
                 currentCheckInterval = COOLDOWN_CHECK_INTERVAL
             }
 
-            if (!TrackingHandlerClass.isTracking) {
+            if (!TrackingHandler.isTracking) {
                 if (trackingTimeoutFuture == null) {
                     trackingTimeoutFuture = executorService.schedule({
                         permanentlyDisabled = true
@@ -80,7 +80,7 @@ object ServerUtils {
                 trackingTimeoutFuture?.cancel(false)
                 trackingTimeoutFuture = null
             }
-            TrackingHandlerClass.stopTracking()
+            TrackingHandler.stopTracking()
         }
     }
 

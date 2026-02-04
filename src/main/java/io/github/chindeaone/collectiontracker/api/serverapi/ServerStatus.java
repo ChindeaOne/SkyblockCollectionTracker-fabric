@@ -45,6 +45,6 @@ public class ServerStatus {
     }
 
     public static synchronized boolean hasData() {
-        return FetchColors.hasColors && FetchNpcPrices.hasNpcPrice && FetchCollectionList.hasCollectionList && FetchGemstoneList.hasGemstoneList && SkillApiFetcher.hasSkills;
+        return FetchColors.hasColors && FetchNpcPrices.hasNpcPrice && FetchCollectionList.hasCollectionList && FetchGemstoneList.hasGemstoneList;
     }
 }
