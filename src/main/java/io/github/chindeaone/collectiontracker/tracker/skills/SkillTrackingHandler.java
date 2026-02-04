@@ -115,19 +115,19 @@ public class SkillTrackingHandler {
                 logger.info("[SCT]: Skill tracking stopped because the API server is down.");
             }
 
-        resetTrackingData();
+        resetTrackingData(false);
     }
 
     public static void stopTrackingManual() {
         if (checkTracking()) return;
 
-        resetTrackingData();
+        resetTrackingData(false);
 
         ChatUtils.INSTANCE.sendMessage("§cStopped tracking " + skillName.toLowerCase() + " skill!", true);
         logger.info("[SCT]: Stopped tracking skill: {}", skillName);
     }
 
-    private static void resetTrackingData() {
+    private static void resetTrackingData(boolean restart) {
         scheduler.shutdown();
         try {
             if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
@@ -138,13 +138,16 @@ public class SkillTrackingHandler {
             Thread.currentThread().interrupt();
         }
 
-
         isTracking = false;
         isPaused = false;
 
         startTime = 0;
         lastTime = 0;
-        lastTrackedTime = System.currentTimeMillis();
+
+        long now = System.currentTimeMillis();
+        if (!restart) {
+            lastTrackedTime = now;
+        } else lastTrackedTime = now - TRACKING_INTERVAL;
 
         isSkillMaxed = false;
         OverlayManager.setSkillOverlayRendering(false);
@@ -182,7 +185,7 @@ public class SkillTrackingHandler {
         }
 
         restartCount++;
-        initTracking(System.currentTimeMillis());
+        resetTrackingData(true);
         startTracking();
     }
 
@@ -197,22 +200,6 @@ public class SkillTrackingHandler {
             return lastTime + (System.currentTimeMillis() - startTime) / 1000;
         }
     }
-
-//    public static String getUptimeInWords() {
-//        if (startTime == 0) return "0 seconds";
-//
-//        long uptime = lastTime + (System.currentTimeMillis() - startTime) / 1000;
-//
-//        long hours = uptime / 3600;
-//        long minutes = (uptime % 3600) / 60;
-//        long seconds = uptime % 60;
-//
-//        return hours > 0
-//                ? String.format("%d hours, %d minutes, %d seconds", hours, minutes, seconds)
-//                : minutes > 0
-//                ? String.format("%d minutes, %d seconds", minutes, seconds)
-//                : String.format("%d seconds", seconds);
-//    }
 
     public static String getUptime() {
         if (startTime == 0) return "00:00:00";
