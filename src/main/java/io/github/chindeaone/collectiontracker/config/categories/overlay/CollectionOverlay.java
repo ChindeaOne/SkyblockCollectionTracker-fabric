@@ -2,17 +2,14 @@ package io.github.chindeaone.collectiontracker.config.categories.overlay;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.*;
 import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SingleOverlay {
+public class CollectionOverlay {
 
     public enum OverlayText {
         COLLECTION("§aGold collection§f: 200.000M"),
@@ -83,14 +80,42 @@ public class SingleOverlay {
 
     @Expose
     @ConfigOption(
-            name = "Explicit values",
-            desc = "Show full values instead of rounded values in the overlay and summary."
+            name = "Overlay Text Color",
+            desc = "Toggle this to enable color-coded overlay."
     )
-    @SerializedName("explicitValues")
+    @SerializedName("overlayTextColor")
     @ConfigEditorBoolean
-    public boolean explicitValues = false;
+    public boolean overlayTextColor = false;
 
     @Expose
-    @ConfigLink(owner = SingleOverlay.class, field = "singleStatsOverlay")
+    @ConfigOption(
+            name = "Tracking Summary",
+            desc = "Show tracking rates summary in chat when stopping a tracking session."
+    )
+    @SerializedName("showTrackingRatesAtEndOfSession")
+    @ConfigEditorBoolean
+    public boolean showTrackingRatesAtEndOfSession = true;
+
+    @Expose
+    @ConfigOption(
+            name = " §b[WIP]§r Sacks Tracking",
+            desc = "Toggle this to use Hypixel's sacks messages instead of api calls when tracking.\n§eRecommended to use only if you have a lot of sacks!"
+    )
+    @SerializedName("enableSacksTracking")
+    @ConfigEditorBoolean
+    public boolean enableSacksTracking = false;
+
+    @Expose
+    @ConfigOption(
+            name = "More Sacks Tracking Info",
+            desc = "§eFor some collections, it can be more accurate then API calls. " +
+                    "However, for now, API calls will still be used, and every API call will update the rates according to the API data, meaning rates can jump around."
+    )
+    @ConfigEditorInfoText
+    @SuppressWarnings("unused")
+    public boolean sacksInfo = true;
+
+    @Expose
+    @ConfigLink(owner = CollectionOverlay.class, field = "singleStatsOverlay")
     public Position overlayPosition = new Position(50, 100);
 }
