@@ -4,7 +4,6 @@ import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList;
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList;
 import io.github.chindeaone.collectiontracker.api.colors.FetchColors;
-import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher;
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

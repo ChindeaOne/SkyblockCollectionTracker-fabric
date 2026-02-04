@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.api.npcpriceapi;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
 import org.apache.logging.log4j.LogManager;

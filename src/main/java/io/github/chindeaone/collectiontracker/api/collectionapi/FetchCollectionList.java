@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.api.collectionapi;
 
 import com.google.gson.*;
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

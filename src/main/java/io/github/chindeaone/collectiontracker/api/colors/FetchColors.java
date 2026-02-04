@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.api.colors;
 
 import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.api.URLManager;
-import io.github.chindeaone.collectiontracker.util.ColorsUtils;
+import io.github.chindeaone.collectiontracker.util.ColorUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,7 +38,7 @@ public class FetchColors {
 
             if (response.statusCode() == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
-                    ColorsUtils.setupColors(JsonParser.parseReader(reader).getAsJsonObject());
+                    ColorUtils.setupColors(JsonParser.parseReader(reader).getAsJsonObject());
                     hasColors = true;
                     logger.info("[SCT]: Successfully fetched colors data.");
                 }
