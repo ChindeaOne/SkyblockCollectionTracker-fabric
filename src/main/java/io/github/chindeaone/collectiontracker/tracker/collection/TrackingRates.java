@@ -85,9 +85,7 @@ public class TrackingRates {
                 unchangedStreak++;
                 if (unchangedStreak >= THRESHOLD) {
                     afk = true;
-                    if (TrackingHandler.isTracking) {
-                        TrackingHandler.stopTracking();
-                    }
+                    TrackingHandler.stopTracking();
                     unchangedStreak = 0;
                     return;
                 }

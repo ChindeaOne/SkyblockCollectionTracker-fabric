@@ -39,25 +39,29 @@ public class SkillTrackingRates {
     public static synchronized void calculateSkillRates(long value) {
         skillXpGained = value - (skillXp - (SkillTrackingHandler.isSkillMaxed ? SkillUtils.getMaxXpForSkill(skillName) : 0L)); // total gained since tracking started
 
-        if (lastXpGained != skillXpGained) {
-            lastXpGained = skillXpGained;
-            unchangedStreak = 0;
-            afk = false;
-        } else {
-            unchangedStreak++;
-            if (unchangedStreak >= THRESHOLD) {
-                afk = true;
+        // AFK detection (API calls only)
+        if (!SkillTrackingHandler.isSkillMaxed) {
+            if (lastXpGained != skillXpGained) {
+                lastXpGained = skillXpGained;
+                unchangedStreak = 0;
+                afk = false;
+            } else {
+                unchangedStreak++;
+                if (unchangedStreak >= THRESHOLD) {
+                    afk = true;
+                    SkillTrackingHandler.stopTracking();
+                    return;
+                }
             }
         }
-
         long uptime = getUptimeInSeconds();
         skillPerHour = uptime > 0 ? (long) Math.floor(skillXpGained / (uptime / 3600.0)) : 0;
-
     }
 
     public static void calculateTamingRates(long value) {
         tamingXpGained = value - tamingXp; // total gained since tracking started
 
+        // AFK detection in case taming tracking is enabled
         if (lastTamingXpGained != tamingXpGained) {
             lastTamingXpGained = tamingXpGained;
             unchangedStreak = 0;
@@ -66,9 +70,12 @@ public class SkillTrackingRates {
             unchangedStreak++;
             if (unchangedStreak >= THRESHOLD) {
                 afk = true;
+                SkillTrackingHandler.stopTracking();
+                return;
             }
         }
 
+        System.out.println(unchangedStreak);
         long uptime = getUptimeInSeconds();
         tamingPerHour = uptime > 0 ? (long) Math.floor(tamingXpGained / (uptime / 3600.0)) : 0;
     }
