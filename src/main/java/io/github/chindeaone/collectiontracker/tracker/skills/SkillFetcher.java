@@ -23,18 +23,18 @@ public class SkillFetcher {
     private static final long CACHE_LIFESPAN_MS = 180_000L; // default 3 minutes
     public static ScheduledExecutorService scheduler;
 
-    public static void scheduleSkillFetch(long value, String skillName) {
+    public static void scheduleSkillFetch(boolean isSkillMaxed, long value, String skillName) {
         int period = 200; // 200 seconds (3 minutes 20 seconds)
 
         // initial delay of 200s because data is already fetched when tracking starts
-        scheduler.scheduleAtFixedRate(() -> fetchSkillData(skillName),200, period, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(() -> fetchSkillData(skillName, isSkillMaxed),200, period, TimeUnit.SECONDS);
         // because of that, manual call is needed
-        SkillTrackingRates.calculateSkillRates(value);
+        if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(value); // only if skill isn't maxed, as maxed skills use chat messages to track
         SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().longValue());
         logger.info("[SCT]: Skill data fetching scheduled to run every {} seconds", period);
     }
 
-    private static void fetchSkillData(String skillName) {
+    private static void fetchSkillData(String skillName, boolean isSkillMaxed) {
         try {
             if (!ServerUtils.INSTANCE.getServerStatus()) {
                 logger.warn("[SCT]: API server not online. Stopping the skill tracker.");
@@ -49,7 +49,7 @@ public class SkillFetcher {
             getData(PlayerData.INSTANCE.getPlayerUUID(), skillName); // fetch data for the tracked skill
             Double skillXp = SkillUtils.getSkillValue(skillName); // get the XP of the tracked skill again here
 
-            SkillTrackingRates.calculateSkillRates(skillXp != null ? skillXp.longValue() : 0L);
+            if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(skillXp != null ? skillXp.longValue() : 0L); // only if skill isn't maxed, as maxed skills use chat messages to track
             SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().longValue());
         } catch (Exception e) {
             logger.error("[SCT]: Error while fetching data from the Hypixel API", e);

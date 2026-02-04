@@ -69,13 +69,22 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun renderSkill(context: GuiGraphics, lines: List<String>) {
+    fun renderSkillStringsWithTaming(context: GuiGraphics, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
         var y = 0
 
         val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: GREEN
         for (line in lines) {
             drawHelper(line, context, y, color)
             y += fr.lineHeight
+        }
+
+        if (withTaming) {
+            y += fr.lineHeight
+            val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: GREEN
+            for (line in tamingLines) {
+                drawHelper(line, context, y, tamingColor)
+                y += fr.lineHeight
+            }
         }
     }
 

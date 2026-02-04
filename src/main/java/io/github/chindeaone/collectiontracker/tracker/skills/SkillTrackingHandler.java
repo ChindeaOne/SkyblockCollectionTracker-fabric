@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.tracker.skills;
 
 import io.github.chindeaone.collectiontracker.commands.SkillTracker;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.Hypixel;
@@ -56,9 +57,9 @@ public class SkillTrackingHandler {
 
         SkillTrackingRates.initTracking(skillLevel != null ? skillLevel : 0, skillXp != null ? skillXp.longValue() : 0L);
 
-        if (!isSkillMaxed) {
+        if (!isSkillMaxed || ConfigAccess.isTamingTrackingEnabled()) {
             // Track only via API
-            SkillFetcher.scheduleSkillFetch(skillXp != null ? skillXp.longValue() : 0L, skillName);
+            SkillFetcher.scheduleSkillFetch(isSkillMaxed, skillXp != null ? skillXp.longValue() : 0L, skillName);
         }
         logger.info("[SCT]: Started tracking skill: {}", skillName);
     }

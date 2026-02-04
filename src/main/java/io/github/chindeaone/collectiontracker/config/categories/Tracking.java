@@ -17,7 +17,7 @@ public class Tracking {
     public CollectionOverlay collectionOverlay = new CollectionOverlay();
 
     @Expose
-    @ConfigOption(name = "Skills Tracking Overlay", desc = "")
+    @ConfigOption(name = "Skill Overlay", desc = "")
     @SerializedName("skillOverlay")
     @Accordion
     public SkillOverlay skillOverlay = new SkillOverlay();

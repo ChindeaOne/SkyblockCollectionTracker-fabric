@@ -45,12 +45,13 @@ public class SkillOverlay implements AbstractOverlay {
     public void render(GuiGraphics context) {
         if (!isEnabled()) return;
 
-        List<String> lines = TextUtils.getSkillLines();
+        List<String> mainLines = TextUtils.getSkillLines();
+        List<String> tamingLines = TextUtils.getTamingLines();
 
-        if (lines.isEmpty()) return;
+        if (mainLines.isEmpty()) return;
 
         RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderSkill(context, lines));
+                RenderUtils.renderSkillStringsWithTaming(context, mainLines, tamingLines, ConfigAccess.isTamingTrackingEnabled()));
     }
 
     @Override

@@ -35,9 +35,10 @@ public class TextUtils {
 
     public static List<String> formattedCommissions = new ArrayList<>();
     public static List<String> formattedMiningStats = new ArrayList<>();
-    private final static List<String> overlayLines = new ArrayList<>();
-    private final static List<String> extraOverlayLines = new ArrayList<>();
-    private final static List<String> skillOverlayLines = new ArrayList<>();
+    private static final List<String> overlayLines = new ArrayList<>();
+    private static final List<String> extraOverlayLines = new ArrayList<>();
+    private static final List<String> skillOverlayLines = new ArrayList<>();
+    private static final List<String> tamingOverlayLines = new ArrayList<>();
     private static boolean hasNpcPrice;
 
     private static void updateTrackingLines() {
@@ -326,20 +327,31 @@ public class TextUtils {
         skillOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(skillPerHour));
         skillOverlayLines.add("Uptime: " + SkillTrackingHandler.getUptime());
 
-        if (ConfigAccess.isTamingTrackingEnabled()) {
-            if (tamingLevel == 0) {
-                ConfigHelper.disableTamingTracking();
-                ChatUtils.INSTANCE.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true);
-                return skillOverlayLines;
-            }
-            skillOverlayLines.add("");
-            skillOverlayLines.add("Taming Level: " + formatNumber(tamingLevel));
-            skillOverlayLines.add("Total Taming XP: " + formatNumberOrPlaceholder(tamingXp));
-            skillOverlayLines.add("Taming: " + formatNumberOrPlaceholder(skillXpGained));
-            skillOverlayLines.add("Taming XP/h: " + formatNumberOrPlaceholder(tamingPerHour));
+        return skillOverlayLines;
+    }
+
+    public static List<String> getTamingLines() {
+        tamingOverlayLines.clear();
+
+        if (!ConfigAccess.isTamingTrackingEnabled()) return Collections.emptyList();
+
+        if (skillName.equals("Taming")) {
+            ConfigHelper.disableTamingTracking();
+            return tamingOverlayLines;
         }
 
-        return skillOverlayLines;
+        if (tamingLevel == 0) {
+            ConfigHelper.disableTamingTracking();
+            ChatUtils.INSTANCE.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true);
+            return skillOverlayLines;
+        }
+        tamingOverlayLines.add("Taming Experience");
+        tamingOverlayLines.add("Taming Level: " + formatNumber(tamingLevel));
+        tamingOverlayLines.add("Total Taming XP: " + formatNumberOrPlaceholder(tamingXp));
+        tamingOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(tamingXpGained));
+        tamingOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(tamingPerHour));
+
+        return tamingOverlayLines;
     }
 
     public static @NotNull List<String> getCollectionLines() {
