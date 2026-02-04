@@ -14,12 +14,17 @@ public class CommandHelper {
     private static final List<String> commandLines = List.of(
             "§a◆/sct",
             "§a◆/sct help",
-            "§a◆/sct track",
+            "§a◆/sct track <collection>",
             "§a◆/sct stop",
             "§a◆/sct pause",
             "§a◆/sct resume",
             "§a◆/sct restart",
-            "§a◆/sct collections"
+            "§a◆/sct collections",
+            "§a◆/sct skill track <skill>",
+            "§a◆/sct skill stop",
+            "§a◆/sct skill pause",
+            "§a◆/sct skill resume",
+            "§a◆/sct skill restart"
     );
 
     public static void showCommands() {
@@ -32,12 +37,17 @@ public class CommandHelper {
         List<String> descriptions = List.of(
                 "§eOpens the gui.",
                 "§eShows this message.",
-                "§eTracks your Skyblock collection.",
+                "§eTracks your collection.",
                 "§eStops tracking.",
                 "§ePauses tracking.",
                 "§eResumes tracking.",
                 "§eRestarts tracking.",
-                "§eShows all collections available."
+                "§eShows all collections available.",
+                "§eTracks your skill progress.",
+                "§eStops skill tracking.",
+                "§ePauses skill tracking.",
+                "§eResumes skill tracking.",
+                "§eRestarts skill tracking."
         );
 
         List<MutableComponent> components = new ArrayList<>();

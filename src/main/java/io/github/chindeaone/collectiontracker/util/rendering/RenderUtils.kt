@@ -1,8 +1,9 @@
 package io.github.chindeaone.collectiontracker.util.rendering
 
-import io.github.chindeaone.collectiontracker.commands.StartTracker
+import io.github.chindeaone.collectiontracker.commands.SkillTracker
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.util.CollectionColors
+import io.github.chindeaone.collectiontracker.util.ColorUtils
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -13,7 +14,8 @@ object RenderUtils {
 
     private val fr: Font get() = Minecraft.getInstance().font
     private const val DUMMY_BG = -0x7fbfbfc0
-    const val WHITE: Int = 0xFFEBEBFA.toInt() // Crystal-white
+    const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
+    const val WHITE: Int = 0xFFFFFFFF.toInt()
     const val GREEN: Int = 0xFF55FF55.toInt()
     const val YELLOW: Int = 0xFFFFFF55.toInt()
 
@@ -51,7 +53,7 @@ object RenderUtils {
     fun renderTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
         var y = 0
 
-        val color: Int = if (withColor)  (CollectionColors.colors[StartTracker.collection]) ?: GREEN  else GREEN
+        val color: Int = if (withColor)  (ColorUtils.collectionColors[CollectionTracker.collection]) ?: GREEN  else GREEN
         for (line in lines) {
             drawHelper(line, context, y, color)
             y += fr.lineHeight
@@ -63,6 +65,17 @@ object RenderUtils {
                 drawHelper(line, context, y, color)
                 y += fr.lineHeight
             }
+        }
+    }
+
+    @JvmStatic
+    fun renderSkill(context: GuiGraphics, lines: List<String>) {
+        var y = 0
+
+        val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: GREEN
+        for (line in lines) {
+            drawHelper(line, context, y, color)
+            y += fr.lineHeight
         }
     }
 
@@ -114,7 +127,7 @@ object RenderUtils {
             context.drawString(fr, prefix, 0, y, prefixColor, true)
 
             val prefixWidth = fr.width(prefix)
-            context.drawString(fr, numberPart,  prefixWidth, y, WHITE, true)
+            context.drawString(fr, numberPart,  prefixWidth, y, CUSTOM_WHITE, true)
         } else {
             context.drawString(fr, line, 0, y, prefixColor, true)
         }

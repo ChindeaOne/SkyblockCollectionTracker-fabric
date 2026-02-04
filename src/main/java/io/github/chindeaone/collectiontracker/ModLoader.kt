@@ -4,10 +4,11 @@
 package io.github.chindeaone.collectiontracker
 
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
+import io.github.chindeaone.collectiontracker.gui.overlays.SkillOverlay
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
+import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.MiningStatsOverlay
-import io.github.chindeaone.collectiontracker.gui.overlays.TrackingOverlay
 import io.github.chindeaone.collectiontracker.util.CommissionsKeybinds
 import io.github.chindeaone.collectiontracker.util.Hypixel
 import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
@@ -42,9 +43,10 @@ class ModLoader: ModInitializer {
     }
 
     private fun overlayRegistration() {
-        OverlayManager.add(TrackingOverlay())
+        OverlayManager.add(CollectionOverlay())
         OverlayManager.add(MiningStatsOverlay())
         OverlayManager.add(CommissionsOverlay())
+        OverlayManager.add(SkillOverlay())
     }
 
     private fun eventRegistration() {
@@ -53,7 +55,7 @@ class ModLoader: ModInitializer {
             TickDispatcher.onEndClientTick(client)
         })
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
-        ClientReceiveMessageEvents.ALLOW_GAME.register { message, _ -> ChatListener.handle(message)}
+        ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.handle(message)}
 
         //? if = 1.21.11 {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")

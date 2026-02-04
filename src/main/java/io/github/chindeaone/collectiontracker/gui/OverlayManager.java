@@ -29,7 +29,14 @@ public class OverlayManager {
     }
 
     public static void setTrackingOverlayRendering(boolean allowed) {
-        AbstractOverlay overlay = overlays.get("Tracking Overlay");
+        AbstractOverlay overlay = overlays.get("Collection Overlay");
+        if (overlay != null) {
+            overlay.setRenderingAllowed(allowed);
+        }
+    }
+
+    public static void setSkillOverlayRendering(boolean allowed) {
+        AbstractOverlay overlay = overlays.get("Skill Overlay");
         if (overlay != null) {
             overlay.setRenderingAllowed(allowed);
         }

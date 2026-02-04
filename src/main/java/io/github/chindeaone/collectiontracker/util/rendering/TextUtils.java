@@ -9,7 +9,9 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.SingleOverlay;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.StringUtils;
 import io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget;
@@ -23,9 +25,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
-import static io.github.chindeaone.collectiontracker.commands.StartTracker.collection;
-import static io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass.*;
-import static io.github.chindeaone.collectiontracker.tracker.TrackingRates.*;
+import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
+import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
+import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
+import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates.*;
 import static io.github.chindeaone.collectiontracker.util.NumbersUtils.formatNumber;
 
 public class TextUtils {
@@ -34,13 +37,14 @@ public class TextUtils {
     public static List<String> formattedMiningStats = new ArrayList<>();
     private final static List<String> overlayLines = new ArrayList<>();
     private final static List<String> extraOverlayLines = new ArrayList<>();
+    private final static List<String> skillOverlayLines = new ArrayList<>();
     private static boolean hasNpcPrice;
 
-    public static void updateTrackingLines() {
+    private static void updateTrackingLines() {
         overlayLines.clear();
         if (ConfigAccess.getStatsText().isEmpty()) return;
 
-        for (SingleOverlay.OverlayText id : ConfigAccess.getStatsText()) {
+        for (CollectionOverlay.OverlayText id : ConfigAccess.getStatsText()) {
             switch (id) {
                 case COLLECTION -> addIfNotNull(handleCollection());
                 case COLLECTION_SESSION -> addIfNotNull(handleCollectionSession());
@@ -178,7 +182,7 @@ public class TextUtils {
     }
 
     // Only if it has bazaar data and is enabled
-    public static void updateTrackingExtraLines() {
+    private static void updateTrackingExtraLines() {
         if (!ConfigAccess.isShowExtraStats()) {
             extraOverlayLines.clear();
             return;
@@ -208,7 +212,7 @@ public class TextUtils {
         extraOverlayLines.clear();
 
         extraOverlayLines.add("§6§lExtra Stats:");
-        for (SingleOverlay.OverlayExtraText id : ConfigAccess.getExtraStatsText()) {
+        for (CollectionOverlay.OverlayExtraText id : ConfigAccess.getExtraStatsText()) {
             switch (id) {
                 case BAZAAR_ITEM -> addIfNotNullExtra(handleBazaarItem());
                 case BAZAAR_PRICE -> addIfNotNullExtra(handleBazaarPrice());
@@ -271,7 +275,7 @@ public class TextUtils {
         }
     }
 
-    public static List<String> updateCommissions() {
+    public static List<String> getCommissionsLines() {
         List<String> raw = CommissionsWidget.INSTANCE.getRawCommissions();
         if (raw.isEmpty()) return Collections.emptyList();
 
@@ -302,7 +306,7 @@ public class TextUtils {
         return formattedCommissions;
     }
 
-    public static List<String> updateMiningStats() {
+    public static List<String> getMiningLines() {
         List<String> raw = MiningStatsWidget.INSTANCE.getRawStats();
         if (raw.isEmpty()) return Collections.emptyList();
 
@@ -311,21 +315,44 @@ public class TextUtils {
         return formattedMiningStats;
     }
 
-    public static @NotNull List<String> getStrings() {
+    @SuppressWarnings("SameReturnValue")
+    public static List<String> getSkillLines() {
+        skillOverlayLines.clear();
+
+        skillOverlayLines.add(skillName + " Experience");
+        skillOverlayLines.add(skillName + " Level: " + formatNumber(skillLevel));
+        skillOverlayLines.add("Total " + skillName + " XP: " + formatNumberOrPlaceholder(skillXp));
+        skillOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(skillXpGained));
+        skillOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(skillPerHour));
+        skillOverlayLines.add("Uptime: " + SkillTrackingHandler.getUptime());
+
+        if (ConfigAccess.isTamingTrackingEnabled()) {
+            if (tamingLevel == 0) {
+                ConfigHelper.disableTamingTracking();
+                ChatUtils.INSTANCE.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true);
+                return skillOverlayLines;
+            }
+            skillOverlayLines.add("");
+            skillOverlayLines.add("Taming Level: " + formatNumber(tamingLevel));
+            skillOverlayLines.add("Total Taming XP: " + formatNumberOrPlaceholder(tamingXp));
+            skillOverlayLines.add("Taming: " + formatNumberOrPlaceholder(skillXpGained));
+            skillOverlayLines.add("Taming XP/h: " + formatNumberOrPlaceholder(tamingPerHour));
+        }
+
+        return skillOverlayLines;
+    }
+
+    public static @NotNull List<String> getCollectionLines() {
         updateTrackingLines();
         if (overlayLines.isEmpty()) return overlayLines;
         List<String> lines = new ArrayList<>(overlayLines);
-        lines.add(uptimeString());
+        lines.add("Uptime: " + TrackingHandler.getUptime());
         return lines;
     }
 
-    public static @NotNull List<String> getExtraStrings() {
+    public static @NotNull List<String> getCollectionExtraLines() {
         updateTrackingExtraLines();
         return extraOverlayLines;
-    }
-
-    public static String uptimeString() {
-        return ("Uptime: " + getUptime());
     }
 
     public static String formatCollectionName(String collection) {

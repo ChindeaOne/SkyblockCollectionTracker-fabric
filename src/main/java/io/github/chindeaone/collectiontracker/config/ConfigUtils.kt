@@ -6,9 +6,10 @@ import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
-import io.github.chindeaone.collectiontracker.config.categories.overlay.SingleOverlay
+import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay
 import io.github.chindeaone.collectiontracker.config.core.Position
 
 /**
@@ -17,9 +18,10 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config!!
 
 // Position Config Accessor
-val trackingPosition: Position get() = modConfig.trackingOverlay.singleOverlay.overlayPosition
+val trackingPosition: Position get() = modConfig.trackingOverlay.collectionOverlay.overlayPosition
 val miningStatsPosition: Position get() = modConfig.mining.miningStatsOverlay.miningStatsOverlayPosition
 val commissionsPosition: Position get() = modConfig.mining.commissionsOverlay.commissionsOverlayPosition
+val skillPosition: Position get() = modConfig.trackingOverlay.skillOverlay.skillOverlayPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -43,12 +45,16 @@ val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsOverlay.mi
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
-val singleOverlay: SingleOverlay get() = trackingConfig.singleOverlay
-val enableSacksTracking: Boolean get() = trackingConfig.enableSacksTracking
-val statsText: List<SingleOverlay.OverlayText> get() = singleOverlay.statsText
-val extraStatsText: List<SingleOverlay.OverlayExtraText> get() = singleOverlay.extraStatsText
-val showExtraStats: Boolean get() = singleOverlay.showExtraStats
-val explicitValues: Boolean get() = singleOverlay.explicitValues
+val collectionOverlay: CollectionOverlay get() = trackingConfig.collectionOverlay
+val enableSacksTracking: Boolean get() = collectionOverlay.enableSacksTracking
+val statsText: List<CollectionOverlay.OverlayText> get() = collectionOverlay.statsText
+val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionOverlay.extraStatsText
+val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
+val explicitValues: Boolean get() = trackingConfig.explicitValues
+
+// Skills Tracking Config Accessors
+val skillOverlay: SkillOverlay get() = trackingConfig.skillOverlay
+val enableTamingTracking: Boolean get() = skillOverlay.enableTamingTracking
 
 /**
  * Accessors for configuration sections.
@@ -63,6 +69,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getCommissionsPosition(): Position = commissionsPosition
+
+    @JvmStatic
+    fun getSkillPosition(): Position = skillPosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
@@ -83,10 +92,10 @@ object ConfigAccess {
     fun hasCheckedUpdate(): Boolean = hasCheckedUpdate
 
     @JvmStatic
-    fun isOverlayTextColorEnabled(): Boolean = trackingConfig.overlayTextColor
+    fun isOverlayTextColorEnabled(): Boolean = collectionOverlay.overlayTextColor
 
     @JvmStatic
-    fun isShowTrackingRatesAtEndOfSession(): Boolean = trackingConfig.showTrackingRatesAtEndOfSession
+    fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionOverlay.showTrackingRatesAtEndOfSession
 
     @JvmStatic
     fun isCommissionsEnabled(): Boolean = commissionsOverlay.enableCommissionsOverlay
@@ -101,19 +110,22 @@ object ConfigAccess {
     fun isMiningStatsOverlayInMiningIslandsOnly(): Boolean = miningStatsOverlayInMiningIslandsOnly
 
     @JvmStatic
-    fun getStatsText(): List<SingleOverlay.OverlayText> = statsText
+    fun getStatsText(): List<CollectionOverlay.OverlayText> = statsText
 
     @JvmStatic
     fun isShowExtraStats(): Boolean = showExtraStats
 
     @JvmStatic
-    fun getExtraStatsText(): List<SingleOverlay.OverlayExtraText> = extraStatsText
+    fun getExtraStatsText(): List<CollectionOverlay.OverlayExtraText> = extraStatsText
 
     @JvmStatic
     fun isExplicitValues(): Boolean = explicitValues
 
     @JvmStatic
     fun isSacksTrackingEnabled(): Boolean = enableSacksTracking
+
+    @JvmStatic
+    fun isTamingTrackingEnabled(): Boolean = enableTamingTracking
 }
 
 /**
@@ -143,7 +155,7 @@ object ConfigHelper {
 
     @JvmStatic
     fun disableExtraStats() {
-        singleOverlay.showExtraStats = false
+        collectionOverlay.showExtraStats = false
     }
 
     @JvmStatic
@@ -154,5 +166,10 @@ object ConfigHelper {
     @JvmStatic
     fun disableMiningStats() {
         miningConfig.miningStatsOverlay.enableMiningStatsOverlay = false
+    }
+
+    @JvmStatic
+    fun disableTamingTracking() {
+        skillOverlay.enableTamingTracking = false
     }
 }

@@ -6,7 +6,9 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
-import io.github.chindeaone.collectiontracker.tracker.TrackingHandlerClass;
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.util.SkillUtils;
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -72,7 +74,7 @@ public class CommandRegistry {
                         .then(ClientCommandManager.argument("collection", StringArgumentType.greedyString())
                                 .suggests(COLLECTION_SUGGESTIONS)
                                 .executes(context -> {
-                                    StartTracker.startTracking(StringArgumentType.getString(context, "collection").trim());
+                                    CollectionTracker.startTracking(StringArgumentType.getString(context, "collection").trim());
                                     return 1;
                                 })
                         )
@@ -80,30 +82,74 @@ public class CommandRegistry {
                 // /sct stop
                 .then(ClientCommandManager.literal("stop")
                         .executes(context -> {
-                            TrackingHandlerClass.stopTrackingManual();
+                            TrackingHandler.stopTrackingManual();
                             return 1;
                         })
                 )
                 // /sct pause
                 .then(ClientCommandManager.literal("pause")
                         .executes(context -> {
-                            TrackingHandlerClass.pauseTracking();
+                            TrackingHandler.pauseTracking();
                             return 1;
                         })
                 )
                 // /sct resume
                 .then(ClientCommandManager.literal("resume")
                         .executes(context -> {
-                            TrackingHandlerClass.resumeTracking();
+                            TrackingHandler.resumeTracking();
                             return 1;
                         })
                 )
                 // sct restart
                 .then(ClientCommandManager.literal("restart")
                         .executes(context -> {
-                            TrackingHandlerClass.restartTracking();
+                            TrackingHandler.restartTracking();
                             return 1;
                         })
+                )
+                // sct skill-track
+                .then(ClientCommandManager.literal("skill")
+                        .then(ClientCommandManager.literal("track")
+                                .executes(context -> {
+                                    ChatUtils.INSTANCE.sendMessage("Use: /sct skill",true);
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.argument("skillName", StringArgumentType.greedyString())
+                                        .suggests(SKILL_LIST)
+                                        .executes(context -> {
+                                            SkillTracker.startTracking(StringArgumentType.getString(context, "skillName").trim());
+                                            return 1;
+                                        })
+                                )
+                        )
+                        // sct skill stop
+                        .then(ClientCommandManager.literal("stop")
+                                .executes(context -> {
+                                    SkillTrackingHandler.stopTrackingManual();
+                                    return 1;
+                                })
+                        )
+                        // sct skill pause
+                        .then(ClientCommandManager.literal("pause")
+                                .executes(context -> {
+                                    SkillTrackingHandler.pauseTracking();
+                                    return 1;
+                                })
+                        )
+                        // sct skill resume
+                        .then(ClientCommandManager.literal("resume")
+                                .executes(context -> {
+                                    SkillTrackingHandler.resumeTracking();
+                                    return 1;
+                                })
+                        )
+                        // sct skill restart
+                        .then(ClientCommandManager.literal("restart")
+                                .executes(context -> {
+                                    SkillTrackingHandler.restartTracking();
+                                    return 1;
+                                })
+                        )
                 )
         ));
     }
@@ -123,6 +169,16 @@ public class CommandRegistry {
         for (String category : CollectionsManager.collections.keySet()) {
             if (category.toLowerCase().startsWith(arg)) {
                 builder.suggest(category);
+            }
+        }
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<FabricClientCommandSource> SKILL_LIST = (context, builder) -> {
+        String arg = builder.getRemaining().toLowerCase();
+        for (String skill : SkillUtils.getDisplayNames()) {
+            if (skill.toLowerCase().startsWith(arg)) {
+                builder.suggest(skill);
             }
         }
         return builder.buildFuture();
