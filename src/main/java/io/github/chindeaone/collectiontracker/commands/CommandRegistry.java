@@ -24,6 +24,13 @@ public class CommandRegistry {
                     GuiManager.INSTANCE.openConfigGui(null);
                     return 1;
                 })
+                // /sct edit -> opens the position editor
+                .then(ClientCommandManager.literal("edit")
+                        .executes(context -> {
+                            GuiManager.openGuiPositionEditor();
+                            return 1;
+                        })
+                )
                 // /sct help -> shows the list of commands
                 .then(ClientCommandManager.literal("help")
                         .executes(context -> {

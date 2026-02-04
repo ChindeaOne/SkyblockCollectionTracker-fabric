@@ -13,6 +13,7 @@ public class CommandHelper {
     public static final String title = "§6§lSkyblock Collection Tracker §7- §eCommands";
     private static final List<String> commandLines = List.of(
             "§a◆/sct",
+            "§a◆/sct edit",
             "§a◆/sct help",
             "§a◆/sct track <collection>",
             "§a◆/sct stop",
@@ -36,6 +37,7 @@ public class CommandHelper {
     public static List<MutableComponent> buildCommandComponents() {
         List<String> descriptions = List.of(
                 "§eOpens the gui.",
+                "§eOpens the position editor.",
                 "§eShows this message.",
                 "§eTracks your collection.",
                 "§eStops tracking.",
