@@ -14,6 +14,7 @@ import io.github.chindeaone.collectiontracker.util.Hypixel
 import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.util.ServerUtils
 import io.github.chindeaone.collectiontracker.util.chat.ChatListener
+import io.github.chindeaone.collectiontracker.util.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.util.tab.TabData
 import io.github.chindeaone.collectiontracker.util.world.BlockWatcher
 import net.fabricmc.api.ModInitializer
@@ -84,6 +85,7 @@ class ModLoader: ModInitializer {
             TabData.tickAndUpdateWidget(client)
             BlockWatcher.onClientTick(client)
             ScoreboardUtils.onTick(client)
+            InventoryListener.onTick(client)
         }
     }
 }
