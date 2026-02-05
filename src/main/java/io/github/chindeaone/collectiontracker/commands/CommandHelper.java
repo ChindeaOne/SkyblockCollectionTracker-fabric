@@ -14,7 +14,7 @@ public class CommandHelper {
     private static final List<String> commandLines = List.of(
             "§a◆/sct",
             "§a◆/sct edit",
-            "§a◆/sct help",
+            "§a◆/sct commands",
             "§a◆/sct track <collection>",
             "§a◆/sct stop",
             "§a◆/sct pause",

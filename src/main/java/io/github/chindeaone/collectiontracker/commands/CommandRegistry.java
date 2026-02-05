@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.commands;
 
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
@@ -13,6 +12,7 @@ import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.client.Minecraft;
 
 public class CommandRegistry {
 
@@ -27,51 +27,53 @@ public class CommandRegistry {
                 // /sct edit -> opens the position editor
                 .then(ClientCommandManager.literal("edit")
                         .executes(context -> {
-                            GuiManager.openGuiPositionEditor();
+                            Minecraft.getInstance().execute(GuiManager::openGuiPositionEditor);
                             return 1;
                         })
                 )
-                // /sct help -> shows the list of commands
-                .then(ClientCommandManager.literal("help")
+                // /sct commands -> shows the list of commands
+                .then(ClientCommandManager.literal("commands")
                         .executes(context -> {
                             CommandHelper.showCommands();
                             return 1;
                         })
                 )
                 // /sct collections -> shows the list of collections
-                        .then(ClientCommandManager.literal("collections")
+                .then(ClientCommandManager.literal("collections")
 
-                                // /sct collections -> opens first category (page 1)
+                        // /sct collections -> opens first category (page 1)
+                        .executes(context -> {
+                            CollectionList.sendCollectionList(1);
+                            return 1;
+                        })
+
+                        // /sct collections <page> or <category>
+                        .then(ClientCommandManager.argument("arg", StringArgumentType.word())
+                                .suggests(CATEGORY_SUGGESTIONS)
                                 .executes(context -> {
-                                    CollectionList.sendCollectionList(1);
+                                    String arg = StringArgumentType.getString(context, "arg");
+                                    // Try to parse as page number
+                                    try {
+                                        int page = Integer.parseInt(arg);
+                                        if (page < 1) {
+                                            ChatUtils.INSTANCE.sendMessage("§cPage number must be at least 1.", true);
+                                        } else {
+                                            CollectionList.sendCollectionList(page);
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        // Not a number, treat as category
+                                        Integer page = CollectionList.getPageForCategory(arg);
+
+                                        if (page == null) {
+                                            ChatUtils.INSTANCE.sendMessage("§cUnknown category.", true);
+                                        } else {
+                                            CollectionList.sendCollectionList(page);
+                                        }
+                                    }
                                     return 1;
                                 })
-
-                                // /sct collections <page>
-                                .then(ClientCommandManager.argument("page", IntegerArgumentType.integer(1))
-                                        .executes(context -> {
-                                            int page = IntegerArgumentType.getInteger(context, "page");
-                                            CollectionList.sendCollectionList(page);
-                                            return 1;
-                                        })
-                                )
-                                // /sct collections <category>
-                                .then(ClientCommandManager.argument("category", StringArgumentType.word())
-                                        .suggests(CATEGORY_SUGGESTIONS)
-                                        .executes(context -> {
-                                            String input = StringArgumentType.getString(context, "category");
-                                            Integer page = CollectionList.getPageForCategory(input);
-
-                                            if (page == null) {
-                                                ChatUtils.INSTANCE.sendMessage("§cUnknown category.", true);
-                                            } else {
-                                                CollectionList.sendCollectionList(page);
-                                            }
-                                            return 1;
-                                        })
-                                )
-
                         )
+                )
                 // /sct track <collection>
                 .then(ClientCommandManager.literal("track")
                         .executes(context -> {
