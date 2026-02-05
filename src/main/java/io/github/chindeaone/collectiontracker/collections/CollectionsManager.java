@@ -19,7 +19,7 @@ public class CollectionsManager {
 
     public static boolean isCollection(String collectionName) {
         for (Map.Entry<String, Set<String>> entry : collections.entrySet()) {
-            if (!entry.getKey().equals("Sacks") && entry.getValue().contains(collectionName)) {
+            if (!entry.getKey().equals("Miscellaneous") && entry.getValue().contains(collectionName)) {
                 return true;
             }
         }
