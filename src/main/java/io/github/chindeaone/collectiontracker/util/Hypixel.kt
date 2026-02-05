@@ -64,48 +64,50 @@ object Hypixel {
             if (HypixelUtils.isInHypixel && !playerLoaded) {
                 loadPlayerData(client)
                 if (playerLoaded) {
-                    serverStatus = ServerStatus.checkServer()
+                    ServerStatus.checkServerAsync(client::execute) { up ->
+                        serverStatus = up
 
-                    if (!serverStatus) {
-                        ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
-                        logger.warn("[SCT]: The API server is currently under maintenance.")
-                    } else {
-                        if (TokenManager.getToken() == null) {
-                            TokenManager.fetchAndStoreToken()
-                        }
-                        CompletableFuture.runAsync { fetchData() }
-                        logger.info("[SCT]: API data loaded successfully.")
-                    }
+                        if (!serverStatus) {
+                            ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
+                            logger.warn("[SCT]: The API server is currently under maintenance.")
+                        } else {
+                            if (TokenManager.getToken() == null) {
+                                TokenManager.fetchAndStoreToken()
+                            }
+                            CompletableFuture.runAsync { fetchData() }
+                            logger.info("[SCT]: API data loaded successfully.")
 
-                    logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
+                            logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
 
-                    if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
-                        CompletableFuture.runAsync {
-                            RepoUtils.checkGithubReleases()
-                            RepoUtils.checkLatestVersion()
-                        }.thenAcceptAsync  {
-                            if (RepoUtils.latestVersion != null) {
-                                Minecraft.getInstance().execute {
-                                    ChatUtils.sendMessage(
-                                        "§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game."
-                                    )
-                                }
-                                logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
-                                UpdaterManager.update()
-                                ConfigHelper.disableUpdateChecks()
-                            } else {
-                                if (!ConfigAccess.hasCheckedUpdate()) {
-                                    Minecraft.getInstance().execute {
-                                        ChatUtils.sendMessage("§aThe mod has been updated successfully.")
+                            if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
+                                CompletableFuture.runAsync {
+                                    RepoUtils.checkGithubReleases()
+                                    RepoUtils.checkLatestVersion()
+                                }.thenAcceptAsync  {
+                                    if (RepoUtils.latestVersion != null) {
+                                        Minecraft.getInstance().execute {
+                                            ChatUtils.sendMessage(
+                                                "§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game."
+                                            )
+                                        }
+                                        logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
+                                        UpdaterManager.update()
+                                        ConfigHelper.disableUpdateChecks()
+                                    } else {
+                                        if (!ConfigAccess.hasCheckedUpdate()) {
+                                            Minecraft.getInstance().execute {
+                                                ChatUtils.sendMessage("§aThe mod has been updated successfully.")
+                                            }
+                                            ConfigHelper.enableUpdateChecks()
+                                            logger.info("[SCT]: The mod has been updated successfully.")
+                                        }
+                                        logger.info("[SCT]: No new version found.")
                                     }
-                                    ConfigHelper.enableUpdateChecks()
-                                    logger.info("[SCT]: The mod has been updated successfully.")
                                 }
-                                logger.info("[SCT]: No new version found.")
+                            } else{
+                                logger.info("[SCT]: Update stream is disabled.")
                             }
                         }
-                    } else{
-                        logger.info("[SCT]: Update stream is disabled.")
                     }
                 }
             }

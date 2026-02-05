@@ -8,11 +8,13 @@ import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
 
@@ -20,27 +22,34 @@ public class ServerStatus {
 
     private static final Logger logger = LogManager.getLogger(ServerStatus.class);
 
-    public static boolean checkServer() {
-        try {
-            URI uri = URI.create(URLManager.STATUS_URL);
+    public static CompletableFuture<Boolean> checkServerAsync() {
+        URI uri = URI.create(URLManager.STATUS_URL);
 
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .method("HEAD", HttpRequest.BodyPublishers.noBody())
-                    .timeout(Duration.ofSeconds(3))
-                    .header("User-Agent", URLManager.AGENT)
-                    .build();
+        HttpRequest request = HttpRequest.newBuilder(uri)
+                .method("HEAD", HttpRequest.BodyPublishers.noBody())
+                .timeout(Duration.ofSeconds(3))
+                .header("User-Agent", URLManager.AGENT)
+                .build();
 
-            HttpResponse<Void> response = HTTP_CLIENT.send(
-                    request,
-                    HttpResponse.BodyHandlers.discarding()
-            );
+        return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.discarding())
+                .handle((resp, ex) -> {
+                    if (ex != null) {
+                        logger.debug("[SCT]: Async check failed", ex);
+                        return false;
+                    }
+                    return resp.statusCode() == 200;
+                });
+    }
 
-            return response.statusCode() == 200;
-
-        } catch (IOException | InterruptedException e) {
-            logger.error("[SCT]: Error checking server status", e);
-            return false;
-        }
+    public static void checkServerAsync(Executor callbackExecutor, Consumer<Boolean> callback) {
+        checkServerAsync()
+                .thenAcceptAsync(result -> {
+                    try {
+                        callback.accept(result);
+                    } catch (Exception e) {
+                        logger.error("[SCT]: Error in server status callback", e);
+                    }
+                }, callbackExecutor);
     }
 
     public static synchronized boolean hasData() {

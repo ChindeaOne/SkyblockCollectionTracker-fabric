@@ -78,7 +78,7 @@ class ModLoader: ModInitializer {
         fun onEndClientTick(client: Minecraft) {
             // Call every onTick here
             SkyblockCollectionTracker.onTick(client)
-            ServerUtils.onClientTick()
+            ServerUtils.onTick(client)
             Hypixel.onTick(client)
             CommissionsKeybinds.onClientTick(client)
             TabData.tickAndUpdateWidget(client)
