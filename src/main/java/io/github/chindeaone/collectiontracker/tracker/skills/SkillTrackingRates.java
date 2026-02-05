@@ -10,6 +10,7 @@ public class SkillTrackingRates {
 
     public static volatile int skillLevel; // session start level and api level
     public static volatile long skillXp; // session start xp and api xp
+    public static volatile long totalSkillXp;
 
     public static volatile long skillXpGained = 0L;
     public static volatile long skillPerHour = 0L;
@@ -29,6 +30,7 @@ public class SkillTrackingRates {
     public static void initTracking(int level, long xp) {
         skillLevel = level;
         skillXp = xp;
+        totalSkillXp = xp;
 
         if (ConfigAccess.isTamingTrackingEnabled()) {
             tamingLevel = SkillUtils.getTamingLevel();
@@ -56,6 +58,7 @@ public class SkillTrackingRates {
         }
         long uptime = getUptimeInSeconds();
         skillPerHour = uptime > 0 ? (long) Math.floor(skillXpGained / (uptime / 3600.0)) : 0;
+        totalSkillXp = skillXp + skillXpGained;
     }
 
     public static void calculateTamingRates(long value) {
@@ -83,6 +86,7 @@ public class SkillTrackingRates {
     public static void resetSession() {
         skillLevel = 0;
         skillXp = 0L;
+        totalSkillXp = 0L;
         skillXpGained = 0L;
         skillPerHour = 0L;
 

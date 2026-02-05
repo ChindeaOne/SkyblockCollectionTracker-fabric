@@ -41,7 +41,7 @@ public class SkillTrackingHandler {
             ChatUtils.INSTANCE.sendMessage("§cPlease wait a few seconds before tracking another skill!", true);
             return;
         } else {
-            ChatUtils.INSTANCE.sendMessage("§aTracking " + skillName + " skill!", true);
+            ChatUtils.INSTANCE.sendMessage("§aTracking " + skillName + " skill.", true);
         }
 
         if (scheduler == null || scheduler.isShutdown()) {

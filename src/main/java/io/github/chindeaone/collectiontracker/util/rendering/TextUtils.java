@@ -322,7 +322,7 @@ public class TextUtils {
 
         skillOverlayLines.add(skillName + " Experience");
         skillOverlayLines.add(skillName + " Level: " + formatNumber(skillLevel));
-        skillOverlayLines.add("Total " + skillName + " XP: " + formatNumberOrPlaceholder(skillXp));
+        skillOverlayLines.add("Total " + skillName + " XP: " + formatNumberOrPlaceholder(totalSkillXp));
         skillOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(skillXpGained));
         skillOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(skillPerHour));
         skillOverlayLines.add("Uptime: " + SkillTrackingHandler.getUptime());
