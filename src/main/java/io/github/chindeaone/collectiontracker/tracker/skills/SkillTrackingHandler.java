@@ -129,14 +129,18 @@ public class SkillTrackingHandler {
     }
 
     private static void resetTrackingData(boolean restart) {
-        scheduler.shutdown();
-        try {
-            if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
+        if (scheduler != null) {
+            if (!scheduler.isShutdown()) {
+                scheduler.shutdown();
             }
-        } catch (InterruptedException e) {
-            scheduler.shutdownNow();
-            Thread.currentThread().interrupt();
+            try {
+                if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
+                    scheduler.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
 
         isTracking = false;

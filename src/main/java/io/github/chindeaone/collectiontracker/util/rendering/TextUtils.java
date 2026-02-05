@@ -172,7 +172,7 @@ public class TextUtils {
                 }
             }
             case "gemstone" -> {
-                localMoneyMade = moneyMade.getOrDefault(ConfigAccess.getGemstoneVariant().toString() + suffix, 0L);
+                localMoneyMade = moneyMade.getOrDefault(ConfigAccess.getGemstoneVariant() + suffix, 0L);
                 return"$ made (Bazaar): " + formatNumberOrPlaceholder(localMoneyMade);
             }
             default -> { return null; }
