@@ -8,7 +8,8 @@ import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 
-import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
+import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
+import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
@@ -102,17 +103,18 @@ public class TextUtils {
         if (!ConfigAccess.isUsingBazaar()) return null;
 
         long localMoneyPerHour;
+        String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
         switch (collectionType) {
             case "normal" -> {
-                localMoneyPerHour = moneyPerHourBazaar.get(collectionType);
+                localMoneyPerHour = moneyPerHourBazaar.getOrDefault(collectionType + suffix, 0L);
                 return "$/h (Bazaar): " + formatNumberOrPlaceholder(localMoneyPerHour);
             }
             case "enchanted" -> {
                 if (ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION)) {
-                    localMoneyPerHour = moneyPerHourBazaar.get("Enchanted version");
+                    localMoneyPerHour = moneyPerHourBazaar.getOrDefault("Enchanted version" + suffix, 0L);
                     return "$/h (Bazaar): " + formatNumberOrPlaceholder(localMoneyPerHour);
                 } else {
-                    localMoneyPerHour = moneyPerHourBazaar.getOrDefault("Super Enchanted version", -1L);
+                    localMoneyPerHour = moneyPerHourBazaar.getOrDefault("Super Enchanted version" + suffix, -1L);
                     if (localMoneyPerHour == -1L) {
                         ConfigHelper.setBazaarType(BazaarType.ENCHANTED_VERSION);
                         return null;
@@ -120,7 +122,7 @@ public class TextUtils {
                 }
             }
             case "gemstone" -> {
-                localMoneyPerHour = moneyPerHourBazaar.get(ConfigAccess.getGemstoneVariant().toString());
+                localMoneyPerHour = moneyPerHourBazaar.getOrDefault(ConfigAccess.getGemstoneVariant() + suffix, 0L);
                 return "$/h (Bazaar): " + formatNumberOrPlaceholder(localMoneyPerHour);
             }
             default -> { return null; }
@@ -151,17 +153,18 @@ public class TextUtils {
         if (!ConfigAccess.isUsingBazaar()) return null;
 
         long localMoneyMade;
+        String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
         switch (collectionType) {
             case "normal" -> {
-                localMoneyMade = moneyMade.get(collectionType);
+                localMoneyMade = moneyMade.getOrDefault(collectionType + suffix, 0L);
                 return "$ made (Bazaar): " + formatNumberOrPlaceholder(localMoneyMade);
             }
             case "enchanted" -> {
                 if (ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION)) {
-                    localMoneyMade = moneyMade.get("Enchanted version");
+                    localMoneyMade = moneyMade.getOrDefault("Enchanted version" + suffix, 0L);
                     return "$ made (Bazaar): " + formatNumberOrPlaceholder(localMoneyMade);
                 } else {
-                    localMoneyMade = moneyMade.getOrDefault("Super Enchanted version", -1L);
+                    localMoneyMade = moneyMade.getOrDefault("Super Enchanted version" + suffix, -1L);
                     if (localMoneyMade == -1L) {
                         ConfigHelper.setBazaarType(BazaarType.ENCHANTED_VERSION);
                         return null;
@@ -169,7 +172,7 @@ public class TextUtils {
                 }
             }
             case "gemstone" -> {
-                localMoneyMade = moneyMade.get(ConfigAccess.getGemstoneVariant().toString());
+                localMoneyMade = moneyMade.getOrDefault(ConfigAccess.getGemstoneVariant().toString() + suffix, 0L);
                 return"$ made (Bazaar): " + formatNumberOrPlaceholder(localMoneyMade);
             }
             default -> { return null; }
@@ -215,6 +218,7 @@ public class TextUtils {
         extraOverlayLines.add("§6§lExtra Stats:");
         for (CollectionOverlay.OverlayExtraText id : ConfigAccess.getExtraStatsText()) {
             switch (id) {
+                case BAZAAR_PRICE_TYPE -> addIfNotNullExtra(handleBazaarPriceType());
                 case BAZAAR_ITEM -> addIfNotNullExtra(handleBazaarItem());
                 case BAZAAR_PRICE -> addIfNotNullExtra(handleBazaarPrice());
             }
@@ -223,6 +227,14 @@ public class TextUtils {
 
     private static void addIfNotNullExtra(String line) {
         if (line != null) extraOverlayLines.add(line);
+    }
+
+    private static String handleBazaarPriceType() {
+        if (ConfigAccess.getBazaarPriceType().equals(Bazaar.BazaarPriceType.INSTANT_BUY)) {
+            return "Price type: Instant Buy";
+        } else {
+            return "Price type: Instant Sell";
+        }
     }
 
     private static String handleBazaarItem() {
@@ -250,27 +262,30 @@ public class TextUtils {
             // Skip normal items
             case "enchanted" -> {
                 if (ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION)) {
-                    if (BazaarPrices.enchantedPrice == 0) {
+                    float price = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? BazaarPrices.enchantedInstantBuy : BazaarPrices.enchantedInstantSell;
+                    if (price == 0) {
                         return "Item price: Unknown price";
                     }
-                    return  "Item price: " + formatNumber((long) BazaarPrices.enchantedPrice);
+                    return  "Item price: " + formatNumber((long) price);
                 } else {
                     if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
                         ConfigHelper.setBazaarType(BazaarType.ENCHANTED_VERSION);
                         return null;
                     } else {
-                        if (BazaarPrices.superEnchantedPrice == 0) {
+                        float price = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? BazaarPrices.superEnchantedInstantBuy : BazaarPrices.superEnchantedInstantSell;
+                        if (price == 0) {
                             return "Item price: Unknown price";
                         }
+                        return  "Item price: " + formatNumber((long) price);
                     }
-                    return  "Item price: " + formatNumber((long) BazaarPrices.superEnchantedPrice);
                 }
             }
             case "gemstone" -> {
-                if (GemstonePrices.getPrice(ConfigAccess.getGemstoneVariant().toString()) == 0) {
+                float price = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? GemstonePrices.getInstantBuyPrice(ConfigAccess.getGemstoneVariant().toString()) : GemstonePrices.getInstantSellPrice(ConfigAccess.getGemstoneVariant().toString());
+                if (price == 0) {
                     return "Variant price: Unknown price";
                 }
-                return "Variant price: " + formatNumber((long) GemstonePrices.getPrice(ConfigAccess.getGemstoneVariant().toString()));
+                return "Variant price: " + formatNumber((long) price);
             }
             default -> { return null; }
         }

@@ -4,8 +4,8 @@ import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManag
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig;
-import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
+import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
+import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager;
@@ -255,23 +255,24 @@ public class TrackingHandler {
                 lines.add(String.format("   §6Motes: §f$%s   §6Rate: §f%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
             } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
         } else {
+            String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
             switch (collectionType) {
                 case "normal" -> {
-                    long bazMoney = moneyMade.get(collectionType);
-                    long bazRate = moneyPerHourBazaar.get(collectionType);
+                    long bazMoney = moneyMade.getOrDefault(collectionType + suffix, 0L);
+                    long bazRate = moneyPerHourBazaar.getOrDefault(collectionType + suffix, 0L);
                     lines.add(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate)));
                 }
                 case "enchanted" -> {
-                    String key = bazaarType.equals(BazaarConfig.BazaarType.ENCHANTED_VERSION)
+                    String key = bazaarType.equals(BazaarType.ENCHANTED_VERSION)
                             ? "Enchanted version" : "Super Enchanted version";
-                    long money = moneyMade.get(key);
-                    long rate = moneyPerHourBazaar.get(key);
+                    long money = moneyMade.getOrDefault(key + suffix, 0L);
+                    long rate = moneyPerHourBazaar.getOrDefault(key + suffix, 0L);
                     lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate)));
                 }
                 case "gemstone" -> {
                     String variant = ConfigAccess.getGemstoneVariant().toString();
-                    long gMoney = moneyMade.get(variant);
-                    long gRate = moneyPerHourBazaar.get(variant);
+                    long gMoney = moneyMade.getOrDefault(variant + suffix, 0L);
+                    long gRate = moneyPerHourBazaar.getOrDefault(variant + suffix, 0L);
                     lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate)));
                 }
             }
@@ -312,33 +313,28 @@ public class TrackingHandler {
         } else {
             // Bazaar extremes per variant
             if (!moneyPerHourBazaar.isEmpty()) {
+                String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
                 switch (collectionType) {
                     case "normal" -> {
-                        long low = lowestRatesPerHourBazaar.getOrDefault("normal", 0L);
-                        long high = highestRatesPerHourBazaar.getOrDefault("normal", 0L);
+                        long low = lowestRatesPerHourBazaar.getOrDefault("normal" + suffix, 0L);
+                        long high = highestRatesPerHourBazaar.getOrDefault("normal" + suffix, 0L);
 
                         lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)) );
                         lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)) );
                     }
                     case "enchanted" -> {
-                        if (bazaarType.equals(BazaarType.ENCHANTED_VERSION)) {
-                            long low = lowestRatesPerHourBazaar.getOrDefault("Enchanted version", 0L);
-                            long high = highestRatesPerHourBazaar.getOrDefault("Enchanted version", 0L);
+                        String key = bazaarType.equals(BazaarType.ENCHANTED_VERSION)
+                                ? "Enchanted version" : "Super Enchanted version";
+                        long low = lowestRatesPerHourBazaar.getOrDefault(key + suffix, 0L);
+                        long high = highestRatesPerHourBazaar.getOrDefault(key + suffix, 0L);
 
-                            lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)) );
-                            lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)) );
-                        } else {
-                            long low = lowestRatesPerHourBazaar.getOrDefault("Super Enchanted version", 0L);
-                            long high = highestRatesPerHourBazaar.getOrDefault("Super Enchanted version", 0L);
-
-                            lines.add(String.format("   §6Best Rate: §f$%s/h", formatNumber(high)));
-                            lines.add(String.format("   §6Worst Rate: §f$%s/h", formatNumber(low)));
-                        }
+                        lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)));
+                        lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)));
                     }
                     case "gemstone" -> {
                         String variant = ConfigAccess.getGemstoneVariant().toString();
-                        long low = lowestRatesPerHourBazaar.getOrDefault(variant, 0L);
-                        long high = highestRatesPerHourBazaar.getOrDefault(variant, 0L);
+                        long low = lowestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L);
+                        long high = highestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L);
 
                         lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)));
                         lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)));

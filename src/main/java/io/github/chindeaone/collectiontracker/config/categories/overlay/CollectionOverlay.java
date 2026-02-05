@@ -56,6 +56,7 @@ public class CollectionOverlay {
 
     public enum OverlayExtraText {
 
+        BAZAAR_PRICE_TYPE("§aPrice type§f: Instant Sell"),
         BAZAAR_ITEM("§aItem/Variant§f: Enchanted gold"),
         BAZAAR_PRICE("§aItem/Variant price§f: 100k");
 
@@ -74,6 +75,7 @@ public class CollectionOverlay {
     )
     @ConfigEditorDraggableList
     public List<OverlayExtraText> extraStatsText = new ArrayList<>(Arrays.asList(
+            OverlayExtraText.BAZAAR_PRICE_TYPE,
             OverlayExtraText.BAZAAR_ITEM,
             OverlayExtraText.BAZAAR_PRICE
     ));

@@ -1,7 +1,8 @@
 package io.github.chindeaone.collectiontracker.collections.prices;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 
 import java.util.HashMap;
@@ -9,18 +10,32 @@ import java.util.Map;
 
 public class GemstonePrices {
 
-    public static Map<String, Float> gemstonePrices = new HashMap<>();
+    public static Map<String, Float> gemstoneInstantBuyPrices = new HashMap<>();
+    public static Map<String, Float> gemstoneInstantSellPrices = new HashMap<>();
     public static Map<String, Integer> recipes = new HashMap<>();
 
     public static void setPrices(String json) {
-        Gson gson = new Gson();
-        gemstonePrices.putAll(gson.fromJson(json, new TypeToken<Map<String, Float>>() {}.getType()));
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+        JsonObject instantSell = jsonObject.getAsJsonObject("INSTANT_SELL");
+        JsonObject instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY");
+
+        gemstoneInstantSellPrices.clear();
+        for (Map.Entry<String, JsonElement> entry : instantSell.entrySet()) {
+            gemstoneInstantSellPrices.put(entry.getKey(), entry.getValue().getAsFloat());
+        }
+
+        gemstoneInstantBuyPrices.clear();
+        for (Map.Entry<String, JsonElement> entry : instantBuy.entrySet()) {
+            gemstoneInstantBuyPrices.put(entry.getKey(), entry.getValue().getAsFloat());
+        }
+
         setRecipes();
         BazaarCollectionsManager.hasBazaarData = true;
     }
 
     private static void setRecipes() {
-        for (String key : gemstonePrices.keySet()) {
+        recipes.clear();
+        for (String key : gemstoneInstantSellPrices.keySet()) {
             int amount = 0;
             if (key.contains("ROUGH")) {
                 amount = 1;
@@ -37,12 +52,17 @@ public class GemstonePrices {
         }
     }
 
-    public static float getPrice(String gemstoneVariant) {
-        return gemstonePrices.get(gemstoneVariant);
+    public static float getInstantBuyPrice(String gemstoneVariant) {
+        return gemstoneInstantBuyPrices.getOrDefault(gemstoneVariant, 0.0f);
+    }
+
+    public static float getInstantSellPrice(String gemstoneVariant) {
+        return gemstoneInstantSellPrices.getOrDefault(gemstoneVariant, 0.0f);
     }
 
     public static void resetPrices() {
-        gemstonePrices.clear();
+        gemstoneInstantBuyPrices.clear();
+        gemstoneInstantSellPrices.clear();
         recipes.clear();
     }
 }

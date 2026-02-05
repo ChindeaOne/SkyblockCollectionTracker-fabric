@@ -2,9 +2,9 @@ package io.github.chindeaone.collectiontracker.config
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.categories.About
+import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
-import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
@@ -29,10 +29,11 @@ val updateType: About.UpdateType get() = aboutConfig.update
 val hasCheckedUpdate: Boolean get() = aboutConfig.hasCheckedUpdate
 
 // Bazaar Config Accessors
-val bazaarConfig: BazaarConfig get() = modConfig.bazaar.bazaarConfig
+val bazaarConfig: Bazaar get() = modConfig.bazaar
+val bazaarPriceType: Bazaar.BazaarPriceType get() = bazaarConfig.bazaarPriceType
 val useBazaar: Boolean get() = bazaarConfig.useBazaar
-val bazaarType: BazaarConfig.BazaarType get() = bazaarConfig.bazaarType
-val gemstoneVariant: BazaarConfig.GemstoneVariant get() = bazaarConfig.gemstoneVariant
+val bazaarType: Bazaar.BazaarType get() = bazaarConfig.bazaarType
+val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
 
 // Mining Config Accessors
 val miningConfig: Mining get() = modConfig.mining
@@ -77,10 +78,10 @@ object ConfigAccess {
     fun getUpdateType(): About.UpdateType = updateType
 
     @JvmStatic
-    fun getBazaarType(): BazaarConfig.BazaarType = bazaarType
+    fun getBazaarType(): Bazaar.BazaarType = bazaarType
 
     @JvmStatic
-    fun getGemstoneVariant(): BazaarConfig.GemstoneVariant = gemstoneVariant
+    fun getGemstoneVariant(): Bazaar.GemstoneVariant = gemstoneVariant
 
     @JvmStatic
     fun isUsingBazaar(): Boolean = useBazaar
@@ -126,6 +127,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun isTamingTrackingEnabled(): Boolean = enableTamingTracking
+
+    @JvmStatic
+    fun getBazaarPriceType(): Bazaar.BazaarPriceType = bazaarPriceType
 }
 
 /**
@@ -134,7 +138,7 @@ object ConfigAccess {
 object ConfigHelper {
 
     @JvmStatic
-    fun setBazaarType(type: BazaarConfig.BazaarType) {
+    fun setBazaarType(type: Bazaar.BazaarType) {
         bazaarConfig.bazaarType = type
     }
 

@@ -111,45 +111,69 @@ public class TrackingRates {
         long uptime = getUptimeInSeconds();
         long collectedSinceStart = currentCollection - sessionStartCollection;
 
-        float bazaarPrice;
-        float enchantedPrice;
-        float superEnchantedPrice;
-
         int priceNPC = NpcPrices.getNpcPrice(collection);
         moneyMade.put("NPC", uptime > 0 ? (long) Math.floor(priceNPC * (double) collectedSinceStart) : 0);
 
-        long computed;
         if (BazaarCollectionsManager.hasBazaarData) {
             switch (collectionType) {
                 case "normal" -> {
-                    bazaarPrice = BazaarPrices.normalPrice;
-                    computed = uptime > 0 ? (long) Math.floor(bazaarPrice * ((double) collectedSinceStart / 160) / (uptime / 3600.0)) : 0;
-                    moneyPerHourBazaar.put(collectionType, computed);
-                    updateBazaarExtremes(collectionType, computed);
-                    moneyMade.put(collectionType, uptime > 0 ? (long) Math.floor(bazaarPrice * collectedSinceStart) : 0);
+                    // Instant Buy
+                    long buyComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.normalInstantBuy * ((double) collectedSinceStart / 160) / (uptime / 3600.0)) : 0;
+                    moneyPerHourBazaar.put(collectionType + "_INSTANT_BUY", buyComputed);
+                    updateBazaarExtremes(collectionType + "_INSTANT_BUY", buyComputed);
+                    moneyMade.put(collectionType + "_INSTANT_BUY", uptime > 0 ? (long) Math.floor(BazaarPrices.normalInstantBuy * collectedSinceStart) : 0);
+
+                    // Instant Sell
+                    long sellComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.normalInstantSell * ((double) collectedSinceStart / 160) / (uptime / 3600.0)) : 0;
+                    moneyPerHourBazaar.put(collectionType + "_INSTANT_SELL", sellComputed);
+                    updateBazaarExtremes(collectionType + "_INSTANT_SELL", sellComputed);
+                    moneyMade.put(collectionType + "_INSTANT_SELL", uptime > 0 ? (long) Math.floor(BazaarPrices.normalInstantSell * collectedSinceStart) : 0);
                 }
                 case "enchanted" -> {
-                    enchantedPrice = BazaarPrices.enchantedPrice;
-                    superEnchantedPrice = BazaarPrices.superEnchantedPrice;
+                    double enchantedDivisor = BazaarCollectionsManager.enchantedRecipe.isEmpty() ? 1.0 : BazaarCollectionsManager.enchantedRecipe.values().iterator().next();
+                    // Enchanted version - Buy
+                    long enchantedBuyComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.enchantedInstantBuy * ((double) collectedSinceStart / enchantedDivisor) / (uptime / 3600.0)) : 0;
+                    moneyPerHourBazaar.put("Enchanted version_INSTANT_BUY", enchantedBuyComputed);
+                    updateBazaarExtremes("Enchanted version_INSTANT_BUY", enchantedBuyComputed);
+                    moneyMade.put("Enchanted version_INSTANT_BUY", uptime > 0 ? (long) Math.floor(BazaarPrices.enchantedInstantBuy * ((double) collectedSinceStart / enchantedDivisor)) : 0);
 
-                    computed = uptime > 0 ? (long) Math.floor(enchantedPrice * ((double) collectedSinceStart / BazaarCollectionsManager.enchantedRecipe.values().iterator().next()) / (uptime / 3600.0)) : 0;
-                    moneyPerHourBazaar.put("Enchanted version", computed);
-                    updateBazaarExtremes("Enchanted version", computed);
-                    moneyMade.put("Enchanted version", uptime > 0 ? (long) Math.floor(enchantedPrice * ((double) collectedSinceStart / BazaarCollectionsManager.enchantedRecipe.values().iterator().next())) : 0);
+                    // Enchanted version - Sell
+                    long enchantedSellComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.enchantedInstantSell * ((double) collectedSinceStart / enchantedDivisor) / (uptime / 3600.0)) : 0;
+                    moneyPerHourBazaar.put("Enchanted version_INSTANT_SELL", enchantedSellComputed);
+                    updateBazaarExtremes("Enchanted version_INSTANT_SELL", enchantedSellComputed);
+                    moneyMade.put("Enchanted version_INSTANT_SELL", uptime > 0 ? (long) Math.floor(BazaarPrices.enchantedInstantSell * ((double) collectedSinceStart / enchantedDivisor)) : 0);
 
-                    if (!(superEnchantedPrice == 0.0f)) {
-                        computed = uptime > 0 ? (long) Math.floor(superEnchantedPrice * ((double) collectedSinceStart / BazaarCollectionsManager.superEnchantedRecipe.values().iterator().next()) / (uptime / 3600.0)) : 0;
-                        moneyPerHourBazaar.put("Super Enchanted version", computed);
-                        updateBazaarExtremes("Super Enchanted version", computed);
-                        moneyMade.put("Super Enchanted version", uptime > 0 ? (long) Math.floor(superEnchantedPrice * ((double) collectedSinceStart / BazaarCollectionsManager.superEnchantedRecipe.values().iterator().next())) : 0);
+                    // Super Enchanted version
+                    if (!(BazaarPrices.superEnchantedInstantBuy == 0.0f)) {
+                        double superDivisor = BazaarCollectionsManager.superEnchantedRecipe.isEmpty() ? 1.0 : BazaarCollectionsManager.superEnchantedRecipe.values().iterator().next();
+                        // Buy
+                        long superBuyComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.superEnchantedInstantBuy * ((double) collectedSinceStart / superDivisor) / (uptime / 3600.0)) : 0;
+                        moneyPerHourBazaar.put("Super Enchanted version_INSTANT_BUY", superBuyComputed);
+                        updateBazaarExtremes("Super Enchanted version_INSTANT_BUY", superBuyComputed);
+                        moneyMade.put("Super Enchanted version_INSTANT_BUY", uptime > 0 ? (long) Math.floor(BazaarPrices.superEnchantedInstantBuy * ((double) collectedSinceStart / superDivisor)) : 0);
+
+                        // Sell
+                        long superSellComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.superEnchantedInstantSell * ((double) collectedSinceStart / superDivisor) / (uptime / 3600.0)) : 0;
+                        moneyPerHourBazaar.put("Super Enchanted version_INSTANT_SELL", superSellComputed);
+                        updateBazaarExtremes("Super Enchanted version_INSTANT_SELL", superSellComputed);
+                        moneyMade.put("Super Enchanted version_INSTANT_SELL", uptime > 0 ? (long) Math.floor(BazaarPrices.superEnchantedInstantSell * ((double) collectedSinceStart / superDivisor)) : 0);
                     }
                 }
                 case "gemstone" -> {
-                    for (String key : GemstonePrices.gemstonePrices.keySet()) {
-                        computed = uptime > 0 ? (long) Math.floor(GemstonePrices.getPrice(key) * ((double) collectedSinceStart / GemstonePrices.recipes.get(key)) / (uptime / 3600.0)) : 0;
-                        moneyPerHourBazaar.put(key, computed);
-                        updateBazaarExtremes(key, computed);
-                        moneyMade.put(key, uptime > 0 ? (long) Math.floor(GemstonePrices.getPrice(key) * ((double) collectedSinceStart / GemstonePrices.recipes.get(key))) : 0);
+                    for (String key : GemstonePrices.gemstoneInstantSellPrices.keySet()) {
+                        // Buy
+                        float buyPrice = GemstonePrices.getInstantBuyPrice(key);
+                        long buyComputed = uptime > 0 ? (long) Math.floor(buyPrice * ((double) collectedSinceStart / GemstonePrices.recipes.get(key)) / (uptime / 3600.0)) : 0;
+                        moneyPerHourBazaar.put(key + "_INSTANT_BUY", buyComputed);
+                        updateBazaarExtremes(key + "_INSTANT_BUY", buyComputed);
+                        moneyMade.put(key + "_INSTANT_BUY", uptime > 0 ? (long) Math.floor(buyPrice * ((double) collectedSinceStart / GemstonePrices.recipes.get(key))) : 0);
+
+                        // Sell
+                        float sellPrice = GemstonePrices.getInstantSellPrice(key);
+                        long sellComputed = uptime > 0 ? (long) Math.floor(sellPrice * ((double) collectedSinceStart / GemstonePrices.recipes.get(key)) / (uptime / 3600.0)) : 0;
+                        moneyPerHourBazaar.put(key + "_INSTANT_SELL", sellComputed);
+                        updateBazaarExtremes(key + "_INSTANT_SELL", sellComputed);
+                        moneyMade.put(key + "_INSTANT_SELL", uptime > 0 ? (long) Math.floor(sellPrice * ((double) collectedSinceStart / GemstonePrices.recipes.get(key))) : 0);
                     }
                 }
             }
