@@ -28,11 +28,6 @@ public class CollectionTracker {
                 ChatUtils.INSTANCE.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
                 return;
             }
-            // Re-enable API server checks if they were permanently disabled
-            if (ServerUtils.INSTANCE.getPermanentlyDisabled()) {
-                ServerUtils.INSTANCE.clearState();
-            }
-
             try {
                 if (!ServerUtils.INSTANCE.getServerStatus()) {
                     ChatUtils.INSTANCE.sendMessage("§cYou can't use any tracking commands at the moment.", true);

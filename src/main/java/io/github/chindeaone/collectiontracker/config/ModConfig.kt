@@ -19,7 +19,7 @@ class ModConfig : Config() {
     @Category(name = "GUI", desc = "GUI config")
     val gui: GUIConfig = GUIConfig()
     @Expose
-    @Category(name = "Tracking", desc = "Overlay config")
+    @Category(name = "Tracking", desc = "Tracking config")
     @SerializedName("trackingOverlay")
     val trackingOverlay: Tracking = Tracking()
     @Expose
