@@ -23,6 +23,7 @@
 <summary><strong>Collection/Profit Tracker</strong></summary>
 
 - Tracks collections and profit over time using Hypixel’s API.
+- Configurable overlay lines showing collection progress and profit rates.
 - Optional Sacks messages mode for faster live updates.
 - Detailed session summary (best/worst rates, elapsed time, profit, etc.).
 - AFK detection stops tracking when idle.
