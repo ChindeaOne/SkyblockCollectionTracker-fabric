@@ -18,23 +18,44 @@
 ---
 
 ## Features
-- **MoulConfig GUI**
-    - Configure your tracking settings through the in-game GUI, accessible via `/sct`.
 
-- **Customizable overlay**
-    - Enable color-coded text for each individual collection.
-    - Configure what stats you want to see displayed in the Overlay category.
+<details>
+<summary><strong>Collection/Profit Tracker</strong></summary>
 
-- **Tracking mechanics**
-    - Use `/sct track <collection>` to start tracking a collection.
-    - Need a break? Simply pause tracking with `/sct pause` and resume anytime with `/sct resume`.
+- Tracks collections and profit over time using Hypixel’s API.
+- Optional Sacks messages mode for faster live updates.
+- Detailed session summary (best/worst rates, elapsed time, profit, etc.).
+- AFK detection stops tracking when idle.
+- Use `/sct collection` to list available collections.
 
-- **Choose your pricing**
-    - You can either use the NPC prices (primarily designed for ironman players) or Bazaar prices from the Bazaar category.
+</details>
 
-- **Auto Updater**
-    - Implements [modrinthautoupdater](https://github.com/ChindeaYTB/modrinthautoupdater), a similar library to [libautoupdate](https://github.com/nea89o/libautoupdate).
-    - The mod updates after closing the game.
+<details>
+<summary><strong>Skill Tracker</strong></summary>
+
+- Tracks all skills, displaying current XP, level, and rates.
+- Uses Hypixel’s API for non‑maxed skills; live in‑game XP messages for maxed skills.
+- Additional tracking for Taming.
+
+</details>
+
+<details>
+<summary><strong>Mining Stats Overlay</strong></summary>
+
+- Shows all mining‑related stats from tab.
+- Updates dynamically based on the targeted block.
+- Compacts Mining Fortune into a single context‑aware stat.
+
+</details>
+
+<details>
+<summary><strong>Commissions Overlay and Claim Buttons</strong></summary>
+
+- Displays active commissions and progress from tab data.
+- Keybinds for quick commission claiming.
+
+</details>
+
 ---
 
 ## Credits
@@ -42,4 +63,3 @@
 All credits can be found [here](CREDITS.md).
 
 ---
-
