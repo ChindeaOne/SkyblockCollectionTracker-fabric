@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.util.inventory
 
-import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler

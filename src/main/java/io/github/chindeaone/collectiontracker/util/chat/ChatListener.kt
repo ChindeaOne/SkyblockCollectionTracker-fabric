@@ -40,9 +40,8 @@ object ChatListener {
         if (match != null) {
             val itemsStr = match.groupValues[1].replace(",", "")
             val items = itemsStr.toIntOrNull() ?: 0
-            val timeframe = match.groupValues[2].toIntOrNull() ?: 0
 
-            SacksTrackingManager.onChatCollection(items, timeframe)
+            SacksTrackingManager.onChatCollection(items)
         }
     }
 

@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarCon
 import io.github.chindeaone.collectiontracker.config.categories.bazaar.BazaarConfig.BazaarType;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.Hypixel;
 import io.github.chindeaone.collectiontracker.util.PlayerData;
@@ -174,6 +175,8 @@ public class TrackingHandler {
         isPaused = false;
         startTime = 0;
         lastTime = 0;
+
+        SacksTrackingManager.reset();
 
         // Reset collection tracking
         lastApiCollection = -1L;

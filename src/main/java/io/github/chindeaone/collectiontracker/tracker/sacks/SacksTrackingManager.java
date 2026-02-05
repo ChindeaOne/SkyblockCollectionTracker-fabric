@@ -4,17 +4,21 @@ import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManag
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates;
+import io.github.chindeaone.collectiontracker.util.inventory.InventoryListener;
 
 public class SacksTrackingManager {
 
-    public static void onChatCollection(int amount, int timeframe) {
+    public static boolean lastHasItem = false;
+    public static boolean isFirstCheck = true;
+
+    public static void onChatCollection(int amount) {
         if (!TrackingHandler.isTracking) return;
 
-        long updatedAmount = updateAmount(amount, timeframe);
+        long updatedAmount = updateAmount(amount);
         TrackingRates.calculateRates(updatedAmount, true);
     }
 
-    private static Long updateAmount(int amount, int timeframe) {
+    private static Long updateAmount(int amount) {
         String type = CollectionsManager.collectionType;
 
         long recipeSize;
@@ -25,18 +29,31 @@ public class SacksTrackingManager {
                 return (long) amount;
             }
         }
-        // If the interval is short, assume raw collection
-        if (timeframe < 10) {
+
+        boolean hasItem = InventoryListener.getHasItem();
+        boolean prevHasItem = lastHasItem;
+        lastHasItem = hasItem;
+
+        boolean firstCheck = isFirstCheck;
+        if (isFirstCheck) isFirstCheck = false;
+
+        if (hasItem) {
+            // If the player has the item in their inventory, we need to check if they had it previously
+            // Unless it's the first check, in which case we assume the amount is compacted
+            if (!firstCheck && !prevHasItem) {
+                return (long) amount;
+            }
+            // If the player had the item previously, we assume the amount is compacted
+            return amount * recipeSize;
+        } else {
+            // Otherwise, the amount is not compacted and we can use it as is
             return (long) amount;
         }
+    }
 
-        long upperBound = recipeSize * 3L; // Very work in progress upper bound, could be lower
-        long lowerBound = recipeSize / 20L; // Very work in progress lower bound, could be higher
-
-        if (amount <= upperBound && amount >= lowerBound) {
-            return amount * recipeSize;
-        }
-
-        return (long) amount; // Fallback to raw amount if unsure to avoid inflating rates
+    public static void reset() {
+        InventoryListener.setHasItem(false);
+        lastHasItem = false;
+        isFirstCheck = true;
     }
 }
