@@ -106,6 +106,8 @@ public class SkillTrackingHandler {
     }
 
     public static void stopTracking() {
+        if (checkTracking()) return;
+
         if (!Hypixel.INSTANCE.getServer()) {
             logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
         } else if (afk) {

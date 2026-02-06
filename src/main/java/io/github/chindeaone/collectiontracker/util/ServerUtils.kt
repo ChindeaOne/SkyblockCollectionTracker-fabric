@@ -7,7 +7,6 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 
 object ServerUtils {

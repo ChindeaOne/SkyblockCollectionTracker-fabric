@@ -88,6 +88,7 @@ public class TrackingHandler {
     }
 
     public static void stopTracking() {
+        if (!isTracking) return;
         if (scheduler != null && !scheduler.isShutdown()) {
 
             if (!Hypixel.INSTANCE.getServer()) {
