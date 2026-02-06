@@ -3,6 +3,7 @@
 */
 package io.github.chindeaone.collectiontracker.util
 
+import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
 import io.github.chindeaone.collectiontracker.api.colors.FetchColors
@@ -74,7 +75,7 @@ object Hypixel {
                             if (TokenManager.getToken() == null) {
                                 TokenManager.fetchAndStoreToken()
                             }
-                            CompletableFuture.runAsync { fetchData() }
+                            fetchData()
                             logger.info("[SCT]: API data loaded successfully.")
 
                             logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
@@ -120,14 +121,14 @@ object Hypixel {
 
     fun fetchData() {
         if (!ServerStatus.hasData()) {
-            // Request collection data
-            FetchCollectionList.fetchCollectionList()
-            // Request NPC prices
-            FetchNpcPrices.fetchPrices()
-            // Request gemstone list
-            FetchGemstoneList.fetchGemstoneList()
-            // Request colors data
-            FetchColors.fetchColorsData()
+            val futures = listOf(
+                CompletableFuture.runAsync { FetchCollectionList.fetchCollectionList() },
+                CompletableFuture.runAsync { FetchNpcPrices.fetchPrices() },
+                CompletableFuture.runAsync { FetchGemstoneList.fetchGemstoneList() },
+                CompletableFuture.runAsync { FetchColors.fetchColorsData() },
+                CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
+            )
+            CompletableFuture.allOf(*futures.toTypedArray()).join()
         }
     }
 

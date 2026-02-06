@@ -62,7 +62,7 @@ object ServerUtils {
 
     private fun checkIfDataWasFetched() {
         if (!ServerStatus.hasData()) {
-            CompletableFuture.runAsync { Hypixel.fetchData() }
+            Hypixel.fetchData()
             logger.info("[SCT]: API data loaded successfully.")
         }
     }
