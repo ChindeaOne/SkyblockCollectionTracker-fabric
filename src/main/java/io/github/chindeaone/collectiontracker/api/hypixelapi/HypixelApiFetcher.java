@@ -25,7 +25,8 @@ public class HypixelApiFetcher {
             HttpResponse<InputStream> response =
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (response.statusCode() == 200) {
+            int status = response.statusCode();
+            if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
                     StringBuilder content = new StringBuilder();
                     char[] buffer = new char[4096];
@@ -36,7 +37,7 @@ public class HypixelApiFetcher {
                     return content.toString();
                 }
             } else {
-                logger.error("[SCT]: Failed to fetch data. Server responded with code: {}", response.statusCode());
+                logger.error("[SCT]: Failed to fetch data. Server responded with code: {}", status);
                 TrackingHandler.stopTracking();
             }
 

@@ -42,7 +42,8 @@ public class SkillApiFetcher {
             HttpResponse<InputStream> response =
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (response.statusCode() == 200) {
+            int status = response.statusCode();
+            if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
                     Gson gson = new Gson();
                     Type mapType = new TypeToken<Map<String, Double>>() {}.getType();
@@ -52,7 +53,7 @@ public class SkillApiFetcher {
                     logger.info("[SCT]: Successfully received the skill data.");
                 }
             } else {
-                logger.error("[SCT]: Failed to fetch skill data. HTTP {}", response.statusCode());
+                logger.error("[SCT]: Failed to fetch skill data. HTTP {}", status);
             }
         } catch (Exception e) {
             logger.error("[SCT]: Error while receiving the skill data", e);

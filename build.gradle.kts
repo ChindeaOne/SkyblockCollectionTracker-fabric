@@ -158,6 +158,7 @@ tasks.processResources {
             "GITHUB_URL" to (System.getenv("GITHUB_URL") ?: ""),
             "COLORS_URL" to (System.getenv("COLORS_URL") ?: ""),
             "SKILLS_URL" to (System.getenv("SKILLS_URL") ?: ""),
+            "COLEWEIGHT_URL" to (System.getenv("COLEWEIGHT_URL") ?: ""),
             "AGENT" to (System.getenv("AGENT") ?: "")
         )
     }
