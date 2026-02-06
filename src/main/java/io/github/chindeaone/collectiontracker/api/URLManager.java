@@ -17,6 +17,7 @@ public class URLManager {
     public static final String GITHUB_URL;
     public static final String COLORS_URL;
     public static final String SKILLS_URL;
+    public static final String COLEWEIGHT_URL;
     public static final String AGENT;
 
     static {
@@ -38,6 +39,7 @@ public class URLManager {
         GITHUB_URL = props.getProperty("GITHUB_URL");
         COLORS_URL = props.getProperty("COLORS_URL");
         SKILLS_URL = props.getProperty("SKILLS_URL");
+        COLEWEIGHT_URL = props.getProperty("COLEWEIGHT_URL");
         AGENT = props.getProperty("AGENT");
     }
 

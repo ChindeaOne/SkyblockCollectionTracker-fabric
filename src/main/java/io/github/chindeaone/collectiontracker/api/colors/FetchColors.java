@@ -36,14 +36,15 @@ public class FetchColors {
             HttpResponse<InputStream> response =
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (response.statusCode() == 200) {
+            int status = response.statusCode();
+            if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
                     ColorUtils.setupColors(JsonParser.parseReader(reader).getAsJsonObject());
                     hasColors = true;
                     logger.info("[SCT]: Successfully fetched colors data.");
                 }
             } else {
-                logger.error("[SCT]: Failed to fetch colors data. Server responded with code: {}", response.statusCode());
+                logger.error("[SCT]: Failed to fetch colors data. Server responded with code: {}", status);
             }
         } catch (Exception e) {
             logger.error("[SCT]: An error occurred while fetching colors data: ", e);

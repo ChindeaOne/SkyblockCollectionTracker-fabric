@@ -38,7 +38,8 @@ public class FetchNpcPrices {
             HttpResponse<InputStream> response =
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (response.statusCode() == 200) {
+            int status = response.statusCode();
+            if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
 
                     Gson gson = new Gson();
@@ -52,7 +53,7 @@ public class FetchNpcPrices {
                     logger.info("[SCT]: Successfully received the npc prices.");
                 }
             } else {
-                logger.error("[SCT]: Failed to fetch NPC prices. HTTP {}", response.statusCode());
+                logger.error("[SCT]: Failed to fetch NPC prices. HTTP {}", status);
             }
 
         } catch (Exception e) {

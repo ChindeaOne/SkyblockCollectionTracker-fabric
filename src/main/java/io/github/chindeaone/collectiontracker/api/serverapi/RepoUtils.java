@@ -43,7 +43,6 @@ public class RepoUtils {
                 HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
         int status = response.statusCode();
-
         if (status != 200) {
             logger.error("[SCT]: Failed to fetch GitHub releases, response code: {}", status);
             return;

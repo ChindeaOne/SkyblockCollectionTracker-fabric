@@ -37,7 +37,6 @@ public class TokenFetcher {
                 HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
         int status = response.statusCode();
-
         if (status != 200) {
             logger.error("[SCT]: Failed to fetch token, response code: {}", status);
             return null;
