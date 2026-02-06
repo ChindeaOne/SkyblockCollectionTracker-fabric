@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.api.bazaarapi;
 
 import io.github.chindeaone.collectiontracker.api.URLManager;
+import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager;
@@ -56,6 +57,24 @@ public class FetchBazaarPrice {
 
             int status = response.statusCode();
 
+            if (response.statusCode() == 401) {
+                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
+                TokenManager.fetchAndStoreToken();
+                token = TokenManager.getToken(); // get the new token
+
+                request = HttpRequest.newBuilder(uri)
+                        .timeout(Duration.ofSeconds(5))
+                        .header("X-UUID", uuid)
+                        .header("Authorization", "Bearer " + token)
+                        .header("X-COLLECTION", collection)
+                        .header("X-TYPE", type)
+                        .header("User-Agent", URLManager.AGENT)
+                        .header("Accept", "application/json")
+                        .GET()
+                        .build();
+                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            }
+
             if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
                     StringBuilder content = new StringBuilder();
@@ -83,7 +102,7 @@ public class FetchBazaarPrice {
                 logger.warn("[SCT]: Server returned HTTP {} for type '{}'", status, type);
             }
 
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
             logger.error("[SCT]: Error fetching bazaar price for collection '{}': {}", collection, e.getMessage());
         }
     }
