@@ -11,9 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 //? if = 1.21.11 {
 import org.jetbrains.annotations.NotNull;
 //? }
-//? if >= 1.21.10 {
 import net.minecraft.client.input.MouseButtonEvent;
-//? }
 import net.minecraft.network.chat.Component;
 
 public class DummyOverlay extends Screen {
@@ -88,32 +86,6 @@ public class DummyOverlay extends Screen {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-    //? if = 1.21.8 {
-    /*@Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (mouseButton == 0) {
-            int mx = (int) mouseX;
-            int my = (int) mouseY;
-
-            for (AbstractOverlay overlay : OverlayManager.all()) {
-                if (isMouseOver(mx, my, overlay.position())) {
-                    dragging = overlay;
-                    dragOffsetX = mx - overlay.position().getX();
-                    dragOffsetY = my - overlay.position().getY();
-                    return true;
-                }
-            }
-        }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int state) {
-        dragging = null;
-        return super.mouseReleased(mouseX, mouseY, state);
-    }
-     
-    *///? } else {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
         if (event.button() == 0) {
@@ -137,7 +109,6 @@ public class DummyOverlay extends Screen {
         dragging = null;
         return super.mouseReleased(event);
     }
-    //? }
 
     private boolean isMouseOver(int mouseX, int mouseY, Position pos) {
         int x = pos.getX();
