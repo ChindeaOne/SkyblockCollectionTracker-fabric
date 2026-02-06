@@ -1,11 +1,14 @@
 package io.github.chindeaone.collectiontracker.commands;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
+import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.util.PlayerData;
 import io.github.chindeaone.collectiontracker.util.SkillUtils;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
@@ -19,35 +22,35 @@ public class CommandRegistry {
     public static void init() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
                 dispatcher.register(ClientCommandManager.literal(SkyblockCollectionTracker.NAMESPACE)
-                // /sct -> opens the config GUI
+                // sct -> opens the config GUI
                 .executes(context -> {
                     GuiManager.INSTANCE.openConfigGui(null);
                     return 1;
                 })
-                // /sct edit -> opens the position editor
+                // sct edit -> opens the position editor
                 .then(ClientCommandManager.literal("edit")
                         .executes(context -> {
                             Minecraft.getInstance().execute(GuiManager::openGuiPositionEditor);
                             return 1;
                         })
                 )
-                // /sct commands -> shows the list of commands
+                // sct commands -> shows the list of commands
                 .then(ClientCommandManager.literal("commands")
                         .executes(context -> {
                             CommandHelper.showCommands();
                             return 1;
                         })
                 )
-                // /sct collections -> shows the list of collections
+                // sct collections -> shows the list of collections
                 .then(ClientCommandManager.literal("collections")
 
-                        // /sct collections -> opens first category (page 1)
+                        // sct collections -> opens first category (page 1)
                         .executes(context -> {
                             CollectionList.sendCollectionList(1);
                             return 1;
                         })
 
-                        // /sct collections <page> or <category>
+                        // sct collections <page> or <category>
                         .then(ClientCommandManager.argument("arg", StringArgumentType.word())
                                 .suggests(CATEGORY_SUGGESTIONS)
                                 .executes(context -> {
@@ -74,7 +77,7 @@ public class CommandRegistry {
                                 })
                         )
                 )
-                // /sct track <collection>
+                // sct track <collection>
                 .then(ClientCommandManager.literal("track")
                         .executes(context -> {
                             ChatUtils.INSTANCE.sendMessage("Use: /sct track <collection>",true);
@@ -88,21 +91,21 @@ public class CommandRegistry {
                                 })
                         )
                 )
-                // /sct stop
+                // sct stop
                 .then(ClientCommandManager.literal("stop")
                         .executes(context -> {
                             TrackingHandler.stopTrackingManual();
                             return 1;
                         })
                 )
-                // /sct pause
+                // sct pause
                 .then(ClientCommandManager.literal("pause")
                         .executes(context -> {
                             TrackingHandler.pauseTracking();
                             return 1;
                         })
                 )
-                // /sct resume
+                // sct resume
                 .then(ClientCommandManager.literal("resume")
                         .executes(context -> {
                             TrackingHandler.resumeTracking();
@@ -116,8 +119,9 @@ public class CommandRegistry {
                             return 1;
                         })
                 )
-                // sct skill-track
+                // sct skill -> skill tracking commands
                 .then(ClientCommandManager.literal("skill")
+                        // sct skill track <skillName>
                         .then(ClientCommandManager.literal("track")
                                 .executes(context -> {
                                     ChatUtils.INSTANCE.sendMessage("Use: /sct skill",true);
@@ -158,6 +162,49 @@ public class CommandRegistry {
                                     SkillTrackingHandler.restartTracking();
                                     return 1;
                                 })
+                        )
+                )
+                // sct cw -> shows player's coleweight
+                .then(ClientCommandManager.literal("cw")
+                        // sct cw -> shows player's coleweight
+                        .executes(context -> {
+                            ColeweightUtils.INSTANCE.getColeweight(PlayerData.INSTANCE.getPlayerName());
+                            return 1;
+                        })
+                        // sct cw find <player> -> shows specified player(or local player)'s coleweight
+                        .then(ClientCommandManager.literal("find")
+                                .executes(context -> {
+                                    ColeweightUtils.INSTANCE.getColeweight(PlayerData.INSTANCE.getPlayerName());
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                        .executes(context -> {
+                                            String playerName = StringArgumentType.getString(context, "player").trim();
+                                            ColeweightUtils.INSTANCE.getColeweight(playerName);
+                                            return 1;
+                                        })
+                                )
+                                .then(ClientCommandManager.literal("detailed")
+                                    .executes(context -> {
+                                                String playerName = PlayerData.INSTANCE.getPlayerName();
+                                                ColeweightUtils.INSTANCE.getColeweightDetailed(playerName);
+                                                return 1;
+                                    })
+                                )
+                        )
+                        // sct cw lb <length>
+                        .then(ClientCommandManager.literal("lb")
+                                .executes(context -> {
+                                    ChatUtils.INSTANCE.sendMessage("Usage: /sct cw lb <length>.",true);
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.argument("length", IntegerArgumentType.integer())
+                                        .executes(context -> {
+                                            int length = IntegerArgumentType.getInteger(context, "length");
+                                            ColeweightUtils.INSTANCE.getColeweightLeaderboard(length);
+                                            return 1;
+                                        })
+                                )
                         )
                 )
         ));
