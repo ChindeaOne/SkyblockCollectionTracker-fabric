@@ -13,7 +13,7 @@
 2. Add the mod to your mods folder (`.minecraft/mods`).
 3. Make sure you have the [Fabric API](https://modrinth.com/mod/fabric-api/versions) and [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) in your Minecraft mods folder.
 4. Run Minecraft with the [Fabric installer](https://fabricmc.net/use/installer/) selected.
-5. Use `/sct help` to get started.
+5. Check all available commands via `/sct commands`.
 
 ---
 
