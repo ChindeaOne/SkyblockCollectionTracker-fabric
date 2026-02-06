@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
@@ -37,12 +38,15 @@ val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
 
 // Mining Config Accessors
 val miningConfig: Mining get() = modConfig.mining
-// Overlays
-val keybindConfig: KeybindConfig get() = miningConfig.commissionsOverlay.commissions
 val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
+val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
+val coleweightConfig: Coleweight get() = miningConfig.coleweight
+// Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
 val enableMiningStatsOverlay: Boolean get() = miningStatsOverlay.enableMiningStatsOverlay
 val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsOverlay.miningStatsOverlayInMiningIslandsOnly
+val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
+val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
@@ -130,6 +134,12 @@ object ConfigAccess {
 
     @JvmStatic
     fun getBazaarPriceType(): Bazaar.BazaarPriceType = bazaarPriceType
+
+    @JvmStatic
+    fun isColeweightRankingInChat(): Boolean = coleweightRankingInChat
+
+    @JvmStatic
+    fun isOnlyOnMiningIslands(): Boolean = onlyOnMiningIslands
 }
 
 /**
