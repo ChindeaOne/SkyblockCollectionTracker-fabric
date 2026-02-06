@@ -23,8 +23,9 @@
 <summary><strong>Collection/Profit Tracker</strong></summary>
 
 - Tracks collections and profit over time using Hypixel’s API.
+- Uses Bazaar Instant Sell/Buy prices.
 - Configurable overlay lines showing collection progress and profit rates.
-- Optional Sacks messages mode for faster live updates.
+- Optional Sack Tracking mode for faster live updates.
 - Detailed session summary (best/worst rates, elapsed time, profit, etc.).
 - AFK detection stops tracking when idle.
 - Use `/sct collection` to list available collections.
