@@ -22,17 +22,6 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Build for 1.21.8
-      - name: "Stonecutter: set active to 1.21.8"
-        run: ./gradlew stonecutterSwitchTo1.21.8 --no-daemon --stacktrace
-      - name: Build 1.21.8
-        run: ./gradlew :1.21.8:build --no-daemon --stacktrace
-      - name: Upload artifact 1.21.8
-        uses: actions/upload-artifact@v4
-        with:
-          name: 1.21.8
-          path: "**/build/libs/*-1.21.8.jar"
-
       # Build for 1.21.10
       - name: "Stonecutter: set active to 1.21.10"
         run: ./gradlew stonecutterSwitchTo1.21.10 --no-daemon --stacktrace
