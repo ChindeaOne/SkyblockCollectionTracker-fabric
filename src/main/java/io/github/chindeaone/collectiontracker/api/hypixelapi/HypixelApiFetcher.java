@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.api.hypixelapi;
 
 import io.github.chindeaone.collectiontracker.api.URLManager;
-import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,15 +24,6 @@ public class HypixelApiFetcher {
             HttpRequest request = buildCollectionRequest(uuid, token, collection);
             HttpResponse<InputStream> response =
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-            if (response.statusCode() == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
-                TokenManager.fetchAndStoreToken();
-                token = TokenManager.getToken(); // get the new token
-
-                request = buildCollectionRequest(uuid, token, collection);
-                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            }
 
             if (response.statusCode() == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
