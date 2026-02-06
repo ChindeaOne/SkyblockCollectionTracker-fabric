@@ -25,7 +25,10 @@ public class CommandHelper {
             "§a◆/sct skill stop",
             "§a◆/sct skill pause",
             "§a◆/sct skill resume",
-            "§a◆/sct skill restart"
+            "§a◆/sct skill restart",
+            "§a◆/sct cw find",
+            "§a◆/sct cw find detailed",
+            "§a◆/sct cw lb <length>"
     );
 
     public static void showCommands() {
@@ -49,7 +52,10 @@ public class CommandHelper {
                 "§eStops skill tracking.",
                 "§ePauses skill tracking.",
                 "§eResumes skill tracking.",
-                "§eRestarts skill tracking."
+                "§eRestarts skill tracking.",
+                "§eShows your coleweight.",
+                "§eShows detailed coleweight information.",
+                "§eShows the coleweight leaderboard."
         );
 
         List<MutableComponent> components = new ArrayList<>();
