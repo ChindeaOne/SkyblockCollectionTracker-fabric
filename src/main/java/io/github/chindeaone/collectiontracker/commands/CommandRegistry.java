@@ -205,10 +205,10 @@ public class CommandRegistry {
                                     ChatUtils.INSTANCE.sendMessage("Usage: /sct cw lb <length>.",true);
                                     return 1;
                                 })
-                                .then(ClientCommandManager.argument("length", IntegerArgumentType.integer())
+                                .then(ClientCommandManager.argument("position", IntegerArgumentType.integer())
                                         .executes(context -> {
-                                            int length = IntegerArgumentType.getInteger(context, "length");
-                                            ColeweightUtils.INSTANCE.getColeweightLeaderboard(length);
+                                            int position = IntegerArgumentType.getInteger(context, "position");
+                                            ColeweightUtils.INSTANCE.getColeweightLeaderboard(position);
                                             return 1;
                                         })
                                 )
