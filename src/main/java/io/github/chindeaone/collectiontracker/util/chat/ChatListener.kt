@@ -6,8 +6,8 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.util.HypixelUtils
-import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.util.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.util.tab.TabWidget
 import io.github.chindeaone.collectiontracker.util.world.MiningMapping
 import net.minecraft.network.chat.Component
 
@@ -46,7 +46,19 @@ object ChatListener {
         val text = message.string.removeColor()
 
         if (ConfigAccess.isOnlyOnMiningIslands()) {
-            if (!MiningMapping.miningIslands.contains(ScoreboardUtils.location)) return message
+            // Check tab area widget
+            val areaWidget = TabWidget.AREA
+
+            if (areaWidget.isPresent) {
+                val currentIsland = areaWidget.lines.firstNotNullOfOrNull { line ->
+                    MiningMapping.miningIslands.firstOrNull { name ->
+                        line.contains(name, ignoreCase = true)
+                    }
+                }
+                if (currentIsland == null) {
+                    return message
+                }
+            }
         }
         val match = NAME_PATTERN.find(text)?: return message
         val playerName = match.groupValues[1]
@@ -60,20 +72,32 @@ object ChatListener {
 
             if (rankSuffix.isNotEmpty()) {
                 val newComponent = Component.empty()
-                var addedRank = false
+                var hasRank = false
 
                 for (sibling in message.siblings) {
                     val siblingText = sibling.string
+                    val cleanSiblingText = siblingText.removeColor() // Remove colors in any guild/party/coop chats (thank you Hypixel very cool)
 
-                    if (!addedRank && siblingText.contains(playerName)) {
-                        newComponent.append(sibling)
-                        newComponent.append(Component.literal(" $rankSuffix"))
-                        addedRank = true
+                    // Check if this sibling contains the player's name, and it doesn't have rank suffix
+                    if (!hasRank && cleanSiblingText.contains(playerName)) {
+                        hasRank = true
+                        val nameIndex = siblingText.indexOf(playerName)
+                        if (nameIndex != -1) {
+                            val colonIndex = siblingText.indexOf(':', nameIndex)
+                            if (colonIndex != -1) {
+                                // Insert the rank suffix between the player's name and the colon
+                                val before = siblingText.substring(0, colonIndex)
+                                val after = siblingText.substring(colonIndex)
+                                newComponent.append(Component.literal(before).withStyle(sibling.style))
+                                newComponent.append(Component.literal(" $rankSuffix").withStyle(sibling.style))
+                                newComponent.append(Component.literal(after).withStyle(sibling.style))
+                            }
+                        }
                     } else {
                         newComponent.append(sibling)
                     }
                 }
-                return if (addedRank) newComponent else message
+                return if (hasRank) newComponent else message
             }
         }
         return message
