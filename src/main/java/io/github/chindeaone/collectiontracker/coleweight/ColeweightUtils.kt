@@ -41,19 +41,19 @@ object ColeweightUtils {
         getColeweight(playerName, true)
     }
 
-    fun getColeweightLeaderboard(length: Int) {
+    fun getColeweightLeaderboard(position: Int) {
         if (!ServerUtils.serverStatus) {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
             return
         }
-        if (length > 5000) {
+        if (position > 5000) {
             ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 5000.", true)
             return
         }
 
-        ChatUtils.sendMessage("§aFetching Top $length in Coleweight...", true)
-        ColeweightFetcher.fetchColeweightLbAsync(length) {
-            displayColeweightLeaderboard(length)
+        ChatUtils.sendMessage("§aFetching Top $position in Coleweight...", true)
+        ColeweightFetcher.fetchColeweightLbAsync {
+            displayColeweightLeaderboard(position)
         }
     }
 
@@ -74,11 +74,16 @@ object ColeweightUtils {
         Minecraft.getInstance().execute { ChatUtils.sendMessage(message, true) }
     }
 
-    private fun displayColeweightLeaderboard(length: Int) {
+    private fun displayColeweightLeaderboard(position: Int) {
         val leaderboard = ColeweightManager.storage.tempLeaderboard
-        val endIndex = minOf(length, leaderboard.size)
-        val startIndex = (endIndex - 25).coerceAtLeast(0)
-        val subList = leaderboard.subList(startIndex, endIndex)
+        val (start, end) = if (position <= 100) {
+            0 to minOf(100, leaderboard.size)
+        } else {
+            val startIndex = minOf(position - 25, leaderboard.size)
+            val endIndex = minOf(position + 25, leaderboard.size)
+            startIndex to endIndex
+        }
+        val subList = leaderboard.subList(start, end)
 
         Minecraft.getInstance().execute {
             subList.forEachIndexed { index, (player, coleweight) ->

@@ -58,13 +58,12 @@ public class ColeweightFetcher {
         }
     }
 
-    public static void fetchColeweightLbAsync(int length, Runnable onComplete) {
+    public static void fetchColeweightLbAsync(Runnable onComplete) {
         try {
             URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/lb");
 
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(java.time.Duration.ofSeconds(5))
-                    .header("X-LENGTH", String.valueOf(length))
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
                     .GET()
