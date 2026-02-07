@@ -80,7 +80,7 @@ public class CommandRegistry {
                 // sct track <collection>
                 .then(ClientCommandManager.literal("track")
                         .executes(context -> {
-                            ChatUtils.INSTANCE.sendMessage("Use: /sct track <collection>",true);
+                            ChatUtils.INSTANCE.sendMessage("Usage: /sct track <collection>",true);
                             return 1;
                         })
                         .then(ClientCommandManager.argument("collection", StringArgumentType.greedyString())
@@ -124,7 +124,7 @@ public class CommandRegistry {
                         // sct skill track <skillName>
                         .then(ClientCommandManager.literal("track")
                                 .executes(context -> {
-                                    ChatUtils.INSTANCE.sendMessage("Use: /sct skill",true);
+                                    ChatUtils.INSTANCE.sendMessage("Usage: /sct skill track <skill>",true);
                                     return 1;
                                 })
                                 .then(ClientCommandManager.argument("skillName", StringArgumentType.greedyString())
