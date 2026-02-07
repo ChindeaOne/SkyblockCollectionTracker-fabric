@@ -10,6 +10,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class Mining {
 
     @Expose
+    @ConfigOption(name = "Coleweight", desc = "")
+    @Accordion
+    public Coleweight coleweight = new Coleweight();
+
+    @Expose
     @ConfigOption(name = "Commissions Overlay", desc = "")
     @Accordion
     public CommissionsOverlay commissionsOverlay = new CommissionsOverlay();
@@ -18,9 +23,4 @@ public class Mining {
     @ConfigOption(name = "Mining Stats Overlay", desc = "")
     @Accordion
     public MiningStatsOverlay miningStatsOverlay = new MiningStatsOverlay();
-
-    @Expose
-    @ConfigOption(name = "Coleweight", desc = "")
-    @Accordion
-    public Coleweight coleweight = new Coleweight();
 }

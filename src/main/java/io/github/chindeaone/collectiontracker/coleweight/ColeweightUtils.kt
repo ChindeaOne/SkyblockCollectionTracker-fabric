@@ -7,18 +7,42 @@ import net.minecraft.client.Minecraft
 
 object ColeweightUtils {
 
-    fun getColeweight(playerName: String) {
+    private val playerCooldowns = mutableMapOf<String, Long>()
+    private var lastPlayer: String? = null
+    private var lastLeaderboard: Long = 0L
+    private const val COOLDOWN_DURATION = 5 * 60 * 1000L // 5 minutes cd
+
+    private fun isPlayerCached(name: String): Boolean {
+        val lastFetch = playerCooldowns[name] ?: 0L
+        return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
+    }
+
+    private fun isLbCached(): Boolean {
+        return (System.currentTimeMillis() - lastLeaderboard < COOLDOWN_DURATION)
+    }
+
+    fun getColeweight(playerName: String, detailed: Boolean = false) {
         if (!ServerUtils.serverStatus) {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
             return
         }
-        ChatUtils.sendMessage("§aFetching Coleweight for $playerName ...", true)
 
-        ColeweightFetcher.fetchColeweightDataAsync(playerName) {
-            val storage = ColeweightManager.storage
-            val message = "${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)"
-            Minecraft.getInstance().execute { ChatUtils.sendMessage(message, true) }
+        if (isPlayerCached(playerName)) {
+            displayColeweight(playerName, ColeweightManager.storage, detailed)
+            return
         }
+
+        val msg = if (detailed) "detailed Coleweight" else "Coleweight"
+        ChatUtils.sendMessage("§aFetching $msg for $playerName ...", true)
+        ColeweightFetcher.fetchColeweightDataAsync(playerName) {
+            playerCooldowns[playerName] = System.currentTimeMillis()
+            lastPlayer = playerName
+            displayColeweight(playerName, ColeweightManager.storage, detailed)
+        }
+    }
+
+    fun getColeweightDetailed(playerName: String) {
+        getColeweight(playerName, true)
     }
 
     fun getColeweightLeaderboard(length: Int) {
@@ -30,40 +54,44 @@ object ColeweightUtils {
             ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 5000.", true)
             return
         }
-        ChatUtils.sendMessage("§aFetching Coleweight Leaderboard...", true)
 
+        if (isLbCached()) {
+            displayColeweightLeaderboard(length)
+            return
+        }
+
+        ChatUtils.sendMessage("§aFetching Coleweight Leaderboard...", true)
         ColeweightFetcher.fetchColeweightLbAsync(length) {
-            val leaderboard = ColeweightManager.storage.tempLeaderboard
-            Minecraft.getInstance().execute {
-                leaderboard.forEachIndexed { index, (player, coleweight) ->
-                    val message = "${getRankColors(index + 1)} §a$player: §b$coleweight"
-                    ChatUtils.sendMessage(message, true)
-                }
-            }
+            lastLeaderboard = System.currentTimeMillis()
+            displayColeweightLeaderboard(length)
         }
     }
 
-    fun getColeweightDetailed(playerName: String) {
-        if (!ServerUtils.serverStatus) {
-            ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
-            return
-        }
-        ChatUtils.sendMessage("§aFetching detailed Coleweight for $playerName ...", true)
-
-        ColeweightFetcher.fetchColeweightDataAsync(playerName) {
-            val storage = ColeweightManager.storage
-            val message = buildString {
-                appendLine("${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
-                appendLine("§6Experience:")
-                storage.experience.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-                appendLine("§6Powder:")
-                storage.powder.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-                appendLine("§6Collection:")
-                storage.collection.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-                appendLine("§6Miscellaneous:")
-                storage.miscellaneous.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
+    private fun displayColeweight(playerName: String, storage: ColeweightStorage, detailed: Boolean = false) {
+        val message = if (detailed) {
+            buildString {
+            appendLine("${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
+            appendLine("§6Experience:")
+            storage.experience.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
+            appendLine("§6Powder:")
+            storage.powder.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
+            appendLine("§6Collection:")
+            storage.collection.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
+            appendLine("§6Miscellaneous:")
+            storage.miscellaneous.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
             }
-            Minecraft.getInstance().execute { ChatUtils.sendMessage(message, true) }
+        } else "${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)"
+
+        Minecraft.getInstance().execute { ChatUtils.sendMessage(message, true) }
+    }
+
+    private fun displayColeweightLeaderboard(length: Int) {
+        val leaderboard = ColeweightManager.storage.tempLeaderboard.take(length)
+        Minecraft.getInstance().execute {
+            leaderboard.forEachIndexed { index, (player, coleweight) ->
+                val message = "${getRankColors(index + 1)} §a$player: §b$coleweight"
+                ChatUtils.sendMessage(message, true)
+            }
         }
     }
 

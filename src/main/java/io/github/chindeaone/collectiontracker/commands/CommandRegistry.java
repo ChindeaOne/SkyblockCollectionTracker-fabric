@@ -168,19 +168,19 @@ public class CommandRegistry {
                 .then(ClientCommandManager.literal("cw")
                         // sct cw -> shows player's coleweight
                         .executes(context -> {
-                            ColeweightUtils.INSTANCE.getColeweight(PlayerData.INSTANCE.getPlayerName());
+                            ColeweightUtils.INSTANCE.getColeweight(PlayerData.INSTANCE.getPlayerName(), false);
                             return 1;
                         })
                         // sct cw find <player> -> shows specified player(or local player)'s coleweight
                         .then(ClientCommandManager.literal("find")
                                 .executes(context -> {
-                                    ColeweightUtils.INSTANCE.getColeweight(PlayerData.INSTANCE.getPlayerName());
+                                    ColeweightUtils.INSTANCE.getColeweight(PlayerData.INSTANCE.getPlayerName(), false);
                                     return 1;
                                 })
                                 .then(ClientCommandManager.argument("player", StringArgumentType.string())
                                         .executes(context -> {
                                             String playerName = StringArgumentType.getString(context, "player").trim();
-                                            ColeweightUtils.INSTANCE.getColeweight(playerName);
+                                            ColeweightUtils.INSTANCE.getColeweight(playerName, false);
                                             return 1;
                                         })
                                 )
