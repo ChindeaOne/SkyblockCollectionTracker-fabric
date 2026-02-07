@@ -6,15 +6,23 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.ChatComponent
 //? }
 import net.minecraft.network.chat.*
+import net.minecraft.network.chat.Component
 
 object ChatUtils {
 
-    private const val SCT = "§6SCT§r"
-    private const val PREFIX = "§o§3[${SCT}§3] §r"
+    private val PREFIX: Component = Component.empty()
+        .append(Component.literal("[").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_AQUA))
+        .append(Component.literal("SCT").withStyle(ChatFormatting.ITALIC, ChatFormatting.GOLD))
+        .append(Component.literal("] ").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_AQUA))
 
     fun sendMessage(message: String, prefix: Boolean = true) {
-        val text = if (prefix) "$PREFIX$message" else message
-        Minecraft.getInstance().player?.displayClientMessage(Component.literal(text), false)
+        val messageComponent = Component.literal(message)
+        val text = if (prefix) {
+            Component.empty().append(PREFIX).append(messageComponent)
+        } else {
+            messageComponent
+        }
+        Minecraft.getInstance().player?.displayClientMessage(text, false)
     }
 
     fun sendEmptyMessage() {
@@ -23,7 +31,7 @@ object ChatUtils {
 
     fun sendComponent(component: Component, prefix: Boolean = true) {
         val finalComponent = if (prefix) {
-            Component.literal(PREFIX).append(component)
+            Component.empty().append(PREFIX).append(component)
         } else {
             component
         }
