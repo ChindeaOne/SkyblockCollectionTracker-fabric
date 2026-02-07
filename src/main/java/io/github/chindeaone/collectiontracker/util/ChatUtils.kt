@@ -10,10 +10,7 @@ import net.minecraft.network.chat.Component
 
 object ChatUtils {
 
-    private val PREFIX: Component = Component.empty()
-        .append(Component.literal("[").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_AQUA))
-        .append(Component.literal("SCT").withStyle(ChatFormatting.ITALIC, ChatFormatting.GOLD))
-        .append(Component.literal("] ").withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_AQUA))
+    private val PREFIX: Component = Component.empty().append(ColorUtils.gradientText("[SCT] ")).withStyle(ChatFormatting.ITALIC)
 
     fun sendMessage(message: String, prefix: Boolean = true) {
         val messageComponent = Component.literal(message)
