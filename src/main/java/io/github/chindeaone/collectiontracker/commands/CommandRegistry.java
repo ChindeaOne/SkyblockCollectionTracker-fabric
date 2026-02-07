@@ -184,12 +184,19 @@ public class CommandRegistry {
                                             return 1;
                                         })
                                 )
-                                .then(ClientCommandManager.literal("detailed")
-                                    .executes(context -> {
-                                                String playerName = PlayerData.INSTANCE.getPlayerName();
-                                                ColeweightUtils.INSTANCE.getColeweightDetailed(playerName);
-                                                return 1;
-                                    })
+                        )
+                        .then(ClientCommandManager.literal("detailed")
+                                .executes(context -> {
+                                    String playerName = PlayerData.INSTANCE.getPlayerName();
+                                    ColeweightUtils.INSTANCE.getColeweightDetailed(playerName);
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                        .executes(context -> {
+                                            String playerName = StringArgumentType.getString(context, "player").trim();
+                                            ColeweightUtils.INSTANCE.getColeweightDetailed(playerName);
+                                            return 1;
+                                        })
                                 )
                         )
                         // sct cw lb <length>

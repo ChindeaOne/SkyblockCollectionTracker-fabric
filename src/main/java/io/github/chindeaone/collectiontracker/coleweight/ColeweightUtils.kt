@@ -2,11 +2,16 @@ package io.github.chindeaone.collectiontracker.coleweight
 
 import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.util.ChatUtils
+import io.github.chindeaone.collectiontracker.util.ServerUtils
 import net.minecraft.client.Minecraft
 
 object ColeweightUtils {
 
     fun getColeweight(playerName: String) {
+        if (!ServerUtils.serverStatus) {
+            ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
+            return
+        }
         ChatUtils.sendMessage("§aFetching Coleweight for $playerName ...", true)
 
         ColeweightFetcher.fetchColeweightDataAsync(playerName) {
@@ -17,6 +22,14 @@ object ColeweightUtils {
     }
 
     fun getColeweightLeaderboard(length: Int) {
+        if (!ServerUtils.serverStatus) {
+            ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
+            return
+        }
+        if (length > 5000) {
+            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 5000.", true)
+            return
+        }
         ChatUtils.sendMessage("§aFetching Coleweight Leaderboard...", true)
 
         ColeweightFetcher.fetchColeweightLbAsync(length) {
@@ -31,6 +44,10 @@ object ColeweightUtils {
     }
 
     fun getColeweightDetailed(playerName: String) {
+        if (!ServerUtils.serverStatus) {
+            ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
+            return
+        }
         ChatUtils.sendMessage("§aFetching detailed Coleweight for $playerName ...", true)
 
         ColeweightFetcher.fetchColeweightDataAsync(playerName) {
