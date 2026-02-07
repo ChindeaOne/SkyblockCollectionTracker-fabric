@@ -9,16 +9,11 @@ object ColeweightUtils {
 
     private val playerCooldowns = mutableMapOf<String, Long>()
     private var lastPlayer: String? = null
-    private var lastLeaderboard: Long = 0L
     private const val COOLDOWN_DURATION = 5 * 60 * 1000L // 5 minutes cd
 
     private fun isPlayerCached(name: String): Boolean {
         val lastFetch = playerCooldowns[name] ?: 0L
         return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
-    }
-
-    private fun isLbCached(): Boolean {
-        return (System.currentTimeMillis() - lastLeaderboard < COOLDOWN_DURATION)
     }
 
     fun getColeweight(playerName: String, detailed: Boolean = false) {
@@ -27,13 +22,14 @@ object ColeweightUtils {
             return
         }
 
+        val msg = if (detailed) "detailed Coleweight" else "Coleweight"
+        ChatUtils.sendMessage("§aFetching $msg for $playerName ...", true)
+
         if (isPlayerCached(playerName)) {
             displayColeweight(playerName, ColeweightManager.storage, detailed)
             return
         }
 
-        val msg = if (detailed) "detailed Coleweight" else "Coleweight"
-        ChatUtils.sendMessage("§aFetching $msg for $playerName ...", true)
         ColeweightFetcher.fetchColeweightDataAsync(playerName) {
             playerCooldowns[playerName] = System.currentTimeMillis()
             lastPlayer = playerName
@@ -55,14 +51,8 @@ object ColeweightUtils {
             return
         }
 
-        if (isLbCached()) {
-            displayColeweightLeaderboard(length)
-            return
-        }
-
-        ChatUtils.sendMessage("§aFetching Coleweight Leaderboard...", true)
+        ChatUtils.sendMessage("§aFetching Top $length in Coleweight...", true)
         ColeweightFetcher.fetchColeweightLbAsync(length) {
-            lastLeaderboard = System.currentTimeMillis()
             displayColeweightLeaderboard(length)
         }
     }
@@ -81,14 +71,17 @@ object ColeweightUtils {
             storage.miscellaneous.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
             }
         } else "${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)"
-
         Minecraft.getInstance().execute { ChatUtils.sendMessage(message, true) }
     }
 
     private fun displayColeweightLeaderboard(length: Int) {
-        val leaderboard = ColeweightManager.storage.tempLeaderboard.take(length)
+        val leaderboard = ColeweightManager.storage.tempLeaderboard
+        val endIndex = minOf(length, leaderboard.size)
+        val startIndex = (endIndex - 25).coerceAtLeast(0)
+        val subList = leaderboard.subList(startIndex, endIndex)
+
         Minecraft.getInstance().execute {
-            leaderboard.forEachIndexed { index, (player, coleweight) ->
+            subList.forEachIndexed { index, (player, coleweight) ->
                 val message = "${getRankColors(index + 1)} §a$player: §b$coleweight"
                 ChatUtils.sendMessage(message, true)
             }
