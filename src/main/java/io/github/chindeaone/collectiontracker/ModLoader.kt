@@ -57,7 +57,6 @@ class ModLoader: ModInitializer {
         })
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
         ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.trackingHandle(message)}
-        ClientReceiveMessageEvents.MODIFY_GAME.register { message, _ -> ChatListener.coleweightHandle(message) }
 
         //? if = 1.21.11 {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")

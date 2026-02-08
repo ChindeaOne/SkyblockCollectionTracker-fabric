@@ -3,7 +3,8 @@
   "refmap": "mixins.sct.refmap.json",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "AccessorGuiContainer"
+    "AccessorGuiContainer",
+    "ChatHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
