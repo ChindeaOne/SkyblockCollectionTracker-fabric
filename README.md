@@ -44,10 +44,8 @@
 <details>
 <summary><strong>Coleweight Modern</strong></summary>
 
-- Ported `/cw find`, `/cw lb` commands from original Coleweight mod as `/sct cw find` and `/sct cw lb`.
-- New `/sct cw find detailed` command for more comprehensive player stats.
-- Ported chat ranks with new custom rank system and colors for top 1000 players in coleweight.
-- Option to display cw ranks in chat on Mining Islands only.
+- Ported commands like `/sct cw find` or `/sct cw lb`, as well as `/sct cw find detailed` for more info.
+- Ported Coleweight chat ranks and the option to display them on Mining Islands only.
 
 </details>
 
