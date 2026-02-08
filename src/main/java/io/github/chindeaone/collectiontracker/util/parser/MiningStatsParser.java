@@ -1,9 +1,11 @@
 package io.github.chindeaone.collectiontracker.util.parser;
 
+import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.util.ScoreboardUtils;
 import io.github.chindeaone.collectiontracker.util.tab.MiningStatsWidget;
 import io.github.chindeaone.collectiontracker.util.world.MiningMapping;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -24,14 +26,17 @@ public class MiningStatsParser {
         MiningContext ctx = new MiningContext(blockType);
 
         for (String line : raw) {
+            if (line.contains("Mining Speed")) {
+                addMiningSpeedPerks(line, ctx);
+                continue;
+            }
+
             if (line.contains("Fortune")) {
                 processFortuneLine(line, ctx);
                 continue;
             }
 
-            if (line.contains("Mining Speed")) {
-                ctx.speed.parse(line);
-            } else if (line.contains("Mining Spread") || line.contains("Gemstone Spread")) {
+            if (line.contains("Mining Spread") || line.contains("Gemstone Spread")) {
                 ctx.spread.parse(line);
             } else if (line.contains("Pristine")) {
                 ctx.pristine.parse(line);
@@ -46,7 +51,7 @@ public class MiningStatsParser {
             }
         }
 
-        if (!"0".equals(ctx.speed.value)) formatted.add(ctx.speed.format());
+        formatted.add(ctx.formatTotalSpeed());
         formatted.add(ctx.formatTotalFortune());
 
         if (ctx.isGemstone) {
@@ -101,6 +106,30 @@ public class MiningStatsParser {
         }
     }
 
+    private static void addMiningSpeedPerks(String line, MiningContext ctx) {
+        int value = extractMiningSpeed(line);
+
+        int professional = ConfigAccess.getProfessionalMS();
+        int strongArm = ConfigAccess.getStrongArmMS();
+
+        int total = switch (ctx.blockType) {
+            case "dwarven_metals" -> value + strongArm;
+            case "gemstones" -> value + professional;
+            default -> value;
+        };
+
+        ctx.speed.value = String.valueOf(total);
+    }
+
+    private static int extractMiningSpeed(String line) {
+        try {
+            String digits = line.replaceAll("[^0-9]", "");
+            return digits.isEmpty() ? 0 : Integer.parseInt(digits);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     private static class MiningContext {
         final String blockType;
         final String island;
@@ -146,23 +175,45 @@ public class MiningStatsParser {
             };
         }
 
+        String getFortuneColor() {
+            return switch (blockType) {
+                case "dwarven_metals" -> "§a"; // Green
+                case "pure_ores", "ores" -> "§e"; // Yellow
+                case "gemstones" -> "§5"; // Purple
+                case "blocks" -> "§7"; // Gray
+                default -> ""; // No color
+            };
+        }
+
         String formatTotalFortune() {
             String symbol = "☘";
+            String color = getFortuneColor();
             int total = globalFortune + specificFortune;
+            boolean showDetailed = ConfigAccess.isShowDetailedFortune();
 
             // Show specific fortune if available
             if (!specificFortuneName.isEmpty()) {
-                return "§a" + specificFortuneName + ": §6" + symbol + total +
-                        " §7(" + globalFortune + "+" + specificFortune + ")";
+                String base = "§a" + specificFortuneName + ": §6" + symbol + total;
+                if (showDetailed) {
+                    base += " §7(§6" + globalFortune + " §7+ " + color + specificFortune + "§7)";
+                }
+                return base;
             }
             // Fallback to last displayed specific fortune
             if (!lastDisplayedSpecificFortune.isEmpty()) {
-                return "§a" + lastDisplayedSpecificFortune + ": §6" + symbol + (total + lastDisplayedSpecificFortuneValue) +
-                        " §7(" + globalFortune + "+" + lastDisplayedSpecificFortuneValue +")";
+                String base = "§a" + lastDisplayedSpecificFortune + ": §6" + symbol + total;
+                if (showDetailed) {
+                    base += " §7(§6" + globalFortune + " §7+ " + color + lastDisplayedSpecificFortuneValue + "§7)";
+                }
+                return base;
             }
 
             // Fallback to mining fortune
             return "§aMining Fortune: §6" + symbol + total;
+        }
+
+        String formatTotalSpeed() {
+            return speed.format();
         }
 
         private static class Stat {

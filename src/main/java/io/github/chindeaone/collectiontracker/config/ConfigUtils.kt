@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.Commissi
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 /**
  * Global accessors for the configuration.
@@ -47,6 +48,9 @@ val enableMiningStatsOverlay: Boolean get() = miningStatsOverlay.enableMiningSta
 val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsOverlay.miningStatsOverlayInMiningIslandsOnly
 val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
 val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
+val showDetailedFortune : Boolean get() = miningStatsOverlay.showDetailedFortune
+val professionalMS: Property<Int> get() = miningStatsOverlay.professionalMS
+val strongArmMS: Property<Int> get() = miningStatsOverlay.strongArmMS
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
@@ -140,6 +144,15 @@ object ConfigAccess {
 
     @JvmStatic
     fun isOnlyOnMiningIslands(): Boolean = onlyOnMiningIslands
+
+    @JvmStatic
+    fun isShowDetailedFortune(): Boolean = showDetailedFortune
+
+    @JvmStatic
+    fun getProfessionalMS(): Int = professionalMS.get()
+
+    @JvmStatic
+    fun getStrongArmMS(): Int = strongArmMS.get()
 }
 
 /**
