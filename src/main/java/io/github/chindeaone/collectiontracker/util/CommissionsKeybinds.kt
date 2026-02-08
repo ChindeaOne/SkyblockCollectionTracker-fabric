@@ -49,7 +49,7 @@ object CommissionsKeybinds {
 
     private var attachedMenu: AbstractContainerMenu? = null
     private val wasDown = HashMap<Int, Boolean>()
-    private const val CLICK_DEBOUNCE_MS = 100L
+    private const val CLICK_DEBOUNCE_MS = 300L
 
     private var keyGuardActive = false
     private val guardedScreens: MutableSet<Screen> =
@@ -75,7 +75,6 @@ object CommissionsKeybinds {
             detachListener()
             return
         }
-
 
         attachListener(screen.menu)
 
@@ -113,7 +112,7 @@ object CommissionsKeybinds {
         )
 
         lastClick = now
-        logger.info("Clicked commissions slot index=$slotIndex id=${slot.index}: $clickedName")
+        logger.info("Clicked $clickedName")
     }
 
     private fun resolveCommissionIndex(client: Minecraft): Int? {
