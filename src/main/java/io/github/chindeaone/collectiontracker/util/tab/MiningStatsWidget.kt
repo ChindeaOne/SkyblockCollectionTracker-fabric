@@ -16,6 +16,12 @@ object MiningStatsWidget {
     private var firstInfoSeenTime: Long = 0L
 
     fun onTabWidgetsUpdate() {
+        if (!ConfigAccess.isMiningStatsEnabled()) {
+            rawStats = emptyList()
+            currentMiningIsland = null
+            lastStats = null
+            return
+        }
         // Check if the player is in a mining area
         val areaWidget = TabWidget.AREA
 

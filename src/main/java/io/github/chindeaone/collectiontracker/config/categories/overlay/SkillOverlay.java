@@ -18,5 +18,5 @@ public class SkillOverlay {
 
     @Expose
     @ConfigLink(owner = SkillOverlay.class, field = "skillOverlay")
-    public Position skillOverlayPosition = new Position(50, 200);
+    public Position skillOverlayPosition = new Position(50, 250);
 }

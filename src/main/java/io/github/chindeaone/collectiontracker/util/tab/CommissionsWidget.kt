@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.util.tab
 
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.util.ChatUtils
 
@@ -11,6 +12,11 @@ object CommissionsWidget {
     private var firstInfoSeenTime: Long = 0L
 
     fun onTabWidgetsUpdate() {
+        if (!ConfigAccess.isCommissionsEnabled()) {
+            rawCommissions = emptyList()
+            lastCommissionSet = null
+            return
+        }
         val areaWidget = TabWidget.AREA
         if (areaWidget.isPresent) {
             if (!areaWidget.lines.any { it.contains("Dwarven Mines") || it.contains("Crystal Hollows") || it.contains("Mineshaft") }) {

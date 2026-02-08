@@ -189,7 +189,7 @@ public class MiningStatsParser {
             String symbol = "☘";
             String color = getFortuneColor();
             int total = globalFortune + specificFortune;
-            boolean showDetailed = ConfigAccess.isShowDetailedFortune();
+            boolean showDetailed = ConfigAccess.isShowDetailedMiningFortune();
 
             // Show specific fortune if available
             if (!specificFortuneName.isEmpty()) {
