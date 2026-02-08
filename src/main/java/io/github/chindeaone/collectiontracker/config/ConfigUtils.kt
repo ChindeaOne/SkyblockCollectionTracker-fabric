@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.config
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
+import io.github.chindeaone.collectiontracker.config.categories.Foraging
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
@@ -10,6 +11,7 @@ import io.github.chindeaone.collectiontracker.config.categories.mining.HotmPerks
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
+import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay
 import io.github.chindeaone.collectiontracker.config.core.Position
@@ -23,6 +25,7 @@ val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config!
 // Position Config Accessor
 val trackingPosition: Position get() = modConfig.trackingOverlay.collectionOverlay.overlayPosition
 val miningStatsPosition: Position get() = modConfig.mining.miningStatsOverlay.miningStatsOverlayPosition
+val foragingStatsPosition: Position get() = modConfig.foraging.foragingStatsOverlay.foragingStatsOverlayPosition
 val commissionsPosition: Position get() = modConfig.mining.commissionsOverlay.commissionsOverlayPosition
 val skillPosition: Position get() = modConfig.trackingOverlay.skillOverlay.skillOverlayPosition
 
@@ -50,9 +53,15 @@ val enableMiningStatsOverlay: Boolean get() = miningStatsOverlay.enableMiningSta
 val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsOverlay.miningStatsOverlayInMiningIslandsOnly
 val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
 val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
-val showDetailedFortune : Boolean get() = miningStatsOverlay.showDetailedFortune
+val showDetailedMiningFortune : Boolean get() = miningStatsOverlay.showDetailedFortune
 val professionalMS: Property<Int> get() = hotmConfig.professionalMS
 val strongArmMS: Property<Int> get() = hotmConfig.strongArmMS
+
+// Foraging Config Accessors
+val foragingConfig: Foraging get() = modConfig.foraging
+val foragingOverlay: ForagingStatsOverlay get() = foragingConfig.foragingStatsOverlay
+val enableForagingStatsOverlay: Boolean get() = foragingOverlay.enableForagingStatsOverlay
+val showDetailedForagingFortune: Boolean get() = foragingOverlay.showDetailedFortune
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
@@ -77,6 +86,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getMiningStatsPosition(): Position = miningStatsPosition
+
+    @JvmStatic
+    fun getForagingStatsPosition(): Position = foragingStatsPosition
 
     @JvmStatic
     fun getCommissionsPosition(): Position = commissionsPosition
@@ -148,13 +160,19 @@ object ConfigAccess {
     fun isOnlyOnMiningIslands(): Boolean = onlyOnMiningIslands
 
     @JvmStatic
-    fun isShowDetailedFortune(): Boolean = showDetailedFortune
+    fun isShowDetailedMiningFortune(): Boolean = showDetailedMiningFortune
 
     @JvmStatic
     fun getProfessionalMS(): Int = professionalMS.get()
 
     @JvmStatic
     fun getStrongArmMS(): Int = strongArmMS.get()
+
+    @JvmStatic
+    fun isForagingStatsOverlayEnabled(): Boolean = enableForagingStatsOverlay
+
+    @JvmStatic
+    fun isShowDetailedForagingFortune(): Boolean = showDetailedForagingFortune
 }
 
 /**
@@ -200,5 +218,10 @@ object ConfigHelper {
     @JvmStatic
     fun disableTamingTracking() {
         skillOverlay.enableTamingTracking = false
+    }
+
+    @JvmStatic
+    fun disableForagingStats() {
+        foragingOverlay.enableForagingStatsOverlay = false
     }
 }

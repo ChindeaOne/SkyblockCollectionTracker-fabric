@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.gui.overlays.SkillOverlay
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.CommissionsOverlay
+import io.github.chindeaone.collectiontracker.gui.overlays.ForagingStatsOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.MiningStatsOverlay
 import io.github.chindeaone.collectiontracker.util.CommissionsKeybinds
 import io.github.chindeaone.collectiontracker.util.Hypixel
@@ -48,6 +49,7 @@ class ModLoader: ModInitializer {
         OverlayManager.add(MiningStatsOverlay())
         OverlayManager.add(CommissionsOverlay())
         OverlayManager.add(SkillOverlay())
+        OverlayManager.add(ForagingStatsOverlay())
     }
 
     private fun eventRegistration() {

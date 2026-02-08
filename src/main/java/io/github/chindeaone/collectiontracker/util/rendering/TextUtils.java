@@ -15,7 +15,9 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.StringUtils;
+import io.github.chindeaone.collectiontracker.util.parser.ForagingStatsParser;
 import io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget;
+import io.github.chindeaone.collectiontracker.util.tab.ForagingStatsWidget;
 import io.github.chindeaone.collectiontracker.util.tab.MiningStatsWidget;
 import io.github.chindeaone.collectiontracker.util.world.BlockWatcher;
 import io.github.chindeaone.collectiontracker.util.parser.MiningStatsParser;
@@ -36,6 +38,7 @@ public class TextUtils {
 
     public static List<String> formattedCommissions = new ArrayList<>();
     public static List<String> formattedMiningStats = new ArrayList<>();
+    public static List<String> formattedForagingStats = new ArrayList<>();
     private static final List<String> overlayLines = new ArrayList<>();
     private static final List<String> extraOverlayLines = new ArrayList<>();
     private static final List<String> skillOverlayLines = new ArrayList<>();
@@ -329,6 +332,16 @@ public class TextUtils {
         formattedMiningStats.clear();
         formattedMiningStats.addAll(MiningStatsParser.parse(raw, BlockWatcher.INSTANCE.getMiningBlockType()));
         return formattedMiningStats;
+    }
+
+    public static List<String> getForagingLines() {
+        List<String> raw = ForagingStatsWidget.INSTANCE.getRawStats();
+        List<String> rawBeacon = ForagingStatsWidget.INSTANCE.getRawBeaconStats();
+        if (raw.isEmpty()) return Collections.emptyList();
+
+        formattedForagingStats.clear();
+        formattedForagingStats.addAll(ForagingStatsParser.parse(raw, rawBeacon, BlockWatcher.INSTANCE.getForagingBlockType()));
+        return formattedForagingStats;
     }
 
     @SuppressWarnings("SameReturnValue")

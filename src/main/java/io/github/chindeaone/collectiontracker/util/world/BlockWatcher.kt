@@ -11,6 +11,8 @@ object BlockWatcher {
         private set
     var miningBlockType: String = ""
         private set
+    var foragingBlockType: String = ""
+        private set
 
     // Check the block the player is looking at
     fun onClientTick(client: Minecraft) {
@@ -26,6 +28,7 @@ object BlockWatcher {
             blockId = BuiltInRegistries.BLOCK.getKey(block).toString()
 
             updateMiningBlockType(blockId)
+            updateForagingBlockType(blockId)
         }
     }
 
@@ -36,6 +39,16 @@ object BlockWatcher {
 
         if (detectedBlock != null) {
             miningBlockType = detectedBlock
+        }
+    }
+
+    private fun updateForagingBlockType(type: String) {
+        val detectedBlock = ForagingMapping.foragingBlockPerType.entries.find { entry ->
+            entry.value.contains(type)
+        }?.key
+
+        if (detectedBlock != null) {
+            foragingBlockType = detectedBlock
         }
     }
 }
