@@ -22,7 +22,7 @@ object TabData {
         }
 
         if (!HypixelUtils.isOnSkyblock) return
-        if (!ConfigAccess.isMiningStatsEnabled() && !ConfigAccess.isCommissionsEnabled()) return
+        if (!ConfigAccess.isMiningStatsEnabled() && !ConfigAccess.isCommissionsEnabled() && !ConfigAccess.isForagingStatsOverlayEnabled()) return
         val newList = readTab() ?: return
         if (newList.isEmpty()) return
 
@@ -31,6 +31,7 @@ object TabData {
 
         CommissionsWidget.onTabWidgetsUpdate()
         MiningStatsWidget.onTabWidgetsUpdate()
+        ForagingStatsWidget.onTabWidgetsUpdate()
     }
 
     private fun readTab(): List<String>? {
@@ -43,6 +44,7 @@ object TabData {
         val result = connection.onlinePlayers
             .sortedWith(compareBy({ it.team?.name ?: "" }, { it.profile.name }))
             .map { tabOverlay.getNameForDisplay(it).string }
+
 
         return if (result.size > 80) result.subList(0, 80) else result
     }

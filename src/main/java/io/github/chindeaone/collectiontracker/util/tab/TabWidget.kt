@@ -318,7 +318,7 @@ enum class TabWidget(headerRegex: String) {
     ),
     MOONGLADE_BEACON(
         // language=RegExp
-        "(?:§.)*Moonglade Beacon: §r§b(?<stacks>\\d+) Stacks?",
+        "(?:§.)*Moonglade Beacon: (?:§.)*(?<stacks>\\d+) Stacks?"
     ),
     SALTS(
         // language=RegExp
