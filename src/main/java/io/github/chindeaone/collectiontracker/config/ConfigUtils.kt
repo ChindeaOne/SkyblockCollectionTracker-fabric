@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
+import io.github.chindeaone.collectiontracker.config.categories.mining.HotmPerks
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
@@ -42,6 +43,7 @@ val miningConfig: Mining get() = modConfig.mining
 val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
 val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
+val hotmConfig: HotmPerks get() = miningStatsOverlay.hotmPerks
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
 val enableMiningStatsOverlay: Boolean get() = miningStatsOverlay.enableMiningStatsOverlay
@@ -49,8 +51,8 @@ val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsOverlay.mi
 val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
 val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
 val showDetailedFortune : Boolean get() = miningStatsOverlay.showDetailedFortune
-val professionalMS: Property<Int> get() = miningStatsOverlay.professionalMS
-val strongArmMS: Property<Int> get() = miningStatsOverlay.strongArmMS
+val professionalMS: Property<Int> get() = hotmConfig.professionalMS
+val strongArmMS: Property<Int> get() = hotmConfig.strongArmMS
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
