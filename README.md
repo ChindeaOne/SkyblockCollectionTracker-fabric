@@ -22,13 +22,12 @@
 <details>
 <summary><strong>Collection/Profit Tracker</strong></summary>
 
-- Tracks collections and profit over time using Hypixel’s API.
-- Uses Bazaar Instant Sell/Buy prices.
+- Tracks collections and profit over time using Hypixel’s API via `/sct track <collection>`.
 - Configurable overlay lines showing collection progress and profit rates.
+- Provides NPC/Bazaar prices for accurate profit tracking.
 - Optional Sack Tracking mode for faster live updates.
-- Detailed session summary (best/worst rates, elapsed time, profit, etc.).
-- AFK detection stops tracking when idle.
-- Use `/sct collection` to list available collections.
+- Detailed session summary at the end (best/worst rates, elapsed time, profit, etc.).
+- `/sct collections` for all available collections.
 
 </details>
 
@@ -55,6 +54,15 @@
 - Shows all mining‑related stats from tab.
 - Updates dynamically based on the targeted block.
 - Compacts Mining Fortune into a single context‑aware stat.
+
+</details>
+
+<details>
+<summary><strong>Foraging Stats Overlay</strong></summary>
+
+- Displays all foraging‑related stats from tab.
+- Updates dynamically based on the targeted tree.
+- Compacts Foraging Fortune into a single context‑aware stat.
 
 </details>
 

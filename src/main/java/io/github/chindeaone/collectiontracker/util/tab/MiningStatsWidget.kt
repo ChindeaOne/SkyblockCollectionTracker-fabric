@@ -22,6 +22,9 @@ object MiningStatsWidget {
             lastStats = null
             return
         }
+        val now = System.currentTimeMillis()
+        if (now < nextAllowedTime) return
+
         // Check if the player is in a mining area
         val areaWidget = TabWidget.AREA
 
@@ -48,7 +51,6 @@ object MiningStatsWidget {
         }
 
         val widget = TabWidget.STATS
-        val now = System.currentTimeMillis()
 
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible
@@ -82,8 +84,6 @@ object MiningStatsWidget {
         }
 
         firstInfoSeenTime = 0L
-
-        if (now < nextAllowedTime) return
 
         val currentRaw = TabData.parseWidgetData(widget.lines)
         if (currentRaw == null || currentRaw == lastStats) return

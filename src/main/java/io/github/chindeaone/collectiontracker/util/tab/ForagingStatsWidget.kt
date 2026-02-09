@@ -21,6 +21,8 @@ object ForagingStatsWidget {
             lastStats = null
             return
         }
+        val now = System.currentTimeMillis()
+        if (now < nextAllowedTime) return
 
         val areaWidget = TabWidget.AREA
         if (areaWidget.isPresent) {
@@ -39,7 +41,6 @@ object ForagingStatsWidget {
         val widget = TabWidget.STATS
         val beaconWidget = TabWidget.MOONGLADE_BEACON
 
-        val now = System.currentTimeMillis()
 
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible
@@ -63,7 +64,6 @@ object ForagingStatsWidget {
         }
 
         firstInfoSeenTime = 0L
-        if (now < nextAllowedTime) return
 
         val currentRaw = TabData.parseWidgetData(widget.lines)
         val beaconDataRaw = TabData.parseWidgetData(beaconWidget.lines)

@@ -26,9 +26,9 @@ public class ServerStatus {
         URI uri = URI.create(URLManager.STATUS_URL);
 
         HttpRequest request = HttpRequest.newBuilder(uri)
-                .method("HEAD", HttpRequest.BodyPublishers.noBody())
                 .timeout(Duration.ofSeconds(3))
                 .header("User-Agent", URLManager.AGENT)
+                .GET()
                 .build();
 
         return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.discarding())

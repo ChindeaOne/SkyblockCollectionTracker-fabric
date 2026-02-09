@@ -17,6 +17,9 @@ object CommissionsWidget {
             lastCommissionSet = null
             return
         }
+        val now = System.currentTimeMillis()
+        if (now < nextAllowedTime) return
+
         val areaWidget = TabWidget.AREA
         if (areaWidget.isPresent) {
             if (!areaWidget.lines.any { it.contains("Dwarven Mines") || it.contains("Crystal Hollows") || it.contains("Mineshaft") }) {
@@ -28,7 +31,6 @@ object CommissionsWidget {
         }
 
         val widget = TabWidget.COMMISSIONS
-        val now = System.currentTimeMillis()
 
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible
@@ -52,8 +54,6 @@ object CommissionsWidget {
         }
 
         firstInfoSeenTime = 0L
-
-        if (now < nextAllowedTime) return
 
         val currentRaw = TabData.parseWidgetData(widget.lines)
         if (currentRaw == null || currentRaw == lastCommissionSet) return
