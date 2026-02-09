@@ -17,6 +17,7 @@ object CommissionsWidget {
             lastCommissionSet = null
             return
         }
+
         val now = System.currentTimeMillis()
         if (now < nextAllowedTime) return
 
@@ -28,6 +29,10 @@ object CommissionsWidget {
                 lastCommissionSet = null
                 return
             }
+        } else {
+            rawCommissions = emptyList()
+            lastCommissionSet = null
+            return
         }
 
         val widget = TabWidget.COMMISSIONS

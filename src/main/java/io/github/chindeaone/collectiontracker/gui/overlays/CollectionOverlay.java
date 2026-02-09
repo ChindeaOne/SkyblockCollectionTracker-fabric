@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.util.HypixelUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -28,7 +29,7 @@ public class CollectionOverlay implements AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return TrackingHandler.isTracking;
+        return TrackingHandler.isTracking && HypixelUtils.isOnSkyblock();
     }
 
     @Override

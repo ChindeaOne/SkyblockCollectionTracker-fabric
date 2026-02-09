@@ -18,7 +18,9 @@ object ForagingStatsWidget {
     fun onTabWidgetsUpdate() {
         if (!ConfigAccess.isForagingStatsOverlayEnabled()) {
             rawStats = emptyList()
+            rawBeaconStats = emptyList()
             lastStats = null
+            lastBeaconStats = null
             return
         }
         val now = System.currentTimeMillis()
@@ -28,12 +30,16 @@ object ForagingStatsWidget {
         if (areaWidget.isPresent) {
             if (!areaWidget.lines.any { it.contains("The Park") || it.contains("Galatea") }) {
                 rawStats = emptyList()
+                rawBeaconStats = emptyList()
                 lastStats = null
+                lastBeaconStats = null
                 return
             }
         } else {
             rawStats = emptyList()
+            rawBeaconStats = emptyList()
             lastStats = null
+            lastBeaconStats = null
             return
         }
         isInGalatea = areaWidget.lines.any { it.contains("Galatea") }

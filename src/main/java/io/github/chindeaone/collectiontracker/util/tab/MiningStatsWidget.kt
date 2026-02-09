@@ -43,10 +43,12 @@ object MiningStatsWidget {
 
             if (currentMiningIsland == null) {
                 rawStats = emptyList()
+                lastStats = null
                 return
             }
         } else {
             rawStats = emptyList()
+            lastStats = null
             return
         }
 
@@ -80,6 +82,7 @@ object MiningStatsWidget {
 
         if (!hasMiningStats) {
             rawStats = emptyList()
+            lastStats = null
             return
         }
 

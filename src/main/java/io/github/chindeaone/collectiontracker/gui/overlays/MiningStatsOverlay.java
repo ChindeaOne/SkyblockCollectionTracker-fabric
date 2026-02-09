@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
+import io.github.chindeaone.collectiontracker.util.HypixelUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
@@ -27,7 +28,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isMiningStatsEnabled();
+        return ConfigAccess.isMiningStatsEnabled() && HypixelUtils.isOnSkyblock();
     }
 
     @Override
