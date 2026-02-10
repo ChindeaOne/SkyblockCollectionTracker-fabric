@@ -15,6 +15,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.StringUtils;
+import io.github.chindeaone.collectiontracker.util.chat.ChatListener;
 import io.github.chindeaone.collectiontracker.util.parser.ForagingStatsParser;
 import io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget;
 import io.github.chindeaone.collectiontracker.util.tab.ForagingStatsWidget;
@@ -43,6 +44,8 @@ public class TextUtils {
     private static final List<String> extraOverlayLines = new ArrayList<>();
     private static final List<String> skillOverlayLines = new ArrayList<>();
     private static final List<String> tamingOverlayLines = new ArrayList<>();
+    private static final List<String> skyMallOverlayLines = new ArrayList<>();
+    private static final List<String> lotteryOverlayLines = new ArrayList<>();
     private static boolean hasNpcPrice;
 
     private static void updateTrackingLines() {
@@ -361,8 +364,6 @@ public class TextUtils {
     public static List<String> getTamingLines() {
         tamingOverlayLines.clear();
 
-        if (!ConfigAccess.isTamingTrackingEnabled()) return Collections.emptyList();
-
         if (skillName.equals("Taming")) {
             ConfigHelper.disableTamingTracking();
             return tamingOverlayLines;
@@ -393,6 +394,37 @@ public class TextUtils {
     public static @NotNull List<String> getCollectionExtraLines() {
         updateTrackingExtraLines();
         return extraOverlayLines;
+    }
+
+    public static List<String> getSkyMallLines() {
+        skyMallOverlayLines.clear();
+        if (ChatListener.getCurrentSkyMallBuff().isEmpty()) return Collections.emptyList();
+        if (ConfigAccess.isSkyMallInMiningIslandsOnly() && MiningStatsWidget.getCurrentMiningIsland() == null) return Collections.emptyList();
+
+        skyMallOverlayLines.add("§bSky Mall: " + ChatListener.getCurrentSkyMallBuff());
+        skyMallOverlayLines.add(updateTimer());
+        return  skyMallOverlayLines;
+    }
+
+    public static List<String> getLotteryLines() {
+        lotteryOverlayLines.clear();
+        if (ChatListener.getCurrentLotteryBuff().isEmpty()) return Collections.emptyList();
+        if (ConfigAccess.isLotteryInForagingIslandsOnly() && ForagingStatsWidget.getCurrentForagingIsland() == null) return Collections.emptyList();
+
+        lotteryOverlayLines.add("§2Lottery: " + ChatListener.getCurrentLotteryBuff());
+        lotteryOverlayLines.add(updateTimer());
+        return  lotteryOverlayLines;
+    }
+
+    private static String updateTimer() {
+        long timeLeft = (ChatListener.getNextBuffTime() - System.currentTimeMillis()) / 1000;
+        if (timeLeft <= 5) {
+            return "§aTime left: §cSoon";
+        }
+
+        long minutes = timeLeft / 60;
+        long seconds = timeLeft % 60;
+        return String.format("§aTime left: %02d:%02d", minutes, seconds);
     }
 
     public static String formatCollectionName(String collection) {

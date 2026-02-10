@@ -5,16 +5,29 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ChatComponent.class)
+@Mixin(value = ChatComponent.class, priority = 998) // lowest priority so other mods can modify the message first
 public class ChatHudMixin {
     @ModifyVariable(
-            method = "addMessage*",
+            method = "addMessage(Lnet/minecraft/network/chat/Component;)V",
             at = @At("HEAD"),
             argsOnly = true
     )
     private Component modifyVisualMessage(Component message) {
         return ChatListener.INSTANCE.coleweightHandle(message);
+    }
+
+    @Inject(
+            method = "addMessage(Lnet/minecraft/network/chat/Component;)V",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void onAddMessage(Component message, CallbackInfo ci) {
+        if (ChatListener.INSTANCE.dailyPerksUpdate(message)) {
+            ci.cancel();
+        }
     }
 }

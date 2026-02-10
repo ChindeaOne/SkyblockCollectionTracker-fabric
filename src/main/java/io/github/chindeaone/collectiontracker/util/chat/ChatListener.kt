@@ -5,7 +5,9 @@ import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
+import io.github.chindeaone.collectiontracker.util.ChatUtils
 import io.github.chindeaone.collectiontracker.util.HypixelUtils
+import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.util.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.util.tab.TabWidget
 import io.github.chindeaone.collectiontracker.util.world.MiningMapping
@@ -20,6 +22,19 @@ object ChatListener {
     private val NAME_PATTERN = Regex( """^(?:\[\d+]\s+)?(?:⸕\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE)
 
     var lastSkillValue = 0L
+
+    @JvmStatic
+    var currentSkyMallBuff = ""
+        private set
+    @JvmStatic
+    var currentLotteryBuff = ""
+        private set
+    @JvmStatic
+    var nextBuffTime: Long = 0
+        private set
+
+    private var expectingSkyMallBuff = false
+    private var expectingLotteryBuff = false
 
     fun trackingHandle(message: Component) {
         if (!HypixelUtils.isOnSkyblock) return
@@ -36,6 +51,109 @@ object ChatListener {
         if (match != null) {
             parseSkillMessage(match)
             return
+        }
+    }
+
+    fun dailyPerksUpdate(message: Component): Boolean {
+        val text = message.string.removeColor()
+
+        when {
+            text.contains("Your Sky Mall buff changed!") -> {
+                expectingSkyMallBuff = true
+                expectingLotteryBuff = false
+                return true
+            }
+            text.contains("Your Lottery buff changed!") -> {
+                expectingLotteryBuff = true
+                expectingSkyMallBuff = false
+                return true
+            }
+            text.startsWith("New buff: ") -> {
+                val buffText = text.substringAfter("New buff: ").trim()
+                updateTimer()
+                val compact = compactBuffs(buffText)
+                if (expectingSkyMallBuff) {
+                    currentSkyMallBuff = compact
+                    expectingSkyMallBuff = false
+                    if (ConfigAccess.isDisableSkyMallChatMessages()) return true // Don't render Sky Mall buff in chat, but update the buffs in overlay
+                    ChatUtils.sendMessage("§eNew §bSky Mall §eBuff§r: $compact", prefix = true)
+                    return true
+                }
+                if (expectingLotteryBuff) {
+                    currentLotteryBuff = compact
+                    expectingLotteryBuff = false
+                    if (ConfigAccess.isDisableLotteryChatMessages()) return true // Don't render Lottery buff in chat, but update the buffs in overlay
+                    ChatUtils.sendMessage("§eNew §2Lottery §eBuff§r: $compact", prefix = true)
+                    return true
+                }
+            }
+            // Don't render these messages at all
+            text.startsWith("You can disable this messaging by toggling") -> return true
+        }
+        return false
+    }
+
+    private fun updateTimer() {
+        val now = System.currentTimeMillis()
+        // Set next buff time based on time left from scoreboard on first join
+        if (ScoreboardUtils.timeLeft != 0) {
+            nextBuffTime = now + (ScoreboardUtils.timeLeft * 1000L)
+            ScoreboardUtils.timeLeft = 0
+            return
+        } else nextBuffTime = now + 1_200_000// set to default 20 mins
+    }
+
+    private fun compactBuffs(message: String): String {
+        val text = message.trim().removeSuffix(".")
+
+        val numberRegex = Regex("[+-]?\\d+")
+        val percentRegex = Regex("[+-]?\\d+%")
+        val xRegex = Regex("\\d+x", RegexOption.IGNORE_CASE)
+
+        return when {
+            // Sky Mall buffs
+            "Mining Speed" in text -> {
+                val num = numberRegex.find(text)?.value
+                "§6$num ⸕ Mining Speed"
+            }
+            "Mining Fortune" in text -> {
+                val num = numberRegex.find(text)?.value
+                "§6$num ☘ Mining Fortune"
+            }
+            "Titanium" in text -> {
+                val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
+                "§a$x §9Titanium"
+            }
+            "Pickaxe Ability" in text -> {
+                val rawPct = percentRegex.find(text)?.value
+                val pct = "${rawPct?.trimEnd('%')}%"
+                "§a$pct §9Pickaxe Ability Cooldown"
+            }
+            "Powder" in text -> {
+                val rawPct = percentRegex.find(text)?.value
+                "§a$rawPct §9Powder"
+            }
+            "Goblins" in text -> {
+                val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
+                "§a$x §9Golden and Diamond Goblins"
+            }
+
+            // Lottery buffs
+            "Fig" in text -> {
+                val num = numberRegex.find(text)?.value
+                "§6$num ☘ Fig Fortune"
+            }
+            "Mangrove" in text -> {
+                val num = numberRegex.find(text)?.value
+                "§6$num ☘ Mangrove Fortune"
+            }
+            "Sweep" in text -> {
+                val rawPct = percentRegex.find(text)?.value
+                val pct = "${rawPct?.trimEnd('%')}%"
+                "§2$pct ∮ Sweep"
+            }
+
+            else -> message // fallback to original text
         }
     }
 
