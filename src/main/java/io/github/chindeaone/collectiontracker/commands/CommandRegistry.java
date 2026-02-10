@@ -178,6 +178,7 @@ public class CommandRegistry {
                                     return 1;
                                 })
                                 .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                        .suggests(PLAYER_SUGGESTIONS)
                                         .executes(context -> {
                                             String playerName = StringArgumentType.getString(context, "player").trim();
                                             ColeweightUtils.INSTANCE.getColeweight(playerName, false);
@@ -192,6 +193,7 @@ public class CommandRegistry {
                                     return 1;
                                 })
                                 .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                        .suggests(PLAYER_SUGGESTIONS)
                                         .executes(context -> {
                                             String playerName = StringArgumentType.getString(context, "player").trim();
                                             ColeweightUtils.INSTANCE.getColeweightDetailed(playerName);
@@ -242,6 +244,16 @@ public class CommandRegistry {
         for (String skill : SkillUtils.getDisplayNames()) {
             if (skill.toLowerCase().startsWith(arg)) {
                 builder.suggest(skill);
+            }
+        }
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<FabricClientCommandSource> PLAYER_SUGGESTIONS = (context, builder) -> {
+        String remaining = builder.getRemaining().toLowerCase();
+        for (String playerName : context.getSource().getOnlinePlayerNames()) {
+            if (playerName.toLowerCase().startsWith(remaining)) {
+                builder.suggest(playerName);
             }
         }
         return builder.buildFuture();
