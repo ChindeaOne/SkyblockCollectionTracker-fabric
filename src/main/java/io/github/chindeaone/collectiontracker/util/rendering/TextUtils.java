@@ -398,7 +398,6 @@ public class TextUtils {
 
     public static List<String> getSkyMallLines() {
         skyMallOverlayLines.clear();
-        if (ChatListener.getCurrentSkyMallBuff().isEmpty()) return Collections.emptyList();
         if (ConfigAccess.isSkyMallInMiningIslandsOnly() && MiningStatsWidget.getCurrentMiningIsland() == null) return Collections.emptyList();
 
         skyMallOverlayLines.add("§bSky Mall: " + ChatListener.getCurrentSkyMallBuff());
@@ -408,7 +407,6 @@ public class TextUtils {
 
     public static List<String> getLotteryLines() {
         lotteryOverlayLines.clear();
-        if (ChatListener.getCurrentLotteryBuff().isEmpty()) return Collections.emptyList();
         if (ConfigAccess.isLotteryInForagingIslandsOnly() && ForagingStatsWidget.getCurrentForagingIsland() == null) return Collections.emptyList();
 
         lotteryOverlayLines.add("§2Lottery: " + ChatListener.getCurrentLotteryBuff());

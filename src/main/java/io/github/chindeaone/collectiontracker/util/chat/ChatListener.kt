@@ -24,10 +24,10 @@ object ChatListener {
     var lastSkillValue = 0L
 
     @JvmStatic
-    var currentSkyMallBuff = ""
+    var currentSkyMallBuff = "§cUnknown"
         private set
     @JvmStatic
-    var currentLotteryBuff = ""
+    var currentLotteryBuff = "§cUnknown"
         private set
     @JvmStatic
     var nextBuffTime: Long = 0
@@ -55,52 +55,64 @@ object ChatListener {
     }
 
     fun dailyPerksUpdate(message: Component): Boolean {
+        if (!HypixelUtils.isOnSkyblock) return false
+
+        val now = System.currentTimeMillis()
+
+        if (ScoreboardUtils.timeLeft > 0) {
+            nextBuffTime = now + ScoreboardUtils.timeLeft * 1000L
+            ScoreboardUtils.timeLeft = 0
+        }
+
         val text = message.string.removeColor()
 
         when {
             text.contains("Your Sky Mall buff changed!") -> {
                 expectingSkyMallBuff = true
-                expectingLotteryBuff = false
                 return true
             }
             text.contains("Your Lottery buff changed!") -> {
                 expectingLotteryBuff = true
-                expectingSkyMallBuff = false
                 return true
             }
             text.startsWith("New buff: ") -> {
+                println ("[SCT] New buff change message: '$text'")
                 val buffText = text.substringAfter("New buff: ").trim()
-                updateTimer()
+                // Set default 20 mins only when a new buff is sent in chat
+                if (nextBuffTime - now < 10_000L) { // Allows chat checking 10 seconds before
+                    nextBuffTime = now + 1_200_000
+                }
+
                 val compact = compactBuffs(buffText)
                 if (expectingSkyMallBuff) {
                     currentSkyMallBuff = compact
                     expectingSkyMallBuff = false
                     if (ConfigAccess.isDisableSkyMallChatMessages()) return true // Don't render Sky Mall buff in chat, but update the buffs in overlay
-                    ChatUtils.sendMessage("§eNew §bSky Mall §eBuff§r: $compact", prefix = true)
-                    return true
+
+                    // Compact messages if overlay is enabled
+                    if (ConfigAccess.isSkyMallEnabled()) {
+                        ChatUtils.sendMessage("§eNew §bSky Mall §eBuff§r: $compact", prefix = true)
+                        return true
+                    }
+                    return false
                 }
                 if (expectingLotteryBuff) {
                     currentLotteryBuff = compact
                     expectingLotteryBuff = false
                     if (ConfigAccess.isDisableLotteryChatMessages()) return true // Don't render Lottery buff in chat, but update the buffs in overlay
-                    ChatUtils.sendMessage("§eNew §2Lottery §eBuff§r: $compact", prefix = true)
-                    return true
+
+                    // Compact messages if overlay is enabled
+                    if (ConfigAccess.isLotteryEnabled()) {
+                        ChatUtils.sendMessage("§eNew §2Lottery §eBuff§r: $compact", prefix = true)
+                        return true
+                    }
+                    return false
                 }
             }
             // Don't render these messages at all
             text.startsWith("You can disable this messaging by toggling") -> return true
         }
         return false
-    }
-
-    private fun updateTimer() {
-        val now = System.currentTimeMillis()
-        // Set next buff time based on time left from scoreboard on first join
-        if (ScoreboardUtils.timeLeft != 0) {
-            nextBuffTime = now + (ScoreboardUtils.timeLeft * 1000L)
-            ScoreboardUtils.timeLeft = 0
-            return
-        } else nextBuffTime = now + 1_200_000// set to default 20 mins
     }
 
     private fun compactBuffs(message: String): String {
@@ -150,9 +162,8 @@ object ChatListener {
             "Sweep" in text -> {
                 val rawPct = percentRegex.find(text)?.value
                 val pct = "${rawPct?.trimEnd('%')}%"
-                "§2$pct ∮ Sweep"
+                "§a$pct §2∮ Sweep"
             }
-
             else -> message // fallback to original text
         }
     }

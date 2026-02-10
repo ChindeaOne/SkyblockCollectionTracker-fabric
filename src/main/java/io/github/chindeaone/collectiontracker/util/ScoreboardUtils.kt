@@ -92,7 +92,7 @@ object ScoreboardUtils {
             val secondsLeft = tenMinuteChunks * sb10Minutes
 
             timeLeft = secondsLeft.roundToInt()
-            checkTime = true
+            checkTime = false
         }
     }
 
