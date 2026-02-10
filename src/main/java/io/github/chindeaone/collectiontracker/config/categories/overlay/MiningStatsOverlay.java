@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.config.categories.overlay;
 
 import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.categories.mining.HotmPerks;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.notenoughupdates.moulconfig.annotations.*;
 
@@ -29,11 +28,6 @@ public class MiningStatsOverlay {
     )
     @ConfigEditorBoolean
     public boolean showDetailedFortune = false;
-
-    @Expose
-    @ConfigOption(name = "HOTM perks", desc = "")
-    @Accordion
-    public HotmPerks hotmPerks = new HotmPerks();
 
     @Expose
     @ConfigLink(owner = MiningStatsOverlay.class, field = "miningStatsOverlay")

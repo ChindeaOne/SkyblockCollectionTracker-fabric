@@ -7,7 +7,8 @@ import io.github.chindeaone.collectiontracker.config.categories.Foraging
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
-import io.github.chindeaone.collectiontracker.config.categories.mining.HotmPerks
+import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
@@ -28,6 +29,8 @@ val miningStatsPosition: Position get() = modConfig.mining.miningStatsOverlay.mi
 val foragingStatsPosition: Position get() = modConfig.foraging.foragingStatsOverlay.foragingStatsOverlayPosition
 val commissionsPosition: Position get() = modConfig.mining.commissionsOverlay.commissionsOverlayPosition
 val skillPosition: Position get() = modConfig.trackingOverlay.skillOverlay.skillOverlayPosition
+val skyMallPosition: Position get() = modConfig.mining.hotmConfig.skyMallPosition
+val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -46,7 +49,12 @@ val miningConfig: Mining get() = modConfig.mining
 val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
 val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
-val hotmConfig: HotmPerks get() = miningStatsOverlay.hotmPerks
+val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
+val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
+val enableSkyMall: Boolean get() = hotmConfig.enableSkyMall
+val skyMallInMiningIslandsOnly: Boolean get() = hotmConfig.skyMallInMiningIslandsOnly
+val disableSkyMallChatMessages: Boolean get() = hotmConfig.disableSkyMallChatMessages
+
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
 val enableMiningStatsOverlay: Boolean get() = miningStatsOverlay.enableMiningStatsOverlay
@@ -62,6 +70,10 @@ val foragingConfig: Foraging get() = modConfig.foraging
 val foragingOverlay: ForagingStatsOverlay get() = foragingConfig.foragingStatsOverlay
 val enableForagingStatsOverlay: Boolean get() = foragingOverlay.enableForagingStatsOverlay
 val showDetailedForagingFortune: Boolean get() = foragingOverlay.showDetailedFortune
+val hotfConfig: HotfConfig get() = foragingConfig.hotfConfig
+val enableLottery: Boolean get() = hotfConfig.enableLottery
+val lotteryInForagingIslandsOnly: Boolean get() = hotfConfig.lotteryInForagingIslandsOnly
+val disableLotteryChatMessages: Boolean get() = hotfConfig.disableLotteryChatMessages
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
@@ -92,6 +104,12 @@ object ConfigAccess {
 
     @JvmStatic
     fun getCommissionsPosition(): Position = commissionsPosition
+
+    @JvmStatic
+    fun getSkyMallPosition(): Position = skyMallPosition
+
+    @JvmStatic
+    fun getLotteryPosition(): Position = lotteryPosition
 
     @JvmStatic
     fun getSkillPosition(): Position = skillPosition
@@ -173,6 +191,27 @@ object ConfigAccess {
 
     @JvmStatic
     fun isShowDetailedForagingFortune(): Boolean = showDetailedForagingFortune
+
+    @JvmStatic
+    fun getCotmLevel(): Int = cotmLevel.get()
+
+    @JvmStatic
+    fun isSkyMallEnabled(): Boolean = enableSkyMall
+
+    @JvmStatic
+    fun isDisableSkyMallChatMessages(): Boolean = disableSkyMallChatMessages
+
+    @JvmStatic
+    fun isLotteryEnabled(): Boolean = enableLottery
+
+    @JvmStatic
+    fun isDisableLotteryChatMessages(): Boolean = disableLotteryChatMessages
+
+    @JvmStatic
+    fun isSkyMallInMiningIslandsOnly(): Boolean = skyMallInMiningIslandsOnly
+
+    @JvmStatic
+    fun isLotteryInForagingIslandsOnly(): Boolean = lotteryInForagingIslandsOnly
 }
 
 /**

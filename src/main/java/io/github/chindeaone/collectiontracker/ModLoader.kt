@@ -4,12 +4,7 @@
 package io.github.chindeaone.collectiontracker
 
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
-import io.github.chindeaone.collectiontracker.gui.overlays.SkillOverlay
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
-import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
-import io.github.chindeaone.collectiontracker.gui.overlays.CommissionsOverlay
-import io.github.chindeaone.collectiontracker.gui.overlays.ForagingStatsOverlay
-import io.github.chindeaone.collectiontracker.gui.overlays.MiningStatsOverlay
 import io.github.chindeaone.collectiontracker.util.CommissionsKeybinds
 import io.github.chindeaone.collectiontracker.util.Hypixel
 import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
@@ -36,7 +31,7 @@ class ModLoader: ModInitializer {
     override fun onInitialize() {
         SkyblockCollectionTracker.init()
 
-        overlayRegistration()
+        OverlayManager.overlayRegistration()
         eventRegistration()
 
         CommandRegistry.init()
@@ -44,13 +39,6 @@ class ModLoader: ModInitializer {
         CommissionsKeybinds.initKeyGuards()
     }
 
-    private fun overlayRegistration() {
-        OverlayManager.add(CollectionOverlay())
-        OverlayManager.add(MiningStatsOverlay())
-        OverlayManager.add(CommissionsOverlay())
-        OverlayManager.add(SkillOverlay())
-        OverlayManager.add(ForagingStatsOverlay())
-    }
 
     private fun eventRegistration() {
         ClientTickEvents.END_CLIENT_TICK.register(ClientTickEvents.EndTick {client ->

@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui;
 
-import io.github.chindeaone.collectiontracker.gui.overlays.AbstractOverlay;
+import io.github.chindeaone.collectiontracker.gui.overlays.*;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -40,5 +40,15 @@ public class OverlayManager {
         if (overlay != null) {
             overlay.setRenderingAllowed(allowed);
         }
+    }
+
+    public static void overlayRegistration() {
+        OverlayManager.add(new CollectionOverlay());
+        OverlayManager.add(new MiningStatsOverlay());
+        OverlayManager.add(new CommissionsOverlay());
+        OverlayManager.add(new SkillOverlay());
+        OverlayManager.add(new ForagingStatsOverlay());
+        OverlayManager.add(new SkyMallOverlay());
+        OverlayManager.add(new LotteryOverlay());
     }
 }
