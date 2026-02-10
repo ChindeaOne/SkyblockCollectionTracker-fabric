@@ -43,6 +43,7 @@ public class CommissionsOverlay implements AbstractOverlay{
 
     @Override
     public void render(GuiGraphics context) {
+        if (!isEnabled()) return;
         List<String> lines = TextUtils.getCommissionsLines();
 
         if (lines.isEmpty()) return;

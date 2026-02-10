@@ -42,6 +42,7 @@ public class ForagingStatsOverlay implements AbstractOverlay{
 
     @Override
     public void render(GuiGraphics context) {
+        if (!isEnabled()) return;
         List<String> lines = TextUtils.getForagingLines();
 
         if (lines.isEmpty()) return;

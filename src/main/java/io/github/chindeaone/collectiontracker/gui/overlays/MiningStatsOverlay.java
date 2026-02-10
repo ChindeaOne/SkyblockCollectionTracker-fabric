@@ -43,6 +43,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
 
     @Override
     public void render(GuiGraphics context) {
+        if (!isEnabled()) return;
         List<String> lines = TextUtils.getMiningLines();
 
         if (lines.isEmpty()) return;
