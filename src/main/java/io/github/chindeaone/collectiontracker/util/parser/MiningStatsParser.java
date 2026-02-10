@@ -150,7 +150,7 @@ public class MiningStatsParser {
 
         MiningContext(String blockType) {
             this.blockType = blockType;
-            this.island = MiningStatsWidget.INSTANCE.getCurrentMiningIsland();
+            this.island = MiningStatsWidget.getCurrentMiningIsland();
             this.isGemstone = "gemstones".equals(blockType);
 
             if (isGemstone) {
@@ -180,7 +180,7 @@ public class MiningStatsParser {
                 case "dwarven_metals" -> "§a"; // Green
                 case "pure_ores", "ores" -> "§e"; // Yellow
                 case "gemstones" -> "§5"; // Purple
-                case "blocks" -> "§7"; // Gray
+                case "blocks" -> "§8"; // Dark Gray
                 default -> ""; // No color
             };
         }

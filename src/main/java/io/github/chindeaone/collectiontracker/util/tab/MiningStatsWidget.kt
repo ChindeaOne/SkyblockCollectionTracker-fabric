@@ -9,6 +9,7 @@ object MiningStatsWidget {
 
     private var lastStats: List<String>? = null
     var rawStats: List<String> = emptyList()
+    @JvmStatic
     var currentMiningIsland: String? = null
         private set
 
@@ -53,7 +54,6 @@ object MiningStatsWidget {
         }
 
         val widget = TabWidget.STATS
-
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible
             if (!TabWidget.INFO.isPresent) {

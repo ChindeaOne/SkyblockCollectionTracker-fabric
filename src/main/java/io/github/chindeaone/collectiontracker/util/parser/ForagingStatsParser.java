@@ -35,7 +35,7 @@ public class ForagingStatsParser {
 
         for (String line : raw) {
             boolean isForagingStat = false;
-            for (String stat : ForagingMapping.INSTANCE.getForagingStats()) {
+            for (String stat : ForagingMapping.getForagingStats()) {
                 if (line.contains(stat)) {
                     isForagingStat = true;
                     break;

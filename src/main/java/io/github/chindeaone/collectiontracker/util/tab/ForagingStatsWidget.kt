@@ -10,6 +10,10 @@ object ForagingStatsWidget {
     private var lastBeaconStats: List<String>? = null
     var rawStats: List<String> = emptyList()
     var rawBeaconStats: List<String> = emptyList()
+
+    @JvmStatic
+    var currentForagingIsland: String? = null
+        private set
     var isInGalatea: Boolean = false
 
     private var nextAllowedTime: Long = 0L
@@ -33,6 +37,7 @@ object ForagingStatsWidget {
                 rawBeaconStats = emptyList()
                 lastStats = null
                 lastBeaconStats = null
+                currentForagingIsland = null
                 return
             }
         } else {
@@ -40,14 +45,14 @@ object ForagingStatsWidget {
             rawBeaconStats = emptyList()
             lastStats = null
             lastBeaconStats = null
+            currentForagingIsland = null
             return
         }
-        isInGalatea = areaWidget.lines.any { it.contains("Galatea") }
+        currentForagingIsland = if (areaWidget.lines.any { it.contains("Galatea") }) "Galatea" else "The Park"
+        isInGalatea = currentForagingIsland == "Galatea"
 
         val widget = TabWidget.STATS
         val beaconWidget = TabWidget.MOONGLADE_BEACON
-
-
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible
             if (!TabWidget.INFO.isPresent) {
