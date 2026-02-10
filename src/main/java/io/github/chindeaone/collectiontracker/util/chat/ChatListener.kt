@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.util.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.util.tab.TabWidget
 import io.github.chindeaone.collectiontracker.util.world.MiningMapping
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
 
 object ChatListener {
 
@@ -200,28 +201,32 @@ object ChatListener {
             val rankSuffix = ColeweightUtils.getRankColors(rank)
 
             if (rankSuffix.isNotEmpty()) {
-                val newComponent = Component.empty()
+                val newComponent = MutableComponent.create(message.contents).withStyle(message.style)
+                var nameFound = false
                 var hasRank = false
 
                 for (sibling in message.siblings) {
-                    val siblingText = sibling.string
-                    val cleanSiblingText = siblingText.removeColor() // Remove colors in any guild/party/coop chats (thank you Hypixel very cool)
+                    if (hasRank) {
+                        newComponent.append(sibling)
+                        continue
+                    }
 
-                    // Check if this sibling contains the player's name, and it doesn't have rank suffix
-                    if (!hasRank && cleanSiblingText.contains(playerName)) {
+                    val siblingText = sibling.string
+                    // Look for player name in the siblings
+                    if (!nameFound && siblingText.contains(playerName)) {
+                        nameFound = true
+                    }
+
+                    // Check for colon to add the rank suffix
+                    if (nameFound && siblingText.contains(":")) {
+                        val colonIndex = siblingText.indexOf(":")
+                        val before = siblingText.substring(0, colonIndex)
+                        val after = siblingText.substring(colonIndex)
+
+                        newComponent.append(Component.literal(before).withStyle(sibling.style))
+                        newComponent.append(Component.literal(" $rankSuffix").withStyle(sibling.style))
+                        newComponent.append(Component.literal(after).withStyle(sibling.style))
                         hasRank = true
-                        val nameIndex = siblingText.indexOf(playerName)
-                        if (nameIndex != -1) {
-                            val colonIndex = siblingText.indexOf(':', nameIndex)
-                            if (colonIndex != -1) {
-                                // Insert the rank suffix between the player's name and the colon
-                                val before = siblingText.substring(0, colonIndex)
-                                val after = siblingText.substring(colonIndex)
-                                newComponent.append(Component.literal(before).withStyle(sibling.style))
-                                newComponent.append(Component.literal(" $rankSuffix").withStyle(sibling.style))
-                                newComponent.append(Component.literal(after).withStyle(sibling.style))
-                            }
-                        }
                     } else {
                         newComponent.append(sibling)
                     }

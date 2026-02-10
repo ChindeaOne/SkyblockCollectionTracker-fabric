@@ -103,7 +103,7 @@ object ColeweightUtils {
             in 101..250 -> "§b[CW #${rank}]§r" // Aqua
             in 251..500 -> "§9[CW #${rank}]§r" // Blue
             in 501..1000 -> "§7[CW #${rank}]§r" // Gray
-            else -> "[CW #${rank}]" // No color for ranks above 1000
+            else -> "[CW #${rank}]§r" // No color for ranks above 1000
         }
     }
 }
