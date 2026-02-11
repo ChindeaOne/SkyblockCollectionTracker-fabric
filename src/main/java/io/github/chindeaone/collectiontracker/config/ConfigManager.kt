@@ -18,6 +18,7 @@ import java.util.*
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import com.google.gson.Gson
+import java.nio.file.AtomicMoveNotSupportedException
 
 class ConfigManager {
 
@@ -65,10 +66,6 @@ class ConfigManager {
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
         driver.processConfig(config)
-
-        Runtime.getRuntime().addShutdownHook(Thread {
-            save()
-        })
     }
 
     private fun tryReadConfig() {
@@ -132,22 +129,38 @@ class ConfigManager {
         remove(root)
     }
 
+    @Synchronized
     fun save() {
         lastSaveTime = System.currentTimeMillis()
-        val config = config ?: error("Can not save null config.")
+        val config = config ?: error("Cannot save null config.")
+
+        configDirectory.mkdirs()
+        val unit = configDirectory.resolve("config.json.write")
 
         try {
-            configDirectory.mkdirs()
-            val unit = configDirectory.resolve("config.json.write")
-            unit.createNewFile()
-            BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
+            OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8).use { writer ->
                 writer.write(gson.toJson(config))
             }
-            Files.move(
-                unit.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE
-            )
+
+            try {
+                Files.move(
+                    unit.toPath(),
+                    configFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE
+                )
+            } catch (e: AtomicMoveNotSupportedException) {
+                logger.warn("Atomic move not supported, falling back to non-atomic move")
+                Files.move(
+                    unit.toPath(),
+                    configFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING
+                )
+            }
+
         } catch (e: IOException) {
-            throw ConfigError("Could not save config", e)
+            unit.delete() // cleanup best effort
+            logger.error("Could not save config", e)
         }
     }
 }

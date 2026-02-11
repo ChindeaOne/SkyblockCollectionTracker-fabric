@@ -18,6 +18,7 @@ object SkyblockCollectionTracker {
             Thread { configManager.save() },
         )
     }
+
     fun onTick(client: Minecraft) {
         val screenToOpen = screenToOpen ?: return
         screenTicks++
