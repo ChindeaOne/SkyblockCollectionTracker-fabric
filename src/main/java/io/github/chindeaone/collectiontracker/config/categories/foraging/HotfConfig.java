@@ -1,38 +1,29 @@
 package io.github.chindeaone.collectiontracker.config.categories.foraging;
 
 import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class HotfConfig {
 
     @Expose
     @ConfigOption(
-            name = "Better Lottery",
-            desc = "Displays current Lottery perks and compacts Lottery chat messages"
+            name = "Center Of The Forest Level",
+            desc = "Input your Center Of The Forest level.\n§eRequired for more precise axe ability cooldown."
     )
-    @ConfigEditorBoolean
-    public boolean enableLottery = false;
+    @ConfigEditorSlider(minValue = 0, maxValue = 10, minStep = 1)
+    public Property<Integer> cotfLevel = Property.of(0);
 
     @Expose
-    @ConfigOption(
-            name = "Foraging Islands Only",
-            desc = "Allows the Lottery overlay to be rendered only in Foraging Islands."
-    )
-    @ConfigEditorBoolean
-    public boolean lotteryInForagingIslandsOnly = true;
+    @ConfigOption(name = "Lottery Config", desc = "")
+    @Accordion
+    public LotteryConfig lotteryConfig = new LotteryConfig();
 
     @Expose
-    @ConfigOption(
-            name = "Disable Lottery chat messages",
-            desc = "Hides Lottery chat messages while displaying perks in the overlay and allowing other mods to process the messages."
-    )
-    @ConfigEditorBoolean
-    public boolean disableLotteryChatMessages = false;
+    @ConfigOption(name = "Axe Ability Config", desc = "")
+    @Accordion
+    public AxeAbilityConfig axeAbilityConfig = new AxeAbilityConfig();
 
-    @Expose
-    @ConfigLink(owner = HotfConfig.class, field = "Lottery")
-    public Position lotteryPosition = new Position(500, 100);
 }

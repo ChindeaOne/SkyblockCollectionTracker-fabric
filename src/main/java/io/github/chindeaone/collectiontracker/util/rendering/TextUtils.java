@@ -46,6 +46,8 @@ public class TextUtils {
     private static final List<String> tamingOverlayLines = new ArrayList<>();
     private static final List<String> skyMallOverlayLines = new ArrayList<>();
     private static final List<String> lotteryOverlayLines = new ArrayList<>();
+    private static final List<String> pickaxeAbilityOverlayLines = new ArrayList<>();
+    private static final List<String> axeAbilityOverlayLines = new ArrayList<>();
     private static boolean hasNpcPrice;
 
     private static void updateTrackingLines() {
@@ -412,6 +414,58 @@ public class TextUtils {
         lotteryOverlayLines.add("§2Lottery: " + ChatListener.getCurrentLotteryBuff());
         lotteryOverlayLines.add(updateTimer());
         return  lotteryOverlayLines;
+    }
+
+    public static List<String> getPickaxeAbilityLines() {
+        pickaxeAbilityOverlayLines.clear();
+        if (!ConfigAccess.isPickaxeAbilityDisplayed()) return Collections.emptyList();
+
+        if (ConfigAccess.getPickaxeAbilityName().isEmpty()) {
+            pickaxeAbilityOverlayLines.add("§cUnknown Ability");
+        } else {
+            pickaxeAbilityOverlayLines.add("§bAbility: §e" + ConfigAccess.getPickaxeAbilityName());
+        }
+        long now = System.currentTimeMillis();
+        double cooldown = (ChatListener.getFinalCooldown() - now) / 1000.0;
+        double duration = (ChatListener.getFinalDuration() - now) / 1000.0;
+
+        if (duration >= 0) {
+            // Ability active
+            pickaxeAbilityOverlayLines.add(String.format("§aActive: %.1fs", duration));
+        } else if (cooldown > 0) {
+            // Ability on cooldown
+            pickaxeAbilityOverlayLines.add(String.format("§cCooldown: %.1fs",cooldown));
+        } else {
+            // Ability ready
+            pickaxeAbilityOverlayLines.add("§aReady!");
+        }
+        return pickaxeAbilityOverlayLines;
+    }
+
+    public static List<String> getAxeAbilityLines() {
+        axeAbilityOverlayLines.clear();
+        if (!ConfigAccess.isAxeAbilityDisplayed()) return Collections.emptyList();
+
+        if (ConfigAccess.getAxeAbilityName().isEmpty()) {
+            axeAbilityOverlayLines.add("§cUnknown Ability");
+        } else {
+            axeAbilityOverlayLines.add("§bAbility: §e" + ConfigAccess.getAxeAbilityName());
+        }
+        long now = System.currentTimeMillis();
+        double cooldown = (ChatListener.getFinalAxeCooldown() - now) / 1000.0;
+        double duration = (ChatListener.getFinalAxeDuration() - now) / 1000.0;
+
+        if (duration >= 0) {
+            // Ability active
+            axeAbilityOverlayLines.add(String.format("§aActive: %.1fs", duration));
+        } else if (cooldown > 0) {
+            // Ability on cooldown
+            axeAbilityOverlayLines.add(String.format("§cCooldown: %.1fs",cooldown));
+        } else {
+            // Ability ready
+            axeAbilityOverlayLines.add("§aReady!");
+        }
+        return axeAbilityOverlayLines;
     }
 
     private static String updateTimer() {

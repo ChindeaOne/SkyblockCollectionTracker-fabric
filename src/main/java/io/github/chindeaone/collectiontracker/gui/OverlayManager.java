@@ -50,5 +50,7 @@ public class OverlayManager {
         OverlayManager.add(new ForagingStatsOverlay());
         OverlayManager.add(new SkyMallOverlay());
         OverlayManager.add(new LotteryOverlay());
+        OverlayManager.add(new PickaxeAbilityOverlay());
+        OverlayManager.add(new AxeAbilityOverlay());
     }
 }

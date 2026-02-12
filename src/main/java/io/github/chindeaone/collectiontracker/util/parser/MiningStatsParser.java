@@ -51,7 +51,7 @@ public class MiningStatsParser {
             }
         }
 
-        formatted.add(ctx.formatTotalSpeed());
+        if (!"0".equals(ctx.speed.value)) formatted.add(ctx.formatTotalSpeed());
         formatted.add(ctx.formatTotalFortune());
 
         if (ctx.isGemstone) {
@@ -193,6 +193,7 @@ public class MiningStatsParser {
 
             // Show specific fortune if available
             if (!specificFortuneName.isEmpty()) {
+                if (total == 0) return ""; // Don't show if total is 0
                 String base = "§a" + specificFortuneName + ": §6" + symbol + total;
                 if (showDetailed) {
                     base += " §7(§6" + globalFortune + " §7+ " + color + specificFortune + "§7)";
@@ -201,6 +202,7 @@ public class MiningStatsParser {
             }
             // Fallback to last displayed specific fortune
             if (!lastDisplayedSpecificFortune.isEmpty()) {
+                if (total == 0) return ""; // Don't show if total is 0
                 String base = "§a" + lastDisplayedSpecificFortune + ": §6" + symbol + total;
                 if (showDetailed) {
                     base += " §7(§6" + globalFortune + " §7+ " + color + lastDisplayedSpecificFortuneValue + "§7)";

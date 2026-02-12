@@ -1,15 +1,13 @@
 package io.github.chindeaone.collectiontracker
 
 import io.github.chindeaone.collectiontracker.config.ConfigManager
+import io.github.chindeaone.collectiontracker.util.ConfigUtils
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.SharedConstants
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
-import java.util.logging.Logger
 
 object SkyblockCollectionTracker {
-
-    val logger: Logger = Logger.getLogger("SkyblockCollectionTracker")
 
     fun init() {
         configManager = ConfigManager()
@@ -17,6 +15,8 @@ object SkyblockCollectionTracker {
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.save() },
         )
+
+        ConfigUtils.loadFromConfig()
     }
 
     fun onTick(client: Minecraft) {

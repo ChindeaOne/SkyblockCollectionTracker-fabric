@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.client.Minecraft
 //? if = 1.21.11 {
 import net.minecraft.resources.Identifier
@@ -46,7 +47,9 @@ class ModLoader: ModInitializer {
             TickDispatcher.onEndClientTick(client)
         })
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
-        ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.trackingHandle(message)}
+        ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.onChatMessage(message) }
+
+        UseItemCallback.EVENT.register { player, _, hand -> ChatListener.checkHandItem(player, hand) }
 
         //? if = 1.21.11 {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")

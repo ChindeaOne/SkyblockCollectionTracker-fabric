@@ -7,9 +7,13 @@ import io.github.chindeaone.collectiontracker.config.categories.Foraging
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
+import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
+import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.PickaxeAbilityConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.SkyMallConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
@@ -29,8 +33,10 @@ val miningStatsPosition: Position get() = modConfig.mining.miningStatsOverlay.mi
 val foragingStatsPosition: Position get() = modConfig.foraging.foragingStatsOverlay.foragingStatsOverlayPosition
 val commissionsPosition: Position get() = modConfig.mining.commissionsOverlay.commissionsOverlayPosition
 val skillPosition: Position get() = modConfig.trackingOverlay.skillOverlay.skillOverlayPosition
-val skyMallPosition: Position get() = modConfig.mining.hotmConfig.skyMallPosition
-val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryPosition
+val skyMallPosition: Position get() = modConfig.mining.hotmConfig.skyMallConfig.skyMallPosition
+val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryConfig.lotteryPosition
+val pickaxeAbilityPosition: Position get() = modConfig.mining.hotmConfig.pickaxeAbilityConfig.pickaxeAbilityPosition
+val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilityConfig.axeAbilityPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -50,10 +56,16 @@ val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverl
 val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
+val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
+val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
 val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
-val enableSkyMall: Boolean get() = hotmConfig.enableSkyMall
-val skyMallInMiningIslandsOnly: Boolean get() = hotmConfig.skyMallInMiningIslandsOnly
-val disableSkyMallChatMessages: Boolean get() = hotmConfig.disableSkyMallChatMessages
+val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
+val abilityName: String get() = pickaxeAbilityConfig.abilityName
+val lastPet: String get() = pickaxeAbilityConfig.lastPet
+val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
+val lastSkyMallPerk: String get() = skyMallConfig.lastSkyMallPerk
+val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIslandsOnly
+val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChatMessages
 
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
@@ -71,9 +83,14 @@ val foragingOverlay: ForagingStatsOverlay get() = foragingConfig.foragingStatsOv
 val enableForagingStatsOverlay: Boolean get() = foragingOverlay.enableForagingStatsOverlay
 val showDetailedForagingFortune: Boolean get() = foragingOverlay.showDetailedFortune
 val hotfConfig: HotfConfig get() = foragingConfig.hotfConfig
-val enableLottery: Boolean get() = hotfConfig.enableLottery
-val lotteryInForagingIslandsOnly: Boolean get() = hotfConfig.lotteryInForagingIslandsOnly
-val disableLotteryChatMessages: Boolean get() = hotfConfig.disableLotteryChatMessages
+val axeAbilityConfig: AxeAbilityConfig get() = hotfConfig.axeAbilityConfig
+val cotfLevel: Property<Int> get() = hotfConfig.cotfLevel
+val abilityNameAxe: String get() = axeAbilityConfig.abilityNameAxe
+val displayAxeAbility: Boolean get() = axeAbilityConfig.displayAxeAbility
+val lotteryConfig: LotteryConfig get() = hotfConfig.lotteryConfig
+val enableLottery: Boolean get() = lotteryConfig.enableLottery
+val lotteryInForagingIslandsOnly: Boolean get() = lotteryConfig.lotteryInForagingIslandsOnly
+val disableLotteryChatMessages: Boolean get() = lotteryConfig.disableLotteryChatMessages
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
@@ -113,6 +130,12 @@ object ConfigAccess {
 
     @JvmStatic
     fun getSkillPosition(): Position = skillPosition
+
+    @JvmStatic
+    fun getPickaxeAbilityPosition(): Position = pickaxeAbilityPosition
+
+    @JvmStatic
+    fun getAxeAbilityPosition(): Position = axeAbilityPosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
@@ -212,6 +235,30 @@ object ConfigAccess {
 
     @JvmStatic
     fun isLotteryInForagingIslandsOnly(): Boolean = lotteryInForagingIslandsOnly
+
+    @JvmStatic
+    fun isPickaxeAbilityDisplayed(): Boolean = displayPickaxeAbility
+
+    @JvmStatic
+    fun getPickaxeAbilityName(): String = abilityName
+
+    @JvmStatic
+    fun getLastPet(): String = lastPet
+
+    @JvmStatic
+    fun getLastSkyMallPerk(): String = lastSkyMallPerk
+
+    @JvmStatic
+    fun getLastLotteryPerk(): String = lotteryConfig.lastLotteryPerk
+
+    @JvmStatic
+    fun isAxeAbilityDisplayed(): Boolean = displayAxeAbility
+
+    @JvmStatic
+    fun getAxeAbilityName(): String = abilityNameAxe
+
+    @JvmStatic
+    fun getCotfLevel(): Int = cotfLevel.get()
 }
 
 /**
@@ -262,5 +309,30 @@ object ConfigHelper {
     @JvmStatic
     fun disableForagingStats() {
         foragingOverlay.enableForagingStatsOverlay = false
+    }
+
+    @JvmStatic
+    fun setAbilityName(name: String) {
+        pickaxeAbilityConfig.abilityName = name
+    }
+
+    @JvmStatic
+    fun setLastPet(pet: String) {
+        pickaxeAbilityConfig.lastPet = pet
+    }
+
+    @JvmStatic
+    fun setLastSkyMallPerk(perk: String) {
+        skyMallConfig.lastSkyMallPerk = perk
+    }
+
+    @JvmStatic
+    fun setLastLotteryPerk(perk: String) {
+        lotteryConfig.lastLotteryPerk = perk
+    }
+
+    @JvmStatic
+    fun setAxeAbilityName(name: String) {
+        axeAbilityConfig.abilityNameAxe = name
     }
 }

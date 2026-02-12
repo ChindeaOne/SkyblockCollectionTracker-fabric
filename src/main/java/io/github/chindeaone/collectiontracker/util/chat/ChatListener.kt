@@ -3,16 +3,23 @@ package io.github.chindeaone.collectiontracker.util.chat
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.util.ChatUtils
 import io.github.chindeaone.collectiontracker.util.HypixelUtils
 import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.util.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.util.AbilityUtils
+import io.github.chindeaone.collectiontracker.util.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.util.tab.TabWidget
 import io.github.chindeaone.collectiontracker.util.world.MiningMapping
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
 
 object ChatListener {
 
@@ -21,15 +28,16 @@ object ChatListener {
     private val SACKS_PATTERN = Regex("""^\[Sacks]\s*\+([0-9,]+)\s+items?\.\s*\(Last\s+([0-9]+)s\.?\)""", RegexOption.IGNORE_CASE)
     // Coleweight pattern
     private val NAME_PATTERN = Regex( """^(?:\[\d+]\s+)?(?:⸕\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE)
-
+    private val ABILITY_PATTERN = Regex("^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!", RegexOption.IGNORE_CASE)
+    private val SUMMON_PATTERN = Regex("^You summoned your (.+?)!")
     var lastSkillValue = 0L
 
     @JvmStatic
     var currentSkyMallBuff = "§cUnknown"
-        private set
+    var isPickaxeAbility = false
     @JvmStatic
     var currentLotteryBuff = "§cUnknown"
-        private set
+
     @JvmStatic
     var nextBuffTime: Long = 0
         private set
@@ -37,10 +45,37 @@ object ChatListener {
     private var expectingSkyMallBuff = false
     private var expectingLotteryBuff = false
 
-    fun trackingHandle(message: Component) {
+    @JvmStatic
+    @Volatile
+    var finalCooldown: Long = 0L
+        private set
+    @JvmStatic
+    @Volatile
+    var finalDuration: Long = 0L
+        private set
+    @JvmStatic
+    @Volatile
+    var finalAxeCooldown: Long = 0L
+        private set
+    @JvmStatic
+    @Volatile
+    var finalAxeDuration: Long = 0L
+        private set
+
+    fun onChatMessage(message: Component) {
         if (!HypixelUtils.isOnSkyblock) return
 
-        val text = message.string.removeColor()
+        val text = message.string
+        val cleanText = text.removeColor()
+
+        trackingListener(cleanText)
+        petSummoned(text)
+        petSwapListener(text)
+        abilityListener(cleanText)
+    }
+
+    private fun trackingListener(text: String) {
+        if (!TrackingHandler.isTracking && !SkillTrackingHandler.isTracking) return
 
         if (text.startsWith("[Sacks]")) {
             parseSacksMessage(text)
@@ -53,6 +88,118 @@ object ChatListener {
             parseSkillMessage(match)
             return
         }
+    }
+
+    @Suppress("SameReturnValue")
+    fun checkHandItem(player: Player, hand: InteractionHand): InteractionResult {
+        if (!HypixelUtils.isOnSkyblock) return InteractionResult.PASS
+
+        val stack = player.getItemInHand(hand)
+        if (stack.isEmpty) return InteractionResult.PASS
+
+        val snap = AbilityItemParser.snapshot(stack)
+        if (snap != null) AbilityUtils.update(snap)
+
+        return InteractionResult.PASS
+    }
+
+    fun abilityListener(text: String) {
+        val match = ABILITY_PATTERN.find(text) ?: return
+        val abilityName = match.groupValues[1].trim()
+        val toolType = match.groupValues[2].lowercase()
+
+        if (toolType == "axe") {
+            startAxeAbilityTimeline(abilityName)
+        } else {
+            val pickSnap = AbilityUtils.recentOrNull()
+            if (pickSnap != null && pickSnap.hasAbility) {
+                startAbilityTimeline(abilityName, pickSnap)
+            }
+        }
+    }
+
+    private fun petSummoned(text: String) {
+        val match = SUMMON_PATTERN.find(text) ?: return
+        val petSegment = match.groupValues[1]
+
+        val name = petSegment.replace(" ✦", "").trim()
+
+        val level = if (AbilityUtils.lastPet?.name == name) AbilityUtils.lastPet!!.level else 100
+        val rarity = if (AbilityUtils.lastPet?.name == name) AbilityUtils.lastPet!!.rarity else AbilityUtils.PetRarity.LEGENDARY
+
+        AbilityUtils.updatePet(
+            AbilityUtils.Pet(
+                name = name,
+                level = level,
+                rarity = rarity,
+                timestamp = System.currentTimeMillis(),
+                isManual = true
+            )
+        )
+    }
+
+    // Listen to Autopet swap messages
+    fun petSwapListener(text: String) {
+        // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §eVIEW RULE"
+        val regex = Regex("§cAutopet §eequipped your §7\\[Lvl (\\d{1,3})] (.+?)! ")
+        val match = regex.find(text) ?: return
+        val level = match.groupValues[1].toIntOrNull() ?: return
+        if (level !in 1..200) return
+        val petSegment = match.groupValues[2]
+
+        val name = petSegment
+            .replace(Regex("§."), "")
+            .replace(" ✦", "")
+            .trim()
+
+        // Extract first color code preceding the pet name
+        val colorCodeMatch = Regex("§.").find(petSegment)
+        val code = colorCodeMatch?.value?.getOrNull(1)
+        val rarity = when (code) {
+            'f' -> AbilityUtils.PetRarity.COMMON
+            'a' -> AbilityUtils.PetRarity.UNCOMMON
+            '9' -> AbilityUtils.PetRarity.RARE
+            '5' -> AbilityUtils.PetRarity.EPIC
+            '6' -> AbilityUtils.PetRarity.LEGENDARY
+            else -> return
+        }
+
+        AbilityUtils.updatePet(AbilityUtils.Pet(name = name, level = level, rarity = rarity, timestamp = System.currentTimeMillis()))
+    }
+
+    private fun startAbilityTimeline(ability: String, snap: AbilityUtils.PickaxeAbilitySnapshot?) {
+        var cotm = ConfigAccess.getCotmLevel()
+        if (cotm >= 1) cotm = 1
+        val hasBlueCheese = snap?.hasBlueCheesePart == true
+
+        val baseCooldownSeconds = AbilityUtils.getBaseCooldown(ability, cotm, hasBlueCheese)
+        val calculateFinalCooldown = AbilityUtils.calculateReduction(
+            baseCooldown = baseCooldownSeconds,
+            snap = snap,
+            skyMallActive = isSkyMallPickaxeAbilityActive()
+            )
+
+        finalDuration = AbilityUtils.getBaseDuration(ability, cotm, hasBlueCheese).toLong() * 1000 + System.currentTimeMillis()
+        finalCooldown = (calculateFinalCooldown * 1000).toLong() + System.currentTimeMillis()
+
+        ConfigHelper.setAbilityName(ability)
+    }
+
+    private fun startAxeAbilityTimeline(ability: String) {
+        var cotf = ConfigAccess.getCotfLevel()
+        if (cotf >= 1) cotf = 1
+
+        val baseCooldownSeconds = AbilityUtils.getBaseAxeCooldown(ability, cotf)
+        finalAxeDuration = AbilityUtils.getBaseAxeDuration(ability, cotf).toLong() * 1000 + System.currentTimeMillis()
+        finalAxeCooldown = (baseCooldownSeconds * 1000).toLong() + System.currentTimeMillis()
+
+        println("Started axe ability timeline for $ability with base cooldown of $baseCooldownSeconds seconds and duration of ${AbilityUtils.getBaseAxeDuration(ability, cotf)} seconds.")
+
+        ConfigHelper.setAxeAbilityName(ability)
+    }
+
+    private fun isSkyMallPickaxeAbilityActive(): Boolean {
+        return isPickaxeAbility
     }
 
     fun dailyPerksUpdate(message: Component): Boolean {
@@ -70,14 +217,13 @@ object ChatListener {
         when {
             text.contains("Your Sky Mall buff changed!") -> {
                 expectingSkyMallBuff = true
-                return true
+                return ConfigAccess.isSkyMallEnabled()
             }
             text.contains("Your Lottery buff changed!") -> {
                 expectingLotteryBuff = true
-                return true
+                return ConfigAccess.isLotteryEnabled()
             }
             text.startsWith("New buff: ") -> {
-                println ("[SCT] New buff change message: '$text'")
                 val buffText = text.substringAfter("New buff: ").trim()
                 // Set default 20 mins only when a new buff is sent in chat
                 if (nextBuffTime - now < 10_000L) { // Allows chat checking 10 seconds before
@@ -86,7 +232,9 @@ object ChatListener {
 
                 val compact = compactBuffs(buffText)
                 if (expectingSkyMallBuff) {
+                    isPickaxeAbility = "Pickaxe Ability" in text
                     currentSkyMallBuff = compact
+                    ConfigHelper.setLastSkyMallPerk(compact)
                     expectingSkyMallBuff = false
                     if (ConfigAccess.isDisableSkyMallChatMessages()) return true // Don't render Sky Mall buff in chat, but update the buffs in overlay
 
@@ -99,6 +247,7 @@ object ChatListener {
                 }
                 if (expectingLotteryBuff) {
                     currentLotteryBuff = compact
+                    ConfigHelper.setLastLotteryPerk(compact)
                     expectingLotteryBuff = false
                     if (ConfigAccess.isDisableLotteryChatMessages()) return true // Don't render Lottery buff in chat, but update the buffs in overlay
 
