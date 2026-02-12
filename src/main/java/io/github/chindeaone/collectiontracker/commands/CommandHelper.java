@@ -26,8 +26,8 @@ public class CommandHelper {
             "§a◆/sct skill pause",
             "§a◆/sct skill resume",
             "§a◆/sct skill restart",
-            "§a◆/sct cw find",
-            "§a◆/sct cw find detailed",
+            "§a◆/sct cw find [player]",
+            "§a◆/sct cw detailed",
             "§a◆/sct cw lb <length>"
     );
 
