@@ -109,7 +109,10 @@ object ChatListener {
         val toolType = match.groupValues[2].lowercase()
 
         if (toolType == "axe") {
-            startAxeAbilityTimeline(abilityName)
+            val axeSnap = AbilityUtils.recentOrNullAxe()
+            if (axeSnap != null && axeSnap.hasAbility) {
+                startAxeAbilityTimeline(abilityName)
+            }
         } else {
             val pickSnap = AbilityUtils.recentOrNull()
             if (pickSnap != null && pickSnap.hasAbility) {
