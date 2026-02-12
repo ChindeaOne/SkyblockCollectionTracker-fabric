@@ -207,4 +207,23 @@ object AbilityUtils {
 
         return cooldown.coerceAtLeast(0.0)
     }
+
+    fun calculateAxeReduction(baseCooldown: Int): Double {
+        val cooldown = baseCooldown.toDouble()
+
+        lastPet?.let { pet ->
+            val petReduction = when {
+                pet.name.equals("Crow", ignoreCase = true) -> {
+                    if (pet.rarity >= PetRarity.EPIC) {
+                        0.03 + (pet.rarity.crowEpicReductionPerLevel * pet.level)
+                    } else {
+                        0.03 + (pet.rarity.crowCommonReductionPerLevel * pet.level)
+                    }
+                }
+                else -> 0.0
+            }
+            return cooldown * (1.0 - petReduction).coerceAtLeast(0.0)
+        }
+        return cooldown
+    }
 }

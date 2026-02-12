@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.config.categories.mining;
 
 import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.notenoughupdates.moulconfig.annotations.*;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 

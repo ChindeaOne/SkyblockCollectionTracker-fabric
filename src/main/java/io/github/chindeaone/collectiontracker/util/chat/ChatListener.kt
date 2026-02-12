@@ -193,10 +193,12 @@ object ChatListener {
         if (cotf >= 1) cotf = 1
 
         val baseCooldownSeconds = AbilityUtils.getBaseAxeCooldown(ability, cotf)
-        finalAxeDuration = AbilityUtils.getBaseAxeDuration(ability, cotf).toLong() * 1000 + System.currentTimeMillis()
-        finalAxeCooldown = (baseCooldownSeconds * 1000).toLong() + System.currentTimeMillis()
+        val calculateFinalCooldown = AbilityUtils.calculateAxeReduction(
+            baseCooldown = baseCooldownSeconds
+        )
 
-        println("Started axe ability timeline for $ability with base cooldown of $baseCooldownSeconds seconds and duration of ${AbilityUtils.getBaseAxeDuration(ability, cotf)} seconds.")
+        finalAxeDuration = AbilityUtils.getBaseAxeDuration(ability, cotf).toLong() * 1000 + System.currentTimeMillis()
+        finalAxeCooldown = (calculateFinalCooldown * 1000).toLong() + System.currentTimeMillis()
 
         ConfigHelper.setAxeAbilityName(ability)
     }
