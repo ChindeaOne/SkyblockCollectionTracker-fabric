@@ -3,17 +3,22 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.util.HypixelUtils;
+import io.github.chindeaone.collectiontracker.util.chat.ChatListener;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
+import io.github.chindeaone.collectiontracker.util.tab.ForagingStatsWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LotteryOverlay implements AbstractOverlay {
 
     private final Position position = ConfigAccess.getLotteryPosition();
+    private final List<String> lotteryOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;
 
     @Override
@@ -44,7 +49,7 @@ public class LotteryOverlay implements AbstractOverlay {
     @Override
     public void render(GuiGraphics context) {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.getLotteryLines();
+        List<String> lines = getLotteryLines();
 
         if (lines.isEmpty()) return;
 
@@ -56,7 +61,7 @@ public class LotteryOverlay implements AbstractOverlay {
     @Override
     public void updateDimensions() {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.getLotteryLines();
+        List<String> lines = getLotteryLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;
@@ -65,5 +70,14 @@ public class LotteryOverlay implements AbstractOverlay {
         int h = fr.lineHeight * lines.size();
 
         position.setDimensions(maxW, h);
+    }
+
+    private List<String> getLotteryLines() {
+        lotteryOverlayLines.clear();
+        if (ConfigAccess.isLotteryInForagingIslandsOnly() && ForagingStatsWidget.getCurrentForagingIsland() == null) return Collections.emptyList();
+
+        lotteryOverlayLines.add("§2Lottery: " + ChatListener.getCurrentLotteryBuff());
+        lotteryOverlayLines.add(TextUtils.updateTimer());
+        return  lotteryOverlayLines;
     }
 }

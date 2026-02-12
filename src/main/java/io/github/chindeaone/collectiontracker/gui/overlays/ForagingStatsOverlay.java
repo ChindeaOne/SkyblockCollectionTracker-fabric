@@ -3,17 +3,22 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.util.HypixelUtils;
+import io.github.chindeaone.collectiontracker.util.parser.ForagingStatsParser;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
+import io.github.chindeaone.collectiontracker.util.tab.ForagingStatsWidget;
+import io.github.chindeaone.collectiontracker.util.world.BlockWatcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ForagingStatsOverlay implements AbstractOverlay{
 
     private final Position position = ConfigAccess.getForagingStatsPosition();
+    private final List<String> formattedForagingStats = new ArrayList<>();
     private boolean renderingAllowed  = true;
 
     @Override
@@ -43,7 +48,7 @@ public class ForagingStatsOverlay implements AbstractOverlay{
     @Override
     public void render(GuiGraphics context) {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.getForagingLines();
+        List<String> lines = getForagingLines();
 
         if (lines.isEmpty()) return;
 
@@ -55,7 +60,7 @@ public class ForagingStatsOverlay implements AbstractOverlay{
     @Override
     public void updateDimensions() {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.getForagingLines();
+        List<String> lines = getForagingLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;
@@ -64,5 +69,15 @@ public class ForagingStatsOverlay implements AbstractOverlay{
         int h = fr.lineHeight * lines.size();
 
         position.setDimensions(maxW, h);
+    }
+
+    private List<String> getForagingLines() {
+        List<String> raw = ForagingStatsWidget.INSTANCE.getRawStats();
+        List<String> rawBeacon = ForagingStatsWidget.INSTANCE.getRawBeaconStats();
+        if (raw.isEmpty()) return Collections.emptyList();
+
+        formattedForagingStats.clear();
+        formattedForagingStats.addAll(ForagingStatsParser.parse(raw, rawBeacon, BlockWatcher.INSTANCE.getForagingBlockType()));
+        return formattedForagingStats;
     }
 }

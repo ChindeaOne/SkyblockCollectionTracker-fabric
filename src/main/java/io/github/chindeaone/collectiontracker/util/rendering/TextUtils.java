@@ -11,63 +11,38 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
-import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.util.ChatUtils;
 import io.github.chindeaone.collectiontracker.util.StringUtils;
 import io.github.chindeaone.collectiontracker.util.chat.ChatListener;
-import io.github.chindeaone.collectiontracker.util.parser.ForagingStatsParser;
-import io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget;
-import io.github.chindeaone.collectiontracker.util.tab.ForagingStatsWidget;
-import io.github.chindeaone.collectiontracker.util.tab.MiningStatsWidget;
-import io.github.chindeaone.collectiontracker.util.world.BlockWatcher;
-import io.github.chindeaone.collectiontracker.util.parser.MiningStatsParser;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
-import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates.*;
 import static io.github.chindeaone.collectiontracker.util.NumbersUtils.formatNumber;
 
 public class TextUtils {
 
-    public static List<String> formattedCommissions = new ArrayList<>();
-    public static List<String> formattedMiningStats = new ArrayList<>();
-    public static List<String> formattedForagingStats = new ArrayList<>();
-    private static final List<String> overlayLines = new ArrayList<>();
-    private static final List<String> extraOverlayLines = new ArrayList<>();
-    private static final List<String> skillOverlayLines = new ArrayList<>();
-    private static final List<String> tamingOverlayLines = new ArrayList<>();
-    private static final List<String> skyMallOverlayLines = new ArrayList<>();
-    private static final List<String> lotteryOverlayLines = new ArrayList<>();
-    private static final List<String> pickaxeAbilityOverlayLines = new ArrayList<>();
-    private static final List<String> axeAbilityOverlayLines = new ArrayList<>();
     private static boolean hasNpcPrice;
 
-    private static void updateTrackingLines() {
-        overlayLines.clear();
+    public static void updateTrackingLines(List<String> list) {
+        list.clear();
         if (ConfigAccess.getStatsText().isEmpty()) return;
 
         for (CollectionOverlay.OverlayText id : ConfigAccess.getStatsText()) {
             switch (id) {
-                case COLLECTION -> addIfNotNull(handleCollection());
-                case COLLECTION_SESSION -> addIfNotNull(handleCollectionSession());
-                case COLL_PER_HOUR -> addIfNotNull(handleCollectionPerHour());
-                case MONEY_PER_HOUR -> addIfNotNull(handleMoneyPerHour());
-                case MONEY_MADE -> addIfNotNull(handleMoneyMade());
-                case COLLECTION_SINCE_LAST -> addIfNotNull(handleCollectionSinceLast());
+                case COLLECTION -> addIfNotNull(list, handleCollection());
+                case COLLECTION_SESSION -> addIfNotNull(list, handleCollectionSession());
+                case COLL_PER_HOUR -> addIfNotNull(list, handleCollectionPerHour());
+                case MONEY_PER_HOUR -> addIfNotNull(list, handleMoneyPerHour());
+                case MONEY_MADE -> addIfNotNull(list, handleMoneyMade());
+                case COLLECTION_SINCE_LAST -> addIfNotNull(list, handleCollectionSinceLast());
             }
         }
     }
 
-    private static void addIfNotNull(String line) {
-        if (line != null) overlayLines.add(line);
+    private static void addIfNotNull(List<String> list, String line) {
+        if (line != null) list.add(line);
     }
 
     private static String handleCollection() {
@@ -194,47 +169,47 @@ public class TextUtils {
     }
 
     // Only if it has bazaar data and is enabled
-    private static void updateTrackingExtraLines() {
+    public static void updateTrackingExtraLines(List<String> list) {
         if (!ConfigAccess.isShowExtraStats()) {
-            extraOverlayLines.clear();
+            list.clear();
             return;
         }
 
         if (!BazaarCollectionsManager.hasBazaarData) {
             ConfigHelper.disableExtraStats();
             ChatUtils.INSTANCE.sendMessage("§cNo Bazaar data available for extra stats!", true);
-            extraOverlayLines.clear();
+            list.clear();
             return;
         }
 
         if (collectionType.equals("normal") && ConfigAccess.isShowExtraStats()) {
             ConfigHelper.disableExtraStats();
             ChatUtils.INSTANCE.sendMessage("§cExtra stats are redundant here!", true);
-            extraOverlayLines.clear();
+            list.clear();
             return;
         }
 
         if (ConfigAccess.isShowExtraStats() && !ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableExtraStats();
             ChatUtils.INSTANCE.sendMessage("§cDisabled extra stats since you don't use Bazaar prices!", true);
-            extraOverlayLines.clear();
+            list.clear();
             return;
         }
 
-        extraOverlayLines.clear();
+        list.clear();
 
-        extraOverlayLines.add("§6§lExtra Stats:");
+        list.add("§6§lExtra Stats:");
         for (CollectionOverlay.OverlayExtraText id : ConfigAccess.getExtraStatsText()) {
             switch (id) {
-                case BAZAAR_PRICE_TYPE -> addIfNotNullExtra(handleBazaarPriceType());
-                case BAZAAR_ITEM -> addIfNotNullExtra(handleBazaarItem());
-                case BAZAAR_PRICE -> addIfNotNullExtra(handleBazaarPrice());
+                case BAZAAR_PRICE_TYPE -> addIfNotNullExtra(list, handleBazaarPriceType());
+                case BAZAAR_ITEM -> addIfNotNullExtra(list, handleBazaarItem());
+                case BAZAAR_PRICE -> addIfNotNullExtra(list, handleBazaarPrice());
             }
         }
     }
 
-    private static void addIfNotNullExtra(String line) {
-        if (line != null) extraOverlayLines.add(line);
+    private static void addIfNotNullExtra(List<String> list, String line) {
+        if (line != null) list.add(line);
     }
 
     private static String handleBazaarPriceType() {
@@ -299,176 +274,7 @@ public class TextUtils {
         }
     }
 
-    public static List<String> getCommissionsLines() {
-        List<String> raw = CommissionsWidget.INSTANCE.getRawCommissions();
-        if (raw.isEmpty()) return Collections.emptyList();
-
-        formattedCommissions.clear();
-        CommissionFormat.Area detectedArea = null;
-
-        for (String line : raw) {
-            String formatted = line;
-            String lowerLine = line.toLowerCase();
-            for (CommissionFormat.CommissionType type : CommissionFormat.INSTANCE.getCOMMISSIONS()) {
-                String typeNameLower = type.getName().toLowerCase();
-                if (lowerLine.contains(typeNameLower)) {
-                    formatted = type.getFormat().invoke(line);
-                    if (detectedArea == null) detectedArea = type.getArea();
-                    break;
-                }
-            }
-            formattedCommissions.add(formatted);
-        }
-
-        if (detectedArea != null) {
-            switch (detectedArea) {
-                case DWARVEN_MINES -> formattedCommissions.addFirst("§2§l" + detectedArea.getDisplayName());
-                case CRYSTAL_HOLLOWS -> formattedCommissions.addFirst("§5§l" + detectedArea.getDisplayName());
-                case GLACITE_TUNNELS -> formattedCommissions.addFirst("§b§l" + detectedArea.getDisplayName());
-            }
-        }
-        return formattedCommissions;
-    }
-
-    public static List<String> getMiningLines() {
-        List<String> raw = MiningStatsWidget.INSTANCE.getRawStats();
-        if (raw.isEmpty()) return Collections.emptyList();
-
-        formattedMiningStats.clear();
-        formattedMiningStats.addAll(MiningStatsParser.parse(raw, BlockWatcher.INSTANCE.getMiningBlockType()));
-        return formattedMiningStats;
-    }
-
-    public static List<String> getForagingLines() {
-        List<String> raw = ForagingStatsWidget.INSTANCE.getRawStats();
-        List<String> rawBeacon = ForagingStatsWidget.INSTANCE.getRawBeaconStats();
-        if (raw.isEmpty()) return Collections.emptyList();
-
-        formattedForagingStats.clear();
-        formattedForagingStats.addAll(ForagingStatsParser.parse(raw, rawBeacon, BlockWatcher.INSTANCE.getForagingBlockType()));
-        return formattedForagingStats;
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    public static List<String> getSkillLines() {
-        skillOverlayLines.clear();
-
-        skillOverlayLines.add(skillName + " Experience");
-        skillOverlayLines.add(skillName + " Level: " + formatNumber(skillLevel));
-        skillOverlayLines.add("Total " + skillName + " XP: " + formatNumberOrPlaceholder(totalSkillXp));
-        skillOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(skillXpGained));
-        skillOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(skillPerHour));
-        skillOverlayLines.add("Uptime: " + SkillTrackingHandler.getUptime());
-
-        return skillOverlayLines;
-    }
-
-    public static List<String> getTamingLines() {
-        tamingOverlayLines.clear();
-
-        if (skillName.equals("Taming")) {
-            ConfigHelper.disableTamingTracking();
-            return tamingOverlayLines;
-        }
-
-        if (tamingLevel == 0) {
-            ConfigHelper.disableTamingTracking();
-            ChatUtils.INSTANCE.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true);
-            return skillOverlayLines;
-        }
-        tamingOverlayLines.add("Taming Experience");
-        tamingOverlayLines.add("Taming Level: " + formatNumber(tamingLevel));
-        tamingOverlayLines.add("Total Taming XP: " + formatNumberOrPlaceholder(tamingXp));
-        tamingOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(tamingXpGained));
-        tamingOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(tamingPerHour));
-
-        return tamingOverlayLines;
-    }
-
-    public static @NotNull List<String> getCollectionLines() {
-        updateTrackingLines();
-        if (overlayLines.isEmpty()) return overlayLines;
-        List<String> lines = new ArrayList<>(overlayLines);
-        lines.add("Uptime: " + TrackingHandler.getUptime());
-        return lines;
-    }
-
-    public static @NotNull List<String> getCollectionExtraLines() {
-        updateTrackingExtraLines();
-        return extraOverlayLines;
-    }
-
-    public static List<String> getSkyMallLines() {
-        skyMallOverlayLines.clear();
-        if (ConfigAccess.isSkyMallInMiningIslandsOnly() && MiningStatsWidget.getCurrentMiningIsland() == null) return Collections.emptyList();
-
-        skyMallOverlayLines.add("§bSky Mall: " + ChatListener.getCurrentSkyMallBuff());
-        skyMallOverlayLines.add(updateTimer());
-        return  skyMallOverlayLines;
-    }
-
-    public static List<String> getLotteryLines() {
-        lotteryOverlayLines.clear();
-        if (ConfigAccess.isLotteryInForagingIslandsOnly() && ForagingStatsWidget.getCurrentForagingIsland() == null) return Collections.emptyList();
-
-        lotteryOverlayLines.add("§2Lottery: " + ChatListener.getCurrentLotteryBuff());
-        lotteryOverlayLines.add(updateTimer());
-        return  lotteryOverlayLines;
-    }
-
-    public static List<String> getPickaxeAbilityLines() {
-        pickaxeAbilityOverlayLines.clear();
-        if (!ConfigAccess.isPickaxeAbilityDisplayed()) return Collections.emptyList();
-
-        if (ConfigAccess.getPickaxeAbilityName().isEmpty()) {
-            pickaxeAbilityOverlayLines.add("§cUnknown Ability");
-        } else {
-            pickaxeAbilityOverlayLines.add("§bAbility: §e" + ConfigAccess.getPickaxeAbilityName());
-        }
-        long now = System.currentTimeMillis();
-        double cooldown = (ChatListener.getFinalCooldown() - now) / 1000.0;
-        double duration = (ChatListener.getFinalDuration() - now) / 1000.0;
-
-        if (duration >= 0) {
-            // Ability active
-            pickaxeAbilityOverlayLines.add(String.format("§aActive: %.1fs", duration));
-        } else if (cooldown > 0) {
-            // Ability on cooldown
-            pickaxeAbilityOverlayLines.add(String.format("§cCooldown: %.1fs",cooldown));
-        } else {
-            // Ability ready
-            pickaxeAbilityOverlayLines.add("§aReady!");
-        }
-        return pickaxeAbilityOverlayLines;
-    }
-
-    public static List<String> getAxeAbilityLines() {
-        axeAbilityOverlayLines.clear();
-        if (!ConfigAccess.isAxeAbilityDisplayed()) return Collections.emptyList();
-
-        if (ConfigAccess.getAxeAbilityName().isEmpty()) {
-            axeAbilityOverlayLines.add("§cUnknown Ability");
-        } else {
-            axeAbilityOverlayLines.add("§bAbility: §e" + ConfigAccess.getAxeAbilityName());
-        }
-        long now = System.currentTimeMillis();
-        double cooldown = (ChatListener.getFinalAxeCooldown() - now) / 1000.0;
-        double duration = (ChatListener.getFinalAxeDuration() - now) / 1000.0;
-
-        if (duration >= 0) {
-            // Ability active
-            axeAbilityOverlayLines.add(String.format("§aActive: %.1fs", duration));
-        } else if (cooldown > 0) {
-            // Ability on cooldown
-            axeAbilityOverlayLines.add(String.format("§cCooldown: %.1fs",cooldown));
-        } else {
-            // Ability ready
-            axeAbilityOverlayLines.add("§aReady!");
-        }
-        return axeAbilityOverlayLines;
-    }
-
-    private static String updateTimer() {
+    public static String updateTimer() {
         long timeLeft = (ChatListener.getNextBuffTime() - System.currentTimeMillis()) / 1000;
         if (timeLeft <= 5) {
             return "§aTime left: §cSoon";
@@ -494,7 +300,7 @@ public class TextUtils {
         return formattedName.toString();
     }
 
-    private static String formatNumberOrPlaceholder(long value) {
+    public static String formatNumberOrPlaceholder(long value) {
         return value > 0 ? formatNumber(value) : "Calculating...";
     }
 }

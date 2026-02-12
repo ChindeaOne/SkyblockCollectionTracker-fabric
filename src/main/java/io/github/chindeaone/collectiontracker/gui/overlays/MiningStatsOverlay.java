@@ -3,17 +3,22 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.util.HypixelUtils;
+import io.github.chindeaone.collectiontracker.util.parser.MiningStatsParser;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
+import io.github.chindeaone.collectiontracker.util.tab.MiningStatsWidget;
+import io.github.chindeaone.collectiontracker.util.world.BlockWatcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MiningStatsOverlay implements AbstractOverlay{
 
     private final Position position = ConfigAccess.getMiningStatsPosition();
+    private final List<String> formattedMiningStats = new ArrayList<>();
     private boolean renderingAllowed  = true;
 
     @Override
@@ -44,7 +49,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
     @Override
     public void render(GuiGraphics context) {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.getMiningLines();
+        List<String> lines = getMiningLines();
 
         if (lines.isEmpty()) return;
 
@@ -56,7 +61,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
     @Override
     public void updateDimensions() {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.getMiningLines();
+        List<String> lines = getMiningLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;
@@ -65,5 +70,14 @@ public class MiningStatsOverlay implements AbstractOverlay{
         int h = fr.lineHeight * lines.size();
 
         position.setDimensions(maxW, h);
+    }
+
+    private List<String> getMiningLines() {
+        List<String> raw = MiningStatsWidget.INSTANCE.getRawStats();
+        if (raw.isEmpty()) return Collections.emptyList();
+
+        formattedMiningStats.clear();
+        formattedMiningStats.addAll(MiningStatsParser.parse(raw, BlockWatcher.INSTANCE.getMiningBlockType()));
+        return formattedMiningStats;
     }
 }

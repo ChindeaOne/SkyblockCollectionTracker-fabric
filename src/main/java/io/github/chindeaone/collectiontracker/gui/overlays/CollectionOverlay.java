@@ -9,13 +9,17 @@ import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CollectionOverlay implements AbstractOverlay{
 
     public static volatile boolean trackingDirty = false;
     private final Position position = ConfigAccess.getTrackingPosition();
+    public final List<String> overlayLines = new ArrayList<>();
+    public final List<String> extraOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;
 
     @Override
@@ -46,8 +50,8 @@ public class CollectionOverlay implements AbstractOverlay{
     public void render(GuiGraphics context) {
         if (!isEnabled() || !trackingDirty) return;
 
-        List<String> mainLines = TextUtils.getCollectionLines();
-        List<String> extraLines = TextUtils.getCollectionExtraLines();
+        List<String> mainLines = getCollectionLines();
+        List<String> extraLines = getCollectionExtraLines();
 
         if (mainLines.isEmpty()) return;
 
@@ -59,7 +63,7 @@ public class CollectionOverlay implements AbstractOverlay{
     @Override
     public void updateDimensions() {
         if (!isEnabled()) return;
-        List<String> lines = TextUtils.getCollectionLines();
+        List<String> lines = getCollectionLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;
@@ -68,5 +72,18 @@ public class CollectionOverlay implements AbstractOverlay{
         int h = fr.lineHeight * lines.size();
 
         position.setDimensions(maxW, h);
+    }
+
+    private @NotNull List<String> getCollectionLines() {
+        TextUtils.updateTrackingLines(overlayLines);
+        if (overlayLines.isEmpty()) return overlayLines;
+        List<String> lines = new ArrayList<>(overlayLines);
+        lines.add("Uptime: " + TrackingHandler.getUptime());
+        return lines;
+    }
+
+    private @NotNull List<String> getCollectionExtraLines() {
+        TextUtils.updateTrackingExtraLines(extraOverlayLines);
+        return extraOverlayLines;
     }
 }
