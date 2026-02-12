@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Foraging
 import io.github.chindeaone.collectiontracker.config.categories.Mining
+import io.github.chindeaone.collectiontracker.config.categories.Misc
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
@@ -55,6 +56,7 @@ val miningConfig: Mining get() = modConfig.mining
 val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
 val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
+val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityFormat
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
@@ -104,6 +106,10 @@ val explicitValues: Boolean get() = trackingConfig.explicitValues
 // Skills Tracking Config Accessors
 val skillOverlay: SkillOverlay get() = trackingConfig.skillOverlay
 val enableTamingTracking: Boolean get() = skillOverlay.enableTamingTracking
+
+// Misc Config Accessors
+val miscConfig: Misc get() = modConfig.misc
+val precision: Property<Int> get() = miscConfig.abilityPrecision
 
 /**
  * Accessors for configuration sections.
@@ -259,6 +265,12 @@ object ConfigAccess {
 
     @JvmStatic
     fun getCotfLevel(): Int = cotfLevel.get()
+
+    @JvmStatic
+    fun getAbilityPrecision(): Int = precision.get()
+
+    @JvmStatic
+    fun isColeweightAbilityFormat(): Boolean = coleweightAbilityFormat
 }
 
 /**

@@ -21,4 +21,12 @@ public class Coleweight {
     )
     @ConfigEditorBoolean
     public boolean onlyOnMiningIslands = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Coleweight ability format",
+            desc = "Changes pickaxe/axe ability display to use Coleweight's format"
+    )
+    @ConfigEditorBoolean
+    public boolean coleweightAbilityFormat = false;
 }

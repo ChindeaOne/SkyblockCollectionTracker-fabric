@@ -36,6 +36,11 @@ class ModConfig : Config() {
     @SerializedName("foraging")
     @Accordion
     val foraging: Foraging = Foraging()
+    @Expose
+    @Category(name = "Misc", desc = "Misc config")
+    @SerializedName("misc")
+    @Accordion
+    val misc: Misc = Misc()
 
     override fun getTitle() : StructuredText {
         val modName = "SkyblockCollectionTracker"

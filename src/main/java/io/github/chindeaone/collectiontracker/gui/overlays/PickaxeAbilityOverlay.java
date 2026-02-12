@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.util.HypixelUtils;
 import io.github.chindeaone.collectiontracker.util.chat.ChatListener;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
+import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -74,24 +75,38 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
         pickaxeAbilityOverlayLines.clear();
         if (!ConfigAccess.isPickaxeAbilityDisplayed()) return Collections.emptyList();
 
-        if (ConfigAccess.getPickaxeAbilityName().isEmpty()) {
-            pickaxeAbilityOverlayLines.add("§cUnknown Ability");
-        } else {
-            pickaxeAbilityOverlayLines.add("§bAbility: §e" + ConfigAccess.getPickaxeAbilityName());
-        }
+        String abilityName = ConfigAccess.getPickaxeAbilityName();
+        String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;
+
         long now = System.currentTimeMillis();
         double cooldown = (ChatListener.getFinalCooldown() - now) / 1000.0;
         double duration = (ChatListener.getFinalDuration() - now) / 1000.0;
 
-        if (duration >= 0) {
-            // Ability active
-            pickaxeAbilityOverlayLines.add(String.format("§aActive: %.1fs", duration));
-        } else if (cooldown > 0) {
-            // Ability on cooldown
-            pickaxeAbilityOverlayLines.add(String.format("§cCooldown: %.1fs",cooldown));
+        if (ConfigAccess.isColeweightAbilityFormat()) {
+            String status;
+            if (duration >= 0) {
+                status = "§a" + TextUtils.formatTime(duration);
+            } else if (cooldown > 0) {
+                status = "§c" + TextUtils.formatTime(cooldown);
+            } else {
+                status = "§aReady!";
+            }
+            pickaxeAbilityOverlayLines.add("§e" + displayName + " CD: " + status);
         } else {
-            // Ability ready
-            pickaxeAbilityOverlayLines.add("§aReady!");
+            // Original format
+            if (abilityName.isEmpty()) {
+                pickaxeAbilityOverlayLines.add("§cUnknown Ability");
+            } else {
+                pickaxeAbilityOverlayLines.add("§bPickaxe Ability: §e" + abilityName);
+            }
+
+            if (duration >= 0) {
+                pickaxeAbilityOverlayLines.add("§aActive: " + TextUtils.formatTime(duration));
+            } else if (cooldown > 0) {
+                pickaxeAbilityOverlayLines.add("§cCooldown: " + TextUtils.formatTime(cooldown));
+            } else {
+                pickaxeAbilityOverlayLines.add("§aReady!");
+            }
         }
         return pickaxeAbilityOverlayLines;
     }

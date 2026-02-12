@@ -77,7 +77,7 @@ object ColeweightUtils {
     private fun displayColeweightLeaderboard(position: Int) {
         val leaderboard = ColeweightManager.storage.tempLeaderboard
         val (start, end) = if (position <= 100) {
-            0 to minOf(100, leaderboard.size)
+            0 to minOf(position, leaderboard.size)
         } else {
             val startIndex = minOf(position - 25, leaderboard.size)
             val endIndex = minOf(position + 25, leaderboard.size)

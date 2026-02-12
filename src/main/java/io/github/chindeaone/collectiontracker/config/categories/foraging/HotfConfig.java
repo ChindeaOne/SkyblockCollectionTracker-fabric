@@ -13,7 +13,7 @@ public class HotfConfig {
             name = "Center Of The Forest Level",
             desc = "Input your Center Of The Forest level.\n§eRequired for more precise axe ability cooldown."
     )
-    @ConfigEditorSlider(minValue = 0, maxValue = 10, minStep = 1)
+    @ConfigEditorSlider(minValue = 0, maxValue = 5, minStep = 1)
     public Property<Integer> cotfLevel = Property.of(0);
 
     @Expose

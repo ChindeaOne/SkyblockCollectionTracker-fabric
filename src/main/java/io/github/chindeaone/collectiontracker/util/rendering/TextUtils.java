@@ -303,4 +303,10 @@ public class TextUtils {
     public static String formatNumberOrPlaceholder(long value) {
         return value > 0 ? formatNumber(value) : "Calculating...";
     }
+
+    public static String formatTime(double time) {
+        int precision = ConfigAccess.getAbilityPrecision();
+        String formatString = "%." + precision + "fs";
+        return String.format(formatString, time);
+    }
 }

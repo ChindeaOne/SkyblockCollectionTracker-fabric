@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.util.HypixelUtils;
 import io.github.chindeaone.collectiontracker.util.chat.ChatListener;
 import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
+import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -74,24 +75,38 @@ public class AxeAbilityOverlay implements AbstractOverlay{
         axeAbilityOverlayLines.clear();
         if (!ConfigAccess.isAxeAbilityDisplayed()) return Collections.emptyList();
 
-        if (ConfigAccess.getAxeAbilityName().isEmpty()) {
-            axeAbilityOverlayLines.add("§cUnknown Ability");
-        } else {
-            axeAbilityOverlayLines.add("§bAbility: §e" + ConfigAccess.getAxeAbilityName());
-        }
+        String abilityName = ConfigAccess.getAxeAbilityName();
+        String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;
+
         long now = System.currentTimeMillis();
         double cooldown = (ChatListener.getFinalAxeCooldown() - now) / 1000.0;
         double duration = (ChatListener.getFinalAxeDuration() - now) / 1000.0;
 
-        if (duration >= 0) {
-            // Ability active
-            axeAbilityOverlayLines.add(String.format("§aActive: %.1fs", duration));
-        } else if (cooldown > 0) {
-            // Ability on cooldown
-            axeAbilityOverlayLines.add(String.format("§cCooldown: %.1fs",cooldown));
+        if (ConfigAccess.isColeweightAbilityFormat()) {
+            String status;
+            if (duration >= 0) {
+                status = "§a" + TextUtils.formatTime(duration);
+            } else if (cooldown > 0) {
+                status = "§c" + TextUtils.formatTime(cooldown);
+            } else {
+                status = "§aReady!";
+            }
+            axeAbilityOverlayLines.add("§e" + displayName + " CD: " + status);
         } else {
-            // Ability ready
-            axeAbilityOverlayLines.add("§aReady!");
+            // Original format
+            if (abilityName.isEmpty()) {
+                axeAbilityOverlayLines.add("§cUnknown Ability");
+            } else {
+                axeAbilityOverlayLines.add("§bPickaxe Ability: §e" + abilityName);
+            }
+
+            if (duration >= 0) {
+                axeAbilityOverlayLines.add("§aActive: " + TextUtils.formatTime(duration));
+            } else if (cooldown > 0) {
+                axeAbilityOverlayLines.add("§cCooldown: " + TextUtils.formatTime(cooldown));
+            } else {
+                axeAbilityOverlayLines.add("§aReady!");
+            }
         }
         return axeAbilityOverlayLines;
     }
