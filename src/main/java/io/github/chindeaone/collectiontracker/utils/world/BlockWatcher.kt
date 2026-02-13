@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.phys.BlockHitResult
@@ -16,6 +17,7 @@ object BlockWatcher {
 
     // Check the block the player is looking at
     fun onClientTick(client: Minecraft) {
+        if (!HypixelUtils.isOnSkyblock) return
         val hitResult = client.hitResult
 
         if (hitResult != null && hitResult.type == HitResult.Type.BLOCK) {

@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
+import org.jetbrains.annotations.NotNull
 
 class ChangelogOverlay(
     private val oldScreen: AbstractContainerScreen<*>?
@@ -20,7 +21,7 @@ class ChangelogOverlay(
         Minecraft.getInstance().setScreen(oldScreen)
     }
 
-    override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun render(@NotNull context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
         renderMenuBackground(context)
 
         if (oldScreen != null) (oldScreen as AccessorGuiContainer)

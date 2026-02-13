@@ -1,3 +1,6 @@
+/*
+ * This kotlin object is derived from the SkyHanni mod.
+ */
 package io.github.chindeaone.collectiontracker.gui
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.configManager
@@ -34,23 +37,21 @@ object GuiManager {
 
     @JvmStatic
     fun openGuiPositionEditor() {
-
         OverlayManager.setGlobalRendering(false)
 
         val current = Minecraft.getInstance().screen
         val old = current as? AbstractContainerScreen<*>
 
-        Minecraft.getInstance().setScreen(DummyOverlay(old))
+        screenToOpen = DummyOverlay(old)
     }
 
     @JvmStatic
     fun openChangelog() {
-
         OverlayManager.setGlobalRendering(false)
 
         val current = Minecraft.getInstance().screen
         val old = current as? AbstractContainerScreen<*>
 
-        Minecraft.getInstance().setScreen(ChangelogOverlay(old))
+        screenToOpen = ChangelogOverlay(old)
     }
 }
