@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
-import io.github.chindeaone.collectiontracker.util.SkillUtils;
-import io.github.chindeaone.collectiontracker.util.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.SkillUtils;
+import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

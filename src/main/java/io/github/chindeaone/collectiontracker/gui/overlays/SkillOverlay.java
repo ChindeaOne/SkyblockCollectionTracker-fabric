@@ -4,9 +4,9 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
-import io.github.chindeaone.collectiontracker.util.ChatUtils;
-import io.github.chindeaone.collectiontracker.util.HypixelUtils;
-import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
+import io.github.chindeaone.collectiontracker.utils.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,8 +16,8 @@ import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
 import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates.*;
-import static io.github.chindeaone.collectiontracker.util.NumbersUtils.formatNumber;
-import static io.github.chindeaone.collectiontracker.util.rendering.TextUtils.formatNumberOrPlaceholder;
+import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
+import static io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatNumberOrPlaceholder;
 
 public class SkillOverlay implements AbstractOverlay {
 

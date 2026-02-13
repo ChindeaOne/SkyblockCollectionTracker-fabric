@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.coleweight
 
 import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
-import io.github.chindeaone.collectiontracker.util.ChatUtils
-import io.github.chindeaone.collectiontracker.util.ServerUtils
+import io.github.chindeaone.collectiontracker.utils.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import net.minecraft.client.Minecraft
 
 object ColeweightUtils {

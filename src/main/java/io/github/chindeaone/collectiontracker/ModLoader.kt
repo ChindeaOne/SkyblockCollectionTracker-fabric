@@ -5,14 +5,14 @@ package io.github.chindeaone.collectiontracker
 
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
-import io.github.chindeaone.collectiontracker.util.CommissionsKeybinds
-import io.github.chindeaone.collectiontracker.util.Hypixel
-import io.github.chindeaone.collectiontracker.util.ScoreboardUtils
-import io.github.chindeaone.collectiontracker.util.ServerUtils
-import io.github.chindeaone.collectiontracker.util.chat.ChatListener
-import io.github.chindeaone.collectiontracker.util.inventory.InventoryListener
-import io.github.chindeaone.collectiontracker.util.tab.TabData
-import io.github.chindeaone.collectiontracker.util.world.BlockWatcher
+import io.github.chindeaone.collectiontracker.utils.CommissionsKeybinds
+import io.github.chindeaone.collectiontracker.utils.Hypixel
+import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
+import io.github.chindeaone.collectiontracker.utils.ServerUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
+import io.github.chindeaone.collectiontracker.utils.tab.TabData
+import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents

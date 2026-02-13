@@ -4,7 +4,7 @@ import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManag
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates;
-import io.github.chindeaone.collectiontracker.util.inventory.InventoryListener;
+import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener;
 
 public class SacksTrackingManager {
 

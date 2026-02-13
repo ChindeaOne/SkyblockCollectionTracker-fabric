@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.api.colors;
 
 import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.api.URLManager;
-import io.github.chindeaone.collectiontracker.util.ColorUtils;
+import io.github.chindeaone.collectiontracker.utils.ColorUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

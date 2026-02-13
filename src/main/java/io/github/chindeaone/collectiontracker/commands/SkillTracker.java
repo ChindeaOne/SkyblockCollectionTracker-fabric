@@ -1,10 +1,10 @@
 package io.github.chindeaone.collectiontracker.commands;
 
 import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher;
-import io.github.chindeaone.collectiontracker.util.SkillUtils;
+import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
-import io.github.chindeaone.collectiontracker.util.ChatUtils;
-import io.github.chindeaone.collectiontracker.util.HypixelUtils;
+import io.github.chindeaone.collectiontracker.utils.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

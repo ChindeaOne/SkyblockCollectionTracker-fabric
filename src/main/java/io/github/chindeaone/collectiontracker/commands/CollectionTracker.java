@@ -4,10 +4,10 @@ import io.github.chindeaone.collectiontracker.api.bazaarapi.FetchBazaarPrice;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
-import io.github.chindeaone.collectiontracker.util.ChatUtils;
-import io.github.chindeaone.collectiontracker.util.HypixelUtils;
-import io.github.chindeaone.collectiontracker.util.PlayerData;
-import io.github.chindeaone.collectiontracker.util.ServerUtils;
+import io.github.chindeaone.collectiontracker.utils.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
+import io.github.chindeaone.collectiontracker.utils.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.ServerUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

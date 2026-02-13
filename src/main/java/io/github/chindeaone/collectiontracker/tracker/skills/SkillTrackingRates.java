@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.tracker.skills;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.util.SkillUtils;
+import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 
 import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
 import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.getUptimeInSeconds;

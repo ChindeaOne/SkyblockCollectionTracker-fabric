@@ -3,8 +3,8 @@ package io.github.chindeaone.collectiontracker.tracker.collection;
 import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
-import io.github.chindeaone.collectiontracker.util.PlayerData;
-import io.github.chindeaone.collectiontracker.util.ServerUtils;
+import io.github.chindeaone.collectiontracker.utils.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.ServerUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

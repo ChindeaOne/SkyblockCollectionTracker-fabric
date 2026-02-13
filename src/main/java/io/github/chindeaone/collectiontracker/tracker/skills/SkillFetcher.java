@@ -2,9 +2,9 @@ package io.github.chindeaone.collectiontracker.tracker.skills;
 
 import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
-import io.github.chindeaone.collectiontracker.util.PlayerData;
-import io.github.chindeaone.collectiontracker.util.ServerUtils;
-import io.github.chindeaone.collectiontracker.util.SkillUtils;
+import io.github.chindeaone.collectiontracker.utils.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.ServerUtils;
+import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

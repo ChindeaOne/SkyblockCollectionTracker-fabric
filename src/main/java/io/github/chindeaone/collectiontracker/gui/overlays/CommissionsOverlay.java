@@ -2,10 +2,10 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.util.HypixelUtils;
-import io.github.chindeaone.collectiontracker.util.rendering.CommissionFormat;
-import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.util.tab.CommissionsWidget;
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
+import io.github.chindeaone.collectiontracker.utils.rendering.CommissionFormat;
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
+import io.github.chindeaone.collectiontracker.utils.tab.CommissionsWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

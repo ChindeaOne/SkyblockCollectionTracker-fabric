@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.api.coleweight;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager;
-import io.github.chindeaone.collectiontracker.util.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

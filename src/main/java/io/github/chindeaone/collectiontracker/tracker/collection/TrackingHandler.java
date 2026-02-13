@@ -9,10 +9,10 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarTyp
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager;
-import io.github.chindeaone.collectiontracker.util.ChatUtils;
-import io.github.chindeaone.collectiontracker.util.Hypixel;
-import io.github.chindeaone.collectiontracker.util.PlayerData;
-import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
+import io.github.chindeaone.collectiontracker.utils.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.Hypixel;
+import io.github.chindeaone.collectiontracker.utils.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +23,7 @@ import static io.github.chindeaone.collectiontracker.collections.CollectionsMana
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
 import static io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.scheduler;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
-import static io.github.chindeaone.collectiontracker.util.NumbersUtils.formatNumber;
+import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
 
 public class TrackingHandler {
 

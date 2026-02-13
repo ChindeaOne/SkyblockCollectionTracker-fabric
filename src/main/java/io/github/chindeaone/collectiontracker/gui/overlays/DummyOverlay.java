@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.mixins.AccessorGuiContainer;
-import io.github.chindeaone.collectiontracker.util.rendering.RenderUtils;
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;

@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.commands;
 
-import io.github.chindeaone.collectiontracker.util.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.ChatUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;

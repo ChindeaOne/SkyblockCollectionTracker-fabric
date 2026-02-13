@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.mixins;
 
-import io.github.chindeaone.collectiontracker.util.chat.ChatListener;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;

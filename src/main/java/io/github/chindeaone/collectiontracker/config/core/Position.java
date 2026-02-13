@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.config.core;
 
 import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.util.rendering.ScaleUtils;
+import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils;
 
 public class Position {
 
