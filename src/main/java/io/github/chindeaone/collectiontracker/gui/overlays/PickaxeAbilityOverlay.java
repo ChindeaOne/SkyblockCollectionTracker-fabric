@@ -94,14 +94,14 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
                     expiredTitleShown = false;
                     readyTitleShown = false;
                 } else {
-                    String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
-                    String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
-                    if (!expiredTitleShown && cooldown >= -1) {
+                    if (!expiredTitleShown && cooldown >= -1 && !displayName.equals("Pickobulus")) {
+                        String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
                         RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getAbilityTitleDisplayTimer());
                         expiredTitleShown = true;
                     }
                     if (cooldown <= 0 && cooldown >= -1) {
                         if (!readyTitleShown) {
+                            String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
                             RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getAbilityTitleDisplayTimer());
                             readyTitleShown = true;
                         }
@@ -128,13 +128,13 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
                     expiredTitleShown = false;
                     readyTitleShown = false;
                 } else {
-                    if (!expiredTitleShown && cooldown >= -1) {
-                        RenderUtils.showTitle(Component.literal("§b" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                    if (!expiredTitleShown && cooldown >= -1 && !displayName.equals("Pickobulus")) {
+                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
                         expiredTitleShown = true;
                     }
                     if (cooldown <= 0 && cooldown >= -1) {
                         if (!readyTitleShown) {
-                            RenderUtils.showTitle(Component.literal("§b" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                            RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
                             readyTitleShown = true;
                         }
                     } else {
