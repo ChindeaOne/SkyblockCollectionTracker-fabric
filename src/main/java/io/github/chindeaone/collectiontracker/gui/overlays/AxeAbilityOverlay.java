@@ -127,12 +127,12 @@ public class AxeAbilityOverlay implements AbstractOverlay{
                     readyTitleShown = false;
                 } else {
                     if (!expiredTitleShown && cooldown >= -1) {
-                        RenderUtils.showTitle(Component.literal("§b" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
                         expiredTitleShown = true;
                     }
                     if (cooldown <= 0 && cooldown >= -1) {
                         if (!readyTitleShown) {
-                            RenderUtils.showTitle(Component.literal("§b" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                            RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
                             readyTitleShown = true;
                         }
                     } else {
@@ -145,7 +145,7 @@ public class AxeAbilityOverlay implements AbstractOverlay{
             if (abilityName.isEmpty()) {
                 axeAbilityOverlayLines.add("§cUnknown Ability");
             } else {
-                axeAbilityOverlayLines.add("§bPickaxe Ability: §e" + abilityName);
+                axeAbilityOverlayLines.add("§bAxe Ability: §e" + abilityName);
             }
 
             if (duration >= 0) {

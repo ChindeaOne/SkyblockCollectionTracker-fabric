@@ -60,15 +60,15 @@ object ColeweightUtils {
     private fun displayColeweight(playerName: String, storage: ColeweightStorage, detailed: Boolean = false) {
         val message = if (detailed) {
             buildString {
-            appendLine("${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
-            appendLine("§6Experience:")
-            storage.experience.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-            appendLine("§6Powder:")
-            storage.powder.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-            appendLine("§6Collection:")
-            storage.collection.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-            appendLine("§6Miscellaneous:")
-            storage.miscellaneous.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
+                appendLine("${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
+                appendLine("§6Experience:")
+                storage.experience.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
+                appendLine("§6Powder:")
+                storage.powder.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
+                appendLine("§6Collection:")
+                storage.collection.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
+                appendLine("§6Miscellaneous:")
+                storage.miscellaneous.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
             }
         } else "${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)"
         Minecraft.getInstance().execute { ChatUtils.sendMessage(message, true) }
