@@ -216,6 +216,12 @@ public class CommandRegistry {
                                 )
                         )
                 )
+                .then(ClientCommandManager.literal("changelog")
+                        .executes(context -> {
+                            Minecraft.getInstance().execute(GuiManager::openChangelog);
+                            return 1;
+                        })
+                )
         ));
     }
 

@@ -26,6 +26,9 @@ public class RepoUtils {
     public static volatile String latestVersion;
     public static String latestReleaseTag;
     public static String latestBetaTag;
+    public static String latestNotes;
+    private static String latestReleaseNotes;
+    private static String latestBetaNotes;
 
     private static final String currentVersion = SkyblockCollectionTracker.VERSION;
 
@@ -54,6 +57,8 @@ public class RepoUtils {
 
             latestReleaseTag = jsonResponse.getAsJsonPrimitive("latest_tag").getAsString();
             latestBetaTag = jsonResponse.getAsJsonPrimitive("latest_beta_tag").getAsString();
+            latestReleaseNotes = jsonResponse.getAsJsonPrimitive("latest_release_notes").getAsString();
+            latestBetaNotes = jsonResponse.getAsJsonPrimitive("latest_beta_notes").getAsString();
         }
     }
 
@@ -65,10 +70,14 @@ public class RepoUtils {
         String chosenTag = (ConfigAccess.getUpdateType() == About.UpdateType.BETA)
                 ? latestBetaTag
                 : latestReleaseTag;
+        String chosenNotes = (ConfigAccess.getUpdateType() == About.UpdateType.BETA)
+                ? latestBetaNotes
+                : latestReleaseNotes;
 
         // If already on that same version -> no update
         if (currentVersion.equals(chosenTag)) {
             latestVersion = null;
+            latestNotes = chosenNotes;
             return;
         }
 
@@ -76,21 +85,22 @@ public class RepoUtils {
         int baseCompare = compareBaseVersion(chosenTag);
 
         if (baseCompare > 0) {
-            // Target has higher major/minor/patch -> update
+            // Target has higher major/minor/beta -> update
             latestVersion = chosenTag;
+            latestNotes = chosenNotes;
         } else if (baseCompare == 0) {
-            // Same base version (ex: 1.0.9-beta2 → 1.0.9)
             if (!currentVersion.equals(chosenTag)) {
                 latestVersion = chosenTag;
+                latestNotes = chosenNotes;
             }
         } else {
             // Target is older -> don't update
             latestVersion = null;
+            latestNotes = null;
         }
     }
 
     private static String normalizeTags(String tag) {
-        // remove 'v' prefix if present
         tag = tag.startsWith("v") ? tag.substring(1) : tag;
 
         // remove metadata if preset
@@ -110,6 +120,6 @@ public class RepoUtils {
             int n2 = Integer.parseInt(b[i]);
             if (n1 != n2) return Integer.compare(n1, n2);
         }
-        return 0; // same major.minor.patch
+        return 0; // same major.minor.beta
     }
 }

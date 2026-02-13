@@ -204,6 +204,7 @@ object AbilityUtils {
             cooldown *= 0.8
         }
 
+        // Mayhem cooldown reduction
         if (MiningStatsWidget.currentMiningIsland == "Mineshaft" && isMayhemCooldown) {
             cooldown *= 0.75
         }

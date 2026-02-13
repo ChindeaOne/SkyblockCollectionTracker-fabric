@@ -21,7 +21,7 @@ public class DummyOverlay extends Screen {
     private final AbstractContainerScreen<?> oldScreen;
 
     public DummyOverlay(AbstractContainerScreen<?> oldScreen) {
-        super(Component.empty());
+        super(Component.literal("Dummy Overlay"));
         this.oldScreen = oldScreen;
     }
 

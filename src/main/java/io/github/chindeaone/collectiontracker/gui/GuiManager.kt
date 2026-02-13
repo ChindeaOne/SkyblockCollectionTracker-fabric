@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.gui
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.configManager
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.screenToOpen
 import io.github.chindeaone.collectiontracker.config.ModConfig
+import io.github.chindeaone.collectiontracker.gui.overlays.ChangelogOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyOverlay
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
@@ -40,5 +41,16 @@ object GuiManager {
         val old = current as? AbstractContainerScreen<*>
 
         Minecraft.getInstance().setScreen(DummyOverlay(old))
+    }
+
+    @JvmStatic
+    fun openChangelog() {
+
+        OverlayManager.setGlobalRendering(false)
+
+        val current = Minecraft.getInstance().screen
+        val old = current as? AbstractContainerScreen<*>
+
+        Minecraft.getInstance().setScreen(ChangelogOverlay(old))
     }
 }

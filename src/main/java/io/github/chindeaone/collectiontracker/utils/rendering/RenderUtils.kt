@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.rendering
 
+import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -10,6 +12,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
+import kotlin.text.split
 
 object RenderUtils {
 
@@ -19,6 +22,7 @@ object RenderUtils {
     const val WHITE: Int = 0xFFFFFFFF.toInt()
     const val GREEN: Int = 0xFF55FF55.toInt()
     const val YELLOW: Int = 0xFFFFFF55.toInt()
+    const val AQUA: Int = 0xFF55FFFF.toInt()
 
     private var activeTitle: Component? = null
     private var titleExpireTime: Long = 0
@@ -170,5 +174,93 @@ object RenderUtils {
 
         context.drawCenteredString(fr, title, 0, -fr.lineHeight / 2, WHITE)
         context.pose().popMatrix()
+    }
+
+    @JvmStatic
+    fun renderChangelog(context: GuiGraphics, scrollOffset: Int) {
+        val rawNotes = RepoUtils.latestNotes
+        val footerIndex = rawNotes.indexOf("**Full Changelog**")
+        val cleanNotes = if (footerIndex != -1) rawNotes.substring(0, footerIndex) else rawNotes
+
+        val screenWidth = context.guiWidth()
+        val screenHeight = context.guiHeight()
+
+        val overlayWidth = screenWidth / 2
+        val overlayHeight = (screenHeight * 0.75f).toInt()
+        val startX = (screenWidth - overlayWidth) / 2
+        val startY = (screenHeight - overlayHeight) / 2
+
+        context.fill((startX - 10), startY - 10, startX + overlayWidth + 10, startY + overlayHeight + 10, -0x7f000000)
+
+        // Render current version first
+        SkyblockCollectionTracker.VERSION.let { version ->
+            context.drawCenteredString(fr, "Version: $version", screenWidth / 2, startY - 20, GREEN)
+        }
+
+        context.enableScissor(startX, startY, startX + overlayWidth, startY + overlayHeight)
+        renderChangelogLines(context, cleanNotes, startX, startY - scrollOffset, overlayWidth, startY, overlayHeight)
+        context.disableScissor()
+    }
+
+    private fun renderChangelogLines(context: GuiGraphics, text: String, startX: Int, startY: Int, overlayWidth: Int, limitStartY: Int, limitHeight: Int) {
+        val lines = text.split(Regex("\r?\n"))
+        var currentY = startY
+        val referenceRegex = Regex("""\(#\d+\)""")
+
+        for (line in lines) {
+            val trimmed = line.trim()
+
+            if (trimmed.isEmpty() || trimmed == "---") {
+                currentY += fr.lineHeight / 2
+                continue
+            }
+            // Set header colors
+            val color = when {
+                line.contains("## What's New") -> GREEN
+                line.contains("## Improvements") -> YELLOW
+                line.contains("## Bug Fixes") -> AQUA
+                else -> WHITE
+            }
+            // clear Markdown
+            val cleanLine = trimmed.replace("## ", "")
+                .replace("**", "")
+                .replace("`", "")
+                .replace(referenceRegex, "")
+
+            val wrappedLines = fr.split(Component.literal(cleanLine), overlayWidth)
+            for (wrapped in wrappedLines) {
+                if (currentY + fr.lineHeight >= limitStartY && currentY <= limitStartY + limitHeight)
+                    context.drawString(fr, wrapped, startX, currentY, color, true)
+                currentY += fr.lineHeight
+            }
+        }
+    }
+
+    fun getChangelogHeight(screenWidth: Int): Int {
+        val text = RepoUtils.latestNotes ?: return 0
+        val overlayWidth = screenWidth / 2
+        val footerIndex = text.indexOf("**Full Changelog**")
+        val cleanNotes = if (footerIndex != -1) text.substring(0, footerIndex) else text
+
+        val lines = cleanNotes.split(Regex("\r?\n"))
+        var totalHeight = 0
+        val referenceRegex = Regex("""\(#\d+\)""")
+
+        for (line in lines) {
+            val trimmed = line.trim()
+            if (trimmed.isEmpty() || trimmed == "---") {
+                totalHeight += fr.lineHeight / 2
+                continue
+            }
+
+            val cleanLine = trimmed.replace("## ", "")
+                .replace("**", "")
+                .replace("`", "")
+                .replace(referenceRegex, "")
+
+            val wrappedLines = fr.split(Component.literal(cleanLine), overlayWidth)
+            totalHeight += wrappedLines.size * fr.lineHeight
+        }
+        return totalHeight
     }
 }

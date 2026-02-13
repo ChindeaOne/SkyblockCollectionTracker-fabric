@@ -35,6 +35,19 @@ object ChatUtils {
         Minecraft.getInstance().player?.displayClientMessage(finalComponent, false)
     }
 
+    fun sendCommandComponent(
+        text: String,
+        command: String,
+        prefix: Boolean = true
+    ) {
+        val component = Component.literal(text)
+            .withStyle { style: Style? ->
+                val newStyle = style!!.withClickEvent(ClickEvent.RunCommand(command))
+                newStyle
+            }
+        sendComponent(component, prefix)
+    }
+
     fun String.asComponent(): Component = Component.literal(this)
 
     private fun Component.centerText(width: Int = getWidth()): Component {

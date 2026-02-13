@@ -98,6 +98,7 @@ object Hypixel {
                                         if (!ConfigAccess.hasCheckedUpdate()) {
                                             Minecraft.getInstance().execute {
                                                 ChatUtils.sendMessage("§aThe mod has been updated successfully.")
+                                                ChatUtils.sendCommandComponent("§eSee what changed here.", "/sct changelog")
                                             }
                                             ConfigHelper.enableUpdateChecks()
                                             logger.info("[SCT]: The mod has been updated successfully.")
