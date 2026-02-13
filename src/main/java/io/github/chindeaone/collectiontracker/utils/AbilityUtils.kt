@@ -51,6 +51,7 @@ object AbilityUtils {
         RARE(0.0, 0.0007, 0.0),
         EPIC(0.0, 0.0, 0.0012),
         LEGENDARY(0.001, 0.0, 0.0012),
+        MYTHIC(0.0, 0.0, 0.0) // for other mythic pets
     }
 
     data class Pet(
@@ -71,6 +72,8 @@ object AbilityUtils {
     @Volatile
     var lastPet: Pet? = null
     private val gson = ConfigManager.gson
+
+    var isMayhemCooldown: Boolean = false
 
     fun update(s: AbilitySnapshot) {
         when (s) {
@@ -200,10 +203,10 @@ object AbilityUtils {
         if (skyMallActive && miningIslands.contains(MiningStatsWidget.currentMiningIsland)) {
             cooldown *= 0.8
         }
-        // TODO: Add Mineshaft Mayhem check next
-//        if (mineshaftActive) {
-//            cooldown *= 0.75
-//        }
+
+        if (MiningStatsWidget.currentMiningIsland == "Mineshaft" && isMayhemCooldown) {
+            cooldown *= 0.75
+        }
 
         return cooldown.coerceAtLeast(0.0)
     }

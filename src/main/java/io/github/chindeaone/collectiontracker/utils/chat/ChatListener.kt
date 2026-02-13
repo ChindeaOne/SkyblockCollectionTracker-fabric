@@ -130,15 +130,7 @@ object ChatListener {
         val level = if (AbilityUtils.lastPet?.name == name) AbilityUtils.lastPet!!.level else 100
         val rarity = if (AbilityUtils.lastPet?.name == name) AbilityUtils.lastPet!!.rarity else AbilityUtils.PetRarity.LEGENDARY
 
-        AbilityUtils.updatePet(
-            AbilityUtils.Pet(
-                name = name,
-                level = level,
-                rarity = rarity,
-                timestamp = System.currentTimeMillis(),
-                isManual = true
-            )
-        )
+        AbilityUtils.updatePet(AbilityUtils.Pet(name = name, level = level, rarity = rarity, timestamp = System.currentTimeMillis(), isManual = true))
     }
 
     // Listen to Autopet swap messages
@@ -164,6 +156,7 @@ object ChatListener {
             '9' -> AbilityUtils.PetRarity.RARE
             '5' -> AbilityUtils.PetRarity.EPIC
             '6' -> AbilityUtils.PetRarity.LEGENDARY
+            'd' -> AbilityUtils.PetRarity.MYTHIC
             else -> return
         }
 
@@ -220,6 +213,9 @@ object ChatListener {
         val text = message.string.removeColor()
 
         when {
+            text.startsWith("MAYHEM!") -> {
+                AbilityUtils.isMayhemCooldown = text.contains("Your Pickaxe Ability cooldown was reduced from your Mineshaft Mayhem perk!")
+            }
             text.contains("Your Sky Mall buff changed!") -> {
                 expectingSkyMallBuff = true
                 return ConfigAccess.isSkyMallEnabled()
