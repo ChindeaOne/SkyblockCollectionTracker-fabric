@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ChatComponent.class, priority = 998) // lowest priority so other mods can modify the message first
+@Mixin(value = ChatComponent.class)
 public class ChatHudMixin {
     @ModifyVariable(
             method = "addMessage(Lnet/minecraft/network/chat/Component;)V",
