@@ -74,7 +74,6 @@ public class ColeweightFetcher {
                         int status = response.statusCode();
                         if (status == 200) {
                             ColeweightManager.updateColeweightLb(response.body(), false);
-                            hasColeweightLb = true;
                             logger.info("Successfully fetched Coleweight leaderboard data.");
                             if (onComplete != null) {
                                 try {

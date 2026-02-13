@@ -79,15 +79,15 @@ object ColeweightUtils {
         val (start, end) = if (position <= 100) {
             0 to minOf(position, leaderboard.size)
         } else {
-            val startIndex = minOf(position - 25, leaderboard.size)
-            val endIndex = minOf(position + 25, leaderboard.size)
+            val startIndex = minOf(position - 15, leaderboard.size)
+            val endIndex = minOf(position + 16, leaderboard.size)
             startIndex to endIndex
         }
         val subList = leaderboard.subList(start, end)
 
         Minecraft.getInstance().execute {
             subList.forEachIndexed { index, (player, coleweight) ->
-                val message = "${getRankColors(index + 1)} §a$player: §b$coleweight"
+                val message = "${getRankColors(start + index)} §a$player: §b$coleweight"
                 ChatUtils.sendMessage(message, true)
             }
         }
