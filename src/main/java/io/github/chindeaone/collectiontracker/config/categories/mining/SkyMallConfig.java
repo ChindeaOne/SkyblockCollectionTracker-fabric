@@ -11,7 +11,7 @@ public class SkyMallConfig {
     @Expose
     @ConfigOption(
             name = "Better Sky Mall",
-            desc = "Displays current Sky Mall perks and compacts Sky Mall chat messages"
+            desc = "Displays current Sky Mall perks and compacts Sky Mall chat messages."
     )
     @ConfigEditorBoolean
     public boolean enableSkyMall = false;

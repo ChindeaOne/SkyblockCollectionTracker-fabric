@@ -17,6 +17,14 @@ public class PickaxeAbilityConfig {
     public boolean displayPickaxeAbility = false;
 
     @Expose
+    @ConfigOption(
+            name = "Show Title",
+            desc = "Shows a title (Ready/Expired) when pickaxe ability is ready or expires."
+    )
+    @ConfigEditorBoolean
+    public boolean showPickaxeAbilityTitle = true;
+
+    @Expose
     public String abilityName = "";
 
     @Expose

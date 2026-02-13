@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.util.rendering
 
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.util.ColorUtils
 import net.minecraft.ChatFormatting
@@ -18,6 +19,9 @@ object RenderUtils {
     const val WHITE: Int = 0xFFFFFFFF.toInt()
     const val GREEN: Int = 0xFF55FF55.toInt()
     const val YELLOW: Int = 0xFFFFFF55.toInt()
+
+    private var activeTitle: Component? = null
+    private var titleExpireTime: Long = 0
 
     @JvmStatic
     fun drawOverlayFrame(context: GuiGraphics, pos: Position, drawContext: Runnable) {
@@ -140,5 +144,31 @@ object RenderUtils {
         } else {
             context.drawString(fr, line, 0, y, prefixColor, true)
         }
+    }
+
+    @JvmStatic
+    fun showTitle(title: Component, durationMs: Int) {
+        activeTitle = title
+        titleExpireTime = System.currentTimeMillis() + durationMs * 1000
+    }
+
+    @JvmStatic
+    fun drawActiveTitle(context: GuiGraphics) {
+        val title = activeTitle ?: return
+        if (System.currentTimeMillis() < titleExpireTime) {
+            renderTitle(context, title)
+        } else activeTitle = null
+    }
+
+    private fun renderTitle(context: GuiGraphics, title: Component) {
+        val screenWidth = context.guiWidth().toFloat()
+        val screenHeight = context.guiHeight().toFloat()
+
+        context.pose().pushMatrix()
+        context.pose().translate(screenWidth / 2f, screenHeight / 2f)
+        context.pose().scale(ConfigAccess.getTitleScale().scale * ScaleUtils.scale, ConfigAccess.getTitleScale().scale * ScaleUtils.scale)
+
+        context.drawCenteredString(fr, title, 0, -fr.lineHeight / 2, WHITE)
+        context.pose().popMatrix()
     }
 }

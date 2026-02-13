@@ -9,6 +9,7 @@ import io.github.chindeaone.collectiontracker.util.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +20,8 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
     private final Position position = ConfigAccess.getPickaxeAbilityPosition();
     private final List<String> pickaxeAbilityOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;
+    private boolean expiredTitleShown = false;
+    private boolean readyTitleShown = false;
 
     @Override
     public String overlayLabel() {
@@ -55,6 +58,8 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
         RenderUtils.drawOverlayFrame(context, position, () ->
                 RenderUtils.renderStrings(context, lines)
         );
+        // Draw expired/ready titles
+        RenderUtils.drawActiveTitle(context);
     }
 
     @Override
@@ -83,6 +88,30 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
         double duration = (ChatListener.getFinalDuration() - now) / 1000.0;
 
         if (ConfigAccess.isColeweightAbilityFormat()) {
+            // Title logic for Coleweight format
+            if (ConfigAccess.isShowPickaxeAbilityTitle()) {
+                if (duration >= 0) {
+                    expiredTitleShown = false;
+                    readyTitleShown = false;
+                } else {
+                    String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
+                    String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
+                    if (!expiredTitleShown && cooldown >= -1) {
+                        RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getAbilityTitleDisplayTimer());
+                        expiredTitleShown = true;
+                    }
+                    if (cooldown <= 0 && cooldown >= -1) {
+                        if (!readyTitleShown) {
+                            RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getAbilityTitleDisplayTimer());
+                            readyTitleShown = true;
+                        }
+                    } else {
+                        readyTitleShown = false;
+                    }
+                }
+            }
+
+            // Lines logic for Coleweight format
             String status;
             if (duration >= 0) {
                 status = "§a" + TextUtils.formatTime(duration);
@@ -93,7 +122,28 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
             }
             pickaxeAbilityOverlayLines.add("§e" + displayName + " CD: " + status);
         } else {
-            // Original format
+            // Original Title logic
+            if (ConfigAccess.isShowPickaxeAbilityTitle()) {
+                if (duration >= 0) {
+                    expiredTitleShown = false;
+                    readyTitleShown = false;
+                } else {
+                    if (!expiredTitleShown && cooldown >= -1) {
+                        RenderUtils.showTitle(Component.literal("§b" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                        expiredTitleShown = true;
+                    }
+                    if (cooldown <= 0 && cooldown >= -1) {
+                        if (!readyTitleShown) {
+                            RenderUtils.showTitle(Component.literal("§b" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                            readyTitleShown = true;
+                        }
+                    } else {
+                        readyTitleShown = false;
+                    }
+                }
+            }
+
+            // Original format lines
             if (abilityName.isEmpty()) {
                 pickaxeAbilityOverlayLines.add("§cUnknown Ability");
             } else {

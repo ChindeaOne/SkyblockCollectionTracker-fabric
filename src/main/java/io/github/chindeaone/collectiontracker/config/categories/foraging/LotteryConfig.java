@@ -11,7 +11,7 @@ public class LotteryConfig {
     @Expose
     @ConfigOption(
             name = "Better Lottery",
-            desc = "Displays current Lottery perks and compacts Lottery chat messages"
+            desc = "Displays current Lottery perks and compacts Lottery chat messages."
     )
     @ConfigEditorBoolean
     public boolean enableLottery = false;

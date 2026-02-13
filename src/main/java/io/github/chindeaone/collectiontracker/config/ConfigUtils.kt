@@ -68,6 +68,7 @@ val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
 val lastSkyMallPerk: String get() = skyMallConfig.lastSkyMallPerk
 val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIslandsOnly
 val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChatMessages
+val showPickaxeAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeAbilityTitle
 
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
@@ -93,6 +94,7 @@ val lotteryConfig: LotteryConfig get() = hotfConfig.lotteryConfig
 val enableLottery: Boolean get() = lotteryConfig.enableLottery
 val lotteryInForagingIslandsOnly: Boolean get() = lotteryConfig.lotteryInForagingIslandsOnly
 val disableLotteryChatMessages: Boolean get() = lotteryConfig.disableLotteryChatMessages
+val showAxeAbilityTitle: Boolean get() = axeAbilityConfig.showAxeAbilityTitle
 
 // Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
@@ -110,6 +112,8 @@ val enableTamingTracking: Boolean get() = skillOverlay.enableTamingTracking
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
 val precision: Property<Int> get() = miscConfig.abilityPrecision
+val abilityTitleDisplayTimer: Property<Int> get() = miscConfig.abilityTitleDisplayTimer
+val titleScale: Misc.TitleScale get() = miscConfig.titleScale
 
 /**
  * Accessors for configuration sections.
@@ -271,6 +275,18 @@ object ConfigAccess {
 
     @JvmStatic
     fun isColeweightAbilityFormat(): Boolean = coleweightAbilityFormat
+
+    @JvmStatic
+    fun getAbilityTitleDisplayTimer(): Int = abilityTitleDisplayTimer.get()
+
+    @JvmStatic
+    fun isShowPickaxeAbilityTitle(): Boolean = showPickaxeAbilityTitle
+
+    @JvmStatic
+    fun isShowAxeAbilityTitle(): Boolean = showAxeAbilityTitle
+
+    @JvmStatic
+    fun getTitleScale(): Misc.TitleScale = titleScale
 }
 
 /**

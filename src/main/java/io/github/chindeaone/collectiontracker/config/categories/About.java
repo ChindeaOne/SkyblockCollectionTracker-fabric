@@ -14,7 +14,7 @@ public class About {
         BETA
     }
 
-    @ConfigOption(name = "Current Version", desc = "This is the SkyblockCollectionTracker version you are currently running")
+    @ConfigOption(name = "Current Version", desc = "This is the SkyblockCollectionTracker version you are currently running.")
     @VersionDisplay
     @SuppressWarnings("unused")
     public transient Void currentVersion = null;
