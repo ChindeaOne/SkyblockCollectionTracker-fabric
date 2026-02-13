@@ -16,7 +16,7 @@ public class Coleweight {
 
     @Expose
     @ConfigOption(
-            name = "Only on Mining Islands",
+            name = "Mining Islands Only",
             desc = "Only show Coleweight ranks in chat when on the Mining Islands."
     )
     @ConfigEditorBoolean
@@ -25,7 +25,7 @@ public class Coleweight {
     @Expose
     @ConfigOption(
             name = "Coleweight ability format",
-            desc = "Changes pickaxe/axe ability display to use Coleweight's format."
+            desc = "Changes ability display and title to use Coleweight's format."
     )
     @ConfigEditorBoolean
     public boolean coleweightAbilityFormat = false;

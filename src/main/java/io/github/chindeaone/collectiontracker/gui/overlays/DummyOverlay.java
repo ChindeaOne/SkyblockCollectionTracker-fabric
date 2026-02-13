@@ -8,9 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-//? if = 1.21.11 {
 import org.jetbrains.annotations.NotNull;
-//? }
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
@@ -32,7 +30,7 @@ public class DummyOverlay extends Screen {
     }
 
     @Override
-    public void render(/*? if = 1.21.11 {*/@NotNull /*?}*/GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTicks) {
         if (!OverlayManager.isInEditorMode()) {
             return;
         }
@@ -105,7 +103,7 @@ public class DummyOverlay extends Screen {
     }
 
     @Override
-    public boolean mouseReleased(/*? if = 1.21.11 {*/@NotNull /*?}*/MouseButtonEvent event) {
+    public boolean mouseReleased(@NotNull MouseButtonEvent event) {
         dragging = null;
         return super.mouseReleased(event);
     }

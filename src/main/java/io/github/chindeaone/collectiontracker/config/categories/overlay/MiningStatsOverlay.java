@@ -15,7 +15,7 @@ public class MiningStatsOverlay {
 
     @Expose
     @ConfigOption(
-            name = "Only in mining specific areas",
+            name = "Mining Islands Only",
             desc = "Allows the overlay to be rendered only in Mining Islands."
     )
     @ConfigEditorBoolean
