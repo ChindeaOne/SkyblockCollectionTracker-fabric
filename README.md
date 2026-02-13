@@ -43,7 +43,7 @@
 <details>
 <summary><strong>Coleweight Modern</strong></summary>
 
-- Ported commands like `/sct cw find` or `/sct cw lb`, as well as `/sct cw find detailed` for more info.
+- Ported commands like `/sct cw find` or `/sct cw lb`, as well as `/sct cw detailed` for more info.
 - Ported Coleweight chat ranks and the option to display them on Mining Islands only.
 
 </details>
@@ -71,6 +71,25 @@
 
 - Displays active commissions and progress from tab data.
 - Keybinds for quick commission claiming.
+
+</details>
+
+<details>
+<summary><strong>Better Pickaxe/Axe Ability Cooldown</strong></summary>
+
+- Shows current pickaxe/axe ability and remaining duration while active.
+- Cooldown updates live based on COTM/COTF, drill parts, and pet swaps.
+- Configurable title alert when the ability is ready or expired.
+
+</details>
+
+<details>
+<summary><strong>Better Sky Mall/Lottery</strong></summary>
+
+- Shows current Sky Mall/Lottery buffs and their remaining time.
+- Compacts their chat messages.
+- Option to show overlays only in Mining/Foraging Islands.
+- Option to not render the buffs in chat.
 
 </details>
 
