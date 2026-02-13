@@ -17,13 +17,12 @@ public class HotfConfig {
     public Property<Integer> cotfLevel = Property.of(0);
 
     @Expose
-    @ConfigOption(name = "Lottery Config", desc = "")
-    @Accordion
-    public LotteryConfig lotteryConfig = new LotteryConfig();
-
-    @Expose
     @ConfigOption(name = "Axe Ability Config", desc = "")
     @Accordion
     public AxeAbilityConfig axeAbilityConfig = new AxeAbilityConfig();
 
+    @Expose
+    @ConfigOption(name = "Lottery Config", desc = "")
+    @Accordion
+    public LotteryConfig lotteryConfig = new LotteryConfig();
 }
