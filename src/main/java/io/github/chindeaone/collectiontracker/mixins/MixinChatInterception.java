@@ -12,10 +12,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinChatInterception {
     @Inject(
             method = "handleSystemChat",
-            at = @At("HEAD")
+            at = @At("HEAD"),
+            cancellable = true
     )
     private void onHandleSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
         String text = packet.content().getString();
         ChatListener.petSwapListener(text);
+        if (ChatListener.dailyPerksUpdate(packet.content())) {
+            ci.cancel();
+        }
     }
 }
