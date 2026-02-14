@@ -10,13 +10,11 @@ object AbilityUtils {
 
     sealed interface AbilitySnapshot {
         val timestamp: Long
-        val itemName: String
         val hasAbility: Boolean
     }
 
     data class PickaxeAbilitySnapshot(
         override val timestamp: Long,
-        override val itemName: String,
         val isDrill: Boolean,
         override val hasAbility: Boolean,
         val fuelTank: FuelTank?,
@@ -25,18 +23,8 @@ object AbilityUtils {
 
     data class AxeAbilitySnapshot(
         override val timestamp: Long,
-        override val itemName: String,
         override val hasAbility: Boolean
     ) : AbilitySnapshot
-
-    enum class ForagingAxes(val displayName: String) {
-        TREECAPITATOR("Treecapitator"),
-        SPRUCE_AXE("Spruce Axe"),
-        SERIOUSLY_DAMAGED_AXE("Seriously Damaged Axe"),
-        DECENT_AXE("Decent Axe"),
-        FIG_HEW("Fig Hew"),
-        FIGSTONE_SPLITTER("Figstone Splitter"),
-    }
 
     enum class FuelTank(val cooldownReduction: Double) {
         MITHRIL(0.02),

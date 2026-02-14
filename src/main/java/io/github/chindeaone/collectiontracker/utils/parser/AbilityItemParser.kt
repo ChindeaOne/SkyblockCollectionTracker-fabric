@@ -9,9 +9,6 @@ import net.minecraft.world.item.TooltipFlag
 
 object AbilityItemParser {
 
-    private val DRILL = Regex("\\bDrill\\b", RegexOption.IGNORE_CASE)
-    private val PICKAXE = Regex("\\bPickaxe\\b|\\bGauntlet\\b", RegexOption.IGNORE_CASE)
-
     private fun normalize (s: String) = s
         .removeColor()
         .replace("\\p{C}+".toRegex(), " ")
@@ -27,12 +24,6 @@ object AbilityItemParser {
         if (stack.isEmpty) return null
         val player = Minecraft.getInstance().player ?: return null
 
-        val rawName = stack.hoverName.string
-        val name = normalize(rawName)
-        val isDrill = DRILL.containsMatchIn(name)
-        val isPickaxeOrDrill = isDrill || PICKAXE.containsMatchIn(name)
-        val isAxe = AbilityUtils.ForagingAxes.entries.any { name.contains(it.displayName.lowercase()) }
-
         // Extract tooltips
         val context = Item.TooltipContext.of(player.level().registryAccess())
         val lines = stack.getTooltipLines(
@@ -41,11 +32,16 @@ object AbilityItemParser {
             tooltipFlag()
         ).map { it.string }.map { normalize(it) }
 
+        val hasBreakingPower = lines.any { it.contains("breaking power") }
+        val toolTypeLine = lines.findLast { it.contains("\\bdrill\\b".toRegex()) || it.contains("\\bpickaxe\\b".toRegex()) || it.contains("\\bgauntlet\\b".toRegex()) }
+        val isDrill = toolTypeLine?.contains("drill") == true
+        val isPickaxeOrDrill = hasBreakingPower && toolTypeLine != null
+        val isAxe = lines.findLast { it.contains("\\baxe\\b".toRegex()) }
+
         // Logic for Axes
-        if (isAxe && !isPickaxeOrDrill) {
+        if (isAxe != null) {
             return AbilityUtils.AxeAbilitySnapshot(
                 timestamp = System.currentTimeMillis(),
-                itemName = rawName,
                 hasAbility = true
             )
         }
@@ -64,7 +60,6 @@ object AbilityItemParser {
 
             return AbilityUtils.PickaxeAbilitySnapshot(
                 timestamp = System.currentTimeMillis(),
-                itemName = rawName,
                 isDrill = isDrill,
                 hasAbility = true,
                 fuelTank = fuelTank,
