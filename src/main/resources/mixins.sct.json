@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AccessorGuiContainer",
-    "ChatHudMixin"
+    "ChatHudMixin",
+    "MixinChatInterception"
   ],
   "injectors": {
     "defaultRequire": 1

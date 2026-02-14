@@ -17,7 +17,7 @@ public class ChatHudMixin {
             argsOnly = true
     )
     private Component modifyVisualMessage(Component message) {
-        return ChatListener.INSTANCE.coleweightHandle(message);
+        return ChatListener.coleweightHandle(message);
     }
 
     @Inject(
@@ -26,7 +26,7 @@ public class ChatHudMixin {
             cancellable = true
     )
     private void onAddMessage(Component message, CallbackInfo ci) {
-        if (ChatListener.INSTANCE.dailyPerksUpdate(message)) {
+        if (ChatListener.dailyPerksUpdate(message)) {
             ci.cancel();
         }
     }

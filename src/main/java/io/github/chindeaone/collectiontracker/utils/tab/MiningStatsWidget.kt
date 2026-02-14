@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.tab
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 
 object MiningStatsWidget {
@@ -15,6 +16,7 @@ object MiningStatsWidget {
 
     private var nextAllowedTime: Long = 0L
     private var firstInfoSeenTime: Long = 0L
+    private var wasReset: Boolean = false
 
     fun onTabWidgetsUpdate() {
         if (!ConfigAccess.isMiningStatsEnabled()) {
@@ -51,6 +53,15 @@ object MiningStatsWidget {
             rawStats = emptyList()
             lastStats = null
             return
+        }
+
+        if (currentMiningIsland == "Mineshaft") {
+            if (!wasReset) {
+                ChatListener.finalCooldown = now
+                wasReset = true
+            }
+        } else {
+            wasReset = false
         }
 
         val widget = TabWidget.STATS

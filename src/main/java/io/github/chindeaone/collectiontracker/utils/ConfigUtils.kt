@@ -28,6 +28,7 @@ object ConfigUtils {
 
         if (lastSkyMallPerk.isNotBlank()) {
             ChatListener.currentSkyMallBuff = lastSkyMallPerk
+            if (lastSkyMallPerk.contains("Cooldown")) ChatListener.isPickaxeAbility = true
         }
         if (lastLotteryPerk.isNotBlank()) {
             ChatListener.currentLotteryBuff = lastLotteryPerk
