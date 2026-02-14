@@ -54,6 +54,6 @@ jobs:
         with:
           name: "Multi-version Development Build"
           path: |
-            **/build/libs/*-1.21.10.jar
-            **/build/libs/*-1.21.11.jar
+            build/libs/1.21.10/*.jar
+            build/libs/1.21.11/*.jar
           if-no-files-found: error
