@@ -4,11 +4,29 @@
 # against bad commits.
 
 name: build
-on: [pull_request, push, workflow_dispatch]
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+    steps:
+      - name: Delete deployment
+        uses: strumwolf/delete-deployment-environment@v3.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: ci
+          onlyRemoveDeployments: true
+
   build:
-    runs-on: ubuntu-24.04
+    needs: [cleanup]
+    runs-on: ubuntu-latest
     environment: ci
     env:
       TOKEN_URL: ${{ secrets.TOKEN_URL }}
@@ -26,6 +44,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
       - name: validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
       - name: setup jdk

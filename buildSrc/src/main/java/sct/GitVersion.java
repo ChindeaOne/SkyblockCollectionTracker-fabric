@@ -2,6 +2,7 @@ package sct;
 
 import org.gradle.api.Project;
 import org.gradle.process.ExecOperations;
+import org.gradle.process.ExecResult;
 
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
@@ -18,7 +19,7 @@ public abstract class GitVersion {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         assert getExecOperations() != null;
-        getExecOperations().exec(execSpec -> {
+        ExecResult result = getExecOperations().exec(execSpec -> {
             execSpec.setWorkingDir(project.getRootDir());
             execSpec.commandLine("git", "describe", "--tags", "--abbrev=0");
             execSpec.setStandardOutput(baos);
@@ -26,11 +27,16 @@ public abstract class GitVersion {
         });
 
         String out = baos.toString(StandardCharsets.UTF_8).trim();
+
+        if (result.getExitValue() != 0 || out.isEmpty()) {
+            return "2.0.0-dev";
+        }
+
         if (out.startsWith("v")) out = out.substring(1);
 
         int plusIndex = out.indexOf("+");
         if (plusIndex != -1) out = out.substring(0, plusIndex);
 
-        return out;
+        return out.isEmpty() ? "2.0.0-dev" : out;
     }
 }
