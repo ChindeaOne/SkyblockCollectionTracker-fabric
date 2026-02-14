@@ -2,8 +2,11 @@ package io.github.chindeaone.collectiontracker.coleweight
 
 import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.utils.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
+import io.github.chindeaone.collectiontracker.utils.toRankComponent
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 
 object ColeweightUtils {
 
@@ -16,6 +19,7 @@ object ColeweightUtils {
         return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
     }
 
+    @JvmStatic
     fun getColeweight(playerName: String, detailed: Boolean = false) {
         if (!ServerUtils.serverStatus) {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
@@ -37,10 +41,12 @@ object ColeweightUtils {
         }
     }
 
+    @JvmStatic
     fun getColeweightDetailed(playerName: String) {
         getColeweight(playerName, true)
     }
 
+    @JvmStatic
     fun getColeweightLeaderboard(position: Int) {
         if (!ServerUtils.serverStatus) {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
@@ -58,20 +64,23 @@ object ColeweightUtils {
     }
 
     private fun displayColeweight(playerName: String, storage: ColeweightStorage, detailed: Boolean = false) {
-        val message = if (detailed) {
-            buildString {
-                appendLine("${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
-                appendLine("§6Experience:")
-                storage.experience.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-                appendLine("§6Powder:")
-                storage.powder.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-                appendLine("§6Collection:")
-                storage.collection.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-                appendLine("§6Miscellaneous:")
-                storage.miscellaneous.forEach { (k, v) -> appendLine("  §e$k: §b$v") }
-            }
-        } else "${getRankColors(storage.rank)} §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)"
-        Minecraft.getInstance().execute { ChatUtils.sendMessage(message, true) }
+        val isMe = playerName.equals(PlayerData.playerName, ignoreCase = true)
+        val rankComp = getCustomColor(storage.rank, isMe)
+
+        val fullMessage = Component.empty().append(rankComp).append(" §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
+
+        if (detailed) {
+            fullMessage.append("\n§6Experience:")
+            storage.experience.forEach { (k, v) -> fullMessage.append("\n  §e$k: §b$v") }
+            fullMessage.append("\n§6Powder:")
+            storage.powder.forEach { (k, v) -> fullMessage.append("\n  §e$k: §b$v") }
+            fullMessage.append("\n§6Collection:")
+            storage.collection.forEach { (k, v) -> fullMessage.append("\n  §e$k: §b$v") }
+            fullMessage.append("\n§6Miscellaneous:")
+            storage.miscellaneous.forEach { (k, v) -> fullMessage.append("\n  §e$k: §b$v") }
+        }
+
+        Minecraft.getInstance().execute { ChatUtils.sendComponent(fullMessage, true) }
     }
 
     private fun displayColeweightLeaderboard(position: Int) {
@@ -86,24 +95,18 @@ object ColeweightUtils {
         val subList = leaderboard.subList(start, end)
 
         Minecraft.getInstance().execute {
-            subList.forEachIndexed { index, (player, coleweight) ->
-                val message = "${getRankColors(start + index)} §a$player: §b$coleweight"
-                ChatUtils.sendMessage(message, true)
+            subList.forEachIndexed { index, entry ->
+                val rank = start + index + 1
+                val isMe = entry.name.equals(PlayerData.playerName, ignoreCase = true)
+                val message = Component.empty()
+                    .append(getCustomColor(rank, isMe))
+                    .append(" §a${entry.name}: §b${entry.coleweight}")
+                ChatUtils.sendComponent(message, true)
             }
         }
     }
 
-    fun getRankColors(rank: Int): String {
-        return when (rank) {
-            1 -> "§0[CW #${rank}]§r" // Black
-            2 -> "§4[CW #${rank}]§r" // Dark Red
-            3 -> "§2[CW #${rank}]§r" // Dark Green
-            in 4..25 -> "§6[CW #${rank}]§r" // Gold
-            in 26..100 -> "§3[CW #${rank}]§r" // Dark Aqua
-            in 101..250 -> "§b[CW #${rank}]§r" // Aqua
-            in 251..500 -> "§9[CW #${rank}]§r" // Blue
-            in 501..1000 -> "§7[CW #${rank}]§r" // Gray
-            else -> "[CW #${rank}]§r" // No color for ranks above 1000
-        }
+    fun getCustomColor(rank: Int, isMe: Boolean): Component {
+        return rank.toRankComponent(isMe)
     }
 }

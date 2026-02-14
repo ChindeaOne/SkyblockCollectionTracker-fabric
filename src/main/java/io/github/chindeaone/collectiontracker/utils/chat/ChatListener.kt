@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
+import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
@@ -338,9 +339,10 @@ object ChatListener {
 
         if (leaderboardRank != -1) {
             val rank = leaderboardRank + 1
-            val rankSuffix = ColeweightUtils.getRankColors(rank)
+            if (rank > 1000) return message // Don't show ranks for players outside of top 1000
+            val rankSuffix = ColeweightUtils.getCustomColor(rank, playerName.equals(PlayerData.playerName, ignoreCase = true))
 
-            if (rankSuffix.isNotEmpty()) {
+            if (rankSuffix != Component.empty() && rankSuffix.string.isNotEmpty()) {
                 val newComponent = MutableComponent.create(message.contents).withStyle(message.style)
                 var nameFound = false
                 var hasRank = false
@@ -364,7 +366,8 @@ object ChatListener {
                         val after = siblingText.substring(colonIndex)
 
                         newComponent.append(Component.literal(before).withStyle(sibling.style))
-                        newComponent.append(Component.literal(" $rankSuffix").withStyle(sibling.style))
+                        newComponent.append(Component.literal(" "))
+                        newComponent.append(rankSuffix)
                         newComponent.append(Component.literal(after).withStyle(sibling.style))
                         hasRank = true
                     } else {

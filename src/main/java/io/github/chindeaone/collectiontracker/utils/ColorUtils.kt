@@ -1,8 +1,12 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import com.google.gson.JsonObject
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.TextColor
 import java.awt.Color
+
+fun Int.toRankComponent(isMe: Boolean): Component = ColorUtils.customColorComponent(this, isMe)
 
 object ColorUtils {
     val skillColors: MutableMap<String, Int> = HashMap()
@@ -69,5 +73,31 @@ object ColorUtils {
         val g = (start.green + (end.green - start.green) * percent).toInt()
         val b = (start.blue + (end.blue - start.blue) * percent).toInt()
         return Color(r, g, b)
+    }
+
+    fun customColorComponent(rank: Int, isMe: Boolean): Component {
+        val color = getRankColor(rank, isMe)
+        val text = "[⛏ #$rank]"
+
+        return Component.literal(text).withStyle {
+            it.withColor(TextColor.fromRgb(color.rgb))
+        }
+    }
+
+    fun getRankColor(rank: Int, isMe: Boolean): Color {
+        if (isMe && ConfigAccess.isCustomColorEnabled()) {
+            return Color(ConfigAccess.getCustomColor().getEffectiveColourRGB())
+        }
+        return when (rank) {
+            1 -> Color.BLACK
+            2 -> Color(170, 0, 0)       // Dark Red
+            3 -> Color(0, 170, 0)       // Dark Green
+            in 4..25 -> Color(255, 170, 0)   // Gold
+            in 26..100 -> Color(0, 170, 170)  // Dark Aqua
+            in 101..250 -> Color(85, 255, 255) // Aqua
+            in 251..500 -> Color(85, 85, 255)  // Blue
+            in 501..1000 -> Color(170, 170, 170)// Gray
+            else -> Color.WHITE
+        }
     }
 }

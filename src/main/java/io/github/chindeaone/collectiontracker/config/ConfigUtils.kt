@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Misc
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightColor
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
@@ -21,6 +22,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.Foraging
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 /**
@@ -55,8 +57,6 @@ val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
 val miningConfig: Mining get() = modConfig.mining
 val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
 val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
-val coleweightConfig: Coleweight get() = miningConfig.coleweight
-val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityFormat
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
@@ -70,6 +70,13 @@ val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIsl
 val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChatMessages
 val showPickaxeAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeAbilityTitle
 val pickaxeAbilityInMiningIslandsOnly: Boolean get() = pickaxeAbilityConfig.pickaxeAbilityInMiningIslandsOnly
+
+// Coleweight Config Accessors
+val coleweightConfig: Coleweight get() = miningConfig.coleweight
+val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityFormat
+val coleweightColor: ColeweightColor get() = coleweightConfig.coleweightColor
+val enableCustomColor: Boolean get() = coleweightColor.enableCustomColor
+val customColor: ChromaColour get() = coleweightColor.customColor
 
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
@@ -299,6 +306,12 @@ object ConfigAccess {
 
     @JvmStatic
     fun isAbilityCooldownOnly(): Boolean = abilityCooldownOnly
+
+    @JvmStatic
+    fun isCustomColorEnabled(): Boolean = enableCustomColor
+
+    @JvmStatic
+    fun getCustomColor(): ChromaColour = customColor
 }
 
 /**

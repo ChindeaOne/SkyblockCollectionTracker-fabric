@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.config.categories.coleweight;
 
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -29,4 +30,9 @@ public class Coleweight {
     )
     @ConfigEditorBoolean
     public boolean coleweightAbilityFormat = false;
+
+    @Expose
+    @ConfigOption(name = "Custom Coleweight Rank Color", desc = "")
+    @Accordion
+    public ColeweightColor coleweightColor = new ColeweightColor();
 }

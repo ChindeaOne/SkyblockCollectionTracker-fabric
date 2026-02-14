@@ -18,13 +18,18 @@ import java.util.*
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import com.google.gson.Gson
+import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import java.nio.file.AtomicMoveNotSupportedException
 
 class ConfigManager {
 
     companion object {
-        val gson: Gson = GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation()
-            .serializeSpecialFloatingPointValues().registerTypeAdapterFactory(PropertyTypeAdapterFactory())
+        val gson: Gson = GsonBuilder().setPrettyPrinting()
+            .excludeFieldsWithoutExposeAnnotation()
+            .serializeSpecialFloatingPointValues()
+            .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
+            .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
             .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
                 override fun write(out: JsonWriter, value: UUID) {
                     out.value(value.toString())
@@ -33,7 +38,9 @@ class ConfigManager {
                 override fun read(reader: JsonReader): UUID {
                     return UUID.fromString(reader.nextString())
                 }
-            }.nullSafe()).enableComplexMapKeySerialization().create()
+            }.nullSafe())
+            .enableComplexMapKeySerialization()
+            .create()
     }
 
     private val logger: Logger = LogManager.getLogger(ConfigManager::class)
@@ -150,7 +157,7 @@ class ConfigManager {
                     StandardCopyOption.ATOMIC_MOVE
                 )
             } catch (e: AtomicMoveNotSupportedException) {
-                logger.warn("Atomic move not supported, falling back to non-atomic move")
+                logger.warn("Atomic move not supported, falling back to non-atomic move", e)
                 Files.move(
                     unit.toPath(),
                     configFile.toPath(),
