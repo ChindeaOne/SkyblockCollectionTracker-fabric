@@ -1,14 +1,28 @@
 # Automatically build the project and run any configured tests for every push
 # and submitted pull request. This can help catch issues that only occur on
-# certain platforms or Java versions, and provides a first line of defence
+# certain platforms or Java versions, and provides a first line of defense
 # against bad commits.
 
 name: build
-on: [pull_request, push]
+on: [pull_request, push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-24.04
+    environment: ci
+    env:
+      TOKEN_URL: ${{ secrets.TOKEN_URL }}
+      TRACKED_COLLECTION_URL: ${{ secrets.TRACKED_COLLECTION_URL }}
+      AVAILABLE_COLLECTIONS_URL: ${{ secrets.AVAILABLE_COLLECTIONS_URL }}
+      AVAILABLE_GEMSTONES_URL: ${{ secrets.AVAILABLE_GEMSTONES_URL }}
+      NPC_PRICES_URL: ${{ secrets.NPC_PRICES_URL }}
+      BAZAAR_URL: ${{ secrets.BAZAAR_URL }}
+      STATUS_URL: ${{ secrets.STATUS_URL }}
+      GITHUB_URL: ${{ secrets.GHUB_URL }}
+      COLORS_URL: ${{ secrets.COLORS_URL }}
+      SKILLS_URL: ${{ secrets.SKILLS_URL }}
+      COLEWEIGHT_URL: ${{ secrets.COLEWEIGHT_URL }}
+      AGENT: ${{ secrets.AGENT }}
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
@@ -26,20 +40,20 @@ jobs:
       - name: "Stonecutter: set active to 1.21.10"
         run: ./gradlew stonecutterSwitchTo1.21.10 --no-daemon --stacktrace
       - name: Build 1.21.10
-        run: ./gradlew :1.21.10:build --no-daemon --stacktrace
-      - name: Upload artifact 1.21.10
-        uses: actions/upload-artifact@v4
-        with:
-          name: 1.21.10
-          path: "**/build/libs/*-1.21.10.jar"
+        run: ./gradlew :1.21.10:clean :1.21.10:build --no-daemon --stacktrace --no-build-cache
 
       # Build for 1.21.11
       - name: "Stonecutter: set active to 1.21.11"
         run: ./gradlew stonecutterSwitchTo1.21.11 --no-daemon --stacktrace
       - name: Build 1.21.11
-        run: ./gradlew :1.21.11:build --no-daemon --stacktrace
-      - name: Upload artifact 1.21.11
+        run: ./gradlew :1.21.11:clean :1.21.11:build --no-daemon --stacktrace --no-build-cache
+
+      # Multi version download
+      - name: Upload Development Build
         uses: actions/upload-artifact@v4
         with:
-          name: 1.21.11
-          path: "**/build/libs/*-1.21.11.jar"
+          name: "Multi-version Development Build"
+          path: |
+            **/build/libs/*-1.21.10.jar
+            **/build/libs/*-1.21.11.jar
+          if-no-files-found: error

@@ -27,7 +27,7 @@ object ChatListener {
     private val SKILL_PATTERN = Regex("\\+(?<gains>[\\d,.]+)\\s+(?<skillName>.+?)\\s*\\((?<current>[\\d,]+)\\s*/\\s*(?<needed>[\\d,]+)\\)", RegexOption.IGNORE_CASE)
     private val SACKS_PATTERN = Regex("""^\[Sacks]\s*\+([0-9,]+)\s+items?\.\s*\(Last\s+([0-9]+)s\.?\)""", RegexOption.IGNORE_CASE)
     // Coleweight pattern
-    private val NAME_PATTERN = Regex( """^(?:\[\d+]\s+)?(?:[^\w\s]\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE)
+    private val NAME_PATTERN = Regex( """^(?:\[\d+]\s+)?(?:\p{So}\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE)
     private val ABILITY_PATTERN = Regex("^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!", RegexOption.IGNORE_CASE)
     private val SUMMON_PATTERN = Regex("^You summoned your (.+?)!")
     var lastSkillValue = 0L
@@ -48,11 +48,10 @@ object ChatListener {
     @JvmStatic
     @Volatile
     var finalCooldown: Long = 0L
-
     @JvmStatic
     @Volatile
     var finalDuration: Long = 0L
-        private set
+
     @JvmStatic
     @Volatile
     var finalAxeCooldown: Long = 0L
