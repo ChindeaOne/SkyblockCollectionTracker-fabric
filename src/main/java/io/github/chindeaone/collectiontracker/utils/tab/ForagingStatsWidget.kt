@@ -20,13 +20,6 @@ object ForagingStatsWidget {
     private var firstInfoSeenTime: Long = 0L
 
     fun onTabWidgetsUpdate() {
-        if (!ConfigAccess.isForagingStatsOverlayEnabled()) {
-            rawStats = emptyList()
-            rawBeaconStats = emptyList()
-            lastStats = null
-            lastBeaconStats = null
-            return
-        }
         val now = System.currentTimeMillis()
         if (now < nextAllowedTime) return
 
@@ -50,6 +43,14 @@ object ForagingStatsWidget {
         }
         currentForagingIsland = if (areaWidget.lines.any { it.contains("Galatea") }) "Galatea" else "The Park"
         isInGalatea = currentForagingIsland == "Galatea"
+
+        if (!ConfigAccess.isForagingStatsOverlayEnabled()) {
+            rawStats = emptyList()
+            rawBeaconStats = emptyList()
+            lastStats = null
+            lastBeaconStats = null
+            return
+        }
 
         val widget = TabWidget.STATS
         val beaconWidget = TabWidget.MOONGLADE_BEACON

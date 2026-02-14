@@ -19,12 +19,6 @@ object MiningStatsWidget {
     private var wasReset: Boolean = false
 
     fun onTabWidgetsUpdate() {
-        if (!ConfigAccess.isMiningStatsEnabled()) {
-            rawStats = emptyList()
-            currentMiningIsland = null
-            lastStats = null
-            return
-        }
         val now = System.currentTimeMillis()
         if (now < nextAllowedTime) return
 
@@ -54,7 +48,6 @@ object MiningStatsWidget {
             lastStats = null
             return
         }
-
         if (currentMiningIsland == "Mineshaft") {
             if (!wasReset) {
                 ChatListener.finalCooldown = now
@@ -63,6 +56,11 @@ object MiningStatsWidget {
             }
         } else {
             wasReset = false
+        }
+        if (!ConfigAccess.isMiningStatsEnabled()) {
+            rawStats = emptyList()
+            lastStats = null
+            return
         }
 
         val widget = TabWidget.STATS
