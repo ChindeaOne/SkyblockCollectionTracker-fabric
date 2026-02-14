@@ -100,11 +100,16 @@ public class SkillOverlay implements AbstractOverlay {
             return tamingOverlayLines;
         }
 
-        if (tamingLevel == 0) {
-            ConfigHelper.disableTamingTracking();
+        if (ConfigAccess.isTamingTrackingEnabled() && SkillTrackingHandler.getUptimeInSeconds() > 1 && tamingXp == 0) {
             ChatUtils.INSTANCE.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true);
-            return skillOverlayLines;
+            ConfigHelper.disableTamingTracking();
+            return tamingOverlayLines;
         }
+
+        if (!ConfigAccess.isTamingTrackingEnabled()) {
+            return tamingOverlayLines;
+        }
+
         tamingOverlayLines.add("Taming Experience");
         tamingOverlayLines.add("Taming Level: " + formatNumber(tamingLevel));
         tamingOverlayLines.add("Total Taming XP: " + formatNumberOrPlaceholder(tamingXp));
