@@ -13,7 +13,7 @@ import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
-import io.github.chindeaone.collectiontracker.utils.tab.TabWidget
+import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
@@ -27,7 +27,7 @@ object ChatListener {
     private val SKILL_PATTERN = Regex("\\+(?<gains>[\\d,.]+)\\s+(?<skillName>.+?)\\s*\\((?<current>[\\d,]+)\\s*/\\s*(?<needed>[\\d,]+)\\)", RegexOption.IGNORE_CASE)
     private val SACKS_PATTERN = Regex("""^\[Sacks]\s*\+([0-9,]+)\s+items?\.\s*\(Last\s+([0-9]+)s\.?\)""", RegexOption.IGNORE_CASE)
     // Coleweight pattern
-    private val NAME_PATTERN = Regex( """^(?:\[\d+]\s+)?(?:\p{So}\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE)
+    private val NAME_PATTERN = Regex( """^(?:\[\d+]\s+)?(?:[^\w\s]\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE)
     private val ABILITY_PATTERN = Regex("^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!", RegexOption.IGNORE_CASE)
     private val SUMMON_PATTERN = Regex("^You summoned your (.+?)!")
     var lastSkillValue = 0L
@@ -327,20 +327,9 @@ object ChatListener {
         val text = message.string.removeColor()
 
         if (ConfigAccess.isOnlyOnMiningIslands()) {
-            // Check tab area widget
-            val areaWidget = TabWidget.AREA
-
-            if (areaWidget.isPresent) {
-                val currentIsland = areaWidget.lines.firstNotNullOfOrNull { line ->
-                    MiningMapping.miningIslands.firstOrNull { name ->
-                        line.contains(name, ignoreCase = true)
-                    }
-                }
-                if (currentIsland == null) {
-                    return message
-                }
-            }
+            if (!MiningMapping.miningIslands.contains(MiningStatsWidget.currentMiningIsland)) return message
         }
+
         val match = NAME_PATTERN.find(text)?: return message
         val playerName = match.groupValues[1]
 
