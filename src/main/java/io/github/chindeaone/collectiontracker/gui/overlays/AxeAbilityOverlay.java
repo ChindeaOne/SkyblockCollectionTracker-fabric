@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
+import io.github.chindeaone.collectiontracker.utils.tab.ForagingStatsWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -76,7 +77,9 @@ public class AxeAbilityOverlay implements AbstractOverlay{
 
     private List<String> getAxeAbilityLines() {
         axeAbilityOverlayLines.clear();
+
         if (!ConfigAccess.isAxeAbilityDisplayed()) return Collections.emptyList();
+        if (ConfigAccess.isAxeAbilityInForagingIslandsOnly() && ForagingStatsWidget.getCurrentForagingIsland() == null) return Collections.emptyList();
 
         String abilityName = ConfigAccess.getAxeAbilityName();
         String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;
@@ -111,7 +114,7 @@ public class AxeAbilityOverlay implements AbstractOverlay{
 
             // Lines logic for Coleweight format
             String status;
-            if (duration >= 0) {
+            if (!ConfigAccess.isAbilityCooldownOnly() && duration >= 0) {
                 status = "§a" + TextUtils.formatTime(duration);
             } else if (cooldown > 0) {
                 status = "§c" + TextUtils.formatTime(cooldown);
@@ -148,7 +151,7 @@ public class AxeAbilityOverlay implements AbstractOverlay{
                 axeAbilityOverlayLines.add("§bAxe Ability: §e" + abilityName);
             }
 
-            if (duration >= 0) {
+            if (!ConfigAccess.isAbilityCooldownOnly() && duration >= 0) {
                 axeAbilityOverlayLines.add("§aActive: " + TextUtils.formatTime(duration));
             } else if (cooldown > 0) {
                 axeAbilityOverlayLines.add("§cCooldown: " + TextUtils.formatTime(cooldown));

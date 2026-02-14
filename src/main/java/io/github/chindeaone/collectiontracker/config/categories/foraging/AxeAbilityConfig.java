@@ -18,6 +18,14 @@ public class AxeAbilityConfig {
 
     @Expose
     @ConfigOption(
+            name = "Foraging Islands Only",
+            desc = "Allows the axe ability display to be rendered only in Foraging Islands."
+    )
+    @ConfigEditorBoolean
+    public boolean axeAbilityInForagingIslandsOnly = false;
+
+    @Expose
+    @ConfigOption(
             name = "Show Title",
             desc = "Shows a title (Ready/Expired) when axe ability is ready or expires."
     )

@@ -18,6 +18,14 @@ public class PickaxeAbilityConfig {
 
     @Expose
     @ConfigOption(
+            name = "Mining Islands Only",
+            desc = "Allows the pickaxe ability display to be rendered only in Mining Islands."
+    )
+    @ConfigEditorBoolean
+    public boolean pickaxeAbilityInMiningIslandsOnly = false;
+
+    @Expose
+    @ConfigOption(
             name = "Show Title",
             desc = "Shows a title (Ready/Expired) when pickaxe ability is ready or expires."
     )
