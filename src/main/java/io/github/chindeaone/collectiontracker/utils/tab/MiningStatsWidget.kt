@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 
 object MiningStatsWidget {
@@ -22,32 +23,13 @@ object MiningStatsWidget {
         val now = System.currentTimeMillis()
         if (now < nextAllowedTime) return
 
-        // Check if the player is in a mining area
-        val areaWidget = TabWidget.AREA
-
-        if (areaWidget.isPresent) {
-            currentMiningIsland = if (ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly()) {
-                areaWidget.lines.firstNotNullOfOrNull { line ->
-                    MiningMapping.miningIslands.firstOrNull { name ->
-                        line.contains(name, ignoreCase = true)
-                    }
-                }
-            } else areaWidget.lines.firstNotNullOfOrNull { line ->
-                MiningMapping.miningAreas.firstOrNull { name ->
-                    line.contains(name, ignoreCase = true)
-                }
-            }
-
-            if (currentMiningIsland == null) {
-                rawStats = emptyList()
-                lastStats = null
-                return
-            }
-        } else {
+        currentMiningIsland = IslandTracker.currentMiningIsland
+        if (currentMiningIsland == null) {
             rawStats = emptyList()
             lastStats = null
             return
         }
+
         if (currentMiningIsland == "Mineshaft") {
             if (!wasReset) {
                 ChatListener.finalCooldownTicks = 0

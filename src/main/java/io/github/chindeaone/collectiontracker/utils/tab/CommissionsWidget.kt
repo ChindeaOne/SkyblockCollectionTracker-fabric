@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.tab
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 
 object CommissionsWidget {
     private var lastCommissionSet: List<String>? = null
@@ -21,18 +22,11 @@ object CommissionsWidget {
         val now = System.currentTimeMillis()
         if (now < nextAllowedTime) return
 
-        val areaWidget = TabWidget.AREA
-        if (areaWidget.isPresent) {
-            if (!areaWidget.lines.any { it.contains("Dwarven Mines") || it.contains("Crystal Hollows") || it.contains("Mineshaft") }) {
+        if (!IslandTracker.currentMiningIsland.let { it.equals("Dwarven Mines") || it.equals("Crystal Hollows") || it.equals("Mineshaft") }) {
                 // not in an area with commissions
                 rawCommissions = emptyList()
                 lastCommissionSet = null
                 return
-            }
-        } else {
-            rawCommissions = emptyList()
-            lastCommissionSet = null
-            return
         }
 
         val widget = TabWidget.COMMISSIONS

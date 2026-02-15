@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.tab
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 
 object ForagingStatsWidget {
 
@@ -23,26 +24,15 @@ object ForagingStatsWidget {
         val now = System.currentTimeMillis()
         if (now < nextAllowedTime) return
 
-        val areaWidget = TabWidget.AREA
-        if (areaWidget.isPresent) {
-            if (!areaWidget.lines.any { it.contains("The Park") || it.contains("Galatea") }) {
-                rawStats = emptyList()
-                rawBeaconStats = emptyList()
-                lastStats = null
-                lastBeaconStats = null
-                currentForagingIsland = null
-                return
-            }
-        } else {
+        currentForagingIsland = IslandTracker.currentForagingIsland
+        isInGalatea = IslandTracker.isInGalatea
+        if (currentForagingIsland == null) {
             rawStats = emptyList()
             rawBeaconStats = emptyList()
             lastStats = null
             lastBeaconStats = null
-            currentForagingIsland = null
             return
         }
-        currentForagingIsland = if (areaWidget.lines.any { it.contains("Galatea") }) "Galatea" else "The Park"
-        isInGalatea = currentForagingIsland == "Galatea"
 
         if (!ConfigAccess.isForagingStatsOverlayEnabled()) {
             rawStats = emptyList()

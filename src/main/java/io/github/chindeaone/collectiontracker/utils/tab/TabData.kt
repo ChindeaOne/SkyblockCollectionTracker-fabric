@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.tab
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 
@@ -19,6 +20,7 @@ object TabData {
 
         if (world != currentWorld) {
             world = currentWorld
+            IslandTracker.reset()
         }
 
         if (!HypixelUtils.isOnSkyblock) return
@@ -29,6 +31,7 @@ object TabData {
         tabCache = newList
         TabWidget.update(tabCache)
 
+        IslandTracker.update()
         CommissionsWidget.onTabWidgetsUpdate()
         MiningStatsWidget.onTabWidgetsUpdate()
         ForagingStatsWidget.onTabWidgetsUpdate()
