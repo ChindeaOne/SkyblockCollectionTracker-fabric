@@ -50,8 +50,8 @@ object MiningStatsWidget {
         }
         if (currentMiningIsland == "Mineshaft") {
             if (!wasReset) {
-                ChatListener.finalCooldown = now
-                ChatListener.finalDuration = now
+                ChatListener.finalCooldownTicks = 0
+                ChatListener.finalDurationTicks = 0
                 wasReset = true
             }
         } else {

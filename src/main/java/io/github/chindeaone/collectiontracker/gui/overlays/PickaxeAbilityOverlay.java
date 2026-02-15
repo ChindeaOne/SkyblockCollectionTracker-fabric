@@ -22,8 +22,8 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
     private final Position position = ConfigAccess.getPickaxeAbilityPosition();
     private final List<String> pickaxeAbilityOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;
-    private boolean expiredTitleShown = false;
-    private boolean readyTitleShown = false;
+    private boolean expiredTitleShown = true;
+    private boolean readyTitleShown = true;
 
     @Override
     public String overlayLabel() {
@@ -87,37 +87,36 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
         String abilityName = ConfigAccess.getPickaxeAbilityName();
         String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;
 
-        long now = System.currentTimeMillis();
-        double cooldown = (ChatListener.getFinalCooldown() - now) / 1000.0;
-        double duration = (ChatListener.getFinalDuration() - now) / 1000.0;
+        double cooldown = ChatListener.getFinalCooldownTicks() * 0.05;
+        double duration = ChatListener.getFinalDurationTicks() * 0.05;
+
+        if (duration > 0) {
+            expiredTitleShown = false;
+            readyTitleShown = false;
+        }
 
         if (ConfigAccess.isColeweightAbilityFormat()) {
             // Title logic for Coleweight format
-            if (ConfigAccess.isShowPickaxeAbilityTitle()) {
-                if (duration >= 0) {
-                    expiredTitleShown = false;
-                    readyTitleShown = false;
+            if (ConfigAccess.isShowPickaxeAbilityTitle() && duration == 0) {
+                if (!expiredTitleShown && cooldown > 0 && !displayName.equals("Pickobulus")) {
+                    String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
+                    RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getAbilityTitleDisplayTimer());
+                    expiredTitleShown = true;
+                }
+                if (cooldown == 0) {
+                    if (!readyTitleShown) {
+                        String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
+                        RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getAbilityTitleDisplayTimer());
+                        readyTitleShown = true;
+                    }
                 } else {
-                    if (!expiredTitleShown && cooldown >= -1 && !displayName.equals("Pickobulus")) {
-                        String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
-                        RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getAbilityTitleDisplayTimer());
-                        expiredTitleShown = true;
-                    }
-                    if (cooldown <= 0 && cooldown >= -1) {
-                        if (!readyTitleShown) {
-                            String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
-                            RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getAbilityTitleDisplayTimer());
-                            readyTitleShown = true;
-                        }
-                    } else {
-                        readyTitleShown = false;
-                    }
+                    readyTitleShown = false;
                 }
             }
 
             // Lines logic for Coleweight format
             String status;
-            if (!ConfigAccess.isAbilityCooldownOnly() && duration >= 0) {
+            if (!ConfigAccess.isAbilityCooldownOnly() && duration > 0) {
                 status = "§a" + TextUtils.formatTime(duration);
             } else if (cooldown > 0) {
                 status = "§c" + TextUtils.formatTime(cooldown);
@@ -127,23 +126,18 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
             pickaxeAbilityOverlayLines.add("§e" + displayName + " CD: " + status);
         } else {
             // Original Title logic
-            if (ConfigAccess.isShowPickaxeAbilityTitle()) {
-                if (duration >= 0) {
-                    expiredTitleShown = false;
-                    readyTitleShown = false;
+            if (ConfigAccess.isShowPickaxeAbilityTitle() && duration == 0) {
+                if (!expiredTitleShown && cooldown > 0 && !displayName.equals("Pickobulus")) {
+                    RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                    expiredTitleShown = true;
+                }
+                if (cooldown == 0) {
+                    if (!readyTitleShown) {
+                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                        readyTitleShown = true;
+                    }
                 } else {
-                    if (!expiredTitleShown && cooldown >= -1 && !displayName.equals("Pickobulus")) {
-                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
-                        expiredTitleShown = true;
-                    }
-                    if (cooldown <= 0 && cooldown >= -1) {
-                        if (!readyTitleShown) {
-                            RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
-                            readyTitleShown = true;
-                        }
-                    } else {
-                        readyTitleShown = false;
-                    }
+                    readyTitleShown = false;
                 }
             }
 
@@ -154,7 +148,7 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
                 pickaxeAbilityOverlayLines.add("§bPickaxe Ability: §e" + abilityName);
             }
 
-            if (!ConfigAccess.isAbilityCooldownOnly() && duration >= 0) {
+            if (!ConfigAccess.isAbilityCooldownOnly() && duration > 0) {
                 pickaxeAbilityOverlayLines.add("§aActive: " + TextUtils.formatTime(duration));
             } else if (cooldown > 0) {
                 pickaxeAbilityOverlayLines.add("§cCooldown: " + TextUtils.formatTime(cooldown));

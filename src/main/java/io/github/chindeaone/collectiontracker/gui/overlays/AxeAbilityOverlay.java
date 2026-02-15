@@ -21,8 +21,8 @@ public class AxeAbilityOverlay implements AbstractOverlay{
     private final Position position = ConfigAccess.getAxeAbilityPosition();
     private final List<String> axeAbilityOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;
-    private boolean expiredTitleShown = false;
-    private boolean readyTitleShown = false;
+    private boolean expiredTitleShown = true;
+    private boolean readyTitleShown = true;
 
     @Override
     public String overlayLabel() {
@@ -84,37 +84,36 @@ public class AxeAbilityOverlay implements AbstractOverlay{
         String abilityName = ConfigAccess.getAxeAbilityName();
         String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;
 
-        long now = System.currentTimeMillis();
-        double cooldown = (ChatListener.getFinalAxeCooldown() - now) / 1000.0;
-        double duration = (ChatListener.getFinalAxeDuration() - now) / 1000.0;
+        double cooldown = ChatListener.getFinalAxeCooldownTicks() * 0.05;
+        double duration = ChatListener.getFinalAxeDurationTicks() * 0.05;
+
+        if (duration > 0) {
+            expiredTitleShown = false;
+            readyTitleShown = false;
+        }
 
         if (ConfigAccess.isColeweightAbilityFormat()) {
             // Title logic for Coleweight format
-            if (ConfigAccess.isShowAxeAbilityTitle()) {
-                if (duration >= 0) {
-                    expiredTitleShown = false;
-                    readyTitleShown = false;
-                } else {
-                    String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
+            if (ConfigAccess.isShowAxeAbilityTitle() && duration == 0) {
+                if (!expiredTitleShown && cooldown > 0) {
                     String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
-                    if (!expiredTitleShown && cooldown >= -1) {
-                        RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getAbilityTitleDisplayTimer());
-                        expiredTitleShown = true;
+                    RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getAbilityTitleDisplayTimer());
+                    expiredTitleShown = true;
+                }
+                if (cooldown == 0) {
+                    if (!readyTitleShown) {
+                        String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
+                        RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getAbilityTitleDisplayTimer());
+                        readyTitleShown = true;
                     }
-                    if (cooldown <= 0 && cooldown >= -1) {
-                        if (!readyTitleShown) {
-                            RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getAbilityTitleDisplayTimer());
-                            readyTitleShown = true;
-                        }
-                    } else {
-                        readyTitleShown = false;
-                    }
+                } else {
+                    readyTitleShown = false;
                 }
             }
 
             // Lines logic for Coleweight format
             String status;
-            if (!ConfigAccess.isAbilityCooldownOnly() && duration >= 0) {
+            if (!ConfigAccess.isAbilityCooldownOnly() && duration > 0) {
                 status = "§a" + TextUtils.formatTime(duration);
             } else if (cooldown > 0) {
                 status = "§c" + TextUtils.formatTime(cooldown);
@@ -124,23 +123,18 @@ public class AxeAbilityOverlay implements AbstractOverlay{
             axeAbilityOverlayLines.add("§e" + displayName + " CD: " + status);
         } else {
             // Original Title logic
-            if (ConfigAccess.isShowAxeAbilityTitle()) {
-                if (duration >= 0) {
-                    expiredTitleShown = false;
-                    readyTitleShown = false;
+            if (ConfigAccess.isShowAxeAbilityTitle() && duration == 0) {
+                if (!expiredTitleShown && cooldown > 0) {
+                    RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                    expiredTitleShown = true;
+                }
+                if (cooldown == 0) {
+                    if (!readyTitleShown) {
+                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                        readyTitleShown = true;
+                    }
                 } else {
-                    if (!expiredTitleShown && cooldown >= -1) {
-                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
-                        expiredTitleShown = true;
-                    }
-                    if (cooldown <= 0 && cooldown >= -1) {
-                        if (!readyTitleShown) {
-                            RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
-                            readyTitleShown = true;
-                        }
-                    } else {
-                        readyTitleShown = false;
-                    }
+                    readyTitleShown = false;
                 }
             }
 
@@ -151,7 +145,7 @@ public class AxeAbilityOverlay implements AbstractOverlay{
                 axeAbilityOverlayLines.add("§bAxe Ability: §e" + abilityName);
             }
 
-            if (!ConfigAccess.isAbilityCooldownOnly() && duration >= 0) {
+            if (!ConfigAccess.isAbilityCooldownOnly() && duration > 0) {
                 axeAbilityOverlayLines.add("§aActive: " + TextUtils.formatTime(duration));
             } else if (cooldown > 0) {
                 axeAbilityOverlayLines.add("§cCooldown: " + TextUtils.formatTime(cooldown));

@@ -13,6 +13,7 @@ import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
+import io.github.chindeaone.collectiontracker.utils.ServerTickUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
@@ -30,6 +31,7 @@ object ChatListener {
     // Coleweight pattern
     private val NAME_PATTERN = Regex( """^(?:\[\d+]\s+)?(?:[^\w\s]\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE)
     private val ABILITY_PATTERN = Regex("^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!", RegexOption.IGNORE_CASE)
+    private val CHANGE_ABILITY_PATTERN = Regex("^You selected (.+?) as your (Pickaxe|Axe)? ?Ability", RegexOption.IGNORE_CASE)
     private val SUMMON_PATTERN = Regex("^You summoned your (.+?)!")
     var lastSkillValue = 0L
 
@@ -48,19 +50,28 @@ object ChatListener {
 
     @JvmStatic
     @Volatile
-    var finalCooldown: Long = 0L
+    var finalCooldownTicks: Int = 0
     @JvmStatic
     @Volatile
-    var finalDuration: Long = 0L
+    var finalDurationTicks: Int = 0
 
     @JvmStatic
     @Volatile
-    var finalAxeCooldown: Long = 0L
+    var finalAxeCooldownTicks: Int = 0
         private set
     @JvmStatic
     @Volatile
-    var finalAxeDuration: Long = 0L
+    var finalAxeDurationTicks: Int = 0
         private set
+
+    init {
+        ServerTickUtils.register {
+            if (finalCooldownTicks > 0) finalCooldownTicks--
+            if (finalDurationTicks > 0) finalDurationTicks--
+            if (finalAxeCooldownTicks > 0) finalAxeCooldownTicks--
+            if (finalAxeDurationTicks > 0) finalAxeDurationTicks--
+        }
+    }
 
     fun onChatMessage(message: Component) {
         if (!HypixelUtils.isOnSkyblock) return
@@ -71,6 +82,7 @@ object ChatListener {
         trackingListener(cleanText)
         petSummoned(text)
         abilityListener(cleanText)
+        abilitySwapListener(cleanText)
     }
 
     private fun trackingListener(text: String) {
@@ -102,7 +114,7 @@ object ChatListener {
         return InteractionResult.PASS
     }
 
-    fun abilityListener(text: String) {
+    private fun abilityListener(text: String) {
         val match = ABILITY_PATTERN.find(text) ?: return
         val abilityName = match.groupValues[1].trim()
         val toolType = match.groupValues[2].lowercase()
@@ -117,6 +129,18 @@ object ChatListener {
             if (pickSnap != null && pickSnap.hasAbility) {
                 startAbilityTimeline(abilityName, pickSnap)
             }
+        }
+    }
+
+    fun abilitySwapListener(text: String) {
+        val match = CHANGE_ABILITY_PATTERN.find(text) ?: return
+        val abilityName = match.groupValues[1].trim()
+        val toolType = match.groupValues[2].lowercase()
+
+        if (toolType == "axe") {
+            ConfigHelper.setAxeAbilityName(abilityName)
+        } else {
+            ConfigHelper.setAbilityName(abilityName)
         }
     }
 
@@ -175,8 +199,8 @@ object ChatListener {
             skyMallActive = isSkyMallPickaxeAbilityActive()
             )
 
-        finalDuration = AbilityUtils.getBaseDuration(ability, cotm, hasBlueCheese).toLong() * 1000 + System.currentTimeMillis()
-        finalCooldown = (calculateFinalCooldown * 1000).toLong() + System.currentTimeMillis()
+        finalDurationTicks = AbilityUtils.getBaseDuration(ability, cotm, hasBlueCheese) * 20
+        finalCooldownTicks = calculateFinalCooldown.toInt() * 20
 
         ConfigHelper.setAbilityName(ability)
     }
@@ -190,8 +214,8 @@ object ChatListener {
             baseCooldown = baseCooldownSeconds
         )
 
-        finalAxeDuration = AbilityUtils.getBaseAxeDuration(ability, cotf).toLong() * 1000 + System.currentTimeMillis()
-        finalAxeCooldown = (calculateFinalCooldown * 1000).toLong() + System.currentTimeMillis()
+        finalAxeDurationTicks = AbilityUtils.getBaseAxeDuration(ability, cotf) * 20
+        finalAxeCooldownTicks = calculateFinalCooldown.toInt() * 20
 
         ConfigHelper.setAxeAbilityName(ability)
     }
