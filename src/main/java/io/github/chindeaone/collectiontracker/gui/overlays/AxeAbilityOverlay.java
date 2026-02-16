@@ -84,8 +84,8 @@ public class AxeAbilityOverlay implements AbstractOverlay{
         String abilityName = ConfigAccess.getAxeAbilityName();
         String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;
 
-        double cooldown = ChatListener.getFinalAxeCooldownTicks() * 0.05;
-        double duration = ChatListener.getFinalAxeDurationTicks() * 0.05;
+        double cooldown = ChatListener.getFinalAxeCooldown();
+        double duration = ChatListener.getFinalAxeDuration();
 
         if (duration > 0) {
             expiredTitleShown = false;

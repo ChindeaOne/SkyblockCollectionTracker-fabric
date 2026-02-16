@@ -13,7 +13,7 @@ import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
-import io.github.chindeaone.collectiontracker.utils.ServerTickUtils
+import io.github.chindeaone.collectiontracker.utils.TimerState
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
@@ -48,30 +48,15 @@ object ChatListener {
     private var expectingSkyMallBuff = false
     private var expectingLotteryBuff = false
 
-    @JvmStatic
-    @Volatile
-    var finalCooldownTicks: Int = 0
-    @JvmStatic
-    @Volatile
-    var finalDurationTicks: Int = 0
+    private val pickaxeDuration = TimerState()
+    private val pickaxeCooldown = TimerState()
+    private val axeDuration = TimerState()
+    private val axeCooldown = TimerState()
 
-    @JvmStatic
-    @Volatile
-    var finalAxeCooldownTicks: Int = 0
-        private set
-    @JvmStatic
-    @Volatile
-    var finalAxeDurationTicks: Int = 0
-        private set
-
-    init {
-        ServerTickUtils.register {
-            if (finalCooldownTicks > 0) finalCooldownTicks--
-            if (finalDurationTicks > 0) finalDurationTicks--
-            if (finalAxeCooldownTicks > 0) finalAxeCooldownTicks--
-            if (finalAxeDurationTicks > 0) finalAxeDurationTicks--
-        }
-    }
+    @JvmStatic val finalCooldown: Double get() = pickaxeCooldown.remainingSeconds
+    @JvmStatic val finalDuration: Double get() = pickaxeDuration.remainingSeconds
+    @JvmStatic val finalAxeCooldown: Double get() = axeCooldown.remainingSeconds
+    @JvmStatic val finalAxeDuration: Double get() = axeDuration.remainingSeconds
 
     fun onChatMessage(message: Component) {
         if (!HypixelUtils.isOnSkyblock) return
@@ -192,15 +177,17 @@ object ChatListener {
         if (cotm >= 1) cotm = 1
         val hasBlueCheese = snap?.hasBlueCheesePart == true
 
-        val baseCooldownSeconds = AbilityUtils.getBaseCooldown(ability, cotm, hasBlueCheese)
-        val calculateFinalCooldown = AbilityUtils.calculateReduction(
-            baseCooldown = baseCooldownSeconds,
+        val baseCooldown = AbilityUtils.getBaseCooldown(ability, cotm, hasBlueCheese)
+        val finalCooldownSec = AbilityUtils.calculateReduction(
+            baseCooldown = baseCooldown,
             snap = snap,
             skyMallActive = isSkyMallPickaxeAbilityActive()
             )
 
-        finalDurationTicks = AbilityUtils.getBaseDuration(ability, cotm, hasBlueCheese) * 20
-        finalCooldownTicks = calculateFinalCooldown.toInt() * 20
+        val durationMs = (AbilityUtils.getBaseDuration(ability, cotm, hasBlueCheese) * 1000).toLong()
+
+        pickaxeDuration.start(durationMs)
+        pickaxeCooldown.start((finalCooldownSec * 1000).toLong())
 
         ConfigHelper.setAbilityName(ability)
     }
@@ -209,13 +196,16 @@ object ChatListener {
         var cotf = ConfigAccess.getCotfLevel()
         if (cotf >= 1) cotf = 1
 
-        val baseCooldownSeconds = AbilityUtils.getBaseAxeCooldown(ability, cotf)
-        val calculateFinalCooldown = AbilityUtils.calculateAxeReduction(
-            baseCooldown = baseCooldownSeconds
+        val baseCooldown = AbilityUtils.getBaseAxeCooldown(ability, cotf)
+        val finalCooldownSec = AbilityUtils.calculateAxeReduction(
+            baseCooldown = baseCooldown
         )
 
-        finalAxeDurationTicks = AbilityUtils.getBaseAxeDuration(ability, cotf) * 20
-        finalAxeCooldownTicks = calculateFinalCooldown.toInt() * 20
+        val durationMs = (AbilityUtils.getBaseAxeDuration(ability, cotf) * 1000).toLong()
+        val cooldownMs = (finalCooldownSec * 1000).toLong()
+
+        axeDuration.start(durationMs)
+        axeCooldown.start(cooldownMs)
 
         ConfigHelper.setAxeAbilityName(ability)
     }
@@ -425,5 +415,11 @@ object ChatListener {
             SkillTrackingHandler.onSkillGain(current, skillName)
             lastSkillValue = current
         }
+    }
+
+    @JvmStatic
+    fun resetPickaxeAbilities() {
+        pickaxeDuration.reset()
+        pickaxeCooldown.reset()
     }
 }

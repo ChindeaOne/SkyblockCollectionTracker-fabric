@@ -32,8 +32,7 @@ object MiningStatsWidget {
 
         if (currentMiningIsland == "Mineshaft") {
             if (!wasReset) {
-                ChatListener.finalCooldownTicks = 0
-                ChatListener.finalDurationTicks = 0
+                ChatListener.resetPickaxeAbilities()
                 wasReset = true
             }
         } else {

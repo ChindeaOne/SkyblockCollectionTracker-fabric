@@ -8,7 +8,6 @@ import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.CommissionsKeybinds
 import io.github.chindeaone.collectiontracker.utils.Hypixel
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
-import io.github.chindeaone.collectiontracker.utils.ServerTickUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
@@ -47,11 +46,7 @@ class ModLoader: ModInitializer {
             if (client.player == null) return@EndTick
             TickDispatcher.onEndClientTick(client)
         })
-        ClientPlayConnectionEvents.JOIN.register { _, _, _ -> ServerTickUtils.reset() }
-        ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
-            Hypixel.onDisconnect()
-            ServerTickUtils.reset()
-        }
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
         ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.onChatMessage(message) }
 
         UseItemCallback.EVENT.register { player, _, hand -> ChatListener.checkHandItem(player, hand) }

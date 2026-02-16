@@ -87,8 +87,8 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
         String abilityName = ConfigAccess.getPickaxeAbilityName();
         String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;
 
-        double cooldown = ChatListener.getFinalCooldownTicks() * 0.05;
-        double duration = ChatListener.getFinalDurationTicks() * 0.05;
+        double cooldown = ChatListener.getFinalCooldown();
+        double duration = ChatListener.getFinalDuration();
 
         if (duration > 0) {
             expiredTitleShown = false;

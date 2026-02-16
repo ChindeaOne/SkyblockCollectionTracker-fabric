@@ -6,7 +6,7 @@
     "AccessorGuiContainer",
     "ChatHudMixin",
     "MixinChatInterception",
-    "ClientCommonPacketListenerImplMixin"
+    "ClientPacketListenerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
