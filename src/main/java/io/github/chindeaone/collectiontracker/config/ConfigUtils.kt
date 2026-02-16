@@ -312,6 +312,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getCustomColor(): ChromaColour = customColor
+
+    @JvmStatic
+    fun isServerLagProtectionEnabled(): Boolean = miscConfig.serverLagProtection
 }
 
 /**

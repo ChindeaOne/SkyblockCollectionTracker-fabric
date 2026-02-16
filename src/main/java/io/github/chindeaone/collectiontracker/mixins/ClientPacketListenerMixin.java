@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.mixins;
 
 import io.github.chindeaone.collectiontracker.utils.ServerTickUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
@@ -14,11 +15,12 @@ public class ClientPacketListenerMixin {
 
     @Inject(method = "handleSetTime", at = @At("RETURN"))
     private void sct$onServerTick(ClientboundSetTimePacket packet, CallbackInfo ci) {
-        ServerTickUtils.onServerTick(packet.gameTime());
+        long gameTime = packet.gameTime();
+        Minecraft.getInstance().execute(() -> ServerTickUtils.onServerTick(gameTime));
     }
 
     @Inject(method = "handleLogin", at = @At("RETURN"))
     private void sct$onLogin(ClientboundLoginPacket packet, CallbackInfo ci) {
-        ServerTickUtils.reset();
+        Minecraft.getInstance().execute(ServerTickUtils::reset);
     }
 }

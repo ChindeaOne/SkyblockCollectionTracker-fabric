@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils
 
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
+
 object ServerTickUtils {
 
     private var lastServerGameTime = -1L
@@ -7,16 +9,15 @@ object ServerTickUtils {
     var totalLagAdjustment = 0L
         private set
 
-
     @JvmStatic
     fun onServerTick(gameTime: Long) {
         val now = System.currentTimeMillis()
-        if (lastServerGameTime != -1L) {
+
+        if (lastServerGameTime != -1L && ConfigAccess.isServerLagProtectionEnabled()) {
             val expectedTicks = gameTime - lastServerGameTime
             val actualTime = now - lastPacketSystemTime
             val expectedTime = expectedTicks * 50
-
-            if (expectedTime < actualTime) totalLagAdjustment += (actualTime - expectedTime)
+            totalLagAdjustment += (actualTime - expectedTime)
         }
 
         lastServerGameTime = gameTime

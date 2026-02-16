@@ -57,4 +57,12 @@ public class Misc {
     )
     @ConfigEditorBoolean
     public boolean abilityCooldownOnly = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Server Lag Protection",
+            desc = "Prevents ability timers from counting down during server lag.\n§eMay desync timers!"
+    )
+    @ConfigEditorBoolean
+    public boolean serverLagProtection = false;
 }
