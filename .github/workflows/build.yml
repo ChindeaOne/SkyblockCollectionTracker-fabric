@@ -26,6 +26,7 @@ jobs:
 
   build:
     needs: [cleanup]
+    if: github.event_name != 'release' && github.ref_type != 'tag'
     runs-on: ubuntu-latest
     environment: ci
     env:
