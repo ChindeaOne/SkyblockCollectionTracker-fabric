@@ -64,25 +64,28 @@ object ChatListener {
         val text = message.string
         val cleanText = text.removeColor()
 
-        trackingListener(cleanText)
+        collectionListener(cleanText)
         petSummoned(text)
         abilityListener(cleanText)
         abilitySwapListener(cleanText)
     }
 
-    private fun trackingListener(text: String) {
-        if (!TrackingHandler.isTracking && !SkillTrackingHandler.isTracking) return
+    private fun collectionListener(text: String) {
+        if (!TrackingHandler.isTracking) return
 
         if (text.startsWith("[Sacks]")) {
             parseSacksMessage(text)
-            return
         }
+    }
 
-        // Check pattern for past max skill level
-        val match = SKILL_PATTERN.find(text)
+    @JvmStatic
+    fun skillListener(text: String) {
+        if (!SkillTrackingHandler.isTracking || !HypixelUtils.isOnSkyblock) return
+        val cleanText = text.removeColor()
+
+        val match = SKILL_PATTERN.find(cleanText)
         if (match != null) {
             parseSkillMessage(match)
-            return
         }
     }
 
