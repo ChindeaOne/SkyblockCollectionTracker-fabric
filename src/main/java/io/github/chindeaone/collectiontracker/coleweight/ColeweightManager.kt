@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.coleweight
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import io.github.chindeaone.collectiontracker.utils.ChatUtils
 
 object ColeweightManager {
 
@@ -13,12 +12,6 @@ object ColeweightManager {
     @JvmStatic
     fun updateColeweight(data: String) {
         val root = JsonParser.parseString(data).asJsonObject
-
-        if (root.has("error")) {
-            // API returned an error, player not found
-            ChatUtils.sendMessage("§cCouldn't find coleweight", true)
-            return
-        }
 
         storage = storage.copy(
             coleweight = root.get("coleweight").asFloat,

@@ -3,7 +3,9 @@ package io.github.chindeaone.collectiontracker.api.coleweight;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager;
+import io.github.chindeaone.collectiontracker.utils.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,14 +40,11 @@ public class ColeweightFetcher {
                         if (status == 200) {
                             ColeweightManager.updateColeweight(response.body());
                             logger.info("Successfully fetched Coleweight data for player: {}", playerName);
-                            if (onComplete != null) {
-                                try {
-                                    onComplete.run();
-                                } catch (Exception e) {
-                                    logger.error("An error occurred while executing the onComplete callback. ", e);
-                                }
-                            }
+                            if (onComplete != null) onComplete.run();
                         } else {
+                            Minecraft.getInstance().execute(() ->
+                                    ChatUtils.INSTANCE.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
+                            );
                             logger.warn("Failed to fetch Coleweight data for player: {}. HTTP status: {}", playerName, status);
                         }
                     })
