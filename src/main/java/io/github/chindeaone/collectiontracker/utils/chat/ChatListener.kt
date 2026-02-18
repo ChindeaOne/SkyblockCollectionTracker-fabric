@@ -7,7 +7,6 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
-import io.github.chindeaone.collectiontracker.utils.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor

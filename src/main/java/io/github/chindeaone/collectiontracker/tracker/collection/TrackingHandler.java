@@ -9,7 +9,7 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarTyp
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager;
-import io.github.chindeaone.collectiontracker.utils.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.Hypixel;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;

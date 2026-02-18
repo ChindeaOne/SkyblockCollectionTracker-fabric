@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.tracker.skills;
 import io.github.chindeaone.collectiontracker.commands.SkillTracker;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
-import io.github.chindeaone.collectiontracker.utils.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.Hypixel;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import org.apache.logging.log4j.LogManager;

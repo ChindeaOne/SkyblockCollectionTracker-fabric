@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.coleweight
 
 import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
-import io.github.chindeaone.collectiontracker.utils.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.toRankComponent

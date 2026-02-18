@@ -1,12 +1,14 @@
-package io.github.chindeaone.collectiontracker.utils
+package io.github.chindeaone.collectiontracker.utils.chat
 
+import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-//? if = 1.21.11 {
 import net.minecraft.client.gui.components.ChatComponent
-//? }
-import net.minecraft.network.chat.*
+import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.Style
 
 object ChatUtils {
 
@@ -78,7 +80,7 @@ object ChatUtils {
         //? if = 1.21.11 {
         return ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get())
         //? } else {
-         /*return Minecraft.getInstance().gui.chat.width 
+         /*return Minecraft.getInstance().gui.chat.width
         *///? }
     }
 

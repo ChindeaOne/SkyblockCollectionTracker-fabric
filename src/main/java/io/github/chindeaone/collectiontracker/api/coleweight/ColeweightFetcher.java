@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.api.coleweight;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager;
-import io.github.chindeaone.collectiontracker.utils.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;

@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.commands;
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
-import io.github.chindeaone.collectiontracker.utils.ChatUtils;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import net.minecraft.util.Mth;
 
 import java.util.*;

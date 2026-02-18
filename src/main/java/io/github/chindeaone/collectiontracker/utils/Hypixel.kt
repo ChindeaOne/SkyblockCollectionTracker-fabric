@@ -19,6 +19,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.ServerUtils.serverStatus
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
