@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.tab
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
@@ -21,6 +22,7 @@ object TabData {
         if (world != currentWorld) {
             world = currentWorld
             IslandTracker.reset()
+            DeployableParser.reset()
         }
 
         if (!HypixelUtils.isOnSkyblock) return

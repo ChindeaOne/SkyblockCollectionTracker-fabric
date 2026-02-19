@@ -14,6 +14,7 @@ import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfCon
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable
 import io.github.chindeaone.collectiontracker.config.categories.mining.PickaxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.SkyMallConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
@@ -40,6 +41,7 @@ val skyMallPosition: Position get() = modConfig.mining.hotmConfig.skyMallConfig.
 val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryConfig.lotteryPosition
 val pickaxeAbilityPosition: Position get() = modConfig.mining.hotmConfig.pickaxeAbilityConfig.pickaxeAbilityPosition
 val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilityConfig.axeAbilityPosition
+val deployablePosition: Position get() = modConfig.mining.lanternDeployable.deployablePosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -60,6 +62,7 @@ val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
+val lanternDeployable: LanternDeployable get() = miningConfig.lanternDeployable
 val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
@@ -87,6 +90,8 @@ val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
 val showDetailedMiningFortune : Boolean get() = miningStatsOverlay.showDetailedFortune
 val professionalMS: Property<Int> get() = hotmConfig.professionalMS
 val strongArmMS: Property<Int> get() = hotmConfig.strongArmMS
+val enableDeployable: Boolean get() = lanternDeployable.enableDeployable
+val showDeployableTitle: Boolean get() = lanternDeployable.showDeployableTitle
 
 // Foraging Config Accessors
 val foragingConfig: Foraging get() = modConfig.foraging
@@ -121,7 +126,7 @@ val enableTamingTracking: Boolean get() = skillOverlay.enableTamingTracking
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
 val precision: Property<Int> get() = miscConfig.abilityPrecision
-val abilityTitleDisplayTimer: Property<Int> get() = miscConfig.abilityTitleDisplayTimer
+val titleDisplayTimer: Property<Int> get() = miscConfig.titleDisplayTimer
 val titleScale: Misc.TitleScale get() = miscConfig.titleScale
 val abilityCooldownOnly: Boolean get() = miscConfig.abilityCooldownOnly
 
@@ -156,6 +161,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getAxeAbilityPosition(): Position = axeAbilityPosition
+
+    @JvmStatic
+    fun getDeployablePosition(): Position = deployablePosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
@@ -287,7 +295,7 @@ object ConfigAccess {
     fun isColeweightAbilityFormat(): Boolean = coleweightAbilityFormat
 
     @JvmStatic
-    fun getAbilityTitleDisplayTimer(): Int = abilityTitleDisplayTimer.get()
+    fun getTitleDisplayTimer(): Int = titleDisplayTimer.get()
 
     @JvmStatic
     fun isShowPickaxeAbilityTitle(): Boolean = showPickaxeAbilityTitle
@@ -315,6 +323,12 @@ object ConfigAccess {
 
     @JvmStatic
     fun isServerLagProtectionEnabled(): Boolean = miscConfig.serverLagProtection
+
+    @JvmStatic
+    fun isDeployableEnabled(): Boolean = enableDeployable
+
+    @JvmStatic
+    fun isShowDeployableTitle(): Boolean = showDeployableTitle
 }
 
 /**

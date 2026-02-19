@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
+import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.tab.TabData
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
 import net.fabricmc.api.ModInitializer
@@ -49,7 +50,7 @@ class ModLoader: ModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
         ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.onChatMessage(message) }
 
-        UseItemCallback.EVENT.register { player, _, hand -> ChatListener.checkHandItem(player, hand) }
+        UseItemCallback.EVENT.register { player, _, hand -> InventoryListener.checkHandItem(player, hand) }
 
         //? if = 1.21.11 {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
@@ -79,6 +80,7 @@ class ModLoader: ModInitializer {
             BlockWatcher.onClientTick(client)
             ScoreboardUtils.onTick(client)
             InventoryListener.onTick(client)
+            DeployableParser.onTick(client)
         }
     }
 }

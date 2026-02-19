@@ -52,5 +52,6 @@ public class OverlayManager {
         OverlayManager.add(new LotteryOverlay());
         OverlayManager.add(new PickaxeAbilityOverlay());
         OverlayManager.add(new AxeAbilityOverlay());
+        OverlayManager.add(new DeployableOverlay());
     }
 }
