@@ -77,8 +77,6 @@ object Hypixel {
                                 TokenManager.fetchAndStoreToken()
                             }
                             fetchData()
-                            logger.info("[SCT]: API data loaded successfully.")
-
                             logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
 
                             if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
@@ -123,14 +121,16 @@ object Hypixel {
 
     fun fetchData() {
         if (!ServerStatus.hasData()) {
-            val futures = listOf(
+            val futures = arrayOf(
                 CompletableFuture.runAsync { FetchCollectionList.fetchCollectionList() },
                 CompletableFuture.runAsync { FetchNpcPrices.fetchPrices() },
                 CompletableFuture.runAsync { FetchGemstoneList.fetchGemstoneList() },
                 CompletableFuture.runAsync { FetchColors.fetchColorsData() },
                 CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
             )
-            CompletableFuture.allOf(*futures.toTypedArray()).join()
+            CompletableFuture.allOf(*futures).thenRun {
+                logger.info("[SCT]: API data loaded successfully.")
+            }
         }
     }
 
