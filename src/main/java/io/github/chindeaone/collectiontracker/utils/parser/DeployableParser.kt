@@ -3,6 +3,7 @@
 */
 package io.github.chindeaone.collectiontracker.utils.parser
 
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.EntityUtils
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
@@ -105,6 +106,7 @@ object DeployableParser {
     }
 
     private fun notifyExpiration() {
+        if (!ConfigAccess.isShowDeployableTitle()) return
         val message = Component.literal("$buffColor$buff §cExpired!")
         RenderUtils.showTitle(message)
     }

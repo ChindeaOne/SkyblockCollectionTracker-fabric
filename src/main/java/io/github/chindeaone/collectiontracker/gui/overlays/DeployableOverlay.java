@@ -5,7 +5,6 @@ import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
