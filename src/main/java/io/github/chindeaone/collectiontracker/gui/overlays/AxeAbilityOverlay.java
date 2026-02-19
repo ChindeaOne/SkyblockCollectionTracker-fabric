@@ -97,13 +97,13 @@ public class AxeAbilityOverlay implements AbstractOverlay{
             if (ConfigAccess.isShowAxeAbilityTitle() && duration == 0) {
                 if (!expiredTitleShown && cooldown > 0) {
                     String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
-                    RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getAbilityTitleDisplayTimer());
+                    RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getTitleDisplayTimer());
                     expiredTitleShown = true;
                 }
                 if (cooldown == 0) {
                     if (!readyTitleShown) {
                         String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
-                        RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getAbilityTitleDisplayTimer());
+                        RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getTitleDisplayTimer());
                         readyTitleShown = true;
                     }
                 } else {
@@ -125,12 +125,12 @@ public class AxeAbilityOverlay implements AbstractOverlay{
             // Original Title logic
             if (ConfigAccess.isShowAxeAbilityTitle() && duration == 0) {
                 if (!expiredTitleShown && cooldown > 0) {
-                    RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                    RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getTitleDisplayTimer());
                     expiredTitleShown = true;
                 }
                 if (cooldown == 0) {
                     if (!readyTitleShown) {
-                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getAbilityTitleDisplayTimer());
+                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getTitleDisplayTimer());
                         readyTitleShown = true;
                     }
                 } else {

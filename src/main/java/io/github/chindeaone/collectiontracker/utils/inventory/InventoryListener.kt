@@ -3,8 +3,14 @@ package io.github.chindeaone.collectiontracker.utils.inventory
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import net.minecraft.client.Minecraft
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Item
 import java.util.Locale.getDefault
 
 /**
@@ -45,6 +51,28 @@ object InventoryListener {
                 return
             }
         }
+    }
+
+    @Suppress("SameReturnValue")
+    fun checkHandItem(player: Player, hand: InteractionHand): InteractionResult {
+        if (!HypixelUtils.isOnSkyblock) return InteractionResult.PASS
+
+        val stack = player.getItemInHand(hand)
+        if (stack.isEmpty) return InteractionResult.PASS
+
+        // Extract tooltips once
+        val context = Item.TooltipContext.of(player.level().registryAccess())
+        val lines = stack.getTooltipLines(
+            context,
+            player,
+            AbilityItemParser.tooltipFlag()
+        ).map { it.string }.map { AbilityItemParser.normalizeText(it) }
+
+        AbilityItemParser.parse(lines)?.let { snap ->
+            AbilityUtils.update(snap)
+        }
+
+        return InteractionResult.PASS
     }
 
     private fun normalize(name: String): String {

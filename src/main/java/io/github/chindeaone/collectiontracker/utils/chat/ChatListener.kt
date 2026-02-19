@@ -13,14 +13,10 @@ import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.TimerState
-import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.player.Player
 
 object ChatListener {
 
@@ -86,19 +82,6 @@ object ChatListener {
         if (match != null) {
             parseSkillMessage(match)
         }
-    }
-
-    @Suppress("SameReturnValue")
-    fun checkHandItem(player: Player, hand: InteractionHand): InteractionResult {
-        if (!HypixelUtils.isOnSkyblock) return InteractionResult.PASS
-
-        val stack = player.getItemInHand(hand)
-        if (stack.isEmpty) return InteractionResult.PASS
-
-        val snap = AbilityItemParser.snapshot(stack)
-        if (snap != null) AbilityUtils.update(snap)
-
-        return InteractionResult.PASS
     }
 
     private fun abilityListener(text: String) {

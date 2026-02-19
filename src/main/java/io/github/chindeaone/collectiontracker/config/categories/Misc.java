@@ -28,7 +28,7 @@ public class Misc {
 
     @Expose
     @ConfigOption(
-            name = "Ability precision",
+            name = "Timer precision",
             desc = "Number of decimal shown for cooldown and duration."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 2, minStep = 1)
@@ -36,11 +36,11 @@ public class Misc {
 
     @Expose
     @ConfigOption(
-            name = "Ability Title Duration",
-            desc = "How long (in seconds) ability titles remain on screen."
+            name = "Title Duration",
+            desc = "How long (in seconds) titles remain on screen."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 8, minStep = 1)
-    public Property<Integer> abilityTitleDisplayTimer = Property.of(3);
+    public Property<Integer> titleDisplayTimer = Property.of(3);
 
     @Expose
     @ConfigOption(

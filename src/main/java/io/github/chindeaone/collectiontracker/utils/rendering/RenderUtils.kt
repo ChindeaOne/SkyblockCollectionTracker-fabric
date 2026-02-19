@@ -2,9 +2,10 @@ package io.github.chindeaone.collectiontracker.utils.rendering
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
-import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import net.minecraft.ChatFormatting
@@ -12,7 +13,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
-import kotlin.text.split
 
 object RenderUtils {
 
@@ -151,7 +151,7 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun showTitle(title: Component, durationMs: Int) {
+    fun showTitle(title: Component, durationMs: Int = getTitleDisplayTimer()) {
         activeTitle = title
         titleExpireTime = System.currentTimeMillis() + durationMs * 1000
     }

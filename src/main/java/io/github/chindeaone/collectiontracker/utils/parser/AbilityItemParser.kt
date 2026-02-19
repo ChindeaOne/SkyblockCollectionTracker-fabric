@@ -3,39 +3,28 @@ package io.github.chindeaone.collectiontracker.utils.parser
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 
 object AbilityItemParser {
 
-    private fun normalize (s: String) = s
+    fun tooltipFlag(): TooltipFlag.Default =
+        if (Minecraft.getInstance().options.advancedItemTooltips) TooltipFlag.Default.ADVANCED
+        else TooltipFlag.Default.NORMAL
+
+    @JvmStatic
+    fun normalizeText(s: String) = s
         .removeColor()
         .replace("\\p{C}+".toRegex(), " ")
         .replace("\\s+".toRegex(), " ")
         .trim()
         .lowercase()
 
-    private fun tooltipFlag(): TooltipFlag.Default =
-        if (Minecraft.getInstance().options.advancedItemTooltips) TooltipFlag.Default.ADVANCED
-        else TooltipFlag.Default.NORMAL
-
-    fun snapshot(stack: ItemStack): AbilityUtils.AbilitySnapshot? {
-        if (stack.isEmpty) return null
-        val player = Minecraft.getInstance().player ?: return null
-
-        // Extract tooltips
-        val context = Item.TooltipContext.of(player.level().registryAccess())
-        val lines = stack.getTooltipLines(
-            context,
-            player,
-            tooltipFlag()
-        ).map { it.string }.map { normalize(it) }
-
+    fun parse(lines: List<String>): AbilityUtils.AbilitySnapshot? {
         val hasBreakingPower = lines.any { it.contains("breaking power") }
+        if (!hasBreakingPower) return null
         val toolTypeLine = lines.findLast { it.contains("\\bdrill\\b".toRegex()) || it.contains("\\bpickaxe\\b".toRegex()) || it.contains("\\bgauntlet\\b".toRegex()) }
         val isDrill = toolTypeLine?.contains("drill") == true
-        val isPickaxeOrDrill = hasBreakingPower && toolTypeLine != null
+        val isPickaxeOrDrill = toolTypeLine != null
         val isAxe = lines.findLast { it.contains("\\baxe\\b".toRegex()) }
 
         // Logic for Axes
@@ -66,7 +55,6 @@ object AbilityItemParser {
                 hasBlueCheesePart = isDrill && hasBlueCheese
             )
         }
-
         return null
     }
 }
