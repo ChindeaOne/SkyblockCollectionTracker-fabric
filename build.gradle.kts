@@ -137,30 +137,30 @@ kotlin {
 }
 
 tasks.processResources {
-    inputs.property("version", project.version)
-    inputs.property("minecraft_version", sc.current.version)
-
-    filesMatching("fabric.mod.json") {
-        expand(
-            "version" to project.version,
-            "minecraft_version" to sc.current.version
-        )
+    val expandProps = buildMap {
+        put("version", project.version)
+        put("minecraft_version", sc.current.version)
+        put("TOKEN_URL", System.getenv("TOKEN_URL") ?: "")
+        put("TRACKED_COLLECTION_URL", System.getenv("TRACKED_COLLECTION_URL") ?: "")
+        put("AVAILABLE_COLLECTIONS_URL", System.getenv("AVAILABLE_COLLECTIONS_URL") ?: "")
+        put("AVAILABLE_GEMSTONES_URL", System.getenv("AVAILABLE_GEMSTONES_URL") ?: "")
+        put("NPC_PRICES_URL", System.getenv("NPC_PRICES_URL") ?: "")
+        put("BAZAAR_URL", System.getenv("BAZAAR_URL") ?: "")
+        put("STATUS_URL", System.getenv("STATUS_URL") ?: "")
+        put("GITHUB_URL", System.getenv("GITHUB_URL") ?: "")
+        put("COLORS_URL", System.getenv("COLORS_URL") ?: "")
+        put("SKILLS_URL", System.getenv("SKILLS_URL") ?: "")
+        put("COLEWEIGHT_URL", System.getenv("COLEWEIGHT_URL") ?: "")
+        put("WAYPOINTS_URL", System.getenv("WAYPOINTS_URL") ?: "")
+        put("AGENT", System.getenv("AGENT") ?: "")
     }
-    filesMatching("assets/skyblockcollectiontracker/url.properties") {
-        expand(
-            "TOKEN_URL" to (System.getenv("TOKEN_URL") ?: ""),
-            "TRACKED_COLLECTION_URL" to (System.getenv("TRACKED_COLLECTION_URL") ?: ""),
-            "AVAILABLE_COLLECTIONS_URL" to (System.getenv("AVAILABLE_COLLECTIONS_URL") ?: ""),
-            "AVAILABLE_GEMSTONES_URL" to (System.getenv("AVAILABLE_GEMSTONES_URL") ?: ""),
-            "NPC_PRICES_URL" to (System.getenv("NPC_PRICES_URL") ?: ""),
-            "BAZAAR_URL" to (System.getenv("BAZAAR_URL") ?: ""),
-            "STATUS_URL" to (System.getenv("STATUS_URL") ?: ""),
-            "GITHUB_URL" to (System.getenv("GITHUB_URL") ?: ""),
-            "COLORS_URL" to (System.getenv("COLORS_URL") ?: ""),
-            "SKILLS_URL" to (System.getenv("SKILLS_URL") ?: ""),
-            "COLEWEIGHT_URL" to (System.getenv("COLEWEIGHT_URL") ?: ""),
-            "AGENT" to (System.getenv("AGENT") ?: "")
-        )
+
+    expandProps.forEach { (key, value) ->
+        inputs.property(key, value)
+    }
+
+    filesMatching(listOf("fabric.mod.json", "assets/skyblockcollectiontracker/url.properties")) {
+        expand(expandProps)
     }
 }
 
