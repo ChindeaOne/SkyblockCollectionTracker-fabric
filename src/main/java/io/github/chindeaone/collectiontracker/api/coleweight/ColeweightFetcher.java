@@ -25,7 +25,7 @@ public class ColeweightFetcher {
             URI uri = URI.create(URLManager.COLEWEIGHT_URL);
 
             HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(java.time.Duration.ofSeconds(5))
+                    .timeout(java.time.Duration.ofSeconds(15))
                     .header("Authorization", "Bearer " + TokenManager.getToken())
                     .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
                     .header("X-NAME", playerName)
@@ -38,6 +38,13 @@ public class ColeweightFetcher {
                     .thenAccept(response -> {
                         int status = response.statusCode();
                         if (status == 200) {
+                            if (response.body() == null || response.body().isEmpty()) {
+                                Minecraft.getInstance().execute(() ->
+                                        ChatUtils.INSTANCE.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
+                                );
+                                logger.warn("Received empty response when fetching Coleweight data for player: {}", playerName);
+                                return;
+                            }
                             ColeweightManager.updateColeweight(response.body());
                             logger.info("Successfully fetched Coleweight data for player: {}", playerName);
                             if (onComplete != null) onComplete.run();
@@ -62,7 +69,7 @@ public class ColeweightFetcher {
             URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/lb");
 
             HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(java.time.Duration.ofSeconds(5))
+                    .timeout(java.time.Duration.ofSeconds(15))
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
                     .GET()
@@ -72,6 +79,13 @@ public class ColeweightFetcher {
                     .thenAccept(response -> {
                         int status = response.statusCode();
                         if (status == 200) {
+                            if (response.body() == null || response.body().isEmpty()) {
+                                Minecraft.getInstance().execute(() ->
+                                        ChatUtils.INSTANCE.sendMessage("§cCouldn't fetch Coleweight leaderboard data.", true)
+                                );
+                                logger.warn("Received empty response when fetching Coleweight leaderboard data.");
+                                return;
+                            }
                             ColeweightManager.updateColeweightLb(response.body(), false);
                             logger.info("Successfully fetched Coleweight leaderboard data.");
                             if (onComplete != null) {
@@ -99,7 +113,7 @@ public class ColeweightFetcher {
             URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/top1k");
 
             HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(java.time.Duration.ofSeconds(5))
+                    .timeout(java.time.Duration.ofSeconds(15))
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
                     .GET()
@@ -109,6 +123,10 @@ public class ColeweightFetcher {
 
             int status = response.statusCode();
             if (status == 200) {
+                if (response.body() == null || response.body().isEmpty()) {
+                    logger.warn("Received empty response when fetching Coleweight leaderboard for top 1k players.");
+                    return;
+                }
                 ColeweightManager.updateColeweightLb(response.body(), true);
                 hasColeweightLb = true;
                 logger.info("[SCT] Successfully fetched Coleweight leaderboard for top 1k players.");
