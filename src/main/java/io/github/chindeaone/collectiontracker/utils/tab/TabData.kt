@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
+import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 
@@ -23,6 +24,7 @@ object TabData {
             world = currentWorld
             IslandTracker.reset()
             DeployableParser.reset()
+            WaypointsUtils.reset()
         }
 
         if (!HypixelUtils.isOnSkyblock) return

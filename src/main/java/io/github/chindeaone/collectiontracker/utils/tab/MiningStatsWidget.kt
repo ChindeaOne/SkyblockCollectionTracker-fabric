@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
+import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 
 object MiningStatsWidget {
 
@@ -38,6 +39,17 @@ object MiningStatsWidget {
         } else {
             wasReset = false
         }
+
+        if (currentMiningIsland == "Dwarven Mines") {
+            if (ConfigAccess.isMineshaftSpawnRoutesEnabled()) {
+                WaypointsUtils.selectCategory(ConfigAccess.getMineshaftSpawnRoutes().type)
+            } else {
+                WaypointsUtils.currentCategory = null
+            }
+        } else if (currentMiningIsland != "Mineshaft") {
+            WaypointsUtils.currentCategory = null
+        }
+
         if (!ConfigAccess.isMiningStatsEnabled()) {
             rawStats = emptyList()
             lastStats = null

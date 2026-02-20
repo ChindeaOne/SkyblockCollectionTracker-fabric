@@ -1,5 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils
 
+import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
+import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.world.scores.DisplaySlot
 import kotlin.math.ceil
@@ -12,6 +15,7 @@ object ScoreboardUtils {
 
     var location: String = ""
     var lastLocation: String = ""
+    var mineshaftType: String = ""
 
     private var checkTime: Boolean = true
     var timeLeft: Int = 0
@@ -36,13 +40,14 @@ object ScoreboardUtils {
                 val prefix = team.playerPrefix.string
                 val suffix = team.playerSuffix.string
                 val strLine = prefix + suffix
-                val formatted = strLine.replace(Regex("§."), "").trim()
+                val formatted = strLine.removeColor().trim()
 
                 formatted.ifEmpty { null }
             }
 
         checkSkyblockTime(rawLines)
         checkLocation(rawLines)
+        checkIfMineshaft(rawLines)
     }
 
     private fun checkLocation(rawLines: List<String>) {
@@ -103,9 +108,39 @@ object ScoreboardUtils {
         return displayName
     }
 
+    fun checkIfMineshaft(rawLines: List<String>) {
+        if (!MiningStatsWidget.currentMiningIsland.equals("Mineshaft")) {
+            if (mineshaftType.isNotEmpty()) {
+                mineshaftType = ""
+            }
+            return
+        }
+        val foundType = rawLines.firstNotNullOfOrNull { line ->
+            WaypointsUtils.MineshaftTypes.entries.find {type ->
+                line.contains(type.name)
+            }?.name
+        } ?: ""
+
+        if (mineshaftType != foundType) {
+            mineshaftType = foundType
+
+            val category = when {
+                foundType.endsWith("_C") -> "crystal"
+                foundType == "JASP_1" -> "jasper"
+                else -> null
+            }
+
+            if (category != null) {
+                WaypointsUtils.selectCategory(category)
+            } else {
+                WaypointsUtils.currentCategory = null
+            }
+        }
+    }
+
     @JvmStatic
     fun isColdStatRelevant(): Boolean {
-        return location == "Glacite Tunnels" || location == "Glacite Mineshafts" || location == "Great Glacite Lake"
+        return location == "Glacite Tunnels" || location == "Glacite Mineshafts" || location == "Great Glacite Lake" || location == "Dwarven Base Camp"
     }
 
     @JvmStatic

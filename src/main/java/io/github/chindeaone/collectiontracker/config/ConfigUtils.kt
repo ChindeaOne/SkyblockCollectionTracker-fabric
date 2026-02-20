@@ -15,6 +15,7 @@ import io.github.chindeaone.collectiontracker.config.categories.foraging.Lottery
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable
+import io.github.chindeaone.collectiontracker.config.categories.mining.MiningRoutesConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.PickaxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.SkyMallConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
@@ -57,6 +58,7 @@ val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
 
 // Mining Config Accessors
 val miningConfig: Mining get() = modConfig.mining
+val miningRoutesConfig: MiningRoutesConfig get() = miningConfig.miningRoutesConfig
 val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
 val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
@@ -73,6 +75,9 @@ val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIsl
 val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChatMessages
 val showPickaxeAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeAbilityTitle
 val pickaxeAbilityInMiningIslandsOnly: Boolean get() = pickaxeAbilityConfig.pickaxeAbilityInMiningIslandsOnly
+val enableMineshaftRoutes: Boolean get() = miningRoutesConfig.enableMineshaftRoutes
+val enableMineshaftSpawnRoutes: Boolean get() = miningRoutesConfig.enableMineshaftSpawnRoutes
+val mineshaftSpawnRoutes: MiningRoutesConfig.MineshaftSpawnRoutes get() = miningRoutesConfig.mineshaftSpawnRoutes
 
 // Coleweight Config Accessors
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
@@ -329,6 +334,15 @@ object ConfigAccess {
 
     @JvmStatic
     fun isShowDeployableTitle(): Boolean = showDeployableTitle
+
+    @JvmStatic
+    fun isMineshaftRoutesEnabled(): Boolean = enableMineshaftRoutes
+
+    @JvmStatic
+    fun isMineshaftSpawnRoutesEnabled(): Boolean = enableMineshaftSpawnRoutes
+
+    @JvmStatic
+    fun getMineshaftSpawnRoutes(): MiningRoutesConfig.MineshaftSpawnRoutes = mineshaftSpawnRoutes
 }
 
 /**

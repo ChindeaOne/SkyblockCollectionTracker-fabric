@@ -3,9 +3,12 @@ package io.github.chindeaone.collectiontracker.config.categories;
 import com.google.gson.annotations.Expose;
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight;
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig;
+import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable;
+import io.github.chindeaone.collectiontracker.config.categories.mining.MiningRoutesConfig;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class Mining {
@@ -29,4 +32,13 @@ public class Mining {
     @ConfigOption(name = "HOTM perks", desc = "")
     @Accordion
     public HotmConfig hotmConfig = new HotmConfig();
+
+    @Expose
+    @Category(name = "Mining Routes", desc = "")
+    public MiningRoutesConfig miningRoutesConfig = new MiningRoutesConfig();
+
+    @Expose
+    @ConfigOption(name = "Lantern Deployable", desc = "")
+    @Accordion
+    public LanternDeployable lanternDeployable = new LanternDeployable();
 }

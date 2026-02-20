@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
@@ -47,7 +48,6 @@ object Hypixel {
 
     private fun checkServer() {
         val mc = Minecraft.getInstance()
-
         var hypixel = false
 
         val clientBrand = mc.connection?.serverBrand()
@@ -56,7 +56,6 @@ object Hypixel {
                 hypixel = true
             }
         }
-
         server = hypixel
     }
 
@@ -121,16 +120,12 @@ object Hypixel {
 
     fun fetchData() {
         if (!ServerStatus.hasData()) {
-            val futures = arrayOf(
-                CompletableFuture.runAsync { FetchCollectionList.fetchCollectionList() },
-                CompletableFuture.runAsync { FetchNpcPrices.fetchPrices() },
-                CompletableFuture.runAsync { FetchGemstoneList.fetchGemstoneList() },
-                CompletableFuture.runAsync { FetchColors.fetchColorsData() },
-                CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
-            )
-            CompletableFuture.allOf(*futures).thenRun {
-                logger.info("[SCT]: API data loaded successfully.")
-            }
+            CompletableFuture.runAsync { FetchCollectionList.fetchCollectionList() }
+            CompletableFuture.runAsync { FetchNpcPrices.fetchPrices() }
+            CompletableFuture.runAsync { FetchGemstoneList.fetchGemstoneList() }
+            CompletableFuture.runAsync { FetchColors.fetchColorsData() }
+            CompletableFuture.runAsync { FetchWaypoints.fetchWaypoints() }
+            CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
         }
     }
 
