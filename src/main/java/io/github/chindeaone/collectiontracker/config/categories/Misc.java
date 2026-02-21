@@ -61,7 +61,7 @@ public class Misc {
     @Expose
     @ConfigOption(
             name = "Server Lag Protection",
-            desc = "Prevents ability timers from counting down during server lag.\n§eMay desync timers!"
+            desc = "Prevents ability timers from counting down during server lag.\n§eSyncs timers to the server!"
     )
     @ConfigEditorBoolean
     public boolean serverLagProtection = false;

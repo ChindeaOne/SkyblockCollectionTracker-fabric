@@ -103,7 +103,7 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
                     RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getTitleDisplayTimer());
                     expiredTitleShown = true;
                 }
-                if (cooldown == 0) {
+                if (cooldown <= 0) {
                     if (!readyTitleShown) {
                         String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
                         RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getTitleDisplayTimer());
@@ -131,7 +131,7 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
                     RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getTitleDisplayTimer());
                     expiredTitleShown = true;
                 }
-                if (cooldown == 0) {
+                if (cooldown <= 0) {
                     if (!readyTitleShown) {
                         RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getTitleDisplayTimer());
                         readyTitleShown = true;

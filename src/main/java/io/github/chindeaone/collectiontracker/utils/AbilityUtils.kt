@@ -161,7 +161,7 @@ object AbilityUtils {
         }
     }
 
-    fun calculateReduction(baseCooldown: Int, snap: PickaxeAbilitySnapshot?, skyMallActive: Boolean): Double {
+    fun calculateReduction(baseCooldown: Int, snap: PickaxeAbilitySnapshot?, skyMallActive: Boolean, abilityName: String): Double {
         var cooldown = baseCooldown.toDouble()
 
         // Fuel Tank
@@ -189,7 +189,11 @@ object AbilityUtils {
 
         // Sky Mall
         if (skyMallActive && miningIslands.contains(MiningStatsWidget.currentMiningIsland)) {
-            cooldown *= 0.8
+            cooldown *= if (abilityName == "Pickobulus") {
+                0.755 // apparently it's more for pickobulus
+            } else {
+                0.8
+            }
         }
 
         // Mayhem cooldown reduction

@@ -58,6 +58,10 @@ object ChatListener {
         val text = message.string
         val cleanText = text.removeColor()
 
+        if (cleanText == "Pickobulus is now available!") {
+            pickaxeCooldown.reset()
+        }
+
         collectionListener(cleanText)
         petSummoned(text)
         abilityListener(cleanText)
