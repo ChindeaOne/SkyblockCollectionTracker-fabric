@@ -20,7 +20,7 @@ public class DeployableOverlay implements AbstractOverlay {
 
     @Override
     public String overlayLabel() {
-        return "Mining Deployable Overlay";
+        return "Mining Deployable";
     }
 
     @Override

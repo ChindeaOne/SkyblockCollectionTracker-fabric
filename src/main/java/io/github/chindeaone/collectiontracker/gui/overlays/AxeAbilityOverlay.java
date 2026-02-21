@@ -26,7 +26,7 @@ public class AxeAbilityOverlay implements AbstractOverlay{
 
     @Override
     public String overlayLabel() {
-        return "Axe Ability Overlay";
+        return "Axe Ability";
     }
 
     @Override

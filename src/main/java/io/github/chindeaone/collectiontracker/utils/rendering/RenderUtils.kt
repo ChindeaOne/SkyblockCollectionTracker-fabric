@@ -112,6 +112,8 @@ object RenderUtils {
 
         val resizeText = Component.literal("Use mouse wheel to resize the overlay")
             .withStyle(ChatFormatting.GREEN)
+        val resetText = Component.literal("Right click to reset the scale")
+            .withStyle(ChatFormatting.GREEN)
 
         val textWidth = fr.width(resizeText)
         val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
@@ -122,11 +124,22 @@ object RenderUtils {
         context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), WHITE, true)
         context.pose().popMatrix()
 
+        val resetWidth = fr.width(resetText)
+        val resetX = (context.guiWidth() / 2f) - (resetWidth * textScale / 2f)
+        val resetY = textY + fr.lineHeight + 2f
+
+        context.pose().pushMatrix()
+        context.pose().scale(textScale, textScale)
+        context.drawString(fr, resetText, (resetX / textScale).toInt(), (resetY / textScale).toInt(), WHITE, true)
+        context.pose().popMatrix()
+
         if (activePosition != null) {
-            val positionText = Component.literal("Position: X=${activePosition.x}, Y=${activePosition.y}")
+            val scaleStr = String.format("%.1f", activePosition.scale)
+            val positionText = Component.literal("Position: X=${activePosition.x}, Y=${activePosition.y}, Scale=${scaleStr}")
+                .withStyle(ChatFormatting.YELLOW)
             val positionWidth = fr.width(positionText)
             val positionX = (context.guiWidth() / 2f) - (positionWidth * textScale / 2f)
-            val positionY = textY + fr.lineHeight + 5f
+            val positionY = textY + fr.lineHeight * 2 + 5f
 
             context.pose().pushMatrix()
             context.pose().scale(textScale, textScale)

@@ -23,7 +23,7 @@ public class LotteryOverlay implements AbstractOverlay {
 
     @Override
     public String overlayLabel() {
-        return "Lottery Overlay";
+        return "Lottery";
     }
 
     @Override

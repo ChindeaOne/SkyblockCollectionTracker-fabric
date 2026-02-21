@@ -86,10 +86,10 @@ public class DummyOverlay extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
-        if (event.button() == 0) {
-            int mx = (int) event.x();
-            int my = (int) event.y();
+        int mx = (int) event.x();
+        int my = (int) event.y();
 
+        if (event.button() == 0) {
             for (AbstractOverlay overlay : OverlayManager.all()) {
                 if (isMouseOver(mx, my, overlay.position())) {
                     dragging = overlay;
@@ -98,7 +98,15 @@ public class DummyOverlay extends Screen {
                     return true;
                 }
             }
+        } else if (event.button() == 1) {
+            for (AbstractOverlay overlay : OverlayManager.all()) {
+                if (isMouseOver(mx, my, overlay.position())) {
+                    overlay.position().setScaling(1.0f);
+                    return true;
+                }
+            }
         }
+
         return super.mouseClicked(event, doubled);
     }
 

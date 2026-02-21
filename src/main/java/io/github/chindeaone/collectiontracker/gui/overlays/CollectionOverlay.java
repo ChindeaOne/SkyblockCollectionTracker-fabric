@@ -24,7 +24,7 @@ public class CollectionOverlay implements AbstractOverlay{
 
     @Override
     public String overlayLabel() {
-        return "Collection Overlay";
+        return "Collection Tracker";
     }
 
     @Override public Position position() {

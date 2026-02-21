@@ -24,7 +24,7 @@ public class SkyMallOverlay implements AbstractOverlay {
 
     @Override
     public String overlayLabel() {
-        return "SkyMall Overlay";
+        return "SkyMall";
     }
 
     @Override

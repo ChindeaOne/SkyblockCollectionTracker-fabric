@@ -23,7 +23,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
 
     @Override
     public String overlayLabel() {
-        return "Mining Stats Overlay";
+        return "Mining Stats";
     }
 
     @Override

@@ -28,7 +28,7 @@ public class SkillOverlay implements AbstractOverlay {
 
     @Override
     public String overlayLabel() {
-        return "Skill Overlay";
+        return "Skill Tracker";
     }
 
     @Override

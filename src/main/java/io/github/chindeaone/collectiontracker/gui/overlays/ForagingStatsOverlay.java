@@ -23,7 +23,7 @@ public class ForagingStatsOverlay implements AbstractOverlay{
 
     @Override
     public String overlayLabel() {
-        return "Foraging Stats Overlay";
+        return "Foraging Stats";
     }
 
     @Override public Position position() {

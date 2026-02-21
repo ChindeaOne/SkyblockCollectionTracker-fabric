@@ -53,7 +53,7 @@ public class CommissionsOverlay implements AbstractOverlay{
 
     @Override
     public String overlayLabel() {
-        return "Commissions Overlay";
+        return "Commissions";
     }
 
     @Override

@@ -27,7 +27,7 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
 
     @Override
     public String overlayLabel() {
-        return "Pickaxe Ability Overlay";
+        return "Pickaxe Ability";
     }
 
     @Override
