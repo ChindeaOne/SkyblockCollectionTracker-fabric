@@ -447,10 +447,10 @@ object ConfigHelper {
     }
 
     @JvmStatic
-    fun saveBuffTimes(refined: Long, filet: Long, potato: Long, pumpkin: Long) {
-        temporaryBuffsConfig.refinedCacaoTime = refined
-        temporaryBuffsConfig.filetTime = filet
-        temporaryBuffsConfig.pristinePotatoTime = potato
-        temporaryBuffsConfig.powderPumpkinTime = pumpkin
+    fun setDuration(refined: Long = -1, filet: Long = -1, potato: Long = -1, pumpkin: Long = -1) {
+        if (refined != -1L) temporaryBuffsConfig.refinedCacaoTime = refined
+        if (filet != -1L) temporaryBuffsConfig.filetTime = filet
+        if (potato != -1L) temporaryBuffsConfig.pristinePotatoTime = potato
+        if (pumpkin != -1L) temporaryBuffsConfig.powderPumpkinTime = pumpkin
     }
 }

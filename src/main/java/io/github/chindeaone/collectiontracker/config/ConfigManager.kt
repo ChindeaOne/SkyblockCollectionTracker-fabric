@@ -18,6 +18,7 @@ import java.util.*
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import com.google.gson.Gson
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import java.nio.file.AtomicMoveNotSupportedException
@@ -138,6 +139,7 @@ class ConfigManager {
 
     @Synchronized
     fun save() {
+        TemporaryBuffsParser.saveDurations()
         lastSaveTime = System.currentTimeMillis()
         val config = config ?: error("Cannot save null config.")
 

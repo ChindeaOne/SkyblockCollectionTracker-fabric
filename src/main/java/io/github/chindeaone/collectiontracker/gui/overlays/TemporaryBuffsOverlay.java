@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -76,10 +77,10 @@ public class TemporaryBuffsOverlay implements AbstractOverlay{
 
         long now = System.currentTimeMillis();
 
-        addBuffLine("§6Refined Dark Cacao Truffle", ConfigAccess.getRefinedCacaoTime(), now);
-        addBuffLine("§9Filet O' Fortune", ConfigAccess.getFiletTime(), now);
-        addBuffLine("§5Chilled Pristine Potato", ConfigAccess.getPristinePotatoTime(), now);
-        addBuffLine("§aPowder Pumpkin", ConfigAccess.getPowderPumpkinTime(), now);
+        addBuffLine("§6Refined Dark Cacao Truffle", TemporaryBuffsParser.getRefinedCacaoTime(), now);
+        addBuffLine("§9Filet O' Fortune", TemporaryBuffsParser.getFiletTime(), now);
+        addBuffLine("§5Chilled Pristine Potato", TemporaryBuffsParser.getPristinePotatoTime(), now);
+        addBuffLine("§aPowder Pumpkin", TemporaryBuffsParser.getPowderPumpkinTime(), now);
 
         return tempBuffLines;
     }
@@ -95,8 +96,10 @@ public class TemporaryBuffsOverlay implements AbstractOverlay{
         String formattedTime;
         if (minutes >= 5) {
             formattedTime = minutes + "m";
+        } else if (minutes >= 1) {
+            formattedTime = String.format("%dm %ds", minutes, seconds);
         } else {
-            formattedTime = String.format("%d:%02d", minutes, seconds);
+            formattedTime = seconds + "s";
         }
 
         tempBuffLines.add(buffName + " §e" + formattedTime);

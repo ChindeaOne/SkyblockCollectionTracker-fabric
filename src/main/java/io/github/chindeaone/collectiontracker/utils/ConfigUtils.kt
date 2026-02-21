@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigManager.Companion.gso
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils.Pet
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils.lastPet
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import kotlin.jvm.java
@@ -33,5 +34,7 @@ object ConfigUtils {
         if (lastLotteryPerk.isNotBlank()) {
             ChatListener.currentLotteryBuff = lastLotteryPerk
         }
+
+        TemporaryBuffsParser.loadDurations()
     }
 }

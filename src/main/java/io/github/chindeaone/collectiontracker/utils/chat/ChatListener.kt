@@ -32,14 +32,11 @@ object ChatListener {
     private val CONSUME_PATTERN = Regex("^You consumed an? (.+?) and gained", RegexOption.IGNORE_CASE)
     var lastSkillValue = 0L
 
-    @JvmStatic
-    var currentSkyMallBuff = "§cUnknown"
+    @JvmStatic var currentSkyMallBuff = "§cUnknown"
     var isPickaxeAbility = false
-    @JvmStatic
-    var currentLotteryBuff = "§cUnknown"
+    @JvmStatic var currentLotteryBuff = "§cUnknown"
 
-    @JvmStatic
-    var nextBuffTime: Long = 0
+    @JvmStatic var nextBuffTime: Long = 0
         private set
 
     private var expectingSkyMallBuff = false
@@ -177,7 +174,8 @@ object ChatListener {
         val finalCooldownSec = AbilityUtils.calculateReduction(
             baseCooldown = baseCooldown,
             snap = snap,
-            skyMallActive = isSkyMallPickaxeAbilityActive()
+            skyMallActive = isSkyMallPickaxeAbilityActive(),
+            abilityName = ability
             )
 
         val durationMs = (AbilityUtils.getBaseDuration(ability, cotm, hasBlueCheese) * 1000).toLong()
