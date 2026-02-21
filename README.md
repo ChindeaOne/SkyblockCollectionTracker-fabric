@@ -93,6 +93,30 @@
 
 </details>
 
+<details>
+<summary><strong>Mining Deployable Tracker</strong></summary>
+
+- Display the lantern type and current time remaining while being in range.
+- Configurable title alert when the deployable has expired.
+
+</details>
+
+<details>
+<summary><strong>Mining Routes</strong></summary>
+
+- Displays ordered waypoints in mineshafts, only for jasper and crystal mineshafts.
+- Displays ordered waypoints for mineshaft spawning routes.
+- All routes used are from Mining Cult.
+
+</details>
+
+<details>
+<summary><strong>Temporary Buff Tracker</strong></summary>
+
+- Tracks temporary mining buffs like refined dark cacao truffle or filet o' fortune.
+
+</details>
+
 ---
 
 ## Credits
