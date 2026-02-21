@@ -13,6 +13,7 @@ import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.TimerState
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 import net.minecraft.network.chat.Component
@@ -28,6 +29,7 @@ object ChatListener {
     private val ABILITY_PATTERN = Regex("^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!", RegexOption.IGNORE_CASE)
     private val CHANGE_ABILITY_PATTERN = Regex("^You selected (.+?) as your (Pickaxe|Axe)? ?Ability", RegexOption.IGNORE_CASE)
     private val SUMMON_PATTERN = Regex("^You summoned your (.+?)!")
+    private val CONSUME_PATTERN = Regex("^You consumed an? (.+?) and gained", RegexOption.IGNORE_CASE)
     var lastSkillValue = 0L
 
     @JvmStatic
@@ -63,6 +65,7 @@ object ChatListener {
         petSummoned(text)
         abilityListener(cleanText)
         abilitySwapListener(cleanText)
+        consumableListener(cleanText)
     }
 
     private fun collectionListener(text: String) {
@@ -102,7 +105,7 @@ object ChatListener {
         }
     }
 
-    fun abilitySwapListener(text: String) {
+    private fun abilitySwapListener(text: String) {
         val match = CHANGE_ABILITY_PATTERN.find(text) ?: return
         val abilityName = match.groupValues[1].trim()
         val toolType = match.groupValues[2].lowercase()
@@ -111,6 +114,15 @@ object ChatListener {
             ConfigHelper.setAxeAbilityName(abilityName)
         } else {
             ConfigHelper.setAbilityName(abilityName)
+        }
+    }
+
+    private fun consumableListener(text: String) {
+        val match = CONSUME_PATTERN.find(text) ?: return
+        val consumableName = match.groupValues[1].trim()
+
+        if (consumableName == "Refined Dark Cacao Truffle") {
+            TemporaryBuffsParser.resetRefinedCacao()
         }
     }
 
@@ -141,7 +153,6 @@ object ChatListener {
             .replace(" ✦", "")
             .trim()
 
-        // Extract first color code preceding the pet name
         val colorCodeMatch = Regex("§.").find(petSegment)
         val code = colorCodeMatch?.value?.getOrNull(1)
         val rarity = when (code) {

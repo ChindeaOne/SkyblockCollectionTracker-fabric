@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
-import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.TooltipFlag
@@ -10,14 +9,6 @@ object AbilityItemParser {
     fun tooltipFlag(): TooltipFlag.Default =
         if (Minecraft.getInstance().options.advancedItemTooltips) TooltipFlag.Default.ADVANCED
         else TooltipFlag.Default.NORMAL
-
-    @JvmStatic
-    fun normalizeText(s: String) = s
-        .removeColor()
-        .replace("\\p{C}+".toRegex(), " ")
-        .replace("\\s+".toRegex(), " ")
-        .trim()
-        .lowercase()
 
     fun parse(lines: List<String>): AbilityUtils.AbilitySnapshot? {
         val hasBreakingPower = lines.any { it.contains("breaking power") }

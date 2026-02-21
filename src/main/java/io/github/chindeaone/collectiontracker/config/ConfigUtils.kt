@@ -18,6 +18,7 @@ import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDe
 import io.github.chindeaone.collectiontracker.config.categories.mining.MiningRoutesConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.PickaxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.SkyMallConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.TemporaryBuffsConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
@@ -43,6 +44,7 @@ val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryConfi
 val pickaxeAbilityPosition: Position get() = modConfig.mining.hotmConfig.pickaxeAbilityConfig.pickaxeAbilityPosition
 val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilityConfig.axeAbilityPosition
 val deployablePosition: Position get() = modConfig.mining.lanternDeployable.deployablePosition
+val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tempBuffPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -65,6 +67,7 @@ val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
 val lanternDeployable: LanternDeployable get() = miningConfig.lanternDeployable
+val temporaryBuffsConfig: TemporaryBuffsConfig get() = miningConfig.temporaryBuffsConfig
 val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
@@ -78,6 +81,11 @@ val pickaxeAbilityInMiningIslandsOnly: Boolean get() = pickaxeAbilityConfig.pick
 val enableMineshaftRoutes: Boolean get() = miningRoutesConfig.enableMineshaftRoutes
 val enableMineshaftSpawnRoutes: Boolean get() = miningRoutesConfig.enableMineshaftSpawnRoutes
 val mineshaftSpawnRoutes: MiningRoutesConfig.MineshaftSpawnRoutes get() = miningRoutesConfig.mineshaftSpawnRoutes
+val enableTempBuffTracker: Boolean get() = temporaryBuffsConfig.enableTempBuffTracker
+val refinedCacaoTime: Long get() = temporaryBuffsConfig.refinedCacaoTime
+val filetTime: Long get() = temporaryBuffsConfig.filetTime
+val pristinePotatoTime: Long get() = temporaryBuffsConfig.pristinePotatoTime
+val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
 
 // Coleweight Config Accessors
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
@@ -169,6 +177,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getDeployablePosition(): Position = deployablePosition
+
+    @JvmStatic
+    fun getTempBuffPosition(): Position = tempBuffPosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
@@ -343,6 +354,21 @@ object ConfigAccess {
 
     @JvmStatic
     fun getMineshaftSpawnRoutes(): MiningRoutesConfig.MineshaftSpawnRoutes = mineshaftSpawnRoutes
+
+    @JvmStatic
+    fun isTempBuffTrackerEnabled(): Boolean = enableTempBuffTracker
+
+    @JvmStatic
+    fun getRefinedCacaoTime(): Long = refinedCacaoTime
+
+    @JvmStatic
+    fun getFiletTime(): Long = filetTime
+
+    @JvmStatic
+    fun getPristinePotatoTime(): Long = pristinePotatoTime
+
+    @JvmStatic
+    fun getPowderPumpkinTime(): Long = powderPumpkinTime
 }
 
 /**
@@ -418,5 +444,13 @@ object ConfigHelper {
     @JvmStatic
     fun setAxeAbilityName(name: String) {
         axeAbilityConfig.abilityNameAxe = name
+    }
+
+    @JvmStatic
+    fun saveBuffTimes(refined: Long, filet: Long, potato: Long, pumpkin: Long) {
+        temporaryBuffsConfig.refinedCacaoTime = refined
+        temporaryBuffsConfig.filetTime = filet
+        temporaryBuffsConfig.pristinePotatoTime = potato
+        temporaryBuffsConfig.powderPumpkinTime = pumpkin
     }
 }

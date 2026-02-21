@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.config.categories.coleweight.Colew
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig;
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable;
 import io.github.chindeaone.collectiontracker.config.categories.mining.MiningRoutesConfig;
+import io.github.chindeaone.collectiontracker.config.categories.mining.TemporaryBuffsConfig;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -41,4 +42,9 @@ public class Mining {
     @ConfigOption(name = "Lantern Deployable", desc = "")
     @Accordion
     public LanternDeployable lanternDeployable = new LanternDeployable();
+
+    @Expose
+    @ConfigOption(name = "Temporary Buffs Tracker", desc = "")
+    @Accordion
+    public TemporaryBuffsConfig temporaryBuffsConfig = new TemporaryBuffsConfig();
 }

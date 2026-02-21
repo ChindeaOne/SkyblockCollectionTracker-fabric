@@ -5,13 +5,14 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
-import java.util.Locale.getDefault
 
 /**
     * This class is used to check for the tracked collection item.
@@ -37,7 +38,7 @@ object InventoryListener {
             val stack = inventory.getItem(i)
             if (stack.isEmpty) continue
 
-            val itemName = normalize(stack.itemName.string)
+            val itemName = StringUtils.normalizeText(stack.itemName.string)
 
             val match = if (isGemstone) {
                 matchesGemstone(itemName, collection)
@@ -66,21 +67,18 @@ object InventoryListener {
             context,
             player,
             AbilityItemParser.tooltipFlag()
-        ).map { it.string }.map { AbilityItemParser.normalizeText(it) }
+        ).map { it.string }.map { StringUtils.normalizeText(it) }
 
         AbilityItemParser.parse(lines)?.let { snap ->
             AbilityUtils.update(snap)
+            return InteractionResult.PASS
         }
 
-        return InteractionResult.PASS
-    }
+        val itemName = lines.firstOrNull()
+        println("Checking hand item: $itemName")
+        TemporaryBuffsParser.resetConsumable(itemName)
 
-    private fun normalize(name: String): String {
-        return name
-            .lowercase(getDefault())
-            .replace(Regex("[^a-z ]"), "")
-            .replace(Regex("\\s+"), " ")
-            .trim()
+        return InteractionResult.PASS
     }
 
     private fun matchesNormal(itemName: String, collection: String): Boolean {

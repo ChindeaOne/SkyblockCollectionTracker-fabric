@@ -134,7 +134,7 @@ object RenderUtils {
         context.pose().popMatrix()
 
         if (activePosition != null) {
-            val scaleStr = String.format("%.1f", activePosition.scale)
+            val scaleStr = String.format("%.2f", activePosition.scale)
             val positionText = Component.literal("Position: X=${activePosition.x}, Y=${activePosition.y}, Scale=${scaleStr}")
                 .withStyle(ChatFormatting.YELLOW)
             val positionWidth = fr.width(positionText)
@@ -192,6 +192,7 @@ object RenderUtils {
     @JvmStatic
     fun renderChangelog(context: GuiGraphics, scrollOffset: Int) {
         val rawNotes = RepoUtils.latestNotes
+        if (rawNotes.isEmpty()) return
         val footerIndex = rawNotes.indexOf("**Full Changelog**")
         val cleanNotes = if (footerIndex != -1) rawNotes.substring(0, footerIndex) else rawNotes
 

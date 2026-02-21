@@ -29,14 +29,14 @@ public class OverlayManager {
     }
 
     public static void setTrackingOverlayRendering(boolean allowed) {
-        AbstractOverlay overlay = overlays.get("Collection Overlay");
+        AbstractOverlay overlay = overlays.get("Collection Tracker");
         if (overlay != null) {
             overlay.setRenderingAllowed(allowed);
         }
     }
 
     public static void setSkillOverlayRendering(boolean allowed) {
-        AbstractOverlay overlay = overlays.get("Skill Overlay");
+        AbstractOverlay overlay = overlays.get("Skill Tracker");
         if (overlay != null) {
             overlay.setRenderingAllowed(allowed);
         }
@@ -53,5 +53,6 @@ public class OverlayManager {
         OverlayManager.add(new PickaxeAbilityOverlay());
         OverlayManager.add(new AxeAbilityOverlay());
         OverlayManager.add(new DeployableOverlay());
+        OverlayManager.add(new TemporaryBuffsOverlay());
     }
 }

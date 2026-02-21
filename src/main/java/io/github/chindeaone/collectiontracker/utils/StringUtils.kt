@@ -23,6 +23,14 @@ object StringUtils {
         return formatted.toString()
     }
 
+    @JvmStatic
+    fun normalizeText(s: String) = s
+        .removeColor()
+        .replace("\\p{C}+".toRegex(), " ")
+        .replace("\\s+".toRegex(), " ")
+        .trim()
+        .lowercase()
+
     // Method taken from Skyhanni
     fun CharSequence.removeColor(keepFormatting: Boolean = false): String {
         // Glossary:

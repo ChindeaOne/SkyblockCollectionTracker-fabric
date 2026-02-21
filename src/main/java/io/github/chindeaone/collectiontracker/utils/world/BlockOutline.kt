@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Axis
+import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
@@ -21,6 +22,7 @@ object BlockOutline {
     fun renderWaypoint(context: WorldRenderContext) {
         if (!RenderSystem.isOnRenderThread()) return
         if (!HypixelUtils.isOnSkyblock) return
+        if (!FetchWaypoints.hasWaypoints) return
 
         val currentIsland = MiningStatsWidget.currentMiningIsland
         if (currentIsland != "Dwarven Mines" && currentIsland != "Mineshaft") return
