@@ -99,11 +99,11 @@ object BlockOutline {
             vc.addVertex(matrices.last(), v1[0], v1[1], v1[2])
                 .setColor(r, g, 0f, 1f)
                 .setNormal(matrix, normal)
-                .setLineWidth(2f)
+                /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
             vc.addVertex(matrices.last(), v2[0], v2[1], v2[2])
                 .setColor(r, g, 0f, 1f)
                 .setNormal(matrix, normal)
-                .setLineWidth(2f)
+                /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
         }
         matrices.popPose()
     }
@@ -122,8 +122,13 @@ object BlockOutline {
         val cameraPos = camera.position()
         matrices.translate(pos.x + 0.5 - cameraPos.x, pos.y + 2.25 - cameraPos.y, pos.z + 0.5 - cameraPos.z)
 
+        //? if = 1.21.11 {
         matrices.mulPose(Axis.YP.rotationDegrees(-camera.yRot()))
         matrices.mulPose(Axis.XP.rotationDegrees(camera.xRot()))
+        //?} else {
+        /*matrices.mulPose(Axis.YP.rotationDegrees(-camera.yRot))
+        matrices.mulPose(Axis.XP.rotationDegrees(camera.xRot))
+        *///? }
 
         matrices.scale(-0.03f, -0.03f, 0.03f)
 
@@ -168,11 +173,11 @@ object BlockOutline {
         vc.addVertex(matrix, sx, sy, sz)
             .setColor(0f, 1f, 0f, 1f)
             .setNormal(matrix, normal)
-            .setLineWidth(2.0f)
+        /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
 
         vc.addVertex(matrix, ex, ey, ez)
             .setColor(0f, 1f, 0f, 1f)
             .setNormal(matrix, normal)
-            .setLineWidth(2.0f)
+        /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
     }
 }

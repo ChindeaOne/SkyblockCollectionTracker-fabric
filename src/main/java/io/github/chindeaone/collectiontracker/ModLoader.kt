@@ -28,7 +28,7 @@ import net.minecraft.client.Minecraft
 //? if = 1.21.11 {
 import net.minecraft.resources.Identifier
 //? } else {
- /*import net.minecraft.resources.ResourceLocation 
+/*import net.minecraft.resources.ResourceLocation
 *///? }
 
 class ModLoader: ModInitializer {
@@ -45,7 +45,6 @@ class ModLoader: ModInitializer {
         OutlineTypes.init()
     }
 
-
     private fun eventRegistration() {
         ClientTickEvents.END_CLIENT_TICK.register(ClientTickEvents.EndTick {client ->
             if (client.player == null) return@EndTick
@@ -56,7 +55,6 @@ class ModLoader: ModInitializer {
 
         UseItemCallback.EVENT.register { player, _, hand -> InventoryListener.checkHandItem(player, hand) }
         WorldRenderEvents.END_MAIN.register { context -> BlockOutline.renderWaypoint(context) }
-
         //? if = 1.21.11 {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
         //? } else {

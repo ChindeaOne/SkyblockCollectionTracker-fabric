@@ -15,7 +15,7 @@ object StringUtils {
         for (i in words.indices) {
             val word = words[i].lowercase(Locale.getDefault())
             if (i == 0) {
-                formatted.append(word.get(0).uppercaseChar()).append(word.substring(1))
+                formatted.append(word[0].uppercaseChar()).append(word.substring(1))
             } else {
                 formatted.append(" ").append(word)
             }
