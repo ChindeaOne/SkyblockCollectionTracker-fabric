@@ -1,0 +1,56 @@
+name: modrinth_publish.yml
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: ci
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Release Assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p build/libs
+            gh release download ${{ github.event.release.tag_name }} --pattern "*.jar" --dir build/libs
+
+      - name: Prepare Description
+        id: prepare_desc
+        run: |
+          {
+            echo 'description<<EOF'
+            echo "${{ github.event.release.body}}" | sed '/^\*\*Full Changelog\*\*/d'
+            echo `EOF`
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish to Modrinth
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: iYI2Iw6k
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
+          name: "${{ github.event.release.name }}"
+          version: "${{ github.event.release.tag_name }}"
+          changelog: ${{ steps.prepare_desc.outputs.description }}
+
+          files: |
+            build/libs/**/*.jar
+            !build/libs/**/*-dev.jar
+            !build/libs/**/*-sources.jar
+            !build/libs/**/*-javadoc.jar
+
+          loaders: fabric
+          game-versions: |
+            1.21.10
+            1.21.11
+
+          dependencies: |
+            P7dR8mSH (required)
+            Ha28R6CL (required)
