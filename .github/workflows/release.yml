@@ -9,6 +9,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: ci
     env:
       TOKEN_URL: ${{ secrets.TOKEN_URL }}
       TRACKED_COLLECTION_URL: ${{ secrets.TRACKED_COLLECTION_URL }}
