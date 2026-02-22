@@ -18,15 +18,19 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p build/libs
-            gh release download ${{ github.event.release.tag_name }} --pattern "*.jar" --dir build/libs
+          gh release download ${{ github.event.release.tag_name }} --pattern "*.jar" --dir build/libs
 
       - name: Prepare Description
         id: prepare_desc
+        env:
+          RELEASE_BODY: ${{ github.event.release.body }}
         run: |
+          echo "$RELEASE_BODY" > body.txt
+          sed -i '/^\*\*Full Changelog\*\*/d' body.txt
           {
             echo 'description<<EOF'
-            echo "${{ github.event.release.body}}" | sed '/^\*\*Full Changelog\*\*/d'
-            echo `EOF`
+            cat body.txt
+            echo 'EOF'
           } >> "$GITHUB_OUTPUT"
 
       - name: Publish to Modrinth
@@ -38,7 +42,7 @@ jobs:
           version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
           name: "${{ github.event.release.name }}"
           version: "${{ github.event.release.tag_name }}"
-          changelog: ${{ steps.prepare_desc.outputs.description }}
+          changelog: "${{ steps.prepare_desc.outputs.description }}"
 
           files: |
             build/libs/**/*.jar
