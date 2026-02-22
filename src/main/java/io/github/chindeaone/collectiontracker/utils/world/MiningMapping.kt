@@ -8,7 +8,7 @@ object MiningMapping {
         "Dwarven Mines",
         "Crystal Hollows",
         "Mineshaft",
-        "Gold Mines",
+        "Gold Mine",
         "Deep Caverns",
         // other areas where you can mine
         "The End",
@@ -23,7 +23,7 @@ object MiningMapping {
         "Dwarven Mines",
         "Crystal Hollows",
         "Mineshaft",
-        "Gold Mines",
+        "Gold Mine",
         "Deep Caverns"
     )
 
@@ -51,7 +51,7 @@ object MiningMapping {
             "Dwarven Mines",
             "Crystal Hollows",
             "Mineshaft",
-            "Gold Mines",
+            "Gold Mine",
             "Deep Caverns",
             "Crimson Isle", // for quartz and sulphur
         ),
@@ -63,7 +63,7 @@ object MiningMapping {
             "Dwarven Mines", // stone, cobblestone
             "Crystal Hollows", // hard stone
             "Mineshaft", // hard stone
-            "Gold Mines", // stone, cobblestone
+            "Gold Mine", // stone, cobblestone
             "Deep Caverns", // stone, cobblestone
             "The End", // for end stone and obsidian
             "Crimson Isle", // for red sand, mycelium, netherrack, glowstone

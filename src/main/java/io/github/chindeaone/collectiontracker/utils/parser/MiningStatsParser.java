@@ -178,7 +178,7 @@ public class MiningStatsParser {
             return switch (blockType) {
                 case "dwarven_metals" -> "§a"; // Green
                 case "pure_ores", "ores" -> "§e"; // Yellow
-                case "gemstones" -> "§5"; // Purple
+                case "gemstones" -> "§d"; // Light Purple
                 case "blocks" -> "§8"; // Dark Gray
                 default -> ""; // No color
             };
