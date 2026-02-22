@@ -119,14 +119,12 @@ object Hypixel {
     }
 
     fun fetchData() {
-        if (!ServerStatus.hasData()) {
-            CompletableFuture.runAsync { FetchCollectionList.fetchCollectionList() }
-            CompletableFuture.runAsync { FetchNpcPrices.fetchPrices() }
-            CompletableFuture.runAsync { FetchGemstoneList.fetchGemstoneList() }
-            CompletableFuture.runAsync { FetchColors.fetchColorsData() }
-            CompletableFuture.runAsync { FetchWaypoints.fetchWaypoints() }
-            CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
-        }
+        if (!FetchCollectionList.hasCollectionList) CompletableFuture.runAsync { FetchCollectionList.fetchCollectionList() }
+        if (!FetchNpcPrices.hasNpcPrice) CompletableFuture.runAsync { FetchNpcPrices.fetchPrices() }
+        if (!FetchGemstoneList.hasGemstoneList) CompletableFuture.runAsync { FetchGemstoneList.fetchGemstoneList() }
+        if (!FetchColors.hasColors) CompletableFuture.runAsync { FetchColors.fetchColorsData() }
+        if (!FetchWaypoints.hasWaypoints) CompletableFuture.runAsync { FetchWaypoints.fetchWaypoints() }
+        if (!ColeweightFetcher.hasColeweightLb) CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
     }
 
     private fun loadPlayerData(client: Minecraft) {

@@ -60,9 +60,9 @@ object ServerUtils {
     }
 
     private fun checkIfDataWasFetched() {
-        if (!ServerStatus.hasData()) {
-            Hypixel.fetchData()
-            logger.info("[SCT]: API data loaded successfully.")
-        }
+        if (ServerStatus.hasData()) return
+
+        Hypixel.fetchData()
+        logger.info("[SCT]: Attempting to load missing data")
     }
 }
