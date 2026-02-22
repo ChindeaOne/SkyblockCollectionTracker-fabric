@@ -75,7 +75,6 @@ object InventoryListener {
         }
 
         val itemName = lines.firstOrNull()
-        println("Checking hand item: $itemName")
         TemporaryBuffsParser.resetConsumable(itemName)
 
         return InteractionResult.PASS
