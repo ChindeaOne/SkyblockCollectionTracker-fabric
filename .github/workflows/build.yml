@@ -41,6 +41,7 @@ jobs:
       COLORS_URL: ${{ secrets.COLORS_URL }}
       SKILLS_URL: ${{ secrets.SKILLS_URL }}
       COLEWEIGHT_URL: ${{ secrets.COLEWEIGHT_URL }}
+      WAYPOINTS_URL: ${{ secrets.WAYPOINTS_URL }}
       AGENT: ${{ secrets.AGENT }}
     steps:
       - name: checkout repository
