@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.tab.TabWidget
 
 object IslandTracker {
@@ -27,17 +26,9 @@ object IslandTracker {
     }
 
     private fun updateMiningIsland(lines: List<String>) {
-        currentMiningIsland = if (ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly()) {
-            lines.firstNotNullOfOrNull { line ->
-                MiningMapping.miningIslands.firstOrNull { name ->
-                    line.contains(name, ignoreCase = true)
-                }
-            }
-        } else {
-            lines.firstNotNullOfOrNull { line ->
-                MiningMapping.miningAreas.firstOrNull { name ->
-                    line.contains(name, ignoreCase = true)
-                }
+        currentMiningIsland = lines.firstNotNullOfOrNull { line ->
+            MiningMapping.miningAreas.firstOrNull { name ->
+                line.contains(name, ignoreCase = true)
             }
         }
     }
