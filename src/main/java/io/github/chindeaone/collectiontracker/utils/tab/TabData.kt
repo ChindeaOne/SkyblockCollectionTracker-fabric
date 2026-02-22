@@ -12,6 +12,7 @@ object TabData {
 
     private var tabCache: List<String> = emptyList()
     private var world: ClientLevel? = null
+    private var tickCounter = 0
 
     fun tickAndUpdateWidget(client: Minecraft) {
         val currentWorld = client.level
@@ -19,6 +20,9 @@ object TabData {
             world = null
             return
         }
+
+        tickCounter++
+        if (tickCounter % 2 != 0) return
 
         if (world != currentWorld) {
             world = currentWorld
@@ -28,7 +32,18 @@ object TabData {
         }
 
         if (!HypixelUtils.isOnSkyblock) return
-        if (!ConfigAccess.isMiningStatsEnabled() && !ConfigAccess.isCommissionsEnabled() && !ConfigAccess.isForagingStatsOverlayEnabled()) return
+        if (!ConfigAccess.isMiningStatsEnabled() &&
+            !ConfigAccess.isCommissionsEnabled() &&
+            !ConfigAccess.isForagingStatsOverlayEnabled() &&
+            !ConfigAccess.isSkyMallEnabled() &&
+            !ConfigAccess.isLotteryEnabled() &&
+            !ConfigAccess.isPickaxeAbilityDisplayed() &&
+            !ConfigAccess.isAxeAbilityDisplayed() &&
+            !ConfigAccess.isMineshaftRoutesEnabled() &&
+            !ConfigAccess.isMineshaftSpawnRoutesEnabled() &&
+            !ConfigAccess.isDeployableEnabled() &&
+            !ConfigAccess.isColeweightRankingInChat()) return
+
         val newList = readTab() ?: return
         if (newList.isEmpty()) return
 

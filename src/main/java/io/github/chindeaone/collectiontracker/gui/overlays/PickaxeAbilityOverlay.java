@@ -6,7 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget;
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -82,7 +82,7 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
         pickaxeAbilityOverlayLines.clear();
 
         if (!ConfigAccess.isPickaxeAbilityDisplayed()) return Collections.emptyList();
-        if (ConfigAccess.isPickaxeAbilityInMiningIslandsOnly() && !MiningMapping.INSTANCE.getMiningIslands().contains(MiningStatsWidget.getCurrentMiningIsland())) return Collections.emptyList();
+        if (ConfigAccess.isPickaxeAbilityInMiningIslandsOnly() && !MiningMapping.INSTANCE.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
 
         String abilityName = ConfigAccess.getPickaxeAbilityName();
         String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;

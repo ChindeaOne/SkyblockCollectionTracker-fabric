@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.utils.tab.TabWidget
 
 object IslandTracker {
 
+    @JvmStatic
     var currentMiningIsland: String? = null
         private set
 
