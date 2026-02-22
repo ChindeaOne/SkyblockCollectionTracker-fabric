@@ -30,6 +30,8 @@ object ChatListener {
     private val CHANGE_ABILITY_PATTERN = Regex("^You selected (.+?) as your (Pickaxe|Axe)? ?Ability", RegexOption.IGNORE_CASE)
     private val SUMMON_PATTERN = Regex("^You summoned your (.+?)!")
     private val CONSUME_PATTERN = Regex("^You consumed an? (.+?) and gained", RegexOption.IGNORE_CASE)
+    private val ON_COOLDOWN_PATTERN = Regex("^Your (.+?) ability is on cooldown for (\\d+)s.", RegexOption.IGNORE_CASE)
+
     var lastSkillValue = 0L
 
     @JvmStatic var currentSkyMallBuff = "§cUnknown"
@@ -38,6 +40,7 @@ object ChatListener {
 
     @JvmStatic var nextBuffTime: Long = 0
         private set
+    var abilityName: String? = null
 
     private var expectingSkyMallBuff = false
     private var expectingLotteryBuff = false
@@ -58,13 +61,10 @@ object ChatListener {
         val text = message.string
         val cleanText = text.removeColor()
 
-        if (cleanText == "Pickobulus is now available!") {
-            pickaxeCooldown.reset()
-        }
-
         collectionListener(cleanText)
         petSummoned(text)
         abilityListener(cleanText)
+        onCooldownListener(cleanText)
         abilitySwapListener(cleanText)
         consumableListener(cleanText)
     }
@@ -91,6 +91,7 @@ object ChatListener {
     private fun abilityListener(text: String) {
         val match = ABILITY_PATTERN.find(text) ?: return
         val abilityName = match.groupValues[1].trim()
+        this.abilityName = abilityName
         val toolType = match.groupValues[2].lowercase()
 
         if (toolType == "axe") {
@@ -103,6 +104,31 @@ object ChatListener {
             if (pickSnap != null && pickSnap.hasAbility) {
                 startAbilityTimeline(abilityName, pickSnap)
             }
+        }
+    }
+
+    private fun onCooldownListener(text: String) {
+        if (!ConfigAccess.isServerLagProtectionEnabled()) return
+
+        val match = ON_COOLDOWN_PATTERN.find(text) ?: return
+        val type = match.groupValues[1].trim()
+        val time = match.groupValues[2].toLongOrNull() ?: return
+
+        if (type == "Pickaxe" && abilityName != "Pickobulus") {
+            syncTimer(pickaxeCooldown, time)
+        } else if (type == "Axe") {
+            syncTimer(axeCooldown, time)
+        }
+    }
+
+    private fun syncTimer(timer: TimerState, time: Long) {
+        val currentRemainingMs = (timer.remainingSeconds * 1000).toLong()
+        val currentSeconds = currentRemainingMs / 1000
+
+        if (currentSeconds != time) {
+            val millisOffset = currentRemainingMs % 1000
+            val newCooldown = (time * 1000) + millisOffset
+            timer.start(newCooldown)
         }
     }
 
@@ -170,11 +196,12 @@ object ChatListener {
     }
 
     private fun startAbilityTimeline(ability: String, snap: AbilityUtils.PickaxeAbilitySnapshot?) {
-        var cotm = ConfigAccess.getCotmLevel()
-        if (cotm >= 1) cotm = 1
+        val cotm = ConfigAccess.getCotmLevel()
+        println("COTM Level: $cotm")
+        val abilityLevel = if (cotm >= 2) 2 else 1
         val hasBlueCheese = snap?.hasBlueCheesePart == true
 
-        val baseCooldown = AbilityUtils.getBaseCooldown(ability, cotm, hasBlueCheese)
+        val baseCooldown = AbilityUtils.getBaseCooldown(ability, abilityLevel, hasBlueCheese)
         val finalCooldownSec = AbilityUtils.calculateReduction(
             baseCooldown = baseCooldown,
             snap = snap,
@@ -182,7 +209,7 @@ object ChatListener {
             abilityName = ability
             )
 
-        val durationMs = (AbilityUtils.getBaseDuration(ability, cotm, hasBlueCheese) * 1000).toLong()
+        val durationMs = (AbilityUtils.getBaseDuration(ability, abilityLevel, hasBlueCheese) * 1000).toLong()
 
         pickaxeDuration.start(durationMs)
         pickaxeCooldown.start((finalCooldownSec * 1000).toLong())
@@ -191,15 +218,15 @@ object ChatListener {
     }
 
     private fun startAxeAbilityTimeline(ability: String) {
-        var cotf = ConfigAccess.getCotfLevel()
-        if (cotf >= 1) cotf = 1
+        val cotf = ConfigAccess.getCotfLevel()
+        val abilityLevel = if (cotf >= 1) 2 else 1
 
-        val baseCooldown = AbilityUtils.getBaseAxeCooldown(ability, cotf)
+        val baseCooldown = AbilityUtils.getBaseAxeCooldown(ability, abilityLevel)
         val finalCooldownSec = AbilityUtils.calculateAxeReduction(
             baseCooldown = baseCooldown
         )
 
-        val durationMs = (AbilityUtils.getBaseAxeDuration(ability, cotf) * 1000).toLong()
+        val durationMs = (AbilityUtils.getBaseAxeDuration(ability, abilityLevel) * 1000).toLong()
         val cooldownMs = (finalCooldownSec * 1000).toLong()
 
         axeDuration.start(durationMs)

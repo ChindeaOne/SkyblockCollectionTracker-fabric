@@ -33,13 +33,13 @@ object AbilityUtils {
         PERFECTLY_CUT(0.10)
     }
 
-    enum class PetRarity(val balReductionPerLevel: Double, val crowCommonReductionPerLevel: Double, val crowEpicReductionPerLevel: Double) {
-        COMMON(0.0, 0.0007, 0.0),
-        UNCOMMON(0.0, 0.0007, 0.0),
-        RARE(0.0, 0.0007, 0.0),
-        EPIC(0.0, 0.0, 0.0012),
-        LEGENDARY(0.001, 0.0, 0.0012),
-        MYTHIC(0.0, 0.0, 0.0) // for other mythic pets
+    enum class PetRarity(val balReductionPerLevel: Double, val crowReductionPerLevel: Double) {
+        COMMON(0.0, 0.0007),
+        UNCOMMON(0.0, 0.0007),
+        RARE(0.0, 0.0007),
+        EPIC(0.0,0.0012),
+        LEGENDARY(0.001,0.0012),
+        MYTHIC(0.0, 0.0) // for other mythic pets
     }
 
     data class Pet(
@@ -81,19 +81,21 @@ object AbilityUtils {
     fun recentOrNullAxe(now: Long = System.currentTimeMillis()): AxeAbilitySnapshot? =
         lastAxeSnap?.takeIf { now - it.timestamp <= MAX_AGE_MS }
 
-    fun getBaseCooldown(ability: String, cotmLevel: Int, hasBlueCheese: Boolean): Int {
-        val effectiveCotm = if (hasBlueCheese && cotmLevel >= 1) cotmLevel + 1 else cotmLevel
+    fun getBaseCooldown(ability: String, abilityLevel: Int, hasBlueCheese: Boolean): Int {
+        val effectiveLevel = if (hasBlueCheese) abilityLevel + 1 else abilityLevel
         return when (ability) {
             "Mining Speed Boost" -> 120
-            "Pickobulus" -> when {
-                effectiveCotm >= 2 -> 40
-                effectiveCotm >= 1 -> 50
-                else -> 60
+            "Pickobulus" -> when (effectiveLevel) {
+                3 -> 40
+                2 -> 50
+                1 -> 60
+                else -> 0
             }
-            "Tunnel Vision" -> when {
-                effectiveCotm >= 2 -> 100
-                effectiveCotm >= 1 -> 110
-                else -> 120
+            "Tunnel Vision" -> when (effectiveLevel) {
+                3 -> 100
+                2 -> 110
+                1 -> 120
+                else -> 0
             }
             "Maniac Miner" -> 120
             "Gemstone Infusion" -> 120
@@ -102,60 +104,68 @@ object AbilityUtils {
         }
     }
 
-    fun getBaseDuration(ability: String, cotmLevel: Int, hasBlueCheese: Boolean): Int {
-        val effectiveCotm = if (hasBlueCheese && cotmLevel >= 1) cotmLevel + 1 else cotmLevel
+    fun getBaseDuration(ability: String, abilityLevel: Int, hasBlueCheese: Boolean): Int {
+        val effectiveLevel = if (hasBlueCheese) abilityLevel + 1 else abilityLevel
         return when (ability) {
-            "Mining Speed Boost" -> when {
-                effectiveCotm >= 2 -> 20
-                effectiveCotm >= 1 -> 15
-                else -> 10
+            "Mining Speed Boost" -> when (effectiveLevel) {
+                3 -> 20
+                2 -> 15
+                1 -> 10
+                else -> 0
             }
             "Pickobulus" -> 0
             "Tunnel Vision" -> 0
-            "Maniac Miner" -> when {
-                effectiveCotm >= 2 -> 35
-                effectiveCotm >= 1 -> 30
-                else -> 25
+            "Maniac Miner" -> when (effectiveLevel) {
+                3 -> 35
+                2 -> 30
+                1 -> 25
+                else -> 0
             }
-            "Gemstone Infusion" -> when {
-                effectiveCotm >= 2 -> 30
-                effectiveCotm >= 1 -> 25
-                else -> 20
+            "Gemstone Infusion" -> when (effectiveLevel) {
+                3 -> 30
+                2 -> 25
+                1 -> 20
+                else -> 0
             }
-            "Sheer Force" -> when {
-                effectiveCotm >= 2 -> 30
-                effectiveCotm >= 1 -> 25
-                else -> 20
+            "Sheer Force" -> when (effectiveLevel) {
+                3 -> 30
+                2 -> 25
+                1 -> 20
+                else -> 0
             }
             else -> 0
         }
     }
 
-    fun getBaseAxeCooldown(ability: String, cotfLevel: Int): Int {
+    fun getBaseAxeCooldown(ability: String, abilityLevel: Int): Int {
         return when (ability) {
-            "Damage Boost" -> when {
-                cotfLevel >= 1 -> 110
-                else -> 120
+            "Damage Boost" -> when (abilityLevel) {
+                2 -> 110
+                1 -> 120
+                else -> 0
             }
-            "Axe Toss" -> when {
-                cotfLevel >= 1 -> 112
-                else -> 120
+            "Axe Toss" -> when (abilityLevel) {
+                2 -> 112
+                1 -> 120
+                else -> 0
             }
-            "Maniac Slicer" -> when {
-                cotfLevel >= 1 -> 58
-                else -> 60
+            "Maniac Slicer" -> when (abilityLevel) {
+                2 -> 58
+                1 -> 60
+                else -> 0
             }
             else -> 0
         }
     }
 
-    fun getBaseAxeDuration(ability: String, cotfLevel: Int): Int {
+    fun getBaseAxeDuration(ability: String, abilityLevel: Int): Int {
         return when (ability) {
             "Damage Boost" -> 10
             "Axe Toss" -> 10
-            "Maniac Slicer" -> when {
-                cotfLevel >= 1 -> 15
-                else -> 20
+            "Maniac Slicer" -> when (abilityLevel) {
+                2 -> 15
+                1 -> 20
+                else -> 0
             }
             else -> 0
         }
@@ -176,11 +186,7 @@ object AbilityUtils {
                     pet.rarity.balReductionPerLevel * pet.level
                 }
                 pet.name.equals("Crow", ignoreCase = true) -> {
-                    if (pet.rarity >= PetRarity.EPIC) {
-                        0.03 + (pet.rarity.crowEpicReductionPerLevel * pet.level)
-                    } else {
-                        0.03 + (pet.rarity.crowCommonReductionPerLevel * pet.level)
-                    }
+                    0.03 + (pet.rarity.crowReductionPerLevel * pet.level)
                 }
                 else -> 0.0
             }
@@ -190,7 +196,7 @@ object AbilityUtils {
         // Sky Mall
         if (skyMallActive && miningIslands.contains(MiningStatsWidget.currentMiningIsland)) {
             cooldown *= if (abilityName == "Pickobulus") {
-                0.755 // apparently it's more for pickobulus
+                0.765 // apparently it's more for pickobulus
             } else {
                 0.8
             }
@@ -210,11 +216,7 @@ object AbilityUtils {
         lastPet?.let { pet ->
             val petReduction = when {
                 pet.name.equals("Crow", ignoreCase = true) -> {
-                    if (pet.rarity >= PetRarity.EPIC) {
-                        0.03 + (pet.rarity.crowEpicReductionPerLevel * pet.level)
-                    } else {
-                        0.03 + (pet.rarity.crowCommonReductionPerLevel * pet.level)
-                    }
+                    0.03 + (pet.rarity.crowReductionPerLevel * pet.level)
                 }
                 else -> 0.0
             }
