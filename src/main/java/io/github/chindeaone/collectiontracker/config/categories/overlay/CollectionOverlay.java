@@ -17,7 +17,8 @@ public class CollectionOverlay {
         COLL_PER_HOUR("§aColl/h§f: Calculating..."),
         MONEY_PER_HOUR("§a$/h (NPC/Bazaar)§f: 100k/h"),
         MONEY_MADE("§a$ made (NPC/Bazaar)§f: 1.000M"),
-        COLLECTION_SINCE_LAST("§aCollected since last§f: 200k");
+        COLLECTION_SINCE_LAST("§aCollected since last§f: 200k"),
+        COLLECTION_SINCE_LAST_TIMER("§aLast collection§f: 20 seconds ago");
 
         private final String text;
 
@@ -43,7 +44,8 @@ public class CollectionOverlay {
             OverlayText.COLL_PER_HOUR,
             OverlayText.MONEY_PER_HOUR,
             OverlayText.MONEY_MADE,
-            OverlayText.COLLECTION_SINCE_LAST
+            OverlayText.COLLECTION_SINCE_LAST,
+            OverlayText.COLLECTION_SINCE_LAST_TIMER
     ));
 
     @Expose

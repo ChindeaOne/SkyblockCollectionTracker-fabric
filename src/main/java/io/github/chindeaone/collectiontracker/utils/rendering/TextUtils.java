@@ -37,6 +37,7 @@ public class TextUtils {
                 case MONEY_PER_HOUR -> addIfNotNull(list, handleMoneyPerHour());
                 case MONEY_MADE -> addIfNotNull(list, handleMoneyMade());
                 case COLLECTION_SINCE_LAST -> addIfNotNull(list, handleCollectionSinceLast());
+                case COLLECTION_SINCE_LAST_TIMER -> addIfNotNull(list, handleCollectionSinceLastTimer());
             }
         }
     }
@@ -166,6 +167,19 @@ public class TextUtils {
         return collectionSinceLast > 0
                 ? formatCollectionName(collection) + " collection since last: " + formatNumber(collectionSinceLast)
                 : formatCollectionName(collection) + " collection since last: Calculating...";
+    }
+
+    private static String handleCollectionSinceLastTimer() {
+        if (collectionSinceLast == 0) return "Last collection: Calculating...";
+        long totalSeconds = (System.currentTimeMillis() - lastCollectionTime) / 1000;
+        if (totalSeconds < 60) {
+            return "Last collection§f: " + totalSeconds + "s ago";
+        }
+
+        long min = totalSeconds / 60;
+        long sec = totalSeconds % 60;
+
+        return String.format("Last collection: %dm %ds ago", min, sec);
     }
 
     // Only if it has bazaar data and is enabled

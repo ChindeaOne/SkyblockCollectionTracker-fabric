@@ -25,6 +25,7 @@ public class TrackingRates {
     public static volatile long collectionMade;
     public static volatile long collectionSinceLast;
     public static volatile long sessionStartCollection = -1L;
+    public static volatile long lastCollectionTime = -1L;
 
     // Sacks tracking data
     public static volatile long lastApiCollection = -1L;
@@ -94,6 +95,8 @@ public class TrackingRates {
                 unchangedStreak = 0;
             }
         }
+
+        lastCollectionTime = System.currentTimeMillis();
 
         logger.info("[SCT]: Collection since last check is {}.", collectionSinceLast);
 

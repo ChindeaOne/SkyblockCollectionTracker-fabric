@@ -183,6 +183,7 @@ public class TrackingHandler {
         lastApiCollection = -1L;
         sacksCollectionGained = 0L;
         sessionStartCollection = -1L;
+        lastCollectionTime = -1L;
 
         // Clear profit map
         moneyPerHourBazaar.clear();
