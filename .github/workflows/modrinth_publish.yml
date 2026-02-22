@@ -9,6 +9,9 @@ jobs:
     environment: ci
     permissions:
       contents: read
+    strategy:
+      matrix:
+        game-version: ["1.21.10", "1.21.11"]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -18,7 +21,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p build/libs
-          gh release download ${{ github.event.release.tag_name }} --pattern "*.jar" --dir build/libs
+          gh release download ${{ github.event.release.tag_name }} --pattern "*${{ matrix.game-version }}*.jar" --dir build/libs
 
       - name: Prepare Description
         id: prepare_desc
@@ -45,15 +48,13 @@ jobs:
           changelog: "${{ steps.prepare_desc.outputs.description }}"
 
           files: |
-            build/libs/**/*.jar
+            build/libs/**/*${{ matrix.game-version }}*.jar
             !build/libs/**/*-dev.jar
             !build/libs/**/*-sources.jar
             !build/libs/**/*-javadoc.jar
 
           loaders: fabric
-          game-versions: |
-            1.21.10
-            1.21.11
+          game-versions: ${{ matrix.game-version }}
 
           dependencies: |
             P7dR8mSH (required)
