@@ -47,7 +47,7 @@ public class DummyOverlay extends Screen {
         for (AbstractOverlay overlay : OverlayManager.all()) {
             overlay.updateDimensions();
 
-            RenderUtils.drawDummyFrame(context,overlay.position(), overlay.overlayLabel());
+            RenderUtils.drawDummyFrame(context, overlay.position(), overlay.overlayLabel());
 
             if (isMouseOver(mouseX, mouseY, overlay.position())) {
                 hovered = overlay;

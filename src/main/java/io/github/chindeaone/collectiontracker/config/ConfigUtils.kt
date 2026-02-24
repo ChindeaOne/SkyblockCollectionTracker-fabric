@@ -45,6 +45,7 @@ val pickaxeAbilityPosition: Position get() = modConfig.mining.hotmConfig.pickaxe
 val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilityConfig.axeAbilityPosition
 val deployablePosition: Position get() = modConfig.mining.lanternDeployable.deployablePosition
 val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tempBuffPosition
+val titlePosition: Position get() = modConfig.misc.titlePosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -76,7 +77,8 @@ val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
 val lastSkyMallPerk: String get() = skyMallConfig.lastSkyMallPerk
 val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIslandsOnly
 val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChatMessages
-val showPickaxeAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeAbilityTitle
+val showPickaxeReadyAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeReadyAbilityTitle
+val showPickaxeExpiredAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeExpiredAbilityTitle
 val pickaxeAbilityInMiningIslandsOnly: Boolean get() = pickaxeAbilityConfig.pickaxeAbilityInMiningIslandsOnly
 val enableMineshaftRoutes: Boolean get() = miningRoutesConfig.enableMineshaftRoutes
 val enableMineshaftSpawnRoutes: Boolean get() = miningRoutesConfig.enableMineshaftSpawnRoutes
@@ -120,7 +122,8 @@ val lotteryConfig: LotteryConfig get() = hotfConfig.lotteryConfig
 val enableLottery: Boolean get() = lotteryConfig.enableLottery
 val lotteryInForagingIslandsOnly: Boolean get() = lotteryConfig.lotteryInForagingIslandsOnly
 val disableLotteryChatMessages: Boolean get() = lotteryConfig.disableLotteryChatMessages
-val showAxeAbilityTitle: Boolean get() = axeAbilityConfig.showAxeAbilityTitle
+val showAxeReadyAbilityTitle: Boolean get() = axeAbilityConfig.showAxeReadyAbilityTitle
+val showAxeExpiredAbilityTitle: Boolean get() = axeAbilityConfig.showAxeExpiredAbilityTitle
 val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbilityInForagingIslandsOnly
 
 // Tracking Config Accessors
@@ -180,6 +183,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getTempBuffPosition(): Position = tempBuffPosition
+
+    @JvmStatic
+    fun getTitlePosition(): Position = titlePosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
@@ -314,10 +320,16 @@ object ConfigAccess {
     fun getTitleDisplayTimer(): Int = titleDisplayTimer.get()
 
     @JvmStatic
-    fun isShowPickaxeAbilityTitle(): Boolean = showPickaxeAbilityTitle
+    fun isShowPickaxeReadyAbilityTitle(): Boolean = showPickaxeReadyAbilityTitle
 
     @JvmStatic
-    fun isShowAxeAbilityTitle(): Boolean = showAxeAbilityTitle
+    fun isShowPickaxeExpiredAbilityTitle(): Boolean = showPickaxeExpiredAbilityTitle
+
+    @JvmStatic
+    fun isShowAxeReadyAbilityTitle(): Boolean = showAxeReadyAbilityTitle
+
+    @JvmStatic
+    fun isShowAxeExpiredAbilityTitle(): Boolean = showAxeExpiredAbilityTitle
 
     @JvmStatic
     fun getTitleScale(): Misc.TitleScale = titleScale
@@ -472,5 +484,10 @@ object ConfigHelper {
     @JvmStatic
     fun setCotfLevel(level: Int) {
         hotfConfig.cotfLevel.set(level)
+    }
+
+    @JvmStatic
+    fun setTitlePosition(x: Int, y: Int) {
+        modConfig.misc.titlePosition = Position(x, y)
     }
 }

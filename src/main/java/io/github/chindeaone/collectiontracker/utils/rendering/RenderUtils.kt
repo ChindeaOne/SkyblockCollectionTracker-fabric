@@ -148,6 +148,37 @@ object RenderUtils {
         }
     }
 
+    @JvmStatic
+    fun drawEditorHudTitle(context: GuiGraphics, activePosition: Position?) {
+        val textScale = 0.8f
+
+        val resizeText = Component.literal("You can move the title position only vertically!")
+            .withStyle(ChatFormatting.GREEN)
+
+        val textWidth = fr.width(resizeText)
+        val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
+        val textY = 10f
+
+        context.pose().pushMatrix()
+        context.pose().scale(textScale, textScale)
+        context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), WHITE, true)
+        context.pose().popMatrix()
+
+        if (activePosition != null) {
+            val scaleStr = String.format("%.2f", activePosition.scale)
+            val positionText = Component.literal("Position: Y=${activePosition.y}, Scale=${scaleStr}")
+                .withStyle(ChatFormatting.YELLOW)
+            val positionWidth = fr.width(positionText)
+            val positionX = (context.guiWidth() / 2f) - (positionWidth * textScale / 2f)
+            val positionY = textY + fr.lineHeight * 2 + 5f
+
+            context.pose().pushMatrix()
+            context.pose().scale(textScale, textScale)
+            context.drawString(fr, positionText, (positionX / textScale).toInt(), (positionY / textScale).toInt(), YELLOW, true)
+            context.pose().popMatrix()
+        }
+    }
+
     private fun drawHelper(line: String, context: GuiGraphics, y: Int, prefixColor: Int) {
         val splitIndex = line.lastIndexOf(": ")
         if (splitIndex != -1) {
@@ -180,10 +211,12 @@ object RenderUtils {
     private fun renderTitle(context: GuiGraphics, title: Component) {
         val screenWidth = context.guiWidth().toFloat()
         val screenHeight = context.guiHeight().toFloat()
+        val y = if (ConfigAccess.getTitlePosition().y == 0) (screenHeight / 2f) else ConfigAccess.getTitlePosition().y
+        val scale = ConfigAccess.getTitleScale().scale
 
         context.pose().pushMatrix()
-        context.pose().translate(screenWidth / 2f, screenHeight / 2f)
-        context.pose().scale(ConfigAccess.getTitleScale().scale * ScaleUtils.scale, ConfigAccess.getTitleScale().scale * ScaleUtils.scale)
+        context.pose().translate(screenWidth / 2f, y.toFloat())
+        context.pose().scale(scale * ScaleUtils.scale, scale * ScaleUtils.scale)
 
         context.drawCenteredString(fr, title, 0, -fr.lineHeight / 2, WHITE)
         context.pose().popMatrix()

@@ -33,8 +33,8 @@ object ChatListener {
         SUMMON("""^You summoned your (.+?)!"""),
         CONSUME("""^You consumed an? (.+?) and gained""", RegexOption.IGNORE_CASE),
         ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
-        // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §eVIEW RULE"
-        AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)! §eVIEW RULE""", RegexOption.IGNORE_CASE),
+        // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §aVIEW RULE"
+        AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)!""", RegexOption.IGNORE_CASE),
         HOTM_RESET("""^Reset your Heart of the Mountain! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE),
         HOTF_RESET("""^You have reset your Heart of the Forest! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE);
         val regex: Regex = Regex(pattern, options.toSet())
@@ -213,7 +213,6 @@ object ChatListener {
 
     private fun startAbilityTimeline(ability: String, snap: AbilityUtils.PickaxeAbilitySnapshot?) {
         val cotm = ConfigAccess.getCotmLevel()
-        println("COTM Level: $cotm")
         val abilityLevel = if (cotm >= 2) 2 else 1
         val hasBlueCheese = snap?.hasBlueCheesePart == true
 

@@ -94,14 +94,14 @@ public class AxeAbilityOverlay implements AbstractOverlay{
 
         if (ConfigAccess.isColeweightAbilityFormat()) {
             // Title logic for Coleweight format
-            if (ConfigAccess.isShowAxeAbilityTitle() && duration == 0) {
-                if (!expiredTitleShown && cooldown > 0) {
+            if (duration == 0) {
+                if (ConfigAccess.isShowAxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0) {
                     String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
                     RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getTitleDisplayTimer());
                     expiredTitleShown = true;
                 }
                 if (cooldown == 0) {
-                    if (!readyTitleShown) {
+                    if (ConfigAccess.isShowAxeReadyAbilityTitle() && !readyTitleShown) {
                         String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
                         RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getTitleDisplayTimer());
                         readyTitleShown = true;
@@ -123,13 +123,13 @@ public class AxeAbilityOverlay implements AbstractOverlay{
             axeAbilityOverlayLines.add("§e" + displayName + " CD: " + status);
         } else {
             // Original Title logic
-            if (ConfigAccess.isShowAxeAbilityTitle() && duration == 0) {
-                if (!expiredTitleShown && cooldown > 0) {
+            if (duration == 0) {
+                if (ConfigAccess.isShowAxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0) {
                     RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getTitleDisplayTimer());
                     expiredTitleShown = true;
                 }
                 if (cooldown == 0) {
-                    if (!readyTitleShown) {
+                    if (ConfigAccess.isShowAxeReadyAbilityTitle() && !readyTitleShown) {
                         RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getTitleDisplayTimer());
                         readyTitleShown = true;
                     }

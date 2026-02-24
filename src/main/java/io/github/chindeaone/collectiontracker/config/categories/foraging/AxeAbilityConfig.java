@@ -27,10 +27,18 @@ public class AxeAbilityConfig {
     @Expose
     @ConfigOption(
             name = "Show Title",
-            desc = "Shows a title (Ready/Expired) when axe ability is ready or expires."
+            desc = "Shows a title when axe ability is ready."
     )
     @ConfigEditorBoolean
-    public boolean showAxeAbilityTitle = true;
+    public boolean showAxeReadyAbilityTitle = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Show Expired Title",
+            desc = "Shows a title when axe ability expires."
+    )
+    @ConfigEditorBoolean
+    public boolean showAxeExpiredAbilityTitle = true;
 
     @Expose
     public String abilityNameAxe = "";

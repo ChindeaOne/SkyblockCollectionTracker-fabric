@@ -33,6 +33,12 @@ public class CommandRegistry {
                             Minecraft.getInstance().execute(GuiManager::openGuiPositionEditor);
                             return 1;
                         })
+                        .then(ClientCommandManager.literal("title")
+                                .executes(context -> {
+                                    Minecraft.getInstance().execute(GuiManager::openGuiTitlePositionEditor);
+                                    return 1;
+                                })
+                        )
                 )
                 // sct commands -> shows the list of commands
                 .then(ClientCommandManager.literal("commands")

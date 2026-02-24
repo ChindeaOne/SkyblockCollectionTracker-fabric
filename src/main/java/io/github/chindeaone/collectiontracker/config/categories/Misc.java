@@ -1,10 +1,8 @@
 package io.github.chindeaone.collectiontracker.config.categories;
 
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.chindeaone.collectiontracker.config.core.Position;
+import io.github.notenoughupdates.moulconfig.annotations.*;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class Misc {
@@ -65,4 +63,8 @@ public class Misc {
     )
     @ConfigEditorBoolean
     public boolean serverLagProtection = false;
+
+    @Expose
+    @ConfigLink(owner = Misc.class, field = "Titles")
+    public Position titlePosition = new Position(0, 0);
 }
