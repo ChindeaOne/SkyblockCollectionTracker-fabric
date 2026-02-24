@@ -453,4 +453,24 @@ object ConfigHelper {
         if (potato != -1L) temporaryBuffsConfig.pristinePotatoTime = potato
         if (pumpkin != -1L) temporaryBuffsConfig.powderPumpkinTime = pumpkin
     }
+
+    @JvmStatic
+    fun setProfessionalMS(ms: Int) {
+        hotmConfig.professionalMS.set(ms)
+    }
+
+    @JvmStatic
+    fun setStrongArmMS(ms: Int) {
+        hotmConfig.strongArmMS.set(ms)
+    }
+
+    @JvmStatic
+    fun setCotmLevel(level: Int) {
+        hotmConfig.cotmLevel.set(level)
+    }
+
+    @JvmStatic
+    fun setCotfLevel(level: Int) {
+        hotfConfig.cotfLevel.set(level)
+    }
 }

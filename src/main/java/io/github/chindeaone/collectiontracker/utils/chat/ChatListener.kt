@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.chat
 
+import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -21,16 +22,25 @@ import net.minecraft.network.chat.MutableComponent
 
 object ChatListener {
 
-    // Skyhanni skill pattern
-    private val SKILL_PATTERN = Regex("\\+(?<gains>[\\d,.]+)\\s+(?<skillName>.+?)\\s*\\((?<current>[\\d,]+)\\s*/\\s*(?<needed>[\\d,]+)\\)", RegexOption.IGNORE_CASE)
-    private val SACKS_PATTERN = Regex("""^\[Sacks]\s*\+([0-9,]+)\s+items?\.\s*\(Last\s+([0-9]+)s\.?\)""", RegexOption.IGNORE_CASE)
-    // Coleweight pattern
-    private val NAME_PATTERN = Regex( """^(?:\[\d+]\s+)?(?:[^\w\s]\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE)
-    private val ABILITY_PATTERN = Regex("^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!", RegexOption.IGNORE_CASE)
-    private val CHANGE_ABILITY_PATTERN = Regex("^You selected (.+?) as your (Pickaxe|Axe)? ?Ability", RegexOption.IGNORE_CASE)
-    private val SUMMON_PATTERN = Regex("^You summoned your (.+?)!")
-    private val CONSUME_PATTERN = Regex("^You consumed an? (.+?) and gained", RegexOption.IGNORE_CASE)
-    private val ON_COOLDOWN_PATTERN = Regex("^Your (.+?) ability is on cooldown for (\\d+)s.", RegexOption.IGNORE_CASE)
+    enum class Patterns(pattern: String, vararg options: RegexOption) {
+        // Skyhanni's skill pattern
+        SKILL("""\+(?<gains>[\d,.]+)\s+(?<skillName>.+?)\s*\((?<current>[\d,]+)\s*/\s*(?<needed>[\d,]+)\)""", RegexOption.IGNORE_CASE),
+        SACKS("""^\[Sacks]\s*\+([0-9,]+)\s+items?\.\s*\(Last\s+([0-9]+)s\.?\)""", RegexOption.IGNORE_CASE),
+        // Coleweight pattern
+        NAME("""^(?:\[\d+]\s+)?(?:[^\w\s]\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE),
+        ABILITY("""^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!""", RegexOption.IGNORE_CASE),
+        CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? ?Ability""", RegexOption.IGNORE_CASE),
+        SUMMON("""^You summoned your (.+?)!"""),
+        CONSUME("""^You consumed an? (.+?) and gained""", RegexOption.IGNORE_CASE),
+        ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
+        // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §eVIEW RULE"
+        AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)! §eVIEW RULE""", RegexOption.IGNORE_CASE),
+        HOTM_RESET("""^Reset your Heart of the Mountain! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE),
+        HOTF_RESET("""^You have reset your Heart of the Forest! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE);
+        val regex: Regex = Regex(pattern, options.toSet())
+
+        fun find(input: CharSequence): MatchResult? = regex.find(input)
+    }
 
     var lastSkillValue = 0L
 
@@ -67,6 +77,7 @@ object ChatListener {
         onCooldownListener(cleanText)
         abilitySwapListener(cleanText)
         consumableListener(cleanText)
+        treeResetListener(cleanText)
     }
 
     private fun collectionListener(text: String) {
@@ -82,14 +93,14 @@ object ChatListener {
         if (!SkillTrackingHandler.isTracking || !HypixelUtils.isOnSkyblock) return
         val cleanText = text.removeColor()
 
-        val match = SKILL_PATTERN.find(cleanText)
+        val match = Patterns.SKILL.find(cleanText)
         if (match != null) {
             parseSkillMessage(match)
         }
     }
 
     private fun abilityListener(text: String) {
-        val match = ABILITY_PATTERN.find(text) ?: return
+        val match = Patterns.ABILITY.find(text) ?: return
         val abilityName = match.groupValues[1].trim()
         this.abilityName = abilityName
         val toolType = match.groupValues[2].lowercase()
@@ -110,7 +121,7 @@ object ChatListener {
     private fun onCooldownListener(text: String) {
         if (!ConfigAccess.isServerLagProtectionEnabled()) return
 
-        val match = ON_COOLDOWN_PATTERN.find(text) ?: return
+        val match = Patterns.ON_COOLDOWN.find(text) ?: return
         val type = match.groupValues[1].trim()
         val time = match.groupValues[2].toLongOrNull() ?: return
 
@@ -133,7 +144,7 @@ object ChatListener {
     }
 
     private fun abilitySwapListener(text: String) {
-        val match = CHANGE_ABILITY_PATTERN.find(text) ?: return
+        val match = Patterns.CHANGE_ABILITY.find(text) ?: return
         val abilityName = match.groupValues[1].trim()
         val toolType = match.groupValues[2].lowercase()
 
@@ -145,7 +156,7 @@ object ChatListener {
     }
 
     private fun consumableListener(text: String) {
-        val match = CONSUME_PATTERN.find(text) ?: return
+        val match = Patterns.CONSUME.find(text) ?: return
         val consumableName = match.groupValues[1].trim()
 
         if (consumableName == "Refined Dark Cacao Truffle") {
@@ -154,7 +165,7 @@ object ChatListener {
     }
 
     private fun petSummoned(text: String) {
-        val match = SUMMON_PATTERN.find(text) ?: return
+        val match = Patterns.SUMMON.find(text) ?: return
         val petSegment = match.groupValues[1]
 
         val name = petSegment.replace(" ✦", "").trim()
@@ -165,12 +176,17 @@ object ChatListener {
         AbilityUtils.updatePet(AbilityUtils.Pet(name = name, level = level, rarity = rarity, timestamp = System.currentTimeMillis(), isManual = true))
     }
 
+    private fun treeResetListener(text: String) {
+        when {
+            Patterns.HOTM_RESET.find(text) != null -> FetchSkillTree.resetHotm()
+            Patterns.HOTF_RESET.find(text) != null -> FetchSkillTree.resetHotf()
+        }
+    }
+
     // Listen to Autopet swap messages
     @JvmStatic
     fun petSwapListener(text: String) {
-        // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §eVIEW RULE"
-        val regex = Regex("§cAutopet §eequipped your §7\\[Lvl (\\d{1,3})] (.+?)! ")
-        val match = regex.find(text) ?: return
+        val match = Patterns.AUTOPET.find(text) ?: return
         val level = match.groupValues[1].toIntOrNull() ?: return
         if (level !in 1..200) return
         val petSegment = match.groupValues[2]
@@ -370,7 +386,7 @@ object ChatListener {
             if (!MiningMapping.miningIslands.contains(MiningStatsWidget.currentMiningIsland)) return message
         }
 
-        val match = NAME_PATTERN.find(text)?: return message
+        val match = Patterns.NAME.find(text)?: return message
         val playerName = match.groupValues[1]
 
         val storage = ColeweightManager.storage
@@ -422,7 +438,7 @@ object ChatListener {
     private fun parseSacksMessage(message: String) {
         if (!ConfigAccess.isSacksTrackingEnabled()) return
 
-        val match = SACKS_PATTERN.find(message)
+        val match = Patterns.SACKS.find(message)
         if (match != null) {
             val itemsStr = match.groupValues[1].replace(",", "")
             val items = itemsStr.toIntOrNull() ?: 0

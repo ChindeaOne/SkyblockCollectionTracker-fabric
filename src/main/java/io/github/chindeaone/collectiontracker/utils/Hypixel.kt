@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.api.colors.FetchColors
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
+import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
@@ -125,6 +126,7 @@ object Hypixel {
         if (!FetchColors.hasColors) CompletableFuture.runAsync { FetchColors.fetchColorsData() }
         if (!FetchWaypoints.hasWaypoints) CompletableFuture.runAsync { FetchWaypoints.fetchWaypoints() }
         if (!ColeweightFetcher.hasColeweightLb) CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
+        if (!FetchSkillTree.hasSkillTree) CompletableFuture.runAsync { FetchSkillTree.fetchSkillTree(true, true) }
     }
 
     private fun loadPlayerData(client: Minecraft) {
