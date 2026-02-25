@@ -50,7 +50,7 @@ public class Misc {
     public TitleScale titleScale = TitleScale.MEDIUM; // Default to MEDIUM
 
     @ConfigOption(
-            name = "Edit Title Position",
+            name = "Title Position GUI",
             desc = "Edit the position of the ability title."
     )
     @ConfigEditorButton(buttonText = "Edit")

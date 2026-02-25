@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GUIConfig {
 
-    @ConfigOption(name = "Edit GUI Location", desc = "Edit the position of all GUIs.")
+    @ConfigOption(name = "Edit GUI Location", desc = "Edit the position of all overlays.")
     @ConfigEditorButton(buttonText = "Edit")
     @SuppressWarnings("unused")
     public Runnable positions = GuiManager::openGuiPositionEditor;
