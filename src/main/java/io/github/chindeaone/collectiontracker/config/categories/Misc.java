@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.config.categories;
 
 import com.google.gson.annotations.Expose;
 import io.github.chindeaone.collectiontracker.config.core.Position;
+import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.notenoughupdates.moulconfig.annotations.*;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
@@ -47,6 +48,14 @@ public class Misc {
     )
     @ConfigEditorDropdown
     public TitleScale titleScale = TitleScale.MEDIUM; // Default to MEDIUM
+
+    @ConfigOption(
+            name = "Edit Title Position",
+            desc = "Edit the position of the ability title."
+    )
+    @ConfigEditorButton(buttonText = "Edit")
+    @SuppressWarnings("unused")
+    public Runnable editTitlePosition = GuiManager::openGuiTitlePositionEditor;
 
     @Expose
     @ConfigOption(
