@@ -95,7 +95,6 @@ class TitleDummy(
         return displayPos
     }
 
-
     private fun isMouseOver(mouseX: Int, mouseY: Int, pos: Position): Boolean {
         val sw = (pos.width * pos.scale).roundToInt()
         val sh = (pos.height * pos.scale).roundToInt()

@@ -9,6 +9,13 @@ import java.awt.Color
 fun Int.toRankComponent(isMe: Boolean): Component = ColorUtils.customColorComponent(this, isMe)
 
 object ColorUtils {
+    const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
+    const val WHITE: Int = 0xFFFFFFFF.toInt()
+    const val GREEN: Int = 0xFF55FF55.toInt()
+    const val YELLOW: Int = 0xFFFFFF55.toInt()
+    const val AQUA: Int = 0xFF55FFFF.toInt()
+    const val GRAY: Int = 0xFFAAAAAA.toInt()
+
     val skillColors: MutableMap<String, Int> = HashMap()
     val collectionColors: MutableMap<String, Int> = HashMap()
 

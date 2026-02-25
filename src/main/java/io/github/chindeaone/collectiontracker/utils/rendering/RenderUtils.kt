@@ -18,11 +18,6 @@ object RenderUtils {
 
     private val fr: Font get() = Minecraft.getInstance().font
     private const val DUMMY_BG = -0x7fbfbfc0
-    const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
-    const val WHITE: Int = 0xFFFFFFFF.toInt()
-    const val GREEN: Int = 0xFF55FF55.toInt()
-    const val YELLOW: Int = 0xFFFFFF55.toInt()
-    const val AQUA: Int = 0xFF55FFFF.toInt()
 
     private var activeTitle: Component? = null
     private var titleExpireTime: Long = 0
@@ -52,7 +47,7 @@ object RenderUtils {
 
             context.pose().pushMatrix()
             context.pose().scale(textScale, textScale)
-            context.drawCenteredString(fr, overlayText, (centerX / textScale).toInt(), (yTop / textScale).toInt(), WHITE)
+            context.drawCenteredString(fr, overlayText, (centerX / textScale).toInt(), (yTop / textScale).toInt(), ColorUtils.WHITE)
             context.pose().popMatrix()
         }
     }
@@ -61,7 +56,7 @@ object RenderUtils {
     fun renderTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
         var y = 0
 
-        val color: Int = if (withColor)  (ColorUtils.collectionColors[CollectionTracker.collection]) ?: GREEN  else GREEN
+        val color: Int = if (withColor) (ColorUtils.collectionColors[CollectionTracker.collection]) ?: ColorUtils.GREEN  else ColorUtils.GREEN
         for (line in lines) {
             drawHelper(line, context, y, color)
             y += fr.lineHeight
@@ -80,7 +75,7 @@ object RenderUtils {
     fun renderSkillStringsWithTaming(context: GuiGraphics, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
         var y = 0
 
-        val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: GREEN
+        val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: ColorUtils.GREEN
         for (line in lines) {
             drawHelper(line, context, y, color)
             y += fr.lineHeight
@@ -88,7 +83,7 @@ object RenderUtils {
 
         if (withTaming) {
             y += fr.lineHeight
-            val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: GREEN
+            val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: ColorUtils.GREEN
             for (line in tamingLines) {
                 drawHelper(line, context, y, tamingColor)
                 y += fr.lineHeight
@@ -101,7 +96,7 @@ object RenderUtils {
         var y = 0
 
         for (line in lines) {
-            context.drawString(fr, line, 0, y, WHITE, true)
+            context.drawString(fr, line, 0, y, ColorUtils.WHITE, true)
             y += fr.lineHeight
         }
     }
@@ -121,7 +116,7 @@ object RenderUtils {
 
         context.pose().pushMatrix()
         context.pose().scale(textScale, textScale)
-        context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), WHITE, true)
+        context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), ColorUtils.WHITE, true)
         context.pose().popMatrix()
 
         val resetWidth = fr.width(resetText)
@@ -130,21 +125,18 @@ object RenderUtils {
 
         context.pose().pushMatrix()
         context.pose().scale(textScale, textScale)
-        context.drawString(fr, resetText, (resetX / textScale).toInt(), (resetY / textScale).toInt(), WHITE, true)
+        context.drawString(fr, resetText, (resetX / textScale).toInt(), (resetY / textScale).toInt(), ColorUtils.WHITE, true)
         context.pose().popMatrix()
 
         if (activePosition != null) {
-            val scaleStr = String.format("%.2f", activePosition.scale)
-            val positionText = Component.literal("Position: X=${activePosition.x}, Y=${activePosition.y}, Scale=${scaleStr}")
-                .withStyle(ChatFormatting.YELLOW)
-            val positionWidth = fr.width(positionText)
-            val positionX = (context.guiWidth() / 2f) - (positionWidth * textScale / 2f)
-            val positionY = textY + fr.lineHeight * 2 + 5f
+            val x = ScaleUtils.mouseX + 12
+            val y = ScaleUtils.mouseY - 12
 
-            context.pose().pushMatrix()
-            context.pose().scale(textScale, textScale)
-            context.drawString(fr, positionText, (positionX / textScale).toInt(), (positionY / textScale).toInt(), YELLOW, true)
-            context.pose().popMatrix()
+            val scaleStr = String.format("%.2f", activePosition.scale)
+            val positionText = Component.literal("X: ${activePosition.x} Y: ${activePosition.y} Scale: $scaleStr")
+                .withStyle(ChatFormatting.YELLOW)
+
+            drawTooltipsHelper(context, positionText, x, y)
         }
     }
 
@@ -161,22 +153,43 @@ object RenderUtils {
 
         context.pose().pushMatrix()
         context.pose().scale(textScale, textScale)
-        context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), WHITE, true)
+        context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), ColorUtils.WHITE, true)
         context.pose().popMatrix()
 
         if (activePosition != null) {
-            val scaleStr = String.format("%.2f", activePosition.scale)
-            val positionText = Component.literal("Position: Y=${activePosition.y}, Scale=${scaleStr}")
-                .withStyle(ChatFormatting.YELLOW)
-            val positionWidth = fr.width(positionText)
-            val positionX = (context.guiWidth() / 2f) - (positionWidth * textScale / 2f)
-            val positionY = textY + fr.lineHeight * 2 + 5f
+            val x = ScaleUtils.mouseX + 12
+            val y = ScaleUtils.mouseY - 12
 
-            context.pose().pushMatrix()
-            context.pose().scale(textScale, textScale)
-            context.drawString(fr, positionText, (positionX / textScale).toInt(), (positionY / textScale).toInt(), YELLOW, true)
-            context.pose().popMatrix()
+            val positionText = Component.literal("Y: ${activePosition.y}")
+                .withStyle(ChatFormatting.YELLOW)
+
+            drawTooltipsHelper(context, positionText, x, y)
         }
+    }
+
+    private fun drawTooltipsHelper(context: GuiGraphics, positionText: Component, x: Int, y: Int) {
+        val textScale = 0.8f
+
+        val positionWidth = fr.width(positionText) * textScale
+        val positionHeight = fr.lineHeight * textScale
+        val positionY = when {
+            y < 8 -> 4f
+            y + fr.lineHeight > context.guiHeight() -> (context.guiHeight() - fr.lineHeight - 6).toFloat()
+            else -> y.toFloat()
+        }
+        val positionX = if (x + positionWidth > context.guiWidth()) {
+            (context.guiWidth() - positionWidth - 6)
+        } else {
+            x.toFloat()
+        }
+
+        drawTooltipBox(context, positionX, positionY, positionWidth, positionHeight)
+
+        context.pose().pushMatrix()
+        context.pose().translate(positionX, positionY)
+        context.pose().scale(textScale, textScale)
+        context.drawString(fr, positionText, 0, 0, ColorUtils.YELLOW, true)
+        context.pose().popMatrix()
     }
 
     private fun drawHelper(line: String, context: GuiGraphics, y: Int, prefixColor: Int) {
@@ -188,7 +201,7 @@ object RenderUtils {
             context.drawString(fr, prefix, 0, y, prefixColor, true)
 
             val prefixWidth = fr.width(prefix)
-            context.drawString(fr, numberPart,  prefixWidth, y, CUSTOM_WHITE, true)
+            context.drawString(fr, numberPart,  prefixWidth, y, ColorUtils.CUSTOM_WHITE, true)
         } else {
             context.drawString(fr, line, 0, y, prefixColor, true)
         }
@@ -211,14 +224,16 @@ object RenderUtils {
     private fun renderTitle(context: GuiGraphics, title: Component) {
         val screenWidth = context.guiWidth().toFloat()
         val screenHeight = context.guiHeight().toFloat()
-        val y = if (ConfigAccess.getTitlePosition().y == 0) (screenHeight / 2f) else ConfigAccess.getTitlePosition().y
-        val scale = ConfigAccess.getTitleScale().scale
+        val pos = ConfigAccess.getTitlePosition()
+        val scale = ConfigAccess.getTitleScale().scale * ScaleUtils.scale
+
+        val y = if (pos.y == 0) ((screenHeight - (pos.height * scale))/ 2f) else pos.y.toFloat()
+        val yOffset = (pos.height - fr.lineHeight) / 2f
 
         context.pose().pushMatrix()
-        context.pose().translate(screenWidth / 2f, y.toFloat())
-        context.pose().scale(scale * ScaleUtils.scale, scale * ScaleUtils.scale)
-
-        context.drawCenteredString(fr, title, 0, -fr.lineHeight / 2, WHITE)
+        context.pose().translate(screenWidth / 2f, y)
+        context.pose().scale(scale, scale)
+        context.drawCenteredString(fr, title, 0, yOffset.toInt(), ColorUtils.WHITE)
         context.pose().popMatrix()
     }
 
@@ -241,7 +256,7 @@ object RenderUtils {
 
         // Render current version first
         SkyblockCollectionTracker.VERSION.let { version ->
-            context.drawCenteredString(fr, "Version: $version", screenWidth / 2, startY - 20, GREEN)
+            context.drawCenteredString(fr, "Version: $version", screenWidth / 2, startY - 20, ColorUtils.GREEN)
         }
 
         context.enableScissor(startX, startY, startX + overlayWidth, startY + overlayHeight)
@@ -263,10 +278,10 @@ object RenderUtils {
             }
             // Set header colors
             val color = when {
-                line.contains("## What's New") -> GREEN
-                line.contains("## Improvements") -> YELLOW
-                line.contains("## Bug Fixes") -> AQUA
-                else -> WHITE
+                line.contains("## What's New") -> ColorUtils.GREEN
+                line.contains("## Improvements") -> ColorUtils.YELLOW
+                line.contains("## Bug Fixes") -> ColorUtils.AQUA
+                else -> ColorUtils.WHITE
             }
             // clear Markdown
             val cleanLine = trimmed.replace("## ", "")
@@ -309,5 +324,19 @@ object RenderUtils {
             totalHeight += wrappedLines.size * fr.lineHeight
         }
         return totalHeight
+    }
+
+    private fun drawTooltipBox(context: GuiGraphics, x: Float, y: Float, width: Float, height: Float, padding: Float = 4f, borderColor: Int = ColorUtils.GRAY) {
+        val x1 = (x - padding).toInt()
+        val y1 = (y - padding).toInt()
+        val x2 = (x + width + padding).toInt()
+        val y2 = (y + height + padding).toInt()
+
+        context.fill(x1, y1, x2, y2, 0x90000000.toInt())
+
+        context.fill(x1, y1, x2, y1 + 1, borderColor) // Top
+        context.fill(x1, y2 - 1, x2, y2, borderColor) // Bottom
+        context.fill(x1, y1, x1 + 1, y2, borderColor) // Left
+        context.fill(x2 - 1, y1, x2, y2, borderColor) // Right
     }
 }
