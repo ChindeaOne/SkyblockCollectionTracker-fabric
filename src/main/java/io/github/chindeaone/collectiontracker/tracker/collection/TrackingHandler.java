@@ -28,34 +28,25 @@ import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNu
 public class TrackingHandler {
 
     private static final Logger logger = LogManager.getLogger(TrackingHandler.class);
-    private static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10 seconds cooldown
+    public static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10 seconds cooldown
 
     public static boolean isTracking = false;
     public static boolean isPaused = false;
 
     public static long startTime;
     private static long lastTime;
-    private static long lastTrackTime = 0;
+    public static long lastTrackTime = 0;
 
     private static final int allowedHourlyRestarts = 10;
     private static int restartCount = 0;
     private static long firstRestartTime;
 
     public static void startTracking() {
-        long now = System.currentTimeMillis();
-
-        if (now - lastTrackTime < COOLDOWN_MILLIS) {
-            ChatUtils.INSTANCE.sendMessage("§cPlease wait before tracking another collection!", true);
-            return;
-        } else {
-            ChatUtils.INSTANCE.sendMessage("§aTracking " + collection + " collection.", true);
-        }
-
         if (scheduler == null || scheduler.isShutdown()) {
             scheduler = Executors.newScheduledThreadPool(1);
         }
 
-        initTracking(now);
+        initTracking(System.currentTimeMillis());
         OverlayManager.setTrackingOverlayRendering(true);
 
         logger.info("[SCT]: Tracking started for player: {}", PlayerData.INSTANCE.getPlayerName());

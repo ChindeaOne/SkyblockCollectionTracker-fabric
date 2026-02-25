@@ -13,8 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 
-import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isPaused;
-import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking;
+import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.*;
 
 public class CollectionTracker {
 
@@ -48,6 +47,14 @@ public class CollectionTracker {
                 if (CollectionsManager.isCollection(collection)) {
                     CollectionsManager.collectionSource = "collection";
                 } else CollectionsManager.collectionSource = "sacks";
+
+                // Check cooldown before fetching bazaar prices
+                if (System.currentTimeMillis() - lastTrackTime < COOLDOWN_MILLIS) {
+                    ChatUtils.INSTANCE.sendMessage("§cPlease wait before tracking another collection!", true);
+                    return;
+                } else {
+                    ChatUtils.INSTANCE.sendMessage("§aTracking " + collection + " collection.", true);
+                }
 
                 // Fetch bazaar data asynchronously
                 CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
