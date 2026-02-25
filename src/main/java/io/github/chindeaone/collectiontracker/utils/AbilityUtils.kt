@@ -180,7 +180,6 @@ object AbilityUtils {
         }
 
         // Pet swap
-        println("Calculating pet reduction for ${lastPet?.name}, level ${lastPet?.level}, rarity ${lastPet?.rarity}")
         lastPet?.let { pet ->
             val petReduction = when {
                 pet.name.equals("Bal", ignoreCase = true) && pet.rarity >= PetRarity.LEGENDARY -> {

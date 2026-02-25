@@ -36,6 +36,7 @@ public class FetchSkillTree {
 
     public static void fetchSkillTree(boolean mining, boolean foraging) {
         if (alreadyHasData()) {
+            hasSkillTree = true;
             logger.info("[SCT]: Skill tree data already exists. Skipping fetch.");
             return;
         }
