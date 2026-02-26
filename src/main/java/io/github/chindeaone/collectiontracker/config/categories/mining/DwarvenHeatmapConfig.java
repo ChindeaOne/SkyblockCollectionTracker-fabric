@@ -9,7 +9,7 @@ public class DwarvenHeatmapConfig {
     @Expose
     @ConfigOption(
             name = "Enable Heatmap",
-            desc = "Toggles the Dwarven Heatmap for Glacite Tunnels."
+            desc = "Toggles the Heatmap for Glacite Tunnels.\n§eColor mapping: §0black §f> §9blue §f> §baqua §f> §cred §f> §2green"
     )
     @ConfigEditorBoolean
     public boolean enableHeatmap = false;
