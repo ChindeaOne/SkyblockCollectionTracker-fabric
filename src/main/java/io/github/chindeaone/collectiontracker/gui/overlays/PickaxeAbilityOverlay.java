@@ -60,8 +60,6 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
         RenderUtils.drawOverlayFrame(context, position, () ->
                 RenderUtils.renderStrings(context, lines)
         );
-        // Draw expired/ready titles
-        RenderUtils.drawActiveTitle(context);
     }
 
     @Override

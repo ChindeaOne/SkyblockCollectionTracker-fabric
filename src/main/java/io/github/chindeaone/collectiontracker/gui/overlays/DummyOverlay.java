@@ -45,7 +45,7 @@ public class DummyOverlay extends Screen {
         AbstractOverlay hovered = null;
         // Draw all dummies
         for (AbstractOverlay overlay : OverlayManager.all()) {
-            if (!overlay.isEnabled()) continue;
+            if (!overlay.isEnabled() || overlay.overlayLabel().equals("Global Title")) continue;
             overlay.updateDimensions();
 
             RenderUtils.drawDummyFrame(context, overlay.position(), overlay.overlayLabel());

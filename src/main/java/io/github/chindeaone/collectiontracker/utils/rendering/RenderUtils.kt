@@ -19,8 +19,8 @@ object RenderUtils {
     private val fr: Font get() = Minecraft.getInstance().font
     private const val DUMMY_BG = -0x7fbfbfc0
 
-    private var activeTitle: Component? = null
-    private var titleExpireTime: Long = 0
+    private data class QueuedTitle(val title: Component, val duration: Long)
+    private val titleQueue = ArrayDeque<QueuedTitle>()
 
     @JvmStatic
     fun drawOverlayFrame(context: GuiGraphics, pos: Position, drawContext: Runnable) {
@@ -208,17 +208,20 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun showTitle(title: Component, durationMs: Int = getTitleDisplayTimer()) {
-        activeTitle = title
-        titleExpireTime = System.currentTimeMillis() + durationMs * 1000
+    fun showTitle(title: Component, duration: Int = getTitleDisplayTimer()) {
+        if (titleQueue.isEmpty()) {
+            titleQueue.add(QueuedTitle(title, System.currentTimeMillis() + duration * 1000L))
+        } else {
+            titleQueue.add(QueuedTitle(title, titleQueue.last().duration + duration * 1000L))
+        }
     }
 
     @JvmStatic
     fun drawActiveTitle(context: GuiGraphics) {
-        val title = activeTitle ?: return
-        if (System.currentTimeMillis() < titleExpireTime) {
-            renderTitle(context, title)
-        } else activeTitle = null
+        val title = titleQueue.firstOrNull() ?: return
+        if (System.currentTimeMillis() < title.duration) {
+            renderTitle(context, title.title)
+        } else titleQueue.removeFirst()
     }
 
     private fun renderTitle(context: GuiGraphics, title: Component) {
