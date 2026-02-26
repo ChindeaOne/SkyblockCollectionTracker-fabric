@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 public class KeybindConfig {
 
     @Expose
-    @ConfigOption(name = "Enable Commissions keybinds", desc = "Lets you use your number keys to quickly claim your commissions.")
+    @ConfigOption(name = "Enable Commissions keybinds", desc = "Set and use keys to quickly claim your commissions.")
     @ConfigEditorBoolean
     public boolean enableCommissionsKeybinds = false;
 

@@ -28,7 +28,7 @@ public class Misc {
     @Expose
     @ConfigOption(
             name = "Timer precision",
-            desc = "Number of decimal shown for cooldown and duration."
+            desc = "Change how many decimals cooldown and duration will show."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 2, minStep = 1)
     public Property<Integer> abilityPrecision = Property.of(0);
@@ -36,7 +36,7 @@ public class Misc {
     @Expose
     @ConfigOption(
             name = "Title Duration",
-            desc = "How long (in seconds) titles remain on screen."
+            desc = "How long (in seconds) will titles remain on screen."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 8, minStep = 1)
     public Property<Integer> titleDisplayTimer = Property.of(3);
@@ -44,14 +44,14 @@ public class Misc {
     @Expose
     @ConfigOption(
             name = "Title Scale",
-            desc = "Change the scale of the ability title.\n§eSmall = 0.5x, Medium = 1x, Large = 2x, Huge = 3x"
+            desc = "Change the scale of titles.\n§eSmall = 0.5x, Medium = 1x, Large = 2x, Huge = 3x"
     )
     @ConfigEditorDropdown
     public TitleScale titleScale = TitleScale.MEDIUM; // Default to MEDIUM
 
     @ConfigOption(
             name = "Title Position GUI",
-            desc = "Edit the position of the ability title."
+            desc = "Edit the position of titles."
     )
     @ConfigEditorButton(buttonText = "Edit")
     @SuppressWarnings("unused")

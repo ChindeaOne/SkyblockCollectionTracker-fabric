@@ -18,7 +18,7 @@ public class Coleweight {
     @Expose
     @ConfigOption(
             name = "Mining Islands Only",
-            desc = "Only show Coleweight ranks in chat when on the Mining Islands."
+            desc = "Show Coleweight ranks in chat only when on the Mining Islands."
     )
     @ConfigEditorBoolean
     public boolean onlyOnMiningIslands = false;

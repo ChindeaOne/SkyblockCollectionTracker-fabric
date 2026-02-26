@@ -11,7 +11,7 @@ public class SkillOverlay {
     @Expose
     @ConfigOption(
             name = "Enable Taming Tracking",
-            desc = "Toggles tracking for Taming as well.\n§eWon't work if you enable mid tracking!"
+            desc = "Toggles additional tracking for Taming.\n§eWon't work if you enable mid tracking!"
     )
     @ConfigEditorBoolean
     public boolean enableTamingTracking = false;

@@ -10,7 +10,7 @@ public class ColeweightColor {
 
     @Expose
     @ConfigOption(
-        name = "Enable Custom Coleweight Rank Color",
+        name = "Custom Coleweight Rank Color",
         desc = "Allows you to customize your Coleweight rank color in chat."
     )
     @ConfigEditorBoolean

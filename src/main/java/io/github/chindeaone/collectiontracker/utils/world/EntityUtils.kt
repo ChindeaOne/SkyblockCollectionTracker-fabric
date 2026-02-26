@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils
+package io.github.chindeaone.collectiontracker.utils.world
 
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
