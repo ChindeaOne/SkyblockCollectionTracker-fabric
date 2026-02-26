@@ -15,6 +15,7 @@ import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.tab.TabData
 import io.github.chindeaone.collectiontracker.utils.world.BlockOutline
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
+import io.github.chindeaone.collectiontracker.utils.world.DwarvenHeatmap
 import io.github.chindeaone.collectiontracker.utils.world.OutlineTypes
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -54,7 +55,10 @@ class ModLoader: ModInitializer {
         ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.onChatMessage(message) }
 
         UseItemCallback.EVENT.register { player, _, hand -> InventoryListener.checkHandItem(player, hand) }
-        WorldRenderEvents.END_MAIN.register { context -> BlockOutline.renderWaypoint(context) }
+        WorldRenderEvents.END_MAIN.register { context ->
+            BlockOutline.renderWaypoint(context)
+            DwarvenHeatmap.render(context)
+        }
         //? if = 1.21.11 {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
         //? } else {

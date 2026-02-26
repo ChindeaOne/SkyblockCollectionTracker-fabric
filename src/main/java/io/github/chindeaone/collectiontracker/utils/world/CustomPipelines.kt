@@ -12,6 +12,7 @@ import net.minecraft.resources.Identifier
 
 object CustomPipelines {
     lateinit var LINE_THROUGH_WALLS: RenderPipeline
+    lateinit var HIGHLIGHT: RenderPipeline
 
     fun register() {
         LINE_THROUGH_WALLS = RenderPipelines.register(
@@ -22,6 +23,16 @@ object CustomPipelines {
                 /*.withLocation(ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/line_through_walls"))
                 *///?}
                 .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                .build()
+        )
+        HIGHLIGHT = RenderPipelines.register(
+            RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
+            //? if = 1.21.11 {
+                .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/highlight"))
+            //? } else {
+                /*.withLocation(ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/highlight"))
+                *///?}
+                .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
                 .build()
         )
     }

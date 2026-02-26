@@ -2,10 +2,7 @@ package io.github.chindeaone.collectiontracker.config.categories;
 
 import com.google.gson.annotations.Expose;
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight;
-import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig;
-import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable;
-import io.github.chindeaone.collectiontracker.config.categories.mining.MiningRoutesConfig;
-import io.github.chindeaone.collectiontracker.config.categories.mining.TemporaryBuffsConfig;
+import io.github.chindeaone.collectiontracker.config.categories.mining.*;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -37,6 +34,11 @@ public class Mining {
     @Expose
     @Category(name = "Mining Routes", desc = "")
     public MiningRoutesConfig miningRoutesConfig = new MiningRoutesConfig();
+
+    @Expose
+    @ConfigOption(name = "Dwarven Heatmap", desc = "")
+    @Accordion
+    public DwarvenHeatmapConfig dwarvenHeatmapConfig = new DwarvenHeatmapConfig();
 
     @Expose
     @ConfigOption(name = "Lantern Deployable", desc = "")

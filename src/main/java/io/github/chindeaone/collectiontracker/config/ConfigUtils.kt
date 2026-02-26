@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.config.categories.coleweight.Colew
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.DwarvenHeatmapConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable
@@ -69,6 +70,7 @@ val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
 val lanternDeployable: LanternDeployable get() = miningConfig.lanternDeployable
 val temporaryBuffsConfig: TemporaryBuffsConfig get() = miningConfig.temporaryBuffsConfig
+val dwarvenHeatmapConfig: DwarvenHeatmapConfig get() = miningConfig.dwarvenHeatmapConfig
 val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
@@ -88,6 +90,7 @@ val refinedCacaoTime: Long get() = temporaryBuffsConfig.refinedCacaoTime
 val filetTime: Long get() = temporaryBuffsConfig.filetTime
 val pristinePotatoTime: Long get() = temporaryBuffsConfig.pristinePotatoTime
 val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
+val enableHeatmap: Boolean get() = dwarvenHeatmapConfig.enableHeatmap
 
 // Coleweight Config Accessors
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
@@ -381,6 +384,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getPowderPumpkinTime(): Long = powderPumpkinTime
+
+    @JvmStatic
+    fun isHeatmapEnabled(): Boolean = enableHeatmap
 }
 
 /**
