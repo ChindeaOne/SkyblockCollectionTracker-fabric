@@ -32,6 +32,7 @@ public class TrackingHandler {
 
     public static boolean isTracking = false;
     public static boolean isPaused = false;
+    public static int apiCallCount = 0;
 
     public static long startTime;
     private static long lastTime;
@@ -59,6 +60,7 @@ public class TrackingHandler {
 
         isTracking = true;
         isPaused = false;
+        apiCallCount = 0;
 
         startTime = now;
         lastTime = 0;
@@ -165,6 +167,7 @@ public class TrackingHandler {
     private static void resetVariables() {
         isTracking = false;
         isPaused = false;
+        apiCallCount = 0;
         startTime = 0;
         lastTime = 0;
 
@@ -367,7 +370,7 @@ public class TrackingHandler {
     }
 
     public static String getUptime() {
-        if (startTime == 0) return "00:00:00";
+        if (startTime == 0 || (TrackingHandler.apiCallCount < 2 && !ConfigAccess.isSacksTrackingEnabled())) return "00:00:00";
 
         long uptime;
 

@@ -170,7 +170,6 @@ public class TextUtils {
     }
 
     private static String handleCollectionSinceLastTimer() {
-        if (collectionSinceLast == 0) return "Last collection: Calculating...";
         long totalSeconds = (System.currentTimeMillis() - lastCollectionTime) / 1000;
         if (totalSeconds < 60) {
             return "Last collection§f: " + totalSeconds + "s ago";
