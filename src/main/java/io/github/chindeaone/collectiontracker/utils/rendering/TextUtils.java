@@ -172,13 +172,13 @@ public class TextUtils {
     private static String handleCollectionSinceLastTimer() {
         long totalSeconds = (System.currentTimeMillis() - lastCollectionTime) / 1000;
         if (totalSeconds < 60) {
-            return "Last collection§f: " + totalSeconds + "s ago";
+            return "Last updated§f: " + totalSeconds + "s ago";
         }
 
         long min = totalSeconds / 60;
         long sec = totalSeconds % 60;
 
-        return String.format("Last collection: %dm %ds ago", min, sec);
+        return String.format("Last updated: %dm %ds ago", min, sec);
     }
 
     // Only if it has bazaar data and is enabled
