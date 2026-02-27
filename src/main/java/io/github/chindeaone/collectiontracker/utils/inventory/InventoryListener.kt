@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.inventory
 
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
@@ -14,25 +15,32 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 
-/**
-    * This class is used to check for the tracked collection item.
-    * If it's found, it means that sacks messages represent compacted items.
- */
 object InventoryListener {
 
     @Volatile
     @JvmStatic
-    var hasItem: Boolean = false
+    var isCompacting: Boolean = false
+    var lastItemSlot = -1
+    var totalItems = 0
+    @JvmStatic
+    var count = 0
+    private var tickCount = 0
 
     fun onTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
-        if (hasItem || !TrackingHandler.isTracking) return
+        if (!TrackingHandler.isTracking || !ConfigAccess.isSacksTrackingEnabled() || isCompacting) return
+
+        tickCount++
+        if (tickCount % 2 != 0) return
 
         val player = client.player ?: return
 
         val inventory = player.inventory
         val collection = CollectionTracker.collection
         val isGemstone: Boolean = GemstonesManager.checkIfGemstone(collection)
+
+        var totalNow = 0
+        var lastSlot = -1
 
         for (i in 0 until 36) {
             val stack = inventory.getItem(i)
@@ -47,11 +55,17 @@ object InventoryListener {
             }
 
             if (match) {
-                hasItem = true
-                println("[SCT]: Found tracked collection item '$collection' in inventory.")
-                return
+                lastSlot = i
+                totalNow += stack.count
             }
         }
+        if (totalItems != totalNow || lastItemSlot != lastSlot) {
+            lastItemSlot = lastSlot
+            totalItems = totalNow
+            count++
+        }
+
+        if (count >= 2) isCompacting = true
     }
 
     @Suppress("SameReturnValue")

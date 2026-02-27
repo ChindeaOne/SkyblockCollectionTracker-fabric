@@ -30,14 +30,14 @@ public class SacksTrackingManager {
             }
         }
 
-        boolean hasItem = InventoryListener.getHasItem();
+        boolean isCompacting = InventoryListener.isCompacting();
         boolean prevHasItem = lastHasItem;
-        lastHasItem = hasItem;
+        lastHasItem = isCompacting;
 
         boolean firstCheck = isFirstCheck;
         if (isFirstCheck) isFirstCheck = false;
 
-        if (hasItem) {
+        if (isCompacting) {
             // If the player has the item in their inventory, we need to check if they had it previously
             // Unless it's the first check, in which case we assume the amount is compacted
             if (!firstCheck && !prevHasItem) {
@@ -52,7 +52,8 @@ public class SacksTrackingManager {
     }
 
     public static void reset() {
-        InventoryListener.setHasItem(false);
+        InventoryListener.setCompacting(false);
+        InventoryListener.setCount(0);
         lastHasItem = false;
         isFirstCheck = true;
     }
