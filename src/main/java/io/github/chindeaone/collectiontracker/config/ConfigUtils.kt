@@ -12,7 +12,6 @@ import io.github.chindeaone.collectiontracker.config.categories.coleweight.Colew
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.DwarvenHeatmapConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable
@@ -70,7 +69,6 @@ val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
 val lanternDeployable: LanternDeployable get() = miningConfig.lanternDeployable
 val temporaryBuffsConfig: TemporaryBuffsConfig get() = miningConfig.temporaryBuffsConfig
-val dwarvenHeatmapConfig: DwarvenHeatmapConfig get() = miningConfig.dwarvenHeatmapConfig
 val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
@@ -90,7 +88,6 @@ val refinedCacaoTime: Long get() = temporaryBuffsConfig.refinedCacaoTime
 val filetTime: Long get() = temporaryBuffsConfig.filetTime
 val pristinePotatoTime: Long get() = temporaryBuffsConfig.pristinePotatoTime
 val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
-val enableHeatmap: Boolean get() = dwarvenHeatmapConfig.enableHeatmap
 
 // Coleweight Config Accessors
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
@@ -98,6 +95,7 @@ val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityF
 val coleweightColor: ColeweightColor get() = coleweightConfig.coleweightColor
 val enableCustomColor: Boolean get() = coleweightColor.enableCustomColor
 val customColor: ChromaColour get() = coleweightColor.customColor
+val enableHeatmap: Boolean get() = coleweightConfig.enableHeatmap
 
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay

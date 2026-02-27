@@ -35,4 +35,12 @@ public class Coleweight {
     @ConfigOption(name = "Custom Coleweight Rank Color", desc = "")
     @Accordion
     public ColeweightColor coleweightColor = new ColeweightColor();
+
+    @Expose
+    @ConfigOption(
+            name = "Enable Heatmap",
+            desc = "Toggles the Heatmap for Glacite Tunnels.\n§eColor mapping: §0black §f> §9blue §f> §baqua §f> §cred §f> §2green"
+    )
+    @ConfigEditorBoolean
+    public boolean enableHeatmap = false;
 }

@@ -36,11 +36,6 @@ public class Mining {
     public MiningRoutesConfig miningRoutesConfig = new MiningRoutesConfig();
 
     @Expose
-    @ConfigOption(name = "Dwarven Heatmap", desc = "")
-    @Accordion
-    public DwarvenHeatmapConfig dwarvenHeatmapConfig = new DwarvenHeatmapConfig();
-
-    @Expose
     @ConfigOption(name = "Lantern Deployable", desc = "")
     @Accordion
     public LanternDeployable lanternDeployable = new LanternDeployable();
