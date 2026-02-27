@@ -127,7 +127,7 @@ object BlockOutline {
             Font.GlyphVisitor.forMultiBufferSource(
                 buffers,
                 matrix,
-                Font.DisplayMode.NORMAL,
+                Font.DisplayMode.SEE_THROUGH,
                 LightTexture.FULL_BRIGHT
             )
         )
@@ -174,7 +174,7 @@ object BlockOutline {
         red: Float,
         green: Float,
         blue: Float,
-        alpha: Float = 0.8f
+        alpha: Float = 1f,
     ) {
         val vc: VertexConsumer = buffers.getBuffer(OutlineTypes.HIGHLIGHT)
 
