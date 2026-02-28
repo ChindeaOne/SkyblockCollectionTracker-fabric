@@ -42,8 +42,8 @@ object PrecisionMining {
         val pos = activeParticlePos ?: return
 
         val box = AABB(
-            pos.x - 0.07, pos.y - 0.07, pos.z - 0.07,
-            pos.x + 0.07, pos.y + 0.07, pos.z + 0.07
+            pos.x - 0.08, pos.y - 0.08, pos.z - 0.08,
+            pos.x + 0.08, pos.y + 0.08, pos.z + 0.08
         )
 
         val color = if (isLooking) Color.GREEN else Color.RED
