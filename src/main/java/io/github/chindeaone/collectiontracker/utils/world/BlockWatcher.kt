@@ -14,6 +14,9 @@ object BlockWatcher {
         private set
     var foragingBlockType: String = ""
         private set
+    @Volatile
+    var precisionMiningBlockType: String = ""
+        private set
 
     // Check the block the player is looking at
     fun onClientTick(client: Minecraft) {
@@ -31,6 +34,7 @@ object BlockWatcher {
 
             updateMiningBlockType(blockId)
             updateForagingBlockType(blockId)
+            precisionMiningBlockType(blockId)
         }
     }
 
@@ -52,5 +56,15 @@ object BlockWatcher {
         if (detectedBlock != null) {
             foragingBlockType = detectedBlock
         }
+    }
+
+    private fun precisionMiningBlockType(type: String) {
+        val allowedKeys = setOf("ores", "pure_ores", "dwarven_metals")
+
+        val detectedBlock = MiningMapping.miningBlockPerType.entries.find { (key, values) ->
+            key in allowedKeys && values.any { it == type }
+        }?.key
+
+        precisionMiningBlockType = detectedBlock ?: ""
     }
 }

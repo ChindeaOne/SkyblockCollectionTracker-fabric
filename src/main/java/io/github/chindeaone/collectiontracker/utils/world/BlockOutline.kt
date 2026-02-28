@@ -13,9 +13,11 @@ import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.state.CameraRenderState
 import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
+import java.awt.Color
 
 object BlockOutline {
 
@@ -188,6 +190,45 @@ object BlockOutline {
         val posMatrix = Matrix4f().apply {
             translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
         }
+
+        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha)
+    }
+
+    fun renderBox(
+        buffers: MultiBufferSource,
+        box: AABB,
+        camera: CameraRenderState,
+        color: Color,
+        alpha: Float = 1f,
+    ) {
+
+        val vc: VertexConsumer = buffers.getBuffer(OutlineTypes.HIGHLIGHT)
+
+        val posMatrix = Matrix4f().apply {
+            translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
+        }
+
+        val minX = box.minX.toFloat()
+        val minY = box.minY.toFloat()
+        val minZ = box.minZ.toFloat()
+        val maxX = box.maxX.toFloat()
+        val maxY = box.maxY.toFloat()
+        val maxZ = box.maxZ.toFloat()
+
+        val r = color.red / 255f
+        val g = color.green / 255f
+        val b = color.blue / 255f
+
+        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, alpha)
+    }
+
+    private fun drawBox(
+        vc: VertexConsumer,
+        posMatrix: Matrix4f,
+        minX: Float, minY: Float, minZ: Float,
+        maxX: Float, maxY: Float, maxZ: Float,
+        red: Float, green: Float, blue: Float, alpha: Float
+    ) {
         // front (+Z)
         vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha)
         vc.addVertex(posMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha)

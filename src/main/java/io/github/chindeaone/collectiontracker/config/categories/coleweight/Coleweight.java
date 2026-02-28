@@ -43,4 +43,12 @@ public class Coleweight {
     )
     @ConfigEditorBoolean
     public boolean enableHeatmap = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Precision Mining Highlight",
+            desc = "Highlights Precision Mining particles and prevents them from rendering."
+    )
+    @ConfigEditorBoolean
+    public boolean enablePrecisionMiningHighlight = false;
 }
