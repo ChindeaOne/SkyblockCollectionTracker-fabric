@@ -140,7 +140,7 @@ object ScoreboardUtils {
 
     @JvmStatic
     fun isColdStatRelevant(): Boolean {
-        return location == "Glacite Tunnels" || location == "Glacite Mineshafts" || location == "Great Glacite Lake" || location == "Dwarven Base Camp"
+        return location == "Glacite Tunnels" || location == "Glacite Mineshafts" || location == "Great Glacite Lake" || location == "Dwarven Base Camp" || location == "Grandpa Wolf's Cave"
     }
 
     @JvmStatic

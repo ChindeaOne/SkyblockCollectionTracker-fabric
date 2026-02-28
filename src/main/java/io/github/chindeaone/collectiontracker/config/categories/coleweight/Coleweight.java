@@ -51,4 +51,12 @@ public class Coleweight {
     )
     @ConfigEditorBoolean
     public boolean enablePrecisionMiningHighlight = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Enable Line to Precision Mining",
+            desc = "Draws a line to the highlighted particles.\n§eOnly works if Precision Mining Highlight is enabled."
+    )
+    @ConfigEditorBoolean
+    public boolean drawLineToPrecisionMining = false;
 }

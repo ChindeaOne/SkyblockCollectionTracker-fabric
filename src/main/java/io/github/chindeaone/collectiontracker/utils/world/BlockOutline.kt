@@ -220,6 +220,7 @@ object BlockOutline {
         val b = color.blue / 255f
 
         drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, alpha)
+        if (ConfigAccess.isDrawLineToPrecisionMiningEnabled()) drawLineToBox(buffers, box, camera)
     }
 
     private fun drawBox(
@@ -264,5 +265,40 @@ object BlockOutline {
         vc.addVertex(posMatrix, maxX, minY, minZ).setColor(red, green, blue, alpha)
         vc.addVertex(posMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha)
         vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha)
+    }
+
+    private fun drawLineToBox(
+        buffers: MultiBufferSource,
+        box: AABB,
+        camera: CameraRenderState,
+    ) {
+        val o = camera.orientation
+        val rotation = Quaternionf(o.x, o.y, o.z, o.w)
+        val forward = Vector3f(0f, 0f, -1f).rotate(rotation)
+
+        val sx = forward.x() * 0.5f
+        val sy = forward.y() * 0.5f
+        val sz = forward.z() * 0.5f
+
+        val ex = ((box.minX + box.maxX) / 2 - camera.pos.x).toFloat()
+        val ey = ((box.minY + box.maxY) / 2 - camera.pos.y).toFloat()
+        val ez = ((box.minZ + box.maxZ) / 2 - camera.pos.z).toFloat()
+
+        val vc = buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS)
+
+        val matrix = Matrix4f().apply {
+            translate(sx, sy, sz)
+        }
+        val normal = Vector3f(ex - sx, ey - sy, ez - sz).normalize()
+
+        vc.addVertex(matrix, sx, sy, sz)
+            .setColor(0f, 1f, 0f, 1f)
+            .setNormal(normal.x(), normal.y(), normal.z())
+        /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
+
+        vc.addVertex(matrix, ex, ey, ez)
+            .setColor(0f, 1f, 0f, 1f)
+            .setNormal(normal.x(), normal.y(), normal.z())
+        /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
     }
 }

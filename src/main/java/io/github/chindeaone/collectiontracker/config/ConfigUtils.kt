@@ -97,6 +97,7 @@ val enableCustomColor: Boolean get() = coleweightColor.enableCustomColor
 val customColor: ChromaColour get() = coleweightColor.customColor
 val enableHeatmap: Boolean get() = coleweightConfig.enableHeatmap
 val enablePrecisionMiningHighlight: Boolean get() = coleweightConfig.enablePrecisionMiningHighlight
+val drawLineToPrecisionMining: Boolean get() = coleweightConfig.drawLineToPrecisionMining
 
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
@@ -389,6 +390,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun isPrecisionMiningHighlightEnabled(): Boolean = enablePrecisionMiningHighlight
+
+    @JvmStatic
+    fun isDrawLineToPrecisionMiningEnabled(): Boolean = drawLineToPrecisionMining
 }
 
 /**
