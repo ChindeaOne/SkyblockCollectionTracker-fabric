@@ -54,14 +54,11 @@ public class TrackingRates {
     public static Map<String, Long> lowestRatesPerHourBazaar = new ConcurrentHashMap<>();
     public static Map<String, Long> highestRatesPerHourBazaar = new ConcurrentHashMap<>();
 
-    public static boolean hasUsedSacks = false;
-
     public static synchronized void calculateRates(long value, boolean isUsingSacks) {
         long currentCollection;
 
         // If using sacks, adjust currentCollection accordingly
         if (isUsingSacks) {
-            hasUsedSacks = true;
             if (lastApiCollection == -1L) {
                 return; // wait for the next API call (should never happen but just in case)
             }
@@ -75,16 +72,12 @@ public class TrackingRates {
             logger.info("[SCT]: Change in collection detected (using sacks). Old collection: '{}'. New collection: '{}'", currentCollection - value, currentCollection);
         } else {
             TrackingHandler.apiCallCount++;
-
+            if (TrackingHandler.apiCallCount == 2) {
+                return; // skip calculations for the second API call
+            }
             // 'value' here is the actual collection value from API
             sacksCollectionGained = 0L; // reset sacks gained
             currentCollection = value; // set current collection to API value
-
-            // Start time on the second API call if the player isn't tracking sacks
-            if (TrackingHandler.apiCallCount == 2 && !hasUsedSacks) {
-                TrackingHandler.startTime = System.currentTimeMillis();
-                return; // skip calculations for the second API call
-            }
 
             collectionSinceLast = lastApiCollection != -1L ? Math.max(0, currentCollection - lastApiCollection) : 0; // calculate since last from API
 

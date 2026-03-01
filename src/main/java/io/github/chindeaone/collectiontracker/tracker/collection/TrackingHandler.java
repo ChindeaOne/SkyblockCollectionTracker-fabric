@@ -30,7 +30,7 @@ public class TrackingHandler {
     private static final Logger logger = LogManager.getLogger(TrackingHandler.class);
     public static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10 seconds cooldown
 
-    public static boolean isTracking = false;
+    public static volatile boolean isTracking = false;
     public static boolean isPaused = false;
     public static int apiCallCount = 0;
 
@@ -178,7 +178,6 @@ public class TrackingHandler {
         sacksCollectionGained = 0L;
         sessionStartCollection = -1L;
         lastCollectionTime = -1L;
-        hasUsedSacks = false;
 
         // Clear profit map
         moneyPerHourBazaar.clear();
@@ -371,7 +370,7 @@ public class TrackingHandler {
     }
 
     public static String getUptime() {
-        if (startTime == 0 || (TrackingHandler.apiCallCount < 2 && !ConfigAccess.isSacksTrackingEnabled())) return "00:00:00";
+        if (startTime == 0) return "00:00:00";
 
         long uptime;
 
