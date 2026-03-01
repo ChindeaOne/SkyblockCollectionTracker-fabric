@@ -22,6 +22,7 @@ object InventoryListener {
     var isCompacting: Boolean = false
     var lastItemSlot = -1
     var totalItems = 0
+    @Volatile
     @JvmStatic
     var count = 0
     private var tickCount = 0
@@ -46,7 +47,7 @@ object InventoryListener {
             val stack = inventory.getItem(i)
             if (stack.isEmpty) continue
 
-            val itemName = StringUtils.normalizeText(stack.itemName.string)
+            val itemName = StringUtils.normalizeText(stack.hoverName.string)
 
             val match = if (isGemstone) {
                 matchesGemstone(itemName, collection)
@@ -64,7 +65,6 @@ object InventoryListener {
             totalItems = totalNow
             count++
         }
-
         if (count >= 2) isCompacting = true
     }
 
