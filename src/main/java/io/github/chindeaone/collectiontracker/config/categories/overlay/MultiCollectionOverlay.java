@@ -33,7 +33,7 @@ public class MultiCollectionOverlay {
             desc = "Select what shows for each collection."
     )
     @ConfigEditorDropdown
-    public TrackingOptions trackingOptions = TrackingOptions.COLLECTION; // Default to collection amount
+    public TrackingOptions trackingOptions = TrackingOptions.COLLECTION_RATE; // Default to collection amount
 
     @Expose
     @ConfigLink(owner = MultiCollectionOverlay.class, field = "multiCollectionOverlay")
