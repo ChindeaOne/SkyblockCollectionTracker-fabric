@@ -231,7 +231,7 @@ public class CommandRegistry {
                             return 1;
                         })
                 )
-                .then(ClientCommandManager.literal("multi-track")
+                .then(ClientCommandManager.literal("track-multi")
                         .executes(context-> {
                             ChatUtils.INSTANCE.sendMessage("Usage: /sct multi-track <collection1> <collection2> etc.",true);
                             return 1;
@@ -246,25 +246,25 @@ public class CommandRegistry {
                                 })
                         )
                 )
-                .then(ClientCommandManager.literal("multi-stop")
+                .then(ClientCommandManager.literal("stop-multi")
                         .executes(context -> {
                             MultiTrackingHandler.stopMultiTrackingManual();
                             return 1;
                         })
                 )
-                .then(ClientCommandManager.literal("multi-pause")
+                .then(ClientCommandManager.literal("pause-multi")
                         .executes(context -> {
                             MultiTrackingHandler.pauseMultiTracking();
                             return 1;
                         })
                 )
-                .then(ClientCommandManager.literal("multi-resume")
+                .then(ClientCommandManager.literal("resume-multi")
                         .executes(context -> {
                             MultiTrackingHandler.resumeMultiTracking();
                             return 1;
                         })
                 )
-                .then(ClientCommandManager.literal("multi-restart")
+                .then(ClientCommandManager.literal("restart-multi")
                         .executes(context -> {
                             MultiTrackingHandler.restartMultiTracking();
                             return 1;
