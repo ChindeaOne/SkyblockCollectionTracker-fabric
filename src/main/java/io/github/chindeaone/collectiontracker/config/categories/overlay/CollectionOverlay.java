@@ -120,6 +120,6 @@ public class CollectionOverlay {
     public boolean sacksInfo = true;
 
     @Expose
-    @ConfigLink(owner = CollectionOverlay.class, field = "singleStatsOverlay")
+    @ConfigLink(owner = CollectionOverlay.class, field = "collectionOverlay")
     public Position overlayPosition = new Position(50, 100);
 }

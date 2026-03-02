@@ -29,7 +29,7 @@ public class FetchSkillTree {
 
     public static final Logger logger = LogManager.getLogger(FetchSkillTree.class);
     public static volatile boolean hasSkillTree = false;
-    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     private static ScheduledFuture<?> pendingHotmReset = null;
     private static ScheduledFuture<?> pendingHotfReset = null;

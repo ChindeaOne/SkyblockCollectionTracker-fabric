@@ -17,6 +17,9 @@ public class BazaarCollectionsManager {
     public static final Map<String, Integer> enchantedRecipe = new HashMap<>();
     public static final Map<String, Integer> superEnchantedRecipe = new HashMap<>();
 
+    public static final Map<String, Map<String, Integer>> multiEnchantedRecipes = new HashMap<>();
+    public static final Map<String, Map<String, Integer>> multiSuperEnchantedRecipes = new HashMap<>();
+
     public static void setPricesAndRecipes(String json, String type) {
         enchantedRecipe.clear();
         superEnchantedRecipe.clear();
@@ -46,10 +49,41 @@ public class BazaarCollectionsManager {
         hasBazaarData = true;
     }
 
+    public static void setPricesAndRecipes(String collection, String json, String type) {
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+
+        if (jsonObject.has("prices") || jsonObject.has("recipe")) {
+            JsonObject prices = jsonObject.getAsJsonObject("prices");
+            JsonObject recipe = jsonObject.getAsJsonObject("recipe");
+
+            Map<String, Integer> enchanted = new HashMap<>();
+            Map<String, Integer> superEnchanted = new HashMap<>();
+
+            Iterator<Map.Entry<String, JsonElement>> iterator = recipe.entrySet().iterator();
+            if (iterator.hasNext()) {
+                Map.Entry<String, JsonElement> entry = iterator.next();
+                enchanted.put(entry.getKey(), entry.getValue().getAsInt());
+            }
+            if (iterator.hasNext()) {
+                Map.Entry<String, JsonElement> entry = iterator.next();
+                superEnchanted.put(entry.getKey(), entry.getValue().getAsInt());
+            }
+
+            multiEnchantedRecipes.put(collection, enchanted);
+            multiSuperEnchantedRecipes.put(collection, superEnchanted);
+            BazaarPrices.setPrices(collection, prices.toString(), type);
+        } else {
+            BazaarPrices.setPrices(collection, jsonObject.toString(), type);
+        }
+        hasBazaarData = true;
+    }
+
     public static void resetBazaarData() {
         hasBazaarData = false;
         enchantedRecipe.clear();
         superEnchantedRecipe.clear();
+        multiEnchantedRecipes.clear();
+        multiSuperEnchantedRecipes.clear();
         BazaarPrices.resetPrices();
         GemstonePrices.resetPrices();
     }

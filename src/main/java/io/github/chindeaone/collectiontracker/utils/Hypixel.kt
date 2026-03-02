@@ -18,6 +18,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.ServerUtils.serverStatus
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
@@ -44,6 +45,7 @@ object Hypixel {
         playerLoaded = false
         serverStatus = false
         TrackingHandler.stopTracking()
+        MultiTrackingHandler.stopMultiTracking()
         SkillTrackingHandler.stopTracking()
     }
 

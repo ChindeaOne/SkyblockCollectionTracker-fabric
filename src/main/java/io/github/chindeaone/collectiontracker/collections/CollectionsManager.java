@@ -8,6 +8,9 @@ public class CollectionsManager {
     public static String collectionSource;
     public static String collectionType;
 
+    public static List<String> multiCollectionSource = new LinkedList<>();
+    public static Map<String, String> multiCollectionTypes = new HashMap<>();
+
     public static boolean isValidCollection(String collectionName) {
         for (Set<String> collectionSet : collections.values()) {
             if (collectionSet.contains(collectionName)) {
@@ -43,5 +46,10 @@ public class CollectionsManager {
     public static void resetCollections() {
         collectionSource = null;
         collectionType = null;
+    }
+
+    public static void resetMultiCollections() {
+        multiCollectionSource.clear();
+        multiCollectionTypes.clear();
     }
 }

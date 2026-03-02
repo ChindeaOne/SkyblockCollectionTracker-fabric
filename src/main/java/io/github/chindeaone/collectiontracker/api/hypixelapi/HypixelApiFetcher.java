@@ -1,7 +1,12 @@
 package io.github.chindeaone.collectiontracker.api.hypixelapi;
 
 import io.github.chindeaone.collectiontracker.api.URLManager;
+import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
+import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,21 +26,13 @@ public class HypixelApiFetcher {
 
     public static String fetchJsonData(String uuid, String token, String collection) {
         try {
-            HttpRequest request = buildCollectionRequest(uuid, token, collection);
-            HttpResponse<InputStream> response =
-                    HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            HttpRequest request = buildCollectionRequest(uuid, token, collection, collectionSource);
+            HttpResponse<String> response =
+                    HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
             int status = response.statusCode();
             if (status == 200) {
-                try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
-                    StringBuilder content = new StringBuilder();
-                    char[] buffer = new char[4096];
-                    int n;
-                    while ((n = reader.read(buffer)) != -1) {
-                        content.append(buffer, 0, n);
-                    }
-                    return content.toString();
-                }
+                return response.body();
             } else {
                 logger.error("[SCT]: Failed to fetch data. Server responded with code: {}", status);
                 TrackingHandler.stopTracking();
@@ -47,7 +44,28 @@ public class HypixelApiFetcher {
         return null;
     }
 
-    private static HttpRequest buildCollectionRequest(String uuid, String token, String collection) {
+    public static String fetchMultiJsonData() {
+        try {
+            String collection = String.join(",", CollectionTracker.collectionList);
+            String collectionSource = String.join(",", CollectionsManager.multiCollectionSource);
+            HttpRequest request = buildCollectionRequest(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection, collectionSource);
+            HttpResponse<String> response =
+                    HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+            int status = response.statusCode();
+            if (status == 200) {
+                return response.body();
+            } else {
+                logger.error("[SCT]: Failed to fetch multi-collection data. Server responded with code: {}", status);
+                MultiTrackingHandler.stopMultiTracking();
+            }
+        } catch (Exception e) {
+            logger.error("[SCT]: An error occurred while fetching multi-collection data from the server", e);
+        }
+        return null;
+    }
+
+    private static HttpRequest buildCollectionRequest(String uuid, String token, String collection, String collectionSource) {
         return HttpRequest.newBuilder(URI.create(URLManager.TRACKED_COLLECTION_URL))
                 .timeout(Duration.ofSeconds(5))
                 .header("Authorization", "Bearer " + token)

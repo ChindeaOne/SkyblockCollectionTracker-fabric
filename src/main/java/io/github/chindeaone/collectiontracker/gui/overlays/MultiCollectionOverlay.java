@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
@@ -18,7 +17,7 @@ import java.util.List;
 public class MultiCollectionOverlay implements AbstractOverlay{
 
     public static volatile boolean trackingDirty = false;
-    private final Position position = ConfigAccess.getTrackingPosition();
+    private final Position position = ConfigAccess.getMultiOverlayPosition();
     public final List<String> multiOverlayLines = new ArrayList<>();
     public final List<String> multiExtraOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;

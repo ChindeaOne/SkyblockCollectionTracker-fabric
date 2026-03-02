@@ -45,7 +45,7 @@ public class SkillTrackingHandler {
         }
 
         if (scheduler == null || scheduler.isShutdown()) {
-            scheduler = Executors.newScheduledThreadPool(1);
+            scheduler = Executors.newSingleThreadScheduledExecutor();
         }
 
         initTracking(now);

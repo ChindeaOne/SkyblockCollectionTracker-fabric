@@ -44,7 +44,7 @@ public class TrackingHandler {
 
     public static void startTracking() {
         if (scheduler == null || scheduler.isShutdown()) {
-            scheduler = Executors.newScheduledThreadPool(1);
+            scheduler = Executors.newSingleThreadScheduledExecutor();
         }
 
         initTracking(System.currentTimeMillis());
@@ -101,7 +101,6 @@ public class TrackingHandler {
             logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
         }
     }
-
 
     public static void restartTracking() {
         if (!isTracking) {
