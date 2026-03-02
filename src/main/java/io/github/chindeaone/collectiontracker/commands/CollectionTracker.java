@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.commands;
 import io.github.chindeaone.collectiontracker.api.bazaarapi.FetchBazaarPrice;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
@@ -48,12 +49,12 @@ public class CollectionTracker {
                 collection = coll.toLowerCase();
                 // Remove general gemstone from normal tracking
                 if (collection.equals("gemstone")) {
-                    ChatUtils.INSTANCE.sendMessage("§cThe `gemstone` collection isn't supported for normal tracking anymore. Use /sct multi-track gemstone instead!", true);
+                    ChatUtils.INSTANCE.sendMessage("§cThe `gemstone` collection isn't supported for normal tracking anymore. Use `/sct track-multi gemstone instead`!", true);
                     return;
                 }
 
                 if (!CollectionsManager.isValidCollection(collection)) {
-                    ChatUtils.INSTANCE.sendMessage("§4" + collection + " collection is not supported! Use /sct collections to see all supported collections.", true);
+                    ChatUtils.INSTANCE.sendMessage("§4" + collection + " collection is not supported! Use `/sct collections` to see all supported collections.", true);
                     return;
                 }
                 // Set collection source
@@ -108,7 +109,11 @@ public class CollectionTracker {
                 for (String coll : list) {
                     coll = coll.toLowerCase().trim();
                     if (!CollectionsManager.isValidCollection(coll)) {
-                        ChatUtils.INSTANCE.sendMessage("§4" + coll + " collection is not supported! Use /sct collections to see all supported collections.", true);
+                        ChatUtils.INSTANCE.sendMessage("§4" + coll + " collection is not supported! Use `/sct collections` to see all supported collections.", true);
+                        return;
+                    }
+                    if (GemstonesManager.checkIfGemstone(coll)) {
+                        ChatUtils.INSTANCE.sendMessage("§cIndividual gemstones aren't supported. Please use `/sct track-multi gemstone`!", true);
                         return;
                     }
                     if (CollectionsManager.isCollection(coll)) {
