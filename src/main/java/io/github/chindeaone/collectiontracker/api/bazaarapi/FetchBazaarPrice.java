@@ -69,7 +69,8 @@ public class FetchBazaarPrice {
                     JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
 
                     // Map the new data structure
-                    Map.Entry<String, JsonElement> entry = jsonObject.entrySet().iterator().next();
+                    JsonObject collectionObject = jsonObject.entrySet().iterator().next().getValue().getAsJsonObject();
+                    Map.Entry<String, JsonElement> entry = collectionObject.entrySet().iterator().next();
 
                     String data = entry.getValue().getAsJsonObject().toString();
                     String type = entry.getKey();
