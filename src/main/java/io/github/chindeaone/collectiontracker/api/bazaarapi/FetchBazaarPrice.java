@@ -17,6 +17,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -91,11 +92,29 @@ public class FetchBazaarPrice {
         try {
             URI uri = URI.create(URLManager.BAZAAR_URL);
 
+            // For `gemstone` collection only, add all gemstones so it fetches prices for every type
+            List<String> newCollections = new ArrayList<>(collections);
+            if (newCollections.contains("gemstone")) {
+                newCollections.remove("gemstone");
+                newCollections.add("ruby");
+                newCollections.add("sapphire");
+                newCollections.add("topaz");
+                newCollections.add("amethyst");
+                newCollections.add("jade");
+                newCollections.add("jasper");
+                newCollections.add("amber");
+                newCollections.add("opal");
+                newCollections.add("aquamarine");
+                newCollections.add("peridot");
+                newCollections.add("citrine");
+                newCollections.add("onyx");
+            }
+
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(5))
                     .header("X-UUID", uuid)
                     .header("Authorization", "Bearer " + token)
-                    .header("X-COLLECTION", String.join(", ", collections))
+                    .header("X-COLLECTION", String.join(", ", newCollections))
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
                     .GET()
@@ -115,7 +134,7 @@ public class FetchBazaarPrice {
                         .timeout(Duration.ofSeconds(5))
                         .header("X-UUID", uuid)
                         .header("Authorization", "Bearer " + token)
-                        .header("X-COLLECTION", String.join(", ", collections))
+                        .header("X-COLLECTION", String.join(", ", newCollections))
                         .header("User-Agent", URLManager.AGENT)
                         .header("Accept", "application/json")
                         .GET()

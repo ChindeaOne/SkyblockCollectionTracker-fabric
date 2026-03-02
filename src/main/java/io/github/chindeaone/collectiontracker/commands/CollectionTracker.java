@@ -46,6 +46,12 @@ public class CollectionTracker {
                 }
 
                 collection = coll.toLowerCase();
+                // Remove general gemstone from normal tracking
+                if (collection.equals("gemstone")) {
+                    ChatUtils.INSTANCE.sendMessage("§cThe `gemstone` collection isn't supported for normal tracking anymore. Use /sct multi-track gemstone instead!", true);
+                    return;
+                }
+
                 if (!CollectionsManager.isValidCollection(collection)) {
                     ChatUtils.INSTANCE.sendMessage("§4" + collection + " collection is not supported! Use /sct collections to see all supported collections.", true);
                     return;
