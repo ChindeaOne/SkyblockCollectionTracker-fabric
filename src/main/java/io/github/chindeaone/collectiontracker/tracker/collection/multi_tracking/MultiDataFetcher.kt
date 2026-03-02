@@ -26,6 +26,13 @@ object MultiDataFetcher {
     private val period = 200.seconds
 
     fun scheduleMultiCollectionDataFetch() {
+        if (CollectionTracker.collectionList.size == 1 && CollectionTracker.collectionList.contains("gemstone")) {
+            logger.info("[SCT]: Only gemstone collection tracked. Performing a single API fetch.")
+            Executors.newSingleThreadExecutor().execute {
+                fetchMultiCollectionData()
+            }
+            return
+        }
         scheduler.scheduleAtFixedRate(MultiDataFetcher::fetchMultiCollectionData, 1, period.inWholeSeconds, TimeUnit.SECONDS)
     }
 
