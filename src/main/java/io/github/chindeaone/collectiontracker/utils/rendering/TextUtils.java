@@ -353,14 +353,13 @@ public class TextUtils {
 
         boolean useBazaar = ConfigAccess.isUsingBazaar();
         if (!useBazaar) {
-            long npcRate = MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().getOrDefault(coll, -1L);
-            if (npcRate == -1) {
-                // It's a gemstone, create special key (e.g "SAPPHIRE_FINE")
+            String key = coll;
+            if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
                 String variant = ConfigAccess.getGemstoneVariant().toString();
-                String key = (coll + "_" + variant).toUpperCase();
-                npcRate = MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().getOrDefault(key, -1L);
+                key = (coll + "_" + variant).toUpperCase();
             }
-            if (npcRate == -1) return null;
+
+            long npcRate = MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().getOrDefault(key, -1L);
             if (CollectionsManager.isRiftCollection(coll)) {
                 return formatCollectionName(coll) + " Motes/h: " + formatNumberOrPlaceholder(npcRate);
             }
@@ -413,14 +412,13 @@ public class TextUtils {
 
         boolean useBazaar = ConfigAccess.isUsingBazaar();
         if (!useBazaar) {
-            long npcMoney = MultiTrackingRates.INSTANCE.getMoneyMadeNPC().getOrDefault(coll, -1L);
-            if (npcMoney == -1) {
-                // It's a gemstone, create special key (e.g "SAPPHIRE_FINE")
+            String key = coll;
+            if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
                 String variant = ConfigAccess.getGemstoneVariant().toString();
-                String key = (coll + "_" + variant).toUpperCase();
-                npcMoney = MultiTrackingRates.INSTANCE.getMoneyMadeNPC().getOrDefault(key, -1L);
+                key = (coll + "_" + variant).toUpperCase();
             }
-            if (npcMoney == -1) return null;
+
+            long npcMoney = MultiTrackingRates.INSTANCE.getMoneyMadeNPC().getOrDefault(key, -1L);
             if (CollectionsManager.isRiftCollection(coll)) {
                 return formatCollectionName(coll) + " Motes made: " + formatNumberOrPlaceholder(npcMoney);
             }

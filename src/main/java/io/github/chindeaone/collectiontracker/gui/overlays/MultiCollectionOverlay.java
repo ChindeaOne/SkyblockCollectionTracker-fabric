@@ -74,7 +74,6 @@ public class MultiCollectionOverlay implements AbstractOverlay{
 
     private @NotNull List<String> getCollectionLines() {
         TextUtils.updateMultiTrackingLines(multiOverlayLines);
-        if (multiOverlayLines.isEmpty()) return multiOverlayLines;
         List<String> lines = new ArrayList<>(multiOverlayLines);
         lines.add("Uptime: " + MultiTrackingHandler.getMultiUptime());
         return lines;
