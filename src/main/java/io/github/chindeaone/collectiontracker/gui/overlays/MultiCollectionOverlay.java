@@ -19,7 +19,6 @@ public class MultiCollectionOverlay implements AbstractOverlay{
     public static volatile boolean trackingDirty = false;
     private final Position position = ConfigAccess.getMultiOverlayPosition();
     public final List<String> multiOverlayLines = new ArrayList<>();
-    public final List<String> multiExtraOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;
 
     @Override
@@ -51,13 +50,11 @@ public class MultiCollectionOverlay implements AbstractOverlay{
         if (!isEnabled() || !trackingDirty) return;
 
         List<String> mainLines = getCollectionLines();
-//        List<String> extraLines = getCollectionExtraLines();
-        List<String> extraLines = new ArrayList<>();
 
         if (mainLines.isEmpty()) return;
 
         RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderMultiTrackingStringsWithColor(context, mainLines, extraLines, ConfigAccess.isOverlayTextColorEnabled())
+                RenderUtils.renderMultiTrackingStringsWithColor(context, mainLines, ConfigAccess.isOverlayTextColorEnabled())
         );
     }
 
@@ -82,9 +79,4 @@ public class MultiCollectionOverlay implements AbstractOverlay{
         lines.add("Uptime: " + MultiTrackingHandler.getMultiUptime());
         return lines;
     }
-
-//    private @NotNull List<String> getCollectionExtraLines() {
-//        TextUtils.updateTrackingExtraLines(multiExtraOverlayLines);
-//        return multiExtraOverlayLines;
-//    }
 }

@@ -72,22 +72,42 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun renderMultiTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
+    fun renderMultiTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, withColor: Boolean) {
         var y = 0
 
-//        val color: Int = if (withColor) (ColorUtils.collectionColors[CollectionTracker.collectionList]) ?: ColorUtils.GREEN  else ColorUtils.GREEN
-        val color: Int = ColorUtils.GREEN
         for (line in lines) {
+            var color: Int = ColorUtils.GREEN
+            if (withColor) {
+                val splitIndex = line.indexOf(": ")
+                if (splitIndex != -1) {
+                    val prefix = line.substring(0, splitIndex)
+                    // Check prefixes
+                    val delimiters = arrayOf(" collection", " $/h", " $ made", " Coll/h", " Motes")
+                    var foundCollName = prefix
+                    for (delim in delimiters) {
+                        if (prefix.contains(delim)) {
+                            foundCollName = prefix.substring(0, prefix.indexOf(delim))
+                            break
+                        }
+                    }
+
+                    // Check if it's a gemstone variant
+                    if (foundCollName.contains(" ")) {
+                        val firstWord = foundCollName.split(" ")[0].lowercase()
+                        val gemstoneTypes = arrayOf("ruby", "sapphire", "topaz", "amethyst", "jade", "jasper", "amber", "opal", "aquamarine", "peridot", "citrine", "onyx")
+                        color = if (gemstoneTypes.contains(firstWord)) {
+                            ColorUtils.collectionColors[firstWord] ?: ColorUtils.GREEN
+                        } else {
+                            ColorUtils.collectionColors[foundCollName.lowercase()] ?: ColorUtils.GREEN
+                        }
+                    } else {
+                        color = ColorUtils.collectionColors[foundCollName.lowercase()] ?: ColorUtils.GREEN
+                    }
+                }
+            }
+
             drawHelper(line, context, y, color)
             y += fr.lineHeight
-        }
-
-        if (extraLines.isNotEmpty()) {
-            y += fr.lineHeight
-            for (line in extraLines) {
-                drawHelper(line, context, y, color)
-                y += fr.lineHeight
-            }
         }
     }
 
@@ -293,7 +313,7 @@ object RenderUtils {
         val referenceRegex = Regex("""\(#\d+\)""")
 
         for (line in lines) {
-            val trimmed = line.trim()
+            val trimmed = line.trimEnd()
 
             if (trimmed.isEmpty() || trimmed == "---") {
                 currentY += fr.lineHeight / 2
