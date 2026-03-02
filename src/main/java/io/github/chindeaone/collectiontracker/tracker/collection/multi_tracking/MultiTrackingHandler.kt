@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking
 
+import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
@@ -32,7 +33,7 @@ object MultiTrackingHandler  {
     @JvmStatic
     var multiLastTrackTime: Long = 0
 
-    private val multiAllowedHourlyRestarts: Int = 10
+    private const val RESETS: Int = 10
     private var multiRestartCount: Int = 0
     private var multiFirstRestartTime: Long = 0
 
@@ -111,7 +112,7 @@ object MultiTrackingHandler  {
             }
         }
 
-        if (multiRestartCount >= multiAllowedHourlyRestarts) {
+        if (multiRestartCount >= RESETS) {
             sendMessage("§cHourly restart limit reached! Cannot restart multi-tracking.", true)
             logger.warn("[SCT]: Hourly restart limit reached. Cannot restart multi-tracking.")
             return
@@ -149,7 +150,7 @@ object MultiTrackingHandler  {
 
     private fun clearFetchedData() {
         CollectionsManager.resetMultiCollections()
-//        BazaarCollectionsManager.resetBazaarData()
+        BazaarCollectionsManager.resetBazaarData()
     }
 
     private fun resetVariables() {
@@ -175,6 +176,7 @@ object MultiTrackingHandler  {
         MultiTrackingRates.moneyMadeNPC.clear()
         MultiTrackingRates.moneyMadeBazaar.clear()
         MultiTrackingRates.moneyPerHourBazaar.clear()
+        MultiTrackingRates.seenGemstones.clear()
     }
 
     @JvmStatic
