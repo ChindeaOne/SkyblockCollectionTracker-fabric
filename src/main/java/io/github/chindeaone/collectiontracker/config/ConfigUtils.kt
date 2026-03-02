@@ -9,6 +9,8 @@ import io.github.chindeaone.collectiontracker.config.categories.Misc
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightColor
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.HeatmapConfig
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.PrecisionMiningConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
@@ -97,9 +99,12 @@ val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityF
 val coleweightColor: ColeweightColor get() = coleweightConfig.coleweightColor
 val enableCustomColor: Boolean get() = coleweightColor.enableCustomColor
 val customColor: ChromaColour get() = coleweightColor.customColor
-val enableHeatmap: Boolean get() = coleweightConfig.enableHeatmap
-val enablePrecisionMiningHighlight: Boolean get() = coleweightConfig.enablePrecisionMiningHighlight
-val drawLineToPrecisionMining: Boolean get() = coleweightConfig.drawLineToPrecisionMining
+val heatmapConfig: HeatmapConfig get() = coleweightConfig.heatmapConfig
+val enableHeatmap: Boolean get() = heatmapConfig.enableHeatmap
+val heatmapOpacity: Property<Float> get() = heatmapConfig.heatmapOpacity
+val precisionMiningConfig: PrecisionMiningConfig get() = coleweightConfig.precisionMiningConfig
+val enablePrecisionMiningHighlight: Boolean get() = precisionMiningConfig.enablePrecisionMiningHighlight
+val drawLineToPrecisionMining: Boolean get() = precisionMiningConfig.drawLineToPrecisionMining
 
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
@@ -140,6 +145,7 @@ val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionO
 val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
 val explicitValues: Boolean get() = trackingConfig.explicitValues
 val multiCollectionOverlay: MultiCollectionOverlay get() = trackingConfig.multiCollectionOverlay
+val trackingOptions: MultiCollectionOverlay.TrackingOptions get() = multiCollectionOverlay.trackingOptions
 
 // Skills Tracking Config Accessors
 val skillOverlay: SkillOverlay get() = trackingConfig.skillOverlay
@@ -395,10 +401,16 @@ object ConfigAccess {
     fun isHeatmapEnabled(): Boolean = enableHeatmap
 
     @JvmStatic
+    fun getHeatmapOpacity(): Float = heatmapOpacity.get()
+
+    @JvmStatic
     fun isPrecisionMiningHighlightEnabled(): Boolean = enablePrecisionMiningHighlight
 
     @JvmStatic
     fun isDrawLineToPrecisionMiningEnabled(): Boolean = drawLineToPrecisionMining
+
+    @JvmStatic
+    fun getTrackingOptions(): MultiCollectionOverlay.TrackingOptions = trackingOptions
 }
 
 /**

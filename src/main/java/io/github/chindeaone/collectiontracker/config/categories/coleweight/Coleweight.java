@@ -37,26 +37,12 @@ public class Coleweight {
     public ColeweightColor coleweightColor = new ColeweightColor();
 
     @Expose
-    @ConfigOption(
-            name = "Enable Heatmap",
-            desc = "Toggles the Heatmap for Glacite Tunnels.\n§eColor mapping: §0black §f> §9blue §f> §baqua §f> §cred §f> §2green"
-    )
-    @ConfigEditorBoolean
-    public boolean enableHeatmap = false;
+    @ConfigOption(name = "Heatmap", desc = "")
+    @Accordion
+    public HeatmapConfig heatmapConfig = new HeatmapConfig();
 
     @Expose
-    @ConfigOption(
-            name = "Precision Mining Highlight",
-            desc = "Highlights Precision Mining particles and prevents them from rendering."
-    )
-    @ConfigEditorBoolean
-    public boolean enablePrecisionMiningHighlight = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Enable Line to Precision Mining",
-            desc = "Draws a line to the highlighted particles.\n§eOnly works if Precision Mining Highlight is enabled."
-    )
-    @ConfigEditorBoolean
-    public boolean drawLineToPrecisionMining = false;
+    @ConfigOption(name = "PrecisionMining", desc = "")
+    @Accordion
+    public PrecisionMiningConfig precisionMiningConfig = new PrecisionMiningConfig();
 }

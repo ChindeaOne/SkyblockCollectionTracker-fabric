@@ -176,7 +176,7 @@ object BlockOutline {
         red: Float,
         green: Float,
         blue: Float,
-        alpha: Float = 1f,
+        alpha: Float = ConfigAccess.getHeatmapOpacity(),
     ) {
         val vc: VertexConsumer = buffers.getBuffer(OutlineTypes.HIGHLIGHT)
 
