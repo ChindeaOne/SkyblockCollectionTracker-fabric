@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
@@ -16,6 +17,8 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
+
+import java.util.List;
 
 public class CommandRegistry {
 
@@ -228,6 +231,45 @@ public class CommandRegistry {
                             return 1;
                         })
                 )
+                .then(ClientCommandManager.literal("multi-track")
+                        .executes(context-> {
+                            ChatUtils.INSTANCE.sendMessage("Usage: /sct multi-track <collection1> <collection2> etc.",true);
+                            return 1;
+                        })
+                        .then(ClientCommandManager.argument("collections", StringArgumentType.greedyString())
+                                .suggests(MULTI_COLLECTION_SUGGESTIONS)
+                                .executes(context -> {
+                                    String collectionsArgs = StringArgumentType.getString(context, "collections").trim();
+                                    List<String> collections = List.of(collectionsArgs.split("\\s+"));
+                                    CollectionTracker.startMultiTracking(collections);
+                                    return 1;
+                                })
+                        )
+                )
+                .then(ClientCommandManager.literal("multi-stop")
+                        .executes(context -> {
+                            MultiTrackingHandler.stopMultiTrackingManual();
+                            return 1;
+                        })
+                )
+                .then(ClientCommandManager.literal("multi-pause")
+                        .executes(context -> {
+                            MultiTrackingHandler.pauseMultiTracking();
+                            return 1;
+                        })
+                )
+                .then(ClientCommandManager.literal("multi-resume")
+                        .executes(context -> {
+                            MultiTrackingHandler.resumeMultiTracking();
+                            return 1;
+                        })
+                )
+                .then(ClientCommandManager.literal("multi-restart")
+                        .executes(context -> {
+                            MultiTrackingHandler.restartMultiTracking();
+                            return 1;
+                        })
+                )
         ));
     }
 
@@ -236,6 +278,38 @@ public class CommandRegistry {
         for (String c : CollectionsManager.getAllCollections()) {
             if (c.toLowerCase().startsWith(arg)) {
                 builder.suggest(c);
+            }
+        }
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<FabricClientCommandSource> MULTI_COLLECTION_SUGGESTIONS = (context, builder) -> {
+        String arg = builder.getRemaining().toLowerCase();
+        String prefix;
+        String lastWord;
+
+        if (arg.isEmpty()) {
+            // no input, suggest collections
+            prefix = "";
+            lastWord = ""; // reminder that empty string is prefix for any string
+        } else if (Character.isWhitespace(arg.charAt(arg.length() - 1))){
+            // new collection, suggest collections and keep previous collections
+            prefix = arg;
+            lastWord = "";
+        } else {
+            int lastSpace = Math.max(arg.lastIndexOf(' '), arg.lastIndexOf('\t'));
+            if (lastSpace == -1) { // no space = first collection
+                prefix = "";
+                lastWord = arg;
+            } else { // more than one collection, divide by last space position to suggest next collection
+                prefix = arg.substring(0, lastSpace + 1);
+                lastWord = arg.substring(lastSpace + 1);
+            }
+        }
+
+        for (String c : CollectionsManager.getAllCollections()) {
+            if (c.toLowerCase().startsWith(lastWord)) {
+                builder.suggest(prefix + c);
             }
         }
         return builder.buildFuture();

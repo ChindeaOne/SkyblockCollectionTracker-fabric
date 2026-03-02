@@ -72,6 +72,26 @@ object RenderUtils {
     }
 
     @JvmStatic
+    fun renderMultiTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
+        var y = 0
+
+//        val color: Int = if (withColor) (ColorUtils.collectionColors[CollectionTracker.collectionList]) ?: ColorUtils.GREEN  else ColorUtils.GREEN
+        val color: Int = ColorUtils.GREEN
+        for (line in lines) {
+            drawHelper(line, context, y, color)
+            y += fr.lineHeight
+        }
+
+        if (extraLines.isNotEmpty()) {
+            y += fr.lineHeight
+            for (line in extraLines) {
+                drawHelper(line, context, y, color)
+                y += fr.lineHeight
+            }
+        }
+    }
+
+    @JvmStatic
     fun renderSkillStringsWithTaming(context: GuiGraphics, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
         var y = 0
 

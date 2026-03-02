@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.StringUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
@@ -284,6 +285,60 @@ public class TextUtils {
                 return "Variant price: " + formatNumber((long) price);
             }
             default -> { return null; }
+        }
+    }
+
+    public static void updateMultiTrackingLines(List<String> list) {
+        list.clear();
+        for (String coll : MultiTrackingRates.INSTANCE.getCollectionAmounts().keySet()) {
+            list.add(formatCollectionName(coll) + " collection: " + formatNumberOrPlaceholder(MultiTrackingRates.INSTANCE.getCollectionAmounts().getOrDefault(coll, 0L)));
+            list.add(formatCollectionName(coll) + " collection (session): " + formatNumberOrPlaceholder(MultiTrackingRates.INSTANCE.getCollectionMade().getOrDefault(coll, 0L)));
+            list.add(formatCollectionName(coll) + " Coll/h: " + formatNumberOrPlaceholder(MultiTrackingRates.INSTANCE.getCollectionPerHour().getOrDefault(coll, 0L)));
+
+            boolean useBazaar = ConfigAccess.isUsingBazaar();
+            if (!useBazaar) {
+                long npcMoney = MultiTrackingRates.INSTANCE.getMoneyMadeNPC().getOrDefault(coll, 0L);
+                long npcRate = MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().getOrDefault(coll, 0L);
+                if (CollectionsManager.isRiftCollection(coll)) {
+                    list.add(formatCollectionName(coll) + " Motes made: " + formatNumberOrPlaceholder(npcMoney));
+                    list.add(formatCollectionName(coll) + " Motes/h: " + formatNumberOrPlaceholder(npcRate));
+                } else {
+                    list.add(formatCollectionName(coll) + " $ made (NPC): " + formatNumberOrPlaceholder(npcMoney));
+                    list.add(formatCollectionName(coll) + " $/h (NPC): " + formatNumberOrPlaceholder(npcRate));
+                }
+            } else {
+                java.util.Map<String, Long> collBazaarRates = MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().get(coll);
+                java.util.Map<String, Long> collBazaarMade = MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().get(coll);
+                String type = CollectionsManager.multiCollectionTypes.get(coll);
+                String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
+
+                if (collBazaarRates != null && collBazaarMade != null && type != null) {
+                    long money = 0;
+                    long rate = 0;
+                    switch (type) {
+                        case "normal" -> {
+                            money = collBazaarMade.getOrDefault("normal" + suffix, 0L);
+                            rate = collBazaarRates.getOrDefault("normal" + suffix, 0L);
+                        }
+                        case "enchanted" -> {
+                            String key = ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION) ? "Enchanted version" : "Super Enchanted version";
+                            money = collBazaarMade.getOrDefault(key + suffix, 0L);
+                            rate = collBazaarRates.getOrDefault(key + suffix, 0L);
+                        }
+                        case "gemstone" -> {
+                            String variant = ConfigAccess.getGemstoneVariant().toString();
+                            money = collBazaarMade.getOrDefault(variant + suffix, 0L);
+                            rate = collBazaarRates.getOrDefault(variant + suffix, 0L);
+                        }
+                    }
+                    list.add(formatCollectionName(coll) + " $ made (Bazaar): " + formatNumberOrPlaceholder(money));
+                    list.add(formatCollectionName(coll) + " $/h (Bazaar): " + formatNumberOrPlaceholder(rate));
+                }
+            }
+            list.add(""); // Spacer between collections
+        }
+        if (!list.isEmpty()) {
+            list.removeLast(); // Remove last spacer
         }
     }
 

@@ -23,6 +23,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.Collecti
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -46,6 +47,7 @@ val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilit
 val deployablePosition: Position get() = modConfig.mining.lanternDeployable.deployablePosition
 val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tempBuffPosition
 val titlePosition: Position get() = modConfig.misc.titlePosition
+val multiOverlayPosition: Position get() = modConfig.trackingOverlay.multiCollectionOverlay.multiOverlayPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -129,7 +131,7 @@ val showAxeReadyAbilityTitle: Boolean get() = axeAbilityConfig.showAxeReadyAbili
 val showAxeExpiredAbilityTitle: Boolean get() = axeAbilityConfig.showAxeExpiredAbilityTitle
 val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbilityInForagingIslandsOnly
 
-// Tracking Config Accessors
+// Collection Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
 val collectionOverlay: CollectionOverlay get() = trackingConfig.collectionOverlay
 val enableSacksTracking: Boolean get() = collectionOverlay.enableSacksTracking
@@ -137,6 +139,7 @@ val statsText: List<CollectionOverlay.OverlayText> get() = collectionOverlay.sta
 val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionOverlay.extraStatsText
 val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
 val explicitValues: Boolean get() = trackingConfig.explicitValues
+val multiCollectionOverlay: MultiCollectionOverlay get() = trackingConfig.multiCollectionOverlay
 
 // Skills Tracking Config Accessors
 val skillOverlay: SkillOverlay get() = trackingConfig.skillOverlay
@@ -189,6 +192,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getTitlePosition(): Position = titlePosition
+
+    @JvmStatic
+    fun getMultiOverlayPosition(): Position = multiOverlayPosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
