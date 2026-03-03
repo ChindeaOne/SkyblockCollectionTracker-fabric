@@ -18,6 +18,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommandRegistry {
@@ -240,8 +241,34 @@ public class CommandRegistry {
                                 .suggests(MULTI_COLLECTION_SUGGESTIONS)
                                 .executes(context -> {
                                     String collectionsArgs = StringArgumentType.getString(context, "collections").trim();
-                                    List<String> collections = List.of(collectionsArgs.split("\\s+"));
-                                    CollectionTracker.startMultiTracking(collections);
+                                    List<String> collections = CollectionsManager.getAllCollections();
+                                    List<String> foundCollections = new ArrayList<>();
+
+                                    String remaining = collectionsArgs;
+                                    while (!remaining.isEmpty()) {
+                                        boolean found = false;
+                                        List<String> sortedCollections = collections.stream()
+                                                .sorted((a, b) -> Integer.compare(b.length(), a.length())) // sort by length to match longest first
+                                                .toList();
+
+                                        for (String coll : sortedCollections) {
+                                            if (remaining.startsWith(coll)) {
+                                                foundCollections.add(coll);
+                                                remaining = remaining.substring(coll.length()).trim();
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found) {
+                                            // skip
+                                            int nextSpace = remaining.indexOf(' ');
+                                            if (nextSpace == -1) break;
+                                            remaining = remaining.substring(nextSpace).trim();
+                                        }
+                                    }
+
+                                    CollectionTracker.startMultiTracking(foundCollections);
                                     return 1;
                                 })
                         )
