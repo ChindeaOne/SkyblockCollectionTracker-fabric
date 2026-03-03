@@ -11,6 +11,7 @@ public class CollectionsManager {
     public static List<String> multiCollectionSource = new LinkedList<>();
     public static Map<String, String> multiCollectionTypes = new HashMap<>();
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidCollection(String collectionName) {
         for (Set<String> collectionSet : collections.values()) {
             if (collectionSet.contains(collectionName)) {

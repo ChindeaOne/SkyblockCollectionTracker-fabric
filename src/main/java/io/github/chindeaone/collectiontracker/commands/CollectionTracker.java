@@ -104,14 +104,15 @@ public class CollectionTracker {
                     return;
                 }
 
+                if (list.isEmpty()) {
+                    ChatUtils.INSTANCE.sendMessage("§cNo valid collections provided!", true);
+                    return;
+                }
+
                 // Validate all collections and build a new list
                 List <String> validCollections = new LinkedList<>();
                 for (String coll : list) {
                     coll = coll.toLowerCase().trim();
-                    if (!CollectionsManager.isValidCollection(coll)) {
-                        ChatUtils.INSTANCE.sendMessage("§4" + coll + " collection is not supported! Use `/sct collections` to see all supported collections.", true);
-                        return;
-                    }
                     if (GemstonesManager.checkIfGemstone(coll)) {
                         ChatUtils.INSTANCE.sendMessage("§cIndividual gemstones aren't supported. Please use `/sct track-multi gemstone`!", true);
                         return;
