@@ -31,6 +31,17 @@ public class HypixelApiFetcher {
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
             int status = response.statusCode();
+
+            if (status == 401) {
+                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
+                TokenManager.fetchAndStoreToken();
+                token = TokenManager.getToken(); // get the new token
+
+                request = buildCollectionRequest(uuid, token, collection, collectionSource);
+                HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+                status = response.statusCode();
+            }
+
             if (status == 200) {
                 return response.body();
             } else {
@@ -53,6 +64,17 @@ public class HypixelApiFetcher {
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
             int status = response.statusCode();
+
+            if (status == 401) {
+                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
+                TokenManager.fetchAndStoreToken();
+                String token = TokenManager.getToken(); // get the new token
+
+                request = buildCollectionRequest(PlayerData.INSTANCE.getPlayerUUID(), token, collection, collectionSource);
+                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+                status = response.statusCode();
+            }
+
             if (status == 200) {
                 return response.body();
             } else {
