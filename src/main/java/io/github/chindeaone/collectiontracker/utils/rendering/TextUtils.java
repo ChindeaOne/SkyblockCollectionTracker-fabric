@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.rendering;
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager;
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
@@ -12,6 +13,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.StringUtils;
@@ -189,11 +191,7 @@ public class TextUtils {
 
     // Only if it has bazaar data and is enabled
     public static void updateTrackingExtraLines(List<String> list) {
-        if (!ConfigAccess.isShowExtraStats()) {
-            list.clear();
-            return;
-        }
-
+        list.clear();
         if (!BazaarCollectionsManager.hasBazaarData) {
             ConfigHelper.disableExtraStats();
             ChatUtils.INSTANCE.sendMessage("§cNo Bazaar data available for extra stats!", true);
@@ -458,6 +456,33 @@ public class TextUtils {
             } else {
                 return formatCollectionName(coll) + " $ made (Bazaar): Calculating...";
             }
+        }
+    }
+
+    public static void addToggleableSettingsLines(List<String> list) {
+        list.add("");
+        boolean isUsingBazaar = ConfigAccess.isUsingBazaar();
+        if (isUsingBazaar) {
+            list.add("§a[Bazaar Prices]");
+            if (CollectionTracker.collectionList.contains("gemstone") || GemstonesManager.checkIfGemstone(collection)) {
+                list.add("§e[" + ConfigAccess.getGemstoneVariant() + "]");
+            }
+            if ("enchanted".equals(collectionType) || CollectionsManager.multiCollectionTypes.containsValue("enchanted")) {
+                if (ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION)) {
+                    list.add("§e[Enchanted version]");
+                } else {
+                    list.add("§e[Super Enchanted version]");
+                }
+            }
+            list.add("§e[" + (ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "Instant Buy]" : "Instant Sell]"));
+            list.add("§e[NPC Prices]");
+            if (TrackingHandler.isTracking) {
+                if (ConfigAccess.isShowExtraStats()) list.add("§a[Extra Stats]");
+                else list.add("§e[Extra Stats]");
+            }
+        } else {
+            list.add("§e[Bazaar Prices]");
+            list.add("§a[NPC Prices]");
         }
     }
 

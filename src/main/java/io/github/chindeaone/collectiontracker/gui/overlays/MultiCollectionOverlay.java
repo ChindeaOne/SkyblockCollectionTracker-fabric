@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
+import io.github.chindeaone.collectiontracker.config.ConfigHelper;
+import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
@@ -9,6 +11,7 @@ import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.ChatScreen;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -49,7 +52,7 @@ public class MultiCollectionOverlay implements AbstractOverlay{
     public void render(GuiGraphics context) {
         if (!isEnabled() || !trackingDirty) return;
 
-        List<String> mainLines = getCollectionLines();
+        List<String> mainLines = getMultiCollectionLines();
 
         if (mainLines.isEmpty()) return;
 
@@ -61,7 +64,7 @@ public class MultiCollectionOverlay implements AbstractOverlay{
     @Override
     public void updateDimensions() {
         if (!isEnabled()) return;
-        List<String> lines = getCollectionLines();
+        List<String> lines = getMultiCollectionLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;
@@ -72,10 +75,69 @@ public class MultiCollectionOverlay implements AbstractOverlay{
         position.setDimensions(maxW, h);
     }
 
-    private @NotNull List<String> getCollectionLines() {
+    @Override
+    public List<String> getLines() {
+        return getMultiCollectionLines();
+    }
+
+    @Override
+    public void handleLineAction(String line) {
+        switch (line) {
+            case "§e[Bazaar Prices]" -> ConfigHelper.setBazaar(true);
+            case "§e[NPC Prices]" -> ConfigHelper.setBazaar(false);
+        }
+        if (line.contains(ConfigAccess.getGemstoneVariant().toString())) {
+            cycleGemstoneVariant();
+        }
+        if (line.contains("version")) {
+            changeEnchantedType();
+        }
+        if (line.contains("Instant")) {
+            changeBazaarPriceType();
+        }
+    }
+
+    @Override
+    public boolean isHovered(double mouseX, double mouseY) {
+        if (!isEnabled()) return false;
+
+        updateDimensions();
+
+        Position position = this.position();
+        int x = position.getX();
+        int y = position.getY();
+        float scale = position.getScale();
+
+        int height = (int) (position.getHeight() * scale);
+        int width = (int) (position.getWidth() * scale);
+
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+    }
+
+    private @NotNull List<String> getMultiCollectionLines() {
         TextUtils.updateMultiTrackingLines(multiOverlayLines);
         List<String> lines = new ArrayList<>(multiOverlayLines);
         lines.add("Uptime: " + MultiTrackingHandler.getMultiUptime());
+        if (Minecraft.getInstance().screen instanceof ChatScreen) {
+            TextUtils.addToggleableSettingsLines(lines);
+        }
         return lines;
+    }
+
+    private void cycleGemstoneVariant() {
+        Bazaar.GemstoneVariant[] variants = Bazaar.GemstoneVariant.values();
+        Bazaar.GemstoneVariant current = ConfigAccess.getGemstoneVariant();
+        int nextOrdinal = (current.ordinal() + 1) % variants.length;
+        ConfigHelper.setGemstoneVariant(variants[nextOrdinal]);
+    }
+
+    private void changeEnchantedType() {
+        ConfigHelper.setBazaarType(ConfigAccess.getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION ?
+                Bazaar.BazaarType.SUPER_ENCHANTED_VERSION : Bazaar.BazaarType.ENCHANTED_VERSION);
+    }
+
+    private void changeBazaarPriceType() {
+        ConfigHelper.changeBazaarPrice(ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ?
+                Bazaar.BazaarPriceType.INSTANT_SELL : Bazaar.BazaarPriceType.INSTANT_BUY);
     }
 }

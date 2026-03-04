@@ -520,4 +520,24 @@ object ConfigHelper {
     fun setTitlePosition(x: Int, y: Int) {
         modConfig.misc.titlePosition = Position(x, y)
     }
+
+    @JvmStatic
+    fun setBazaar(enabled: Boolean) {
+        bazaarConfig.useBazaar = enabled
+    }
+
+    @JvmStatic
+    fun setGemstoneVariant(variant: Bazaar.GemstoneVariant) {
+        bazaarConfig.gemstoneVariant = variant
+    }
+
+    @JvmStatic
+    fun setShowExtraStats(show: Boolean) {
+        collectionOverlay.showExtraStats = show
+    }
+
+    @JvmStatic
+    fun changeBazaarPrice(type: Bazaar.BazaarPriceType) {
+        bazaarConfig.bazaarPriceType = type
+    }
 }

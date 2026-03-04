@@ -6,7 +6,8 @@
     "AccessorGuiContainer",
     "ChatHudMixin",
     "ClientPacketListenerMixin",
-    "ParticleMixin"
+    "ParticleMixin",
+    "ChatScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

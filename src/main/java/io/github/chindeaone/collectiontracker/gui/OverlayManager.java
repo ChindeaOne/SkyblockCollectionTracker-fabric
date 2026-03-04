@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui;
 
 import io.github.chindeaone.collectiontracker.gui.overlays.*;
+import net.minecraft.client.input.MouseButtonInfo;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -63,5 +64,9 @@ public class OverlayManager {
         OverlayManager.add(new DeployableOverlay());
         OverlayManager.add(new TemporaryBuffsOverlay());
         OverlayManager.add(new TitleOverlay());
+    }
+
+    public static boolean isCollectionOverlay(AbstractOverlay overlay) {
+        return overlay.overlayLabel().equals("Collection Tracker") || overlay.overlayLabel().equals("Multi-Collection Tracker");
     }
 }

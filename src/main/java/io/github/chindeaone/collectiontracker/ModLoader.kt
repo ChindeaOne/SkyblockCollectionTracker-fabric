@@ -25,8 +25,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.ChatScreen
 //? if = 1.21.11 {
 import net.minecraft.resources.Identifier
 //? } else {
@@ -73,6 +76,18 @@ class ModLoader: ModInitializer {
             for (overlay in OverlayManager.all()) {
                 if (overlay.shouldRender()) {
                     overlay.render(context)
+                }
+            }
+        }
+        ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
+            if (screen is ChatScreen) {
+                ScreenMouseEvents.allowMouseClick(screen).register { _, event ->
+                    for (overlay in OverlayManager.all()) {
+                        if (OverlayManager.isCollectionOverlay(overlay))
+                            if (overlay.shouldRender() && overlay.handleMouseClick(event.x, event.y))
+                                return@register false // consume event
+                    }
+                    true
                 }
             }
         }
