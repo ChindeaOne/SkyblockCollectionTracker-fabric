@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui;
 
 import io.github.chindeaone.collectiontracker.gui.overlays.*;
-import net.minecraft.client.input.MouseButtonInfo;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

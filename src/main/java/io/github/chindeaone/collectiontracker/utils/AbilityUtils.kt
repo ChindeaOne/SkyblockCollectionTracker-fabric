@@ -114,7 +114,7 @@ object AbilityUtils {
                 else -> 0
             }
             "Pickobulus" -> 0
-            "Tunnel Vision" -> 0
+            "Tunnel Vision" -> 30
             "Maniac Miner" -> when (effectiveLevel) {
                 3 -> 35
                 2 -> 30
