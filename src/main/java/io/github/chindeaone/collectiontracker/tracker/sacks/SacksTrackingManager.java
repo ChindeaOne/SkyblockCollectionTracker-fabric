@@ -11,7 +11,7 @@ public class SacksTrackingManager {
     public static boolean isFirstCheck = true;
 
     public static void onChatCollection(int amount) {
-        if (!TrackingHandler.isTracking) return;
+        if (!TrackingHandler.isTracking || TrackingHandler.isPaused) return;
 
         long updatedAmount = updateAmount(amount);
         TrackingRates.calculateRates(updatedAmount, true);

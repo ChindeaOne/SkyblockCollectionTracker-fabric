@@ -189,7 +189,7 @@ object ChatListener {
     }
 
     private fun pristineTracker(text: String) {
-        if (!MultiTrackingHandler.isMultiTracking || !CollectionTracker.collectionList.contains("gemstone")) return // Only track gemstones
+        if (!MultiTrackingHandler.isMultiTracking || MultiTrackingHandler.isMultiPaused || !CollectionTracker.collectionList.contains("gemstone")) return // Only track gemstones
 
         val match = Patterns.PRISTINE.find(text) ?: return
         val gemstone = match.groupValues[1].trim()
