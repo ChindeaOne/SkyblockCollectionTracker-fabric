@@ -144,8 +144,13 @@ val statsText: List<CollectionOverlay.OverlayText> get() = collectionOverlay.sta
 val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionOverlay.extraStatsText
 val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
 val explicitValues: Boolean get() = trackingConfig.explicitValues
+
+// Multi Collection Tracking Config Accessors
 val multiCollectionOverlay: MultiCollectionOverlay get() = trackingConfig.multiCollectionOverlay
 val trackingOptions: MultiCollectionOverlay.TrackingOptions get() = multiCollectionOverlay.trackingOptions
+val multiTrackingSummary: Boolean get() = multiCollectionOverlay.multiTrackingSummary
+val multiDetailedSummary: Boolean get() = multiCollectionOverlay.multiDetailedSummary
+val summaryStats: MultiCollectionOverlay.SummaryStats get() = multiCollectionOverlay.summaryStats
 
 // Skills Tracking Config Accessors
 val skillOverlay: SkillOverlay get() = trackingConfig.skillOverlay
@@ -411,6 +416,15 @@ object ConfigAccess {
 
     @JvmStatic
     fun getTrackingOptions(): MultiCollectionOverlay.TrackingOptions = trackingOptions
+
+    @JvmStatic
+    fun isMultiTrackingSummaryEnabled(): Boolean = multiTrackingSummary
+
+    @JvmStatic
+    fun isMultiDetailedSummaryEnabled(): Boolean = multiDetailedSummary
+
+    @JvmStatic
+    fun getSummaryStats(): MultiCollectionOverlay.SummaryStats = summaryStats
 }
 
 /**
