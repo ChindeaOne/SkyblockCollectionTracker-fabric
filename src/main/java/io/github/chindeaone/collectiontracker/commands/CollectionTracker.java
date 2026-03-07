@@ -124,6 +124,11 @@ public class CollectionTracker {
                     if (!validCollections.contains(coll)) validCollections.add(coll);
                 }
                 collectionList = validCollections;
+                // move gemstone to the end
+                if (collectionList.contains("gemstone")) {
+                    collectionList.remove("gemstone");
+                    collectionList.add("gemstone");
+                }
 
                 if (System.currentTimeMillis() - MultiTrackingHandler.getMultiLastTrackTime() < MultiTrackingHandler.getCOOLDOWN_MILLIS()) {
                     ChatUtils.INSTANCE.sendMessage("§cPlease wait before another multi-tracking!", true);
