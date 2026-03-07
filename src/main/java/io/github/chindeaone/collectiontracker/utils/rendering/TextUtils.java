@@ -28,8 +28,6 @@ import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNu
 
 public class TextUtils {
 
-    private static boolean hasNpcPrice;
-
     public static void updateTrackingLines(List<String> list) {
         list.clear();
         if (ConfigAccess.getStatsText().isEmpty()) return;
@@ -79,7 +77,7 @@ public class TextUtils {
 
         if (collectionType == null) return null; // no collection type (probably rift collection)
 
-        hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
+        boolean hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
         if (!ConfigAccess.isUsingBazaar() && hasNpcPrice) {
             if (CollectionsManager.isRiftCollection(collection)) {
@@ -130,7 +128,7 @@ public class TextUtils {
         if (collectionType == null) return null; // no collection type (probably rift collection)
 
 
-        hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
+        boolean hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
         if (!ConfigAccess.isUsingBazaar() && hasNpcPrice) {
             long moneyMadeNPC = moneyMade.get("NPC");

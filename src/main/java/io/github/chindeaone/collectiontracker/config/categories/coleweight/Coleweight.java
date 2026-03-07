@@ -1,8 +1,10 @@
 package io.github.chindeaone.collectiontracker.config.categories.coleweight;
 
 import com.google.gson.annotations.Expose;
+import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class Coleweight {
@@ -45,4 +47,8 @@ public class Coleweight {
     @ConfigOption(name = "Precision Mining", desc = "")
     @Accordion
     public PrecisionMiningConfig precisionMiningConfig = new PrecisionMiningConfig();
+
+    @Expose
+    @ConfigLink(owner = Coleweight.class, field = "Coleweight Timer")
+    public Position coleweightTimerPosition = new Position(300, 200);
 }

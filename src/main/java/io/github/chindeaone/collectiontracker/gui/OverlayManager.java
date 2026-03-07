@@ -63,6 +63,7 @@ public class OverlayManager {
         OverlayManager.add(new DeployableOverlay());
         OverlayManager.add(new TemporaryBuffsOverlay());
         OverlayManager.add(new TitleOverlay());
+        OverlayManager.add(new TimerOverlay());
     }
 
     public static boolean isCollectionOverlay(AbstractOverlay overlay) {

@@ -7,6 +7,7 @@ import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
+import io.github.chindeaone.collectiontracker.gui.overlays.TimerOverlay;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
@@ -296,6 +297,35 @@ public class CommandRegistry {
                             MultiTrackingHandler.restartMultiTracking();
                             return 1;
                         })
+                )
+                .then(ClientCommandManager.literal("timer")
+                        .then(ClientCommandManager.literal("set")
+                                .then(ClientCommandManager.argument("time", IntegerArgumentType.integer(1))
+                                        .executes(context -> {
+                                            int time = IntegerArgumentType.getInteger(context, "time");
+                                            TimerOverlay.setTimer(time);
+                                            return 1;
+                                        })
+                                )
+                        )
+                        .then(ClientCommandManager.literal("pause")
+                                .executes(context -> {
+                                    TimerOverlay.pauseTimer();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("resume")
+                                .executes(context -> {
+                                    TimerOverlay.pauseTimer();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("stop")
+                                .executes(context -> {
+                                    TimerOverlay.setTimer(0);
+                                    return 1;
+                                })
+                        )
                 )
         ));
     }

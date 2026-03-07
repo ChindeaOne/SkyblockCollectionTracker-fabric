@@ -50,6 +50,7 @@ val deployablePosition: Position get() = modConfig.mining.lanternDeployable.depl
 val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tempBuffPosition
 val titlePosition: Position get() = modConfig.misc.titlePosition
 val multiOverlayPosition: Position get() = modConfig.trackingOverlay.multiCollectionOverlay.multiOverlayPosition
+val coleweightTimerPosition: Position get() = modConfig.mining.coleweight.coleweightTimerPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -206,6 +207,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getMultiOverlayPosition(): Position = multiOverlayPosition
+
+    @JvmStatic
+    fun getColeweightTimerPosition(): Position = coleweightTimerPosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
