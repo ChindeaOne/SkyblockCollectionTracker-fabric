@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering
+package io.github.chindeaone.collectiontracker.utils.parser
 
 object CommissionFormat {
     enum class Area(val displayName: String) {

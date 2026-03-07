@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.CommissionFormat;
+import io.github.chindeaone.collectiontracker.utils.parser.CommissionFormat;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionsWidget;
 import net.minecraft.client.Minecraft;
@@ -19,37 +19,6 @@ public class CommissionsOverlay implements AbstractOverlay{
     private final Position position = ConfigAccess.getCommissionsPosition();
     private final List<String> formattedCommissions = new ArrayList<>();
     private boolean renderingAllowed  = true;
-
-    private List<String> getCommissionsLines() {
-        List<String> raw = CommissionsWidget.INSTANCE.getRawCommissions();
-        if (raw.isEmpty()) return Collections.emptyList();
-
-        formattedCommissions.clear();
-        CommissionFormat.Area detectedArea = null;
-
-        for (String line : raw) {
-            String formatted = line;
-            String lowerLine = line.toLowerCase();
-            for (CommissionFormat.CommissionType type : CommissionFormat.INSTANCE.getCOMMISSIONS()) {
-                String typeNameLower = type.getName().toLowerCase();
-                if (lowerLine.contains(typeNameLower)) {
-                    formatted = type.getFormat().invoke(line);
-                    if (detectedArea == null) detectedArea = type.getArea();
-                    break;
-                }
-            }
-            formattedCommissions.add(formatted);
-        }
-
-        if (detectedArea != null) {
-            switch (detectedArea) {
-                case DWARVEN_MINES -> formattedCommissions.addFirst("§2§l" + detectedArea.getDisplayName());
-                case CRYSTAL_HOLLOWS -> formattedCommissions.addFirst("§5§l" + detectedArea.getDisplayName());
-                case GLACITE_TUNNELS -> formattedCommissions.addFirst("§b§l" + detectedArea.getDisplayName());
-            }
-        }
-        return formattedCommissions;
-    }
 
     @Override
     public String overlayLabel() {
@@ -100,5 +69,36 @@ public class CommissionsOverlay implements AbstractOverlay{
         int h = fr.lineHeight * lines.size();
 
         position.setDimensions(maxW, h);
+    }
+
+    private List<String> getCommissionsLines() {
+        List<String> raw = CommissionsWidget.INSTANCE.getRawCommissions();
+        if (raw.isEmpty()) return Collections.emptyList();
+
+        formattedCommissions.clear();
+        CommissionFormat.Area detectedArea = null;
+
+        for (String line : raw) {
+            String formatted = line;
+            String lowerLine = line.toLowerCase();
+            for (CommissionFormat.CommissionType type : CommissionFormat.INSTANCE.getCOMMISSIONS()) {
+                String typeNameLower = type.getName().toLowerCase();
+                if (lowerLine.contains(typeNameLower)) {
+                    formatted = type.getFormat().invoke(line);
+                    if (detectedArea == null) detectedArea = type.getArea();
+                    break;
+                }
+            }
+            formattedCommissions.add(formatted);
+        }
+
+        if (detectedArea != null) {
+            switch (detectedArea) {
+                case DWARVEN_MINES -> formattedCommissions.addFirst("§2§l" + detectedArea.getDisplayName());
+                case CRYSTAL_HOLLOWS -> formattedCommissions.addFirst("§5§l" + detectedArea.getDisplayName());
+                case GLACITE_TUNNELS -> formattedCommissions.addFirst("§b§l" + detectedArea.getDisplayName());
+            }
+        }
+        return formattedCommissions;
     }
 }
