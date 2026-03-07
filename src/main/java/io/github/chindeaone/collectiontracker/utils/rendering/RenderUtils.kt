@@ -84,9 +84,12 @@ object RenderUtils {
                     // Check prefixes
                     val delimiters = arrayOf(" collection", " $/h", " $ made", " Coll/h", " Motes")
                     var foundCollName = prefix
+                        .replace("§e[+]§r ", "")
+                        .replace("§e[-]§r ", "")
+
                     for (delim in delimiters) {
-                        if (prefix.contains(delim)) {
-                            foundCollName = prefix.substring(0, prefix.indexOf(delim))
+                        if (foundCollName.contains(delim)) {
+                            foundCollName = foundCollName.substring(0, foundCollName.indexOf(delim))
                             break
                         }
                     }
@@ -96,12 +99,12 @@ object RenderUtils {
                         val firstWord = foundCollName.split(" ")[0].lowercase()
                         val gemstoneTypes = arrayOf("ruby", "sapphire", "topaz", "amethyst", "jade", "jasper", "amber", "opal", "aquamarine", "peridot", "citrine", "onyx")
                         color = if (gemstoneTypes.contains(firstWord)) {
-                            ColorUtils.collectionColors[firstWord] ?: ColorUtils.GREEN
+                            ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN
                         } else {
-                            ColorUtils.collectionColors[foundCollName.lowercase()] ?: ColorUtils.GREEN
+                            ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: ColorUtils.GREEN
                         }
                     } else {
-                        color = ColorUtils.collectionColors[foundCollName.lowercase()] ?: ColorUtils.GREEN
+                        color = ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: ColorUtils.GREEN
                     }
                 }
             }

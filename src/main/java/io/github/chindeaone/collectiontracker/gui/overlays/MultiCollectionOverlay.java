@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class MultiCollectionOverlay implements AbstractOverlay{
     private final Position position = ConfigAccess.getMultiOverlayPosition();
     public final List<String> multiOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;
+    private final List<String> expandedCollections = new ArrayList<>();
 
     @Override
     public String overlayLabel() {
@@ -82,6 +84,35 @@ public class MultiCollectionOverlay implements AbstractOverlay{
 
     @Override
     public void handleLineAction(String line) {
+        String cleanLine = StringUtil.stripColor(line);
+        if (cleanLine.startsWith("[+] ") || cleanLine.startsWith("[-] ")) {
+            String content = cleanLine.substring(4);
+            String collName;
+
+            if (content.startsWith("Gemstone Coll/h") || content.startsWith("Gemstone collection") || content.startsWith("Gemstone $ made") || content.startsWith("Gemstone $/h") || content.startsWith("Gemstones:")) {
+                collName = "gemstone";
+            } else {
+                collName = content.split(":")[0].trim().toLowerCase().replace(" ", "_");
+            }
+
+            if (expandedCollections.contains(collName)) {
+                expandedCollections.remove(collName);
+            } else {
+                expandedCollections.add(collName);
+            }
+            return;
+        }
+
+        if (cleanLine.startsWith("Gemstones:") || cleanLine.startsWith("Gemstone:")) {
+            String collName = "gemstone";
+            if (expandedCollections.contains(collName)) {
+                expandedCollections.remove(collName);
+            } else {
+                expandedCollections.add(collName);
+            }
+            return;
+        }
+
         switch (line) {
             case "§e[Bazaar Prices]" -> ConfigHelper.setBazaar(true);
             case "§e[NPC Prices]" -> ConfigHelper.setBazaar(false);
@@ -115,10 +146,11 @@ public class MultiCollectionOverlay implements AbstractOverlay{
     }
 
     private @NotNull List<String> getMultiCollectionLines() {
-        TextUtils.updateMultiTrackingLines(multiOverlayLines);
+        boolean isChatOpened = Minecraft.getInstance().screen instanceof ChatScreen;
+        TextUtils.updateMultiTrackingLines(multiOverlayLines, expandedCollections, isChatOpened);
         List<String> lines = new ArrayList<>(multiOverlayLines);
         lines.add("Uptime: " + MultiTrackingHandler.getMultiUptime());
-        if (Minecraft.getInstance().screen instanceof ChatScreen) {
+        if (isChatOpened) {
             TextUtils.addToggleableSettingsLines(lines);
         }
         return lines;

@@ -22,6 +22,7 @@ import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
+import static io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay.TrackingOptions.COLLECTION;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
 
@@ -218,15 +219,11 @@ public class TextUtils {
         list.add("§6§lExtra Stats:");
         for (CollectionOverlay.OverlayExtraText id : ConfigAccess.getExtraStatsText()) {
             switch (id) {
-                case BAZAAR_PRICE_TYPE -> addIfNotNullExtra(list, handleBazaarPriceType());
-                case BAZAAR_ITEM -> addIfNotNullExtra(list, handleBazaarItem());
-                case BAZAAR_PRICE -> addIfNotNullExtra(list, handleBazaarPrice());
+                case BAZAAR_PRICE_TYPE -> addIfNotNull(list, handleBazaarPriceType());
+                case BAZAAR_ITEM -> addIfNotNull(list, handleBazaarItem());
+                case BAZAAR_PRICE -> addIfNotNull(list, handleBazaarPrice());
             }
         }
-    }
-
-    private static void addIfNotNullExtra(List<String> list, String line) {
-        if (line != null) list.add(line);
     }
 
     private static String handleBazaarPriceType() {
@@ -296,30 +293,94 @@ public class TextUtils {
         }
     }
 
-    public static void updateMultiTrackingLines(List<String> list) {
+    public static void updateMultiTrackingLines(List<String> list, List<String> expanded, boolean showPrefixes) {
         list.clear();
         for (String coll : CollectionTracker.collectionList) {
             if ("gemstone".equals(coll)) {
-                GemstonePrices.multiGemstoneRecipes.forEach((type, variants) -> {
-                    if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(type)) {
-                        switch (ConfigAccess.getTrackingOptions()) {
-                            case COLLECTION -> addIfNotNull(list, "");
-                            case COLLECTION_MADE -> addIfNotNull(list, handleCollectionSessionMulti(type));
-                            case COLLECTION_RATE -> addIfNotNull(list, handleCollectionPerHourMulti(type));
-                            case MONEY_RATE -> addIfNotNull(list, handleMoneyPerHourMulti(type));
-                            case MONEY_MADE -> addIfNotNull(list, handleMoneyMadeMulti(type));
-                        }
-                    }
+                boolean mainExpanded = expanded.contains("gemstone");
+                boolean showingCollection = ConfigAccess.getTrackingOptions() == COLLECTION;
+                String prefix = (showPrefixes && !showingCollection) ? (mainExpanded ? "§e[-]§r " : "§e[+]§r ") : "";
 
-                });
+                if (mainExpanded) {
+                    list.add(prefix + "§dGemstones:§r");
+
+                    GemstonePrices.multiGemstoneRecipes.forEach((type, variants) -> {
+                        if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(type)) {
+                            String line = null;
+                            switch (ConfigAccess.getTrackingOptions()) {
+                                case COLLECTION_RATE -> line = handleCollectionPerHourMulti(type);
+                                case COLLECTION_MADE -> line = handleCollectionSessionMulti(type);
+                                case MONEY_RATE -> line = handleMoneyPerHourMulti(type);
+                                case MONEY_MADE -> line = handleMoneyMadeMulti(type);
+                            }
+                            if (line != null) {
+                                list.add("  " + line);
+                            }
+                        }
+                    });
+                } else {
+                    String line = null;
+                    switch (ConfigAccess.getTrackingOptions()) {
+                        case COLLECTION -> line = handleCollectionMulti("gemstone");
+                        case COLLECTION_RATE -> line = handleCollectionPerHourMulti("gemstone");
+                        case COLLECTION_MADE -> line = handleCollectionSessionMulti("gemstone");
+                        case MONEY_RATE -> line = handleMoneyPerHourMulti("gemstone");
+                        case MONEY_MADE -> line = handleMoneyMadeMulti("gemstone");
+                    }
+                    if (line != null) {
+                        list.add(prefix + "§d" + line + "§r");
+                    } else {
+                        list.add(prefix + "§dGemstones:§r");
+                    }
+                }
                 continue;
             }
+
+            String line = null;
             switch (ConfigAccess.getTrackingOptions()) {
-                case COLLECTION -> addIfNotNull(list, handleCollectionMulti(coll));
-                case COLLECTION_MADE -> addIfNotNull(list, handleCollectionSessionMulti(coll));
-                case COLLECTION_RATE -> addIfNotNull(list, handleCollectionPerHourMulti(coll));
-                case MONEY_RATE -> addIfNotNull(list, handleMoneyPerHourMulti(coll));
-                case MONEY_MADE -> addIfNotNull(list, handleMoneyMadeMulti(coll));
+                case COLLECTION -> line = handleCollectionMulti(coll);
+                case COLLECTION_RATE -> line = handleCollectionPerHourMulti(coll);
+                case COLLECTION_MADE -> line = handleCollectionSessionMulti(coll);
+                case MONEY_RATE -> line = handleMoneyPerHourMulti(coll);
+                case MONEY_MADE -> line = handleMoneyMadeMulti(coll);
+            }
+            if (line != null) {
+                list.add(line);
+            }
+        }
+
+        String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
+        String type = ConfigAccess.getBazaarType() == BazaarType.ENCHANTED_VERSION ? "Enchanted version" : "Super Enchanted version";
+        String variant = ConfigAccess.getGemstoneVariant().toString();
+
+        switch (ConfigAccess.getTrackingOptions()) {
+            case MONEY_RATE -> {
+                if (!ConfigAccess.isUsingBazaar()) {
+                    long total = MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().entrySet().stream()
+                            .filter(entry -> !entry.getKey().contains("_") || entry.getKey().endsWith("_" + variant))
+                            .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
+                    list.add("§eOverall $/h (NPC): " + formatNumber(total));
+                } else {
+                    long total = MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().entrySet().stream()
+                            .filter(entry -> entry.getKey().endsWith(suffix))
+                            .filter(entry -> entry.getKey().contains("_normal") || entry.getKey().contains("_" + type) || entry.getKey().contains("_" + variant))
+                            .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
+                    list.add("§eOverall $/h (Bazaar): " + formatNumber(total));
+                }
+            }
+            case MONEY_MADE -> {
+                if (!ConfigAccess.isUsingBazaar()) {
+                    long total = MultiTrackingRates.INSTANCE.getMoneyMadeNPC().entrySet().stream()
+                            .filter(entry -> !entry.getKey().contains("_") || entry.getKey().endsWith("_" + variant))
+                            .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
+                    list.add("§eOverall $ made (NPC): " + formatNumber(total));
+                } else {
+                    long total = MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().entrySet().stream()
+                            .filter(entry -> entry.getKey().endsWith(suffix))
+                            .filter(entry -> entry.getKey().contains("_normal") || entry.getKey().contains("_" + type) || entry.getKey().contains("_" + variant))
+                            .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
+                    list.add("§eOverall $ made (Bazaar): " + formatNumber(total));
+                }
             }
         }
     }
@@ -350,6 +411,21 @@ public class TextUtils {
         }
 
         boolean useBazaar = ConfigAccess.isUsingBazaar();
+        if ("gemstone".equals(coll)) {
+            long totalRate = 0;
+            String variant = ConfigAccess.getGemstoneVariant().toString();
+            String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
+
+            for (String gem : MultiTrackingRates.INSTANCE.getSeenGemstones()) {
+                if (useBazaar) {
+                    totalRate += MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().getOrDefault((gem + "_" + variant).toUpperCase() + suffix, 0L);
+                } else {
+                    totalRate += MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().getOrDefault((gem + "_" + variant).toUpperCase(), 0L);
+                }
+            }
+            return "Gemstone $/h (" + (useBazaar ? "Bazaar" : "NPC") + "): " + formatNumberOrPlaceholder(totalRate);
+        }
+
         if (!useBazaar) {
             String key = coll;
             if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
@@ -366,14 +442,11 @@ public class TextUtils {
             String actualColl = coll;
             String gemstoneVariant = null;
 
-            // Check if it's an encountered gemstone
             if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
                 actualColl = "gemstone";
-                // Create special key
                 String variant = ConfigAccess.getGemstoneVariant().toString();
                 gemstoneVariant = (coll + "_" + variant).toUpperCase();
             }
-            // Get bazaar price type
             String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
 
             if (gemstoneVariant != null) {
@@ -381,7 +454,6 @@ public class TextUtils {
                 return formatCollectionName(coll) + " $/h (Bazaar): " + formatNumberOrPlaceholder(rate);
             }
 
-            // Rest of the collections
             String type = CollectionsManager.multiCollectionTypes.get(actualColl);
 
             if (type != null) {
@@ -409,6 +481,21 @@ public class TextUtils {
         }
 
         boolean useBazaar = ConfigAccess.isUsingBazaar();
+        if ("gemstone".equals(coll)) {
+            long totalMoney = 0;
+            String variant = ConfigAccess.getGemstoneVariant().toString();
+            String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
+
+            for (String gem : MultiTrackingRates.INSTANCE.getSeenGemstones()) {
+                if (useBazaar) {
+                    totalMoney += MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().getOrDefault((gem + "_" + variant).toUpperCase() + suffix, 0L);
+                } else {
+                    totalMoney += MultiTrackingRates.INSTANCE.getMoneyMadeNPC().getOrDefault((gem + "_" + variant).toUpperCase(), 0L);
+                }
+            }
+            return "Gemstone $ made (" + (useBazaar ? "Bazaar" : "NPC") + "): " + formatNumberOrPlaceholder(totalMoney);
+        }
+
         if (!useBazaar) {
             String key = coll;
             if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
@@ -425,7 +512,6 @@ public class TextUtils {
             String actualColl = coll;
             String gemstoneVariant = null;
 
-            // Check if it's an encountered gemstone
             if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
                 actualColl = "gemstone";
                 String variant = ConfigAccess.getGemstoneVariant().toString();
@@ -439,7 +525,6 @@ public class TextUtils {
                 return formatCollectionName(coll) + " $ made (Bazaar): " + formatNumberOrPlaceholder(money);
             }
 
-            // Rest of the collections
             String type = CollectionsManager.multiCollectionTypes.get(actualColl);
 
             if (type != null) {
