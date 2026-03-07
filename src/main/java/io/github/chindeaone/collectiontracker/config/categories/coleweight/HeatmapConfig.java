@@ -21,6 +21,6 @@ public class HeatmapConfig {
             name = "Heatmap Opacity",
             desc = "Adjust the opacity of the heatmap overlay. (0.0 - fully transparent, 1.0 - fully opaque)"
     )
-    @ConfigEditorSlider(minValue = 0.0f, maxValue = 1.0f, minStep = 0.5f)
+    @ConfigEditorSlider(minValue = 0.0f, maxValue = 1.0f, minStep = 0.1f)
     public Property<Float> heatmapOpacity = Property.of(1.0f);
 }
