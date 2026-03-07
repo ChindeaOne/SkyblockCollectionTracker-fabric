@@ -107,4 +107,11 @@ object ColorUtils {
             else -> Color.WHITE
         }
     }
+
+    fun collToColor(collection: String): Component {
+        return Component.literal(collection).withStyle {
+            val colorInt = collectionColors[collection.lowercase()] ?: WHITE
+            it.withColor(TextColor.fromRgb(colorInt))
+        }
+    }
 }
