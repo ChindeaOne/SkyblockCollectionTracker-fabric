@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.config.categories;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -15,6 +16,12 @@ public class Tracking {
     @SerializedName("collection_overlay")
     @Accordion
     public CollectionOverlay collectionOverlay = new CollectionOverlay();
+
+    @Expose
+    @ConfigOption(name = "Multi-Collection Overlay", desc = "")
+    @SerializedName("multi_collection_overlay")
+    @Accordion
+    public MultiCollectionOverlay multiCollectionOverlay = new MultiCollectionOverlay();
 
     @Expose
     @ConfigOption(name = "Skill Overlay", desc = "")

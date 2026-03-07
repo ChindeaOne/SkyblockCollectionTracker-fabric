@@ -35,6 +35,13 @@ public class OverlayManager {
         }
     }
 
+    public static void setMultiTrackingOverlayRendering(boolean allowed) {
+        AbstractOverlay overlay = overlays.get("Multi-Collection Tracker");
+        if (overlay != null) {
+            overlay.setRenderingAllowed(allowed);
+        }
+    }
+
     public static void setSkillOverlayRendering(boolean allowed) {
         AbstractOverlay overlay = overlays.get("Skill Tracker");
         if (overlay != null) {
@@ -44,6 +51,7 @@ public class OverlayManager {
 
     public static void overlayRegistration() {
         OverlayManager.add(new CollectionOverlay());
+        OverlayManager.add(new MultiCollectionOverlay());
         OverlayManager.add(new MiningStatsOverlay());
         OverlayManager.add(new CommissionsOverlay());
         OverlayManager.add(new SkillOverlay());
@@ -55,5 +63,9 @@ public class OverlayManager {
         OverlayManager.add(new DeployableOverlay());
         OverlayManager.add(new TemporaryBuffsOverlay());
         OverlayManager.add(new TitleOverlay());
+    }
+
+    public static boolean isCollectionOverlay(AbstractOverlay overlay) {
+        return overlay.overlayLabel().equals("Collection Tracker") || overlay.overlayLabel().equals("Multi-Collection Tracker");
     }
 }

@@ -8,11 +8,10 @@ import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener;
 
 public class SacksTrackingManager {
 
-    public static boolean lastHasItem = false;
     public static boolean isFirstCheck = true;
 
     public static void onChatCollection(int amount) {
-        if (!TrackingHandler.isTracking) return;
+        if (!TrackingHandler.isTracking || TrackingHandler.isPaused) return;
 
         long updatedAmount = updateAmount(amount);
         TrackingRates.calculateRates(updatedAmount, true);
@@ -30,21 +29,17 @@ public class SacksTrackingManager {
             }
         }
 
-        boolean hasItem = InventoryListener.getHasItem();
-        boolean prevHasItem = lastHasItem;
-        lastHasItem = hasItem;
+        boolean isCompacting = InventoryListener.isCompacting();
 
-        boolean firstCheck = isFirstCheck;
-        if (isFirstCheck) isFirstCheck = false;
-
-        if (hasItem) {
+        if (isCompacting) {
             // If the player has the item in their inventory, we need to check if they had it previously
-            // Unless it's the first check, in which case we assume the amount is compacted
-            if (!firstCheck && !prevHasItem) {
+            if (isFirstCheck) {
+                isFirstCheck = false;
                 return (long) amount;
+            } else {
+                // If the player had the item previously, the amount is compacted
+                return amount * recipeSize;
             }
-            // If the player had the item previously, we assume the amount is compacted
-            return amount * recipeSize;
         } else {
             // Otherwise, the amount is not compacted and we can use it as is
             return (long) amount;
@@ -52,8 +47,8 @@ public class SacksTrackingManager {
     }
 
     public static void reset() {
-        InventoryListener.setHasItem(false);
-        lastHasItem = false;
+        InventoryListener.setCompacting(false);
+        InventoryListener.setCount(0);
         isFirstCheck = true;
     }
 }

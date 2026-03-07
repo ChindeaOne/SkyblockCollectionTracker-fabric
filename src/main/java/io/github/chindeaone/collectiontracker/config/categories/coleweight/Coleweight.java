@@ -35,4 +35,14 @@ public class Coleweight {
     @ConfigOption(name = "Custom Coleweight Rank Color", desc = "")
     @Accordion
     public ColeweightColor coleweightColor = new ColeweightColor();
+
+    @Expose
+    @ConfigOption(name = "Dwarven Heatmap", desc = "")
+    @Accordion
+    public HeatmapConfig heatmapConfig = new HeatmapConfig();
+
+    @Expose
+    @ConfigOption(name = "Precision Mining", desc = "")
+    @Accordion
+    public PrecisionMiningConfig precisionMiningConfig = new PrecisionMiningConfig();
 }

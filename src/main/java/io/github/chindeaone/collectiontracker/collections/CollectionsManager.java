@@ -8,6 +8,10 @@ public class CollectionsManager {
     public static String collectionSource;
     public static String collectionType;
 
+    public static List<String> multiCollectionSource = new LinkedList<>();
+    public static Map<String, String> multiCollectionTypes = new HashMap<>();
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidCollection(String collectionName) {
         for (Set<String> collectionSet : collections.values()) {
             if (collectionSet.contains(collectionName)) {
@@ -26,12 +30,12 @@ public class CollectionsManager {
         return false;
     }
 
-    public static String[] getAllCollections() {
-        Set<String> allCollections = new HashSet<>();
+    public static List<String> getAllCollections() {
+        List<String> allCollections = new LinkedList<>();
         for (Set<String> collectionSet : collections.values()) {
             allCollections.addAll(collectionSet);
         }
-        return allCollections.toArray(new String[0]);
+        return allCollections;
     }
 
     public static boolean isRiftCollection(String collectionName) {
@@ -43,5 +47,10 @@ public class CollectionsManager {
     public static void resetCollections() {
         collectionSource = null;
         collectionType = null;
+    }
+
+    public static void resetMultiCollections() {
+        multiCollectionSource.clear();
+        multiCollectionTypes.clear();
     }
 }

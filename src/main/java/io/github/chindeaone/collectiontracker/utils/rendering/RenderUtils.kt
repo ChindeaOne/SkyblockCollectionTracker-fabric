@@ -72,6 +72,49 @@ object RenderUtils {
     }
 
     @JvmStatic
+    fun renderMultiTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, withColor: Boolean) {
+        var y = 0
+
+        for (line in lines) {
+            var color: Int = ColorUtils.GREEN
+            if (withColor) {
+                val splitIndex = line.indexOf(": ")
+                if (splitIndex != -1) {
+                    val prefix = line.substring(0, splitIndex)
+                    // Check prefixes
+                    val delimiters = arrayOf(" collection", " $/h", " $ made", " Coll/h", " Motes")
+                    var foundCollName = prefix
+                        .replace("§e[+]§r ", "")
+                        .replace("§e[-]§r ", "")
+
+                    for (delim in delimiters) {
+                        if (foundCollName.contains(delim)) {
+                            foundCollName = foundCollName.substring(0, foundCollName.indexOf(delim))
+                            break
+                        }
+                    }
+
+                    // Check if it's a gemstone variant
+                    if (foundCollName.contains(" ")) {
+                        val firstWord = foundCollName.split(" ")[0].lowercase()
+                        val gemstoneTypes = arrayOf("ruby", "sapphire", "topaz", "amethyst", "jade", "jasper", "amber", "opal", "aquamarine", "peridot", "citrine", "onyx")
+                        color = if (gemstoneTypes.contains(firstWord)) {
+                            ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN
+                        } else {
+                            ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: ColorUtils.GREEN
+                        }
+                    } else {
+                        color = ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: ColorUtils.GREEN
+                    }
+                }
+            }
+
+            drawHelper(line, context, y, color)
+            y += fr.lineHeight
+        }
+    }
+
+    @JvmStatic
     fun renderSkillStringsWithTaming(context: GuiGraphics, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
         var y = 0
 
@@ -273,7 +316,7 @@ object RenderUtils {
         val referenceRegex = Regex("""\(#\d+\)""")
 
         for (line in lines) {
-            val trimmed = line.trim()
+            val trimmed = line.trimEnd()
 
             if (trimmed.isEmpty() || trimmed == "---") {
                 currentY += fr.lineHeight / 2

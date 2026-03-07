@@ -45,6 +45,7 @@
 
 - Ported commands like `/sct cw find` or `/sct cw lb`, as well as `/sct cw detailed` for more info.
 - Ported Coleweight chat ranks and the option to display them on Mining Islands only.
+- Ported Dwarven Heatmap.
 
 </details>
 

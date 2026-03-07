@@ -9,10 +9,11 @@ import io.github.chindeaone.collectiontracker.config.categories.Misc
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightColor
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.HeatmapConfig
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.PrecisionMiningConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.DwarvenHeatmapConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable
@@ -24,6 +25,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.Collecti
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -47,6 +49,7 @@ val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilit
 val deployablePosition: Position get() = modConfig.mining.lanternDeployable.deployablePosition
 val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tempBuffPosition
 val titlePosition: Position get() = modConfig.misc.titlePosition
+val multiOverlayPosition: Position get() = modConfig.trackingOverlay.multiCollectionOverlay.multiOverlayPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -70,7 +73,6 @@ val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
 val lanternDeployable: LanternDeployable get() = miningConfig.lanternDeployable
 val temporaryBuffsConfig: TemporaryBuffsConfig get() = miningConfig.temporaryBuffsConfig
-val dwarvenHeatmapConfig: DwarvenHeatmapConfig get() = miningConfig.dwarvenHeatmapConfig
 val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
@@ -90,7 +92,6 @@ val refinedCacaoTime: Long get() = temporaryBuffsConfig.refinedCacaoTime
 val filetTime: Long get() = temporaryBuffsConfig.filetTime
 val pristinePotatoTime: Long get() = temporaryBuffsConfig.pristinePotatoTime
 val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
-val enableHeatmap: Boolean get() = dwarvenHeatmapConfig.enableHeatmap
 
 // Coleweight Config Accessors
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
@@ -98,6 +99,12 @@ val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityF
 val coleweightColor: ColeweightColor get() = coleweightConfig.coleweightColor
 val enableCustomColor: Boolean get() = coleweightColor.enableCustomColor
 val customColor: ChromaColour get() = coleweightColor.customColor
+val heatmapConfig: HeatmapConfig get() = coleweightConfig.heatmapConfig
+val enableHeatmap: Boolean get() = heatmapConfig.enableHeatmap
+val heatmapOpacity: Property<Float> get() = heatmapConfig.heatmapOpacity
+val precisionMiningConfig: PrecisionMiningConfig get() = coleweightConfig.precisionMiningConfig
+val enablePrecisionMiningHighlight: Boolean get() = precisionMiningConfig.enablePrecisionMiningHighlight
+val drawLineToPrecisionMining: Boolean get() = precisionMiningConfig.drawLineToPrecisionMining
 
 // Overlays
 val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
@@ -129,7 +136,7 @@ val showAxeReadyAbilityTitle: Boolean get() = axeAbilityConfig.showAxeReadyAbili
 val showAxeExpiredAbilityTitle: Boolean get() = axeAbilityConfig.showAxeExpiredAbilityTitle
 val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbilityInForagingIslandsOnly
 
-// Tracking Config Accessors
+// Collection Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
 val collectionOverlay: CollectionOverlay get() = trackingConfig.collectionOverlay
 val enableSacksTracking: Boolean get() = collectionOverlay.enableSacksTracking
@@ -137,6 +144,13 @@ val statsText: List<CollectionOverlay.OverlayText> get() = collectionOverlay.sta
 val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionOverlay.extraStatsText
 val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
 val explicitValues: Boolean get() = trackingConfig.explicitValues
+
+// Multi Collection Tracking Config Accessors
+val multiCollectionOverlay: MultiCollectionOverlay get() = trackingConfig.multiCollectionOverlay
+val trackingOptions: MultiCollectionOverlay.TrackingOptions get() = multiCollectionOverlay.trackingOptions
+val multiTrackingSummary: Boolean get() = multiCollectionOverlay.multiTrackingSummary
+val multiDetailedSummary: Boolean get() = multiCollectionOverlay.multiDetailedSummary
+val summaryStats: MultiCollectionOverlay.SummaryStats get() = multiCollectionOverlay.summaryStats
 
 // Skills Tracking Config Accessors
 val skillOverlay: SkillOverlay get() = trackingConfig.skillOverlay
@@ -189,6 +203,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getTitlePosition(): Position = titlePosition
+
+    @JvmStatic
+    fun getMultiOverlayPosition(): Position = multiOverlayPosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType
@@ -387,6 +404,27 @@ object ConfigAccess {
 
     @JvmStatic
     fun isHeatmapEnabled(): Boolean = enableHeatmap
+
+    @JvmStatic
+    fun getHeatmapOpacity(): Float = heatmapOpacity.get()
+
+    @JvmStatic
+    fun isPrecisionMiningHighlightEnabled(): Boolean = enablePrecisionMiningHighlight
+
+    @JvmStatic
+    fun isDrawLineToPrecisionMiningEnabled(): Boolean = drawLineToPrecisionMining
+
+    @JvmStatic
+    fun getTrackingOptions(): MultiCollectionOverlay.TrackingOptions = trackingOptions
+
+    @JvmStatic
+    fun isMultiTrackingSummaryEnabled(): Boolean = multiTrackingSummary
+
+    @JvmStatic
+    fun isMultiDetailedSummaryEnabled(): Boolean = multiDetailedSummary
+
+    @JvmStatic
+    fun getSummaryStats(): MultiCollectionOverlay.SummaryStats = summaryStats
 }
 
 /**
@@ -495,5 +533,25 @@ object ConfigHelper {
     @JvmStatic
     fun setTitlePosition(x: Int, y: Int) {
         modConfig.misc.titlePosition = Position(x, y)
+    }
+
+    @JvmStatic
+    fun setBazaar(enabled: Boolean) {
+        bazaarConfig.useBazaar = enabled
+    }
+
+    @JvmStatic
+    fun setGemstoneVariant(variant: Bazaar.GemstoneVariant) {
+        bazaarConfig.gemstoneVariant = variant
+    }
+
+    @JvmStatic
+    fun setShowExtraStats(show: Boolean) {
+        collectionOverlay.showExtraStats = show
+    }
+
+    @JvmStatic
+    fun changeBazaarPrice(type: Bazaar.BazaarPriceType) {
+        bazaarConfig.bazaarPriceType = type
     }
 }

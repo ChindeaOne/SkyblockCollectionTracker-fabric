@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
@@ -16,6 +17,9 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommandRegistry {
 
@@ -228,6 +232,71 @@ public class CommandRegistry {
                             return 1;
                         })
                 )
+                .then(ClientCommandManager.literal("track-multi")
+                        .executes(context-> {
+                            ChatUtils.INSTANCE.sendMessage("Usage: /sct multi-track <collection1> <collection2> etc.",true);
+                            return 1;
+                        })
+                        .then(ClientCommandManager.argument("collections", StringArgumentType.greedyString())
+                                .suggests(MULTI_COLLECTION_SUGGESTIONS)
+                                .executes(context -> {
+                                    String collectionsArgs = StringArgumentType.getString(context, "collections").trim();
+                                    List<String> collections = CollectionsManager.getAllCollections();
+                                    List<String> foundCollections = new ArrayList<>();
+
+                                    String remaining = collectionsArgs;
+                                    while (!remaining.isEmpty()) {
+                                        boolean found = false;
+                                        List<String> sortedCollections = collections.stream()
+                                                .sorted((a, b) -> Integer.compare(b.length(), a.length())) // sort by length to match longest first
+                                                .toList();
+
+                                        for (String coll : sortedCollections) {
+                                            if (remaining.startsWith(coll)) {
+                                                foundCollections.add(coll);
+                                                remaining = remaining.substring(coll.length()).trim();
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found) {
+                                            // skip
+                                            int nextSpace = remaining.indexOf(' ');
+                                            if (nextSpace == -1) break;
+                                            remaining = remaining.substring(nextSpace).trim();
+                                        }
+                                    }
+
+                                    CollectionTracker.startMultiTracking(foundCollections);
+                                    return 1;
+                                })
+                        )
+                )
+                .then(ClientCommandManager.literal("stop-multi")
+                        .executes(context -> {
+                            MultiTrackingHandler.stopMultiTrackingManual();
+                            return 1;
+                        })
+                )
+                .then(ClientCommandManager.literal("pause-multi")
+                        .executes(context -> {
+                            MultiTrackingHandler.pauseMultiTracking();
+                            return 1;
+                        })
+                )
+                .then(ClientCommandManager.literal("resume-multi")
+                        .executes(context -> {
+                            MultiTrackingHandler.resumeMultiTracking();
+                            return 1;
+                        })
+                )
+                .then(ClientCommandManager.literal("restart-multi")
+                        .executes(context -> {
+                            MultiTrackingHandler.restartMultiTracking();
+                            return 1;
+                        })
+                )
         ));
     }
 
@@ -236,6 +305,38 @@ public class CommandRegistry {
         for (String c : CollectionsManager.getAllCollections()) {
             if (c.toLowerCase().startsWith(arg)) {
                 builder.suggest(c);
+            }
+        }
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<FabricClientCommandSource> MULTI_COLLECTION_SUGGESTIONS = (context, builder) -> {
+        String arg = builder.getRemaining().toLowerCase();
+        String prefix;
+        String lastWord;
+
+        if (arg.isEmpty()) {
+            // no input, suggest collections
+            prefix = "";
+            lastWord = ""; // reminder that empty string is prefix for any string
+        } else if (Character.isWhitespace(arg.charAt(arg.length() - 1))){
+            // new collection, suggest collections and keep previous collections
+            prefix = arg;
+            lastWord = "";
+        } else {
+            int lastSpace = Math.max(arg.lastIndexOf(' '), arg.lastIndexOf('\t'));
+            if (lastSpace == -1) { // no space = first collection
+                prefix = "";
+                lastWord = arg;
+            } else { // more than one collection, divide by last space position to suggest next collection
+                prefix = arg.substring(0, lastSpace + 1);
+                lastWord = arg.substring(lastSpace + 1);
+            }
+        }
+
+        for (String c : CollectionsManager.getAllCollections()) {
+            if (c.toLowerCase().startsWith(lastWord)) {
+                builder.suggest(prefix + c);
             }
         }
         return builder.buildFuture();

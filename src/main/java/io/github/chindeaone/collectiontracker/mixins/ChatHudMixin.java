@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(value = ChatComponent.class)
+@Mixin(value = ChatComponent.class, priority = -1)
 public class ChatHudMixin {
     @ModifyVariable(
             method = "addMessage(Lnet/minecraft/network/chat/Component;)V",

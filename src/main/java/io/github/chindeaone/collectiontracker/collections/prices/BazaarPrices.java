@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -15,6 +16,13 @@ public class BazaarPrices {
     public static float enchantedInstantSell = 0.0f;
     public static float superEnchantedInstantBuy = 0.0f;
     public static float superEnchantedInstantSell = 0.0f;
+
+    public static final Map<String, Float> multiNormalInstantBuy = new HashMap<>();
+    public static final Map<String, Float> multiNormalInstantSell = new HashMap<>();
+    public static final Map<String, Float> multiEnchantedInstantBuy = new HashMap<>();
+    public static final Map<String, Float> multiEnchantedInstantSell = new HashMap<>();
+    public static final Map<String, Float> multiSuperEnchantedInstantBuy = new HashMap<>();
+    public static final Map<String, Float> multiSuperEnchantedInstantSell = new HashMap<>();
 
     public static void setPrices(String json, String type) {
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
@@ -51,6 +59,39 @@ public class BazaarPrices {
         }
     }
 
+    public static void setPrices(String collection, String json, String type) {
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+
+        if (type.equals("normal")) {
+            for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                JsonObject prices = entry.getValue().getAsJsonObject();
+                multiNormalInstantBuy.put(collection, prices.get("INSTANT_BUY").getAsFloat());
+                multiNormalInstantSell.put(collection, prices.get("INSTANT_SELL").getAsFloat());
+                break;
+            }
+        } else if (type.equals("enchanted")) {
+            JsonObject instantSell = jsonObject.getAsJsonObject("INSTANT_SELL");
+            JsonObject instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY");
+
+            Iterator<Map.Entry<String, JsonElement>> sellIterator = instantSell.entrySet().iterator();
+            Iterator<Map.Entry<String, JsonElement>> buyIterator = instantBuy.entrySet().iterator();
+
+            if (sellIterator.hasNext()) {
+                multiEnchantedInstantSell.put(collection, sellIterator.next().getValue().getAsFloat());
+            }
+            if (buyIterator.hasNext()) {
+                multiEnchantedInstantBuy.put(collection, buyIterator.next().getValue().getAsFloat());
+            }
+
+            if (sellIterator.hasNext()) {
+                multiSuperEnchantedInstantSell.put(collection, sellIterator.next().getValue().getAsFloat());
+            }
+            if (buyIterator.hasNext()) {
+                multiSuperEnchantedInstantBuy.put(collection, buyIterator.next().getValue().getAsFloat());
+            }
+        }
+    }
+
     public static void resetPrices() {
         normalInstantBuy = 0.0f;
         normalInstantSell = 0.0f;
@@ -58,5 +99,12 @@ public class BazaarPrices {
         enchantedInstantSell = 0.0f;
         superEnchantedInstantBuy = 0.0f;
         superEnchantedInstantSell = 0.0f;
+
+        multiNormalInstantBuy.clear();
+        multiNormalInstantSell.clear();
+        multiEnchantedInstantBuy.clear();
+        multiEnchantedInstantSell.clear();
+        multiSuperEnchantedInstantBuy.clear();
+        multiSuperEnchantedInstantSell.clear();
     }
 }

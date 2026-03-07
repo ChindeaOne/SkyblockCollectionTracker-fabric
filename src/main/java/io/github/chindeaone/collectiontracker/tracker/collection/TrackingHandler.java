@@ -13,9 +13,12 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.Hypixel;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
+import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +33,7 @@ public class TrackingHandler {
     private static final Logger logger = LogManager.getLogger(TrackingHandler.class);
     public static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10 seconds cooldown
 
-    public static boolean isTracking = false;
+    public static volatile boolean isTracking = false;
     public static boolean isPaused = false;
     public static int apiCallCount = 0;
 
@@ -44,7 +47,7 @@ public class TrackingHandler {
 
     public static void startTracking() {
         if (scheduler == null || scheduler.isShutdown()) {
-            scheduler = Executors.newScheduledThreadPool(1);
+            scheduler = Executors.newSingleThreadScheduledExecutor();
         }
 
         initTracking(System.currentTimeMillis());
@@ -101,7 +104,6 @@ public class TrackingHandler {
             logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
         }
     }
-
 
     public static void restartTracking() {
         if (!isTracking) {
@@ -238,9 +240,9 @@ public class TrackingHandler {
         assert collection != null;
         String collectionDisplay = TextUtils.formatCollectionName(collection);
 
-        java.util.List<String> lines = new java.util.ArrayList<>();
-        lines.add(String.format("   §aCollection tracked: §f%s", collectionDisplay));
-        lines.add(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour)));
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.literal(String.format("   §aCollection tracked: §f%s", collectionDisplay)));
+        lines.add(Component.literal(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour))));
 
         boolean useBazaar = ConfigAccess.isUsingBazaar();
         BazaarType bazaarType = ConfigAccess.getBazaarType();
@@ -248,33 +250,33 @@ public class TrackingHandler {
         if (!useBazaar) {
             long npcMoney = moneyMade.get("NPC");
             if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                lines.add(String.format("   §6Motes: §f$%s   §6Rate: §f%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
-            } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)));
+                lines.add(Component.literal(String.format("   §6Motes: §f$%s   §6Rate: §f%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC))));
+            } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC))));
         } else {
             String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
             switch (collectionType) {
                 case "normal" -> {
                     long bazMoney = moneyMade.getOrDefault(collectionType + suffix, 0L);
                     long bazRate = moneyPerHourBazaar.getOrDefault(collectionType + suffix, 0L);
-                    lines.add(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate)));
+                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate))));
                 }
                 case "enchanted" -> {
                     String key = bazaarType.equals(BazaarType.ENCHANTED_VERSION)
                             ? "Enchanted version" : "Super Enchanted version";
                     long money = moneyMade.getOrDefault(key + suffix, 0L);
                     long rate = moneyPerHourBazaar.getOrDefault(key + suffix, 0L);
-                    lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate)));
+                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate))));
                 }
                 case "gemstone" -> {
                     String variant = ConfigAccess.getGemstoneVariant().toString();
                     long gMoney = moneyMade.getOrDefault(variant + suffix, 0L);
                     long gRate = moneyPerHourBazaar.getOrDefault(variant + suffix, 0L);
-                    lines.add(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate)));
+                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate))));
                 }
             }
         }
 
-        lines.add(String.format("   §7Elapsed time: §f%s", getUptimeInWords()));
+        lines.add(Component.literal(String.format("   §7Elapsed time: §f%s", getUptimeInWords())));
 
         // If no collection update, skip best/worst rates
         if (collectionMade == 0) {
@@ -282,29 +284,29 @@ public class TrackingHandler {
             return;
         }
 
-        lines.add("");
-        lines.add("   §eBest/Worst Rates:");
-        lines.add("");
+        lines.add(Component.empty());
+        lines.add(Component.literal("   §eBest/Worst Rates:"));
+        lines.add(Component.empty());
 
         // Collection extremes
         if (highestCollectionPerHour > 0) {
-            lines.add(String.format("   §6Best collection rate: §f%s coll/h", formatNumber(highestCollectionPerHour)));
+            lines.add(Component.literal(String.format("   §6Best collection rate: §f%s coll/h", formatNumber(highestCollectionPerHour))));
         }
         if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Long.MAX_VALUE) {
-            lines.add(String.format("   §6Lowest collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour)));
+            lines.add(Component.literal(String.format("   §6Lowest collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour))));
         }
 
         if (!useBazaar) {
             // NPC money extremes
             if (highestRatePerHourNPC > 0) {
                 if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(String.format("   §6Best motes rate: §f%s/h", formatNumber(highestRatePerHourNPC)));
-                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(String.format("   §6Best NPC money rate: §f$%s/h", formatNumber(highestRatePerHourNPC)));
+                    lines.add(Component.literal(String.format("   §6Best motes rate: §f%s/h", formatNumber(highestRatePerHourNPC))));
+                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal(String.format("   §6Best NPC money rate: §f$%s/h", formatNumber(highestRatePerHourNPC))));
             }
             if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
                 if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(String.format("   §6Lowest motes rate: §f%s/h", formatNumber(lowestRatePerHourNPC)));
-                } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(String.format("   §6Lowest NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC)));
+                    lines.add(Component.literal(String.format("   §6Lowest motes rate: §f%s/h", formatNumber(lowestRatePerHourNPC))));
+                } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal(String.format("   §6Lowest NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC))));
             }
         } else {
             // Bazaar extremes per variant
@@ -315,8 +317,8 @@ public class TrackingHandler {
                         long low = lowestRatesPerHourBazaar.getOrDefault("normal" + suffix, 0L);
                         long high = highestRatesPerHourBazaar.getOrDefault("normal" + suffix, 0L);
 
-                        lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)) );
-                        lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)) );
+                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))));
+                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))));
                     }
                     case "enchanted" -> {
                         String key = bazaarType.equals(BazaarType.ENCHANTED_VERSION)
@@ -324,16 +326,16 @@ public class TrackingHandler {
                         long low = lowestRatesPerHourBazaar.getOrDefault(key + suffix, 0L);
                         long high = highestRatesPerHourBazaar.getOrDefault(key + suffix, 0L);
 
-                        lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)));
-                        lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)));
+                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))));
+                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))));
                     }
                     case "gemstone" -> {
                         String variant = ConfigAccess.getGemstoneVariant().toString();
                         long low = lowestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L);
                         long high = highestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L);
 
-                        lines.add(String.format("   §6Best: §f$%s/h", formatNumber(high)));
-                        lines.add(String.format("   §6Worst: §f$%s/h", formatNumber(low)));
+                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))));
+                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))));
                     }
                 }
             }
@@ -370,7 +372,7 @@ public class TrackingHandler {
     }
 
     public static String getUptime() {
-        if (startTime == 0 || (TrackingHandler.apiCallCount < 2 && !ConfigAccess.isSacksTrackingEnabled())) return "00:00:00";
+        if (startTime == 0) return "00:00:00";
 
         long uptime;
 

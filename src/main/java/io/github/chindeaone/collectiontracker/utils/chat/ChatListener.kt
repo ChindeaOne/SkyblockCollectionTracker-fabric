@@ -3,9 +3,12 @@ package io.github.chindeaone.collectiontracker.utils.chat
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
@@ -27,8 +30,7 @@ object ChatListener {
         SKILL("""\+(?<gains>[\d,.]+)\s+(?<skillName>.+?)\s*\((?<current>[\d,]+)\s*/\s*(?<needed>[\d,]+)\)""", RegexOption.IGNORE_CASE),
         SACKS("""^\[Sacks]\s*\+([0-9,]+)\s+items?\.\s*\(Last\s+([0-9]+)s\.?\)""", RegexOption.IGNORE_CASE),
         // Coleweight pattern
-        NAME("""^(?:\[\d+]\s+)?(?:[^\w\s]\s+)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE),
-        ABILITY("""^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!""", RegexOption.IGNORE_CASE),
+        NAME("""^(?:\[\d+]\s+)?(?:[^a-zA-Z0-9\s§]+\s*)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE),        ABILITY("""^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!""", RegexOption.IGNORE_CASE),
         CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? ?Ability""", RegexOption.IGNORE_CASE),
         SUMMON("""^You summoned your (.+?)!"""),
         CONSUME("""^You consumed an? (.+?) and gained""", RegexOption.IGNORE_CASE),
@@ -36,7 +38,8 @@ object ChatListener {
         // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §aVIEW RULE"
         AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)!""", RegexOption.IGNORE_CASE),
         HOTM_RESET("""^Reset your Heart of the Mountain! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE),
-        HOTF_RESET("""^You have reset your Heart of the Forest! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE);
+        HOTF_RESET("""^You have reset your Heart of the Forest! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE),
+        PRISTINE("""^PRISTINE! You found (?:[^\w\s] )?Flawed (.+?) Gemstone x(\d{1,3})!""", RegexOption.IGNORE_CASE);
         val regex: Regex = Regex(pattern, options.toSet())
 
         fun find(input: CharSequence): MatchResult? = regex.find(input)
@@ -78,6 +81,7 @@ object ChatListener {
         abilitySwapListener(cleanText)
         consumableListener(cleanText)
         treeResetListener(cleanText)
+        pristineTracker(cleanText)
     }
 
     private fun collectionListener(text: String) {
@@ -181,6 +185,16 @@ object ChatListener {
             Patterns.HOTM_RESET.find(text) != null -> FetchSkillTree.resetHotm()
             Patterns.HOTF_RESET.find(text) != null -> FetchSkillTree.resetHotf()
         }
+    }
+
+    private fun pristineTracker(text: String) {
+        if (!MultiTrackingHandler.isMultiTracking || MultiTrackingHandler.isMultiPaused || !CollectionTracker.collectionList.contains("gemstone")) return // Only track gemstones
+
+        val match = Patterns.PRISTINE.find(text) ?: return
+        val gemstone = match.groupValues[1].trim()
+        val amount = match.groupValues[2].toIntOrNull() ?: return
+
+        MultiTrackingRates.calculateMultiRates(gemstone = gemstone.lowercase(), amount = amount * 80)
     }
 
     // Listen to Autopet swap messages
