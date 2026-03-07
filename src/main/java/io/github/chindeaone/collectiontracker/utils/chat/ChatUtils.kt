@@ -106,7 +106,7 @@ object ChatUtils {
 
     fun sendSummary(
         title: String,
-        lines: List<String>
+        lines: List<Component>
     ) {
         val divider = fillChat()
         val displayTitle = title.asComponent().centerText()
@@ -116,7 +116,7 @@ object ChatUtils {
         sendComponent(displayTitle, prefix = false)
         sendEmptyMessage()
 
-        for (line in lines) sendComponent(line.asComponent(), prefix = false)
+        for (line in lines) sendComponent(line, prefix = false)
 
         sendEmptyMessage()
         sendComponent(divider, prefix = false)
