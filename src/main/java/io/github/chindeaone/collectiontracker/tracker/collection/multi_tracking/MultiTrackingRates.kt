@@ -164,55 +164,44 @@ object MultiTrackingRates {
         val currentMade = collectionMade.getOrDefault(gemstoneType, 0L) + amountAdded
         collectionMade[gemstoneType] = currentMade
 
-        val totalGemstoneMade = collectionMade.getOrDefault("gemstone", 0L) + amountAdded
-        collectionMade["gemstone"] = totalGemstoneMade
+        collectionMade["gemstone"] = (collectionMade["gemstone"] ?: 0L) + amountAdded
+        collectionAmounts["gemstone"] = (collectionAmounts["gemstone"] ?: 0L) + amountAdded
+        collectionPerHour["gemstone"] = if (uptime > 0) (collectionMade["gemstone"]!! / (uptime / 3600.0)).toLong() else 0L
 
-        val totalGemstoneAmount = collectionAmounts.getOrDefault("gemstone", 0L) + amountAdded
-        collectionAmounts["gemstone"] = totalGemstoneAmount
+        for (seenType in seenGemstones) {
+            val seenMade = collectionMade.getOrDefault(seenType, 0L)
+            collectionPerHour[seenType] = if (uptime > 0) (seenMade / (uptime / 3600.0)).toLong() else 0L
 
-        collectionPerHour[gemstoneType] = if (uptime > 0) (currentMade / (uptime / 3600.0)).toLong() else 0L
+            val gemstoneKey = seenType.lowercase()
+            val gemstoneRecipes = GemstonePrices.multiGemstoneRecipes[gemstoneKey] ?: emptyMap()
 
-        collectionPerHour["gemstone"] = if (uptime > 0) (totalGemstoneMade / (uptime / 3600.0)).toLong() else 0L
-
-        // NPC Prices
-        val gemstoneRecipes = GemstonePrices.multiGemstoneRecipes[gemstoneType.lowercase()] ?: emptyMap() // Get all gemstones with types and variants
-        if (gemstoneRecipes.isNotEmpty()) {
+            // NPC Prices
             for (variant in gemstoneRecipes.keys) {
-                // Variant is "ROUGH", "FINE", etc.
-                val basePriceNPC = NpcPrices.getNpcPrice(gemstoneType)
-                // Create prefix (e.g "AMETHYST_ROUGH")
-                val keyPrefix = (gemstoneType + "_" + variant).uppercase()
+                val basePriceNPC = NpcPrices.getNpcPrice(seenType)
+                val keyPrefix = (seenType + "_" + variant).uppercase()
 
                 if (basePriceNPC != -1) {
-                    val rate = if (uptime > 0) (basePriceNPC * currentMade / (uptime / 3600.0)).toLong() else 0L
-                    val made = (basePriceNPC * currentMade)
-                    moneyPerHourNPC[keyPrefix] = rate
-                    moneyMadeNPC[keyPrefix] = made
+                    moneyPerHourNPC[keyPrefix] = if (uptime > 0) (basePriceNPC * seenMade / (uptime / 3600.0)).toLong() else 0L
+                    moneyMadeNPC[keyPrefix] = (basePriceNPC * seenMade)
                 }
             }
-        }
 
-        // Bazaar Prices
-        if (BazaarCollectionsManager.hasBazaarData) {
-            val gemstoneBuyPrices = GemstonePrices.multiGemstoneInstantBuyPrices[gemstoneType.lowercase()] ?: emptyMap()
-            val gemstoneSellPrices = GemstonePrices.multiGemstoneInstantSellPrices[gemstoneType.lowercase()] ?: emptyMap()
+            // Bazaar Prices
+            if (BazaarCollectionsManager.hasBazaarData) {
+                val gemstoneBuyPrices = GemstonePrices.multiGemstoneInstantBuyPrices[gemstoneKey] ?: emptyMap()
+                val gemstoneSellPrices = GemstonePrices.multiGemstoneInstantSellPrices[gemstoneKey] ?: emptyMap()
 
-            for (tier in gemstoneRecipes.keys) {
-                val buyPrice = gemstoneBuyPrices[tier] ?: 0f
-                val sellPrice = gemstoneSellPrices[tier] ?: 0f
-                val recipe = gemstoneRecipes[tier]?.toDouble() ?: 1.0
+                for (tier in gemstoneRecipes.keys) {
+                    val buyPrice = gemstoneBuyPrices[tier] ?: 0f
+                    val sellPrice = gemstoneSellPrices[tier] ?: 0f
+                    val recipe = gemstoneRecipes[tier]?.toDouble() ?: 1.0
+                    val keyPrefix = (seenType + "_" + tier).uppercase()
 
-                val keyPrefix = (gemstoneType + "_" + tier).uppercase()
-
-                val buyRate = if (uptime > 0) (buyPrice * (currentMade / recipe) / (uptime / 3600.0)).toLong() else 0L
-                val sellRate = if (uptime > 0) (sellPrice * (currentMade / recipe) / (uptime / 3600.0)).toLong() else 0L
-                val buyMade = (buyPrice * (currentMade / recipe)).toLong()
-                val sellMade = (sellPrice * (currentMade / recipe)).toLong()
-
-                moneyPerHourBazaar["${keyPrefix}_INSTANT_BUY"] = buyRate
-                moneyPerHourBazaar["${keyPrefix}_INSTANT_SELL"] = sellRate
-                moneyMadeBazaar["${keyPrefix}_INSTANT_BUY"] = buyMade
-                moneyMadeBazaar["${keyPrefix}_INSTANT_SELL"] = sellMade
+                    moneyPerHourBazaar["${keyPrefix}_INSTANT_BUY"] = if (uptime > 0) (buyPrice * (seenMade / recipe) / (uptime / 3600.0)).toLong() else 0L
+                    moneyPerHourBazaar["${keyPrefix}_INSTANT_SELL"] = if (uptime > 0) (sellPrice * (seenMade / recipe) / (uptime / 3600.0)).toLong() else 0L
+                    moneyMadeBazaar["${keyPrefix}_INSTANT_BUY"] = (buyPrice * (seenMade / recipe)).toLong()
+                    moneyMadeBazaar["${keyPrefix}_INSTANT_SELL"] = (sellPrice * (seenMade / recipe)).toLong()
+                }
             }
         }
     }
