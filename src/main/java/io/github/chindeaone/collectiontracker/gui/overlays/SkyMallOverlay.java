@@ -79,6 +79,6 @@ public class SkyMallOverlay implements AbstractOverlay {
 
         skyMallOverlayLines.add("§bSky Mall: " + ChatListener.getCurrentSkyMallBuff());
         skyMallOverlayLines.add(TextUtils.updateTimer());
-        return  skyMallOverlayLines;
+        return skyMallOverlayLines;
     }
 }

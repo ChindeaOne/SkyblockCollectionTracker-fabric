@@ -16,10 +16,10 @@ public class TimerOverlay implements AbstractOverlay{
 
     private final Position position = ConfigAccess.getColeweightTimerPosition();
     private final List<String> timerLines = new ArrayList<>();
-    private static long coleweightTimerEnd = 0;
-    private static long remainingTime = 0;
-    private static boolean isPaused = false;
-    private static boolean hasEnded = false;
+    private long coleweightTimerEnd = 0;
+    private long remainingTime = 0;
+    private boolean isPaused = false;
+    private boolean hasEnded = true;
     private boolean renderingAllowed = true;
 
     @Override
@@ -34,7 +34,7 @@ public class TimerOverlay implements AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return coleweightTimerEnd > 0 && HypixelUtils.isOnSkyblock();
+        return !hasEnded && HypixelUtils.isOnSkyblock();
     }
 
     @Override
@@ -72,13 +72,20 @@ public class TimerOverlay implements AbstractOverlay{
         position.setDimensions(maxW, h);
     }
 
-    public static void setTimer(int duration) {
+    public void setTimer(int duration) {
+        if (duration == 0) {
+            ChatUtils.INSTANCE.sendMessage("§cTimer cancelled!", true);
+            hasEnded = true;
+            isPaused = false;
+            return;
+        }
+        ChatUtils.INSTANCE.sendMessage("§aTimer set for " + duration + " seconds!", true);
         coleweightTimerEnd = System.currentTimeMillis() + duration * 1000L;
         isPaused = false;
         hasEnded = false;
     }
 
-    public static void pauseTimer() {
+    public void pauseTimer() {
         if (hasEnded) {
             ChatUtils.INSTANCE.sendMessage("§cTimer has already ended!", true);
             return;
@@ -97,6 +104,7 @@ public class TimerOverlay implements AbstractOverlay{
     private List<String> getTimerLines() {
         timerLines.clear();
         if (hasEnded) return timerLines;
+
         long now = System.currentTimeMillis();
         long remaining = isPaused? remainingTime : coleweightTimerEnd - now;
 
@@ -108,18 +116,16 @@ public class TimerOverlay implements AbstractOverlay{
 
             String timeFormat;
             if (hours > 0) {
-               timeFormat = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+                timeFormat = String.format("%d:%02d:%02d", hours, minutes, seconds);
             } else if (minutes > 0) {
-                timeFormat = String.format("%02d:%02d", minutes, seconds);
+                timeFormat = String.format("%d:%02d", minutes, seconds);
             } else {
-                timeFormat = String.format("%02ds", seconds);
+                timeFormat = String.format("%ds", seconds);
             }
             timerLines.add("§bTimer: §e" + timeFormat + pauseTarget);
         } else {
-            if (!hasEnded) {
-                ChatUtils.INSTANCE.sendMessage("§cTimer finished!", true);
-                hasEnded = true;
-            }
+            ChatUtils.INSTANCE.sendMessage("§cTimer finished!", true);
+            hasEnded = true;
         }
 
         return timerLines;

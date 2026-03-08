@@ -69,4 +69,13 @@ public class OverlayManager {
     public static boolean isCollectionOverlay(AbstractOverlay overlay) {
         return overlay.overlayLabel().equals("Collection Tracker") || overlay.overlayLabel().equals("Multi-Collection Tracker");
     }
+
+    public static TimerOverlay getTimerOverlay() {
+        for (AbstractOverlay overlay : overlays.values()) {
+            if (overlay instanceof TimerOverlay) {
+                return (TimerOverlay) overlay;
+            }
+        }
+        return null;
+    }
 }
