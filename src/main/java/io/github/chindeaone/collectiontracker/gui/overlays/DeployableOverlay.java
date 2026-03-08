@@ -25,7 +25,7 @@ public class DeployableOverlay implements AbstractOverlay {
 
     @Override
     public Position position() {
-        return this.position;
+        return position;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class DeployableOverlay implements AbstractOverlay {
 
     @Override
     public void setRenderingAllowed(boolean allowed) {
-        this.renderingAllowed = allowed;
+        renderingAllowed = allowed;
     }
 
     @Override

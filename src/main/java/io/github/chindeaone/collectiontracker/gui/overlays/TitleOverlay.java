@@ -31,7 +31,7 @@ public class TitleOverlay implements AbstractOverlay{
 
     @Override
     public void setRenderingAllowed(boolean allowed) {
-        this.renderingAllowed = allowed;
+        renderingAllowed = allowed;
     }
 
     @Override
