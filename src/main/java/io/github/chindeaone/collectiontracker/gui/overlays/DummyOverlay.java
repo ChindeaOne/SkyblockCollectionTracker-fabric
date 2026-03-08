@@ -45,7 +45,7 @@ public class DummyOverlay extends Screen {
         AbstractOverlay hovered = null;
         // Draw all dummies
         for (AbstractOverlay overlay : OverlayManager.all()) {
-            if (!overlay.isEnabled() || overlay.overlayLabel().equals("Global Title")) continue;
+            if (!overlay.isEnabled() || "Global Title".equals(overlay.overlayLabel())) continue;
             overlay.updateDimensions();
 
             RenderUtils.drawDummyFrame(context, overlay.position(), overlay.overlayLabel());
@@ -72,8 +72,9 @@ public class DummyOverlay extends Screen {
         int my = (int) mouseY;
 
         for (AbstractOverlay overlay : OverlayManager.all()) {
-            Position pos = overlay.position();
+            if (!overlay.isEnabled() || "Global Title".equals(overlay.overlayLabel())) continue;
 
+            Position pos = overlay.position();
             if (isMouseOver(mx, my, pos)) {
                 float scaleChange = 0.05f;
                 float next = pos.getScale() + (verticalAmount > 0 ? scaleChange : -scaleChange);
@@ -92,6 +93,8 @@ public class DummyOverlay extends Screen {
 
         if (event.button() == 0) {
             for (AbstractOverlay overlay : OverlayManager.all()) {
+                if (!overlay.isEnabled() || "Global Title".equals(overlay.overlayLabel())) continue;
+
                 if (isMouseOver(mx, my, overlay.position())) {
                     dragging = overlay;
                     dragOffsetX = mx - overlay.position().getX();
@@ -101,6 +104,8 @@ public class DummyOverlay extends Screen {
             }
         } else if (event.button() == 1) {
             for (AbstractOverlay overlay : OverlayManager.all()) {
+                if (!overlay.isEnabled() || "Global Title".equals(overlay.overlayLabel())) continue;
+
                 if (isMouseOver(mx, my, overlay.position())) {
                     overlay.position().setScaling(1.0f);
                     return true;
