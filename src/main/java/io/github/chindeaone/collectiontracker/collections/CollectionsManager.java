@@ -4,7 +4,7 @@ import java.util.*;
 
 public class CollectionsManager {
 
-    public static Map<String, Set<String>> collections = new HashMap<>();
+    public static Map<String, Set<String>> collections = new LinkedHashMap<>();
     public static String collectionSource;
     public static String collectionType;
 

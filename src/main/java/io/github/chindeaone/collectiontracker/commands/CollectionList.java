@@ -13,7 +13,7 @@ public class CollectionList {
     private record Page(String category, String color, List<String> collections) {}
 
     public static void sendCollectionList(int page) {
-        Map<String, String> categoryColors = new HashMap<>();
+        Map<String, String> categoryColors = new LinkedHashMap<>();
         categoryColors.put("Farming", "§a"); // Green
         categoryColors.put("Mining", "§6"); // Gold
         categoryColors.put("Combat", "§c"); // Red

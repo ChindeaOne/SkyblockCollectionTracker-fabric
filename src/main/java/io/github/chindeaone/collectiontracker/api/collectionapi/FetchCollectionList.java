@@ -14,7 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,7 +51,7 @@ public class FetchCollectionList {
                         String category = entry.getKey();
                         JsonArray itemsArray = entry.getValue().getAsJsonArray();
 
-                        Set<String> items = new HashSet<>();
+                        Set<String> items = new LinkedHashSet<>();
                         for (JsonElement el : itemsArray) {
                             items.add(el.getAsString());
                         }
