@@ -84,24 +84,60 @@ object ChatUtils {
         *///? }
     }
 
-    fun sendCommands(
-        title: String,
-        commands: List<MutableComponent>
+    fun sendCommandPage(
+        category: String,
+        color: String,
+        commands: List<MutableComponent>,
+        page: Int,
+        totalPages: Int
     ) {
         val divider = fillChat()
-        val displayTitle = title.asComponent().centerText()
+        val title: Component = buildCommandTitleBar(page, totalPages).centerText()
 
         sendEmptyMessage()
         sendComponent(divider, prefix = false)
-        sendComponent(displayTitle, prefix = false)
+        sendComponent(title, prefix = false)
         sendComponent(divider, prefix = false)
-        sendEmptyMessage()
+
+        val categoryTitle: Component = Component.literal("$color§l$category").centerText()
+        sendComponent(categoryTitle, prefix = false)
 
         for (command in commands) sendComponent(command, prefix = false)
 
         sendEmptyMessage()
         sendComponent(divider, prefix = false)
         sendEmptyMessage()
+    }
+
+    private fun buildCommandTitleBar(page: Int, totalPages: Int): Component {
+        val title: MutableComponent = Component.literal("")
+
+        if (page > 1) {
+            title.append(
+                Component.literal("§6<< ")
+                    .withStyle {
+                        it.withClickEvent(ClickEvent.RunCommand("/sct commands ${page - 1}"))
+                            .withHoverEvent(HoverEvent.ShowText(Component.literal("§7Previous page")))
+                    }
+            )
+        } else {
+            title.append(Component.literal("§7<< "))
+        }
+
+        title.append(Component.literal("§6§lSkyblockCollectionTracker §7- §eCommands §7($page/$totalPages)"))
+
+        if (page < totalPages) {
+            title.append(
+                Component.literal(" §6>>")
+                    .withStyle {
+                        it.withClickEvent(ClickEvent.RunCommand("/sct commands ${page + 1}"))
+                            .withHoverEvent(HoverEvent.ShowText(Component.literal("§7Next page")))
+                    }
+            )
+        } else {
+            title.append(Component.literal(" §7>>"))
+        }
+        return title
     }
 
     fun sendSummary(

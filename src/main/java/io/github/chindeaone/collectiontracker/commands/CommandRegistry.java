@@ -9,6 +9,7 @@ import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.gui.overlays.TimerOverlay;
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
@@ -48,14 +49,22 @@ public class CommandRegistry {
                 )
                 // sct commands -> shows the list of commands
                 .then(ClientCommandManager.literal("commands")
+                        // sct commands -> shows first page of commands
                         .executes(context -> {
-                            CommandHelper.showCommands();
+                            CommandHelper.showCommands(1);
                             return 1;
                         })
+                        // sct commands <page>
+                        .then(ClientCommandManager.argument("page", IntegerArgumentType.integer(1))
+                                .executes(context -> {
+                                    int page = IntegerArgumentType.getInteger(context, "page");
+                                    CommandHelper.showCommands(page);
+                                    return 1;
+                                })
+                        )
                 )
                 // sct collections -> shows the list of collections
                 .then(ClientCommandManager.literal("collections")
-
                         // sct collections -> opens first category (page 1)
                         .executes(context -> {
                             CollectionList.sendCollectionList(1);
@@ -227,6 +236,35 @@ public class CommandRegistry {
                                         })
                                 )
                         )
+                        .then(ClientCommandManager.literal("track")
+                                .executes(context -> {
+                                    ColeweightTrackingHandler.startTracking();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("stop")
+                                .executes(context -> {
+                                    ColeweightTrackingHandler.stopTrackingManual();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("pause")
+                                .executes(context -> {
+                                    ColeweightTrackingHandler.pauseTracking();
+                                    return 1;
+                                })
+                        ).then(ClientCommandManager.literal("resume")
+                                .executes(context -> {
+                                    ColeweightTrackingHandler.resumeTracking();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("restart")
+                                .executes(context -> {
+                                    ColeweightTrackingHandler.restartTracking();
+                                    return 1;
+                                })
+                        )
                 )
                 .then(ClientCommandManager.literal("changelog")
                         .executes(context -> {
@@ -250,7 +288,7 @@ public class CommandRegistry {
                                     while (!remaining.isEmpty()) {
                                         boolean found = false;
                                         List<String> sortedCollections = collections.stream()
-                                                .sorted((a, b) -> Integer.compare(b.length(), a.length())) // sort by length to match longest first
+                                                .sorted((a, b) -> Integer.compare(b.length(), a.length()))
                                                 .toList();
 
                                         for (String coll : sortedCollections) {
