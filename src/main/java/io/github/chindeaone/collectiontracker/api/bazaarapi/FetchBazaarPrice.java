@@ -10,7 +10,7 @@ import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.URI;
@@ -140,7 +140,7 @@ public class FetchBazaarPrice {
         }
     }
 
-    private static @NonNull List<String> addGemstones(List<String> collections) {
+    private static @NotNull List<String> addGemstones(List<String> collections) {
         List<String> newCollections = new ArrayList<>(collections);
         if (newCollections.contains("gemstone")) {
             newCollections.remove("gemstone");
