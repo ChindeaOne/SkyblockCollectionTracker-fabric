@@ -43,8 +43,7 @@ object MultiDataFetcher {
                 MultiTrackingHandler.stopMultiTracking()
                 return
             }
-            if (!isMultiTracking) return
-            if (isMultiPaused) return
+            if (!isMultiTracking || isMultiPaused) return
 
             val data = getData()
             if (data.isEmpty()) {

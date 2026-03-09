@@ -144,10 +144,8 @@ object MultiTrackingHandler  {
             scheduler.shutdownNow()
             Thread.currentThread().interrupt()
         }
-        // Clear cached data
         clearCache()
 
-        // Reset uptime
         val now = System.currentTimeMillis()
         if (!restart) {
             multiLastTrackTime = now

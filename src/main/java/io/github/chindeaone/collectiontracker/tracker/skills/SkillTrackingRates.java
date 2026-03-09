@@ -78,7 +78,6 @@ public class SkillTrackingRates {
             }
         }
 
-        System.out.println(unchangedStreak);
         long uptime = getUptimeInSeconds();
         tamingPerHour = uptime > 0 ? (long) Math.floor(tamingXpGained / (uptime / 3600.0)) : 0;
     }

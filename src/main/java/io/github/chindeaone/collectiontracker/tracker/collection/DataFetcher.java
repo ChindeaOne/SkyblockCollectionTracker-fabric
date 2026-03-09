@@ -46,9 +46,7 @@ public class DataFetcher {
                 TrackingHandler.stopTracking();
                 return;
             }
-
-            if (!isTracking) return;
-            if (isPaused) return;
+            if (!isTracking || isPaused) return;
 
             String playerUUID = PlayerData.INSTANCE.getPlayerUUID();
             String jsonData = getData(playerUUID, collection);

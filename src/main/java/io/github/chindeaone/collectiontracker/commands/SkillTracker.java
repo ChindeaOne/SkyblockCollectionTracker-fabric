@@ -38,7 +38,7 @@ public class SkillTracker {
                     return;
                 }
 
-                // Fetch skill data asynchronously and start tracking once done
+                // Fetch skill data asynchronously
                 CompletableFuture.runAsync(SkillApiFetcher::fetchSkillsData)
                         .thenRun(SkillTrackingHandler::startTracking);
             } catch (Exception e) {
