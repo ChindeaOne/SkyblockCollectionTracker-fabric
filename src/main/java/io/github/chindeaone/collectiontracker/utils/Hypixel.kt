@@ -17,6 +17,7 @@ import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.About
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
@@ -47,6 +48,7 @@ object Hypixel {
         TrackingHandler.stopTracking()
         MultiTrackingHandler.stopMultiTracking()
         SkillTrackingHandler.stopTracking()
+        ColeweightTrackingHandler.stopTracking()
     }
 
     private fun checkServer() {

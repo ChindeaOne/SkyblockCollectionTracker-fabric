@@ -15,6 +15,7 @@ object ColorUtils {
     const val YELLOW: Int = 0xFFFFFF55.toInt()
     const val AQUA: Int = 0xFF55FFFF.toInt()
     const val GRAY: Int = 0xFFAAAAAA.toInt()
+    const val SILVER_BLUE: Int = 0xFF7FB4DB.toInt()
 
     val skillColors: MutableMap<String, Int> = HashMap()
     val collectionColors: MutableMap<String, Int> = HashMap()
@@ -97,13 +98,13 @@ object ColorUtils {
         }
         return when (rank) {
             1 -> Color.BLACK
-            2 -> Color(170, 0, 0)       // Dark Red
-            3 -> Color(0, 170, 0)       // Dark Green
-            in 4..25 -> Color(255, 170, 0)   // Gold
-            in 26..100 -> Color(0, 170, 170)  // Dark Aqua
-            in 101..250 -> Color(85, 255, 255) // Aqua
-            in 251..500 -> Color(85, 85, 255)  // Blue
-            in 501..1000 -> Color(170, 170, 170)// Gray
+            2 -> Color(170, 0, 0)
+            3 -> Color(0, 170, 0)
+            in 4..25 -> Color(255, 170, 0)
+            in 26..100 -> Color(0, 170, 170)
+            in 101..250 -> Color(85, 255, 255)
+            in 251..500 -> Color(85, 85, 255)
+            in 501..1000 -> Color(170, 170, 170)
             else -> Color.WHITE
         }
     }

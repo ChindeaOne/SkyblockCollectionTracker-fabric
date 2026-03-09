@@ -51,6 +51,7 @@ val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tem
 val titlePosition: Position get() = modConfig.misc.titlePosition
 val multiOverlayPosition: Position get() = modConfig.trackingOverlay.multiCollectionOverlay.multiOverlayPosition
 val coleweightTimerPosition: Position get() = modConfig.mining.coleweight.coleweightTimerPosition
+val coleweightTrackerPosition: Position get() = modConfig.mining.coleweight.coleweightTrackerPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -210,6 +211,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getColeweightTimerPosition(): Position = coleweightTimerPosition
+
+    @JvmStatic
+    fun getColeweightTrackerPosition(): Position = coleweightTrackerPosition
 
     @JvmStatic
     fun getUpdateType(): About.UpdateType = updateType

@@ -51,4 +51,8 @@ public class Coleweight {
     @Expose
     @ConfigLink(owner = Coleweight.class, field = "Coleweight Timer")
     public Position coleweightTimerPosition = new Position(300, 200);
+
+    @Expose
+    @ConfigLink(owner = Coleweight.class, field = "Coleweight Tracker")
+    public Position coleweightTrackerPosition = new Position(400, 200);
 }
