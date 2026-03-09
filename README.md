@@ -14,6 +14,7 @@
 3. Make sure you have the [Fabric API](https://modrinth.com/mod/fabric-api/versions) and [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) in your Minecraft mods folder.
 4. Run Minecraft with the [Fabric installer](https://fabricmc.net/use/installer/) selected.
 5. Check all available commands via `/sct commands`.
+6. Configure any features in the gui via `/sct`.
 
 ---
 
@@ -23,6 +24,7 @@
 <summary><strong>Collection/Profit Tracker</strong></summary>
 
 - Tracks collections and profit over time using Hypixel’s API via `/sct track <collection>`.
+- Supports multi-tracking via `/sct track-multi <collection1> <collection2> ...`.
 - Configurable overlay lines showing collection progress and profit rates.
 - Provides NPC/Bazaar prices for accurate profit tracking.
 - Optional Sack Tracking mode for faster live updates.
@@ -45,25 +47,19 @@
 
 - Ported commands like `/sct cw find` or `/sct cw lb`, as well as `/sct cw detailed` for more info.
 - Ported Coleweight chat ranks and the option to display them on Mining Islands only.
-- Ported Dwarven Heatmap.
+- Ported Dwarven Heatmap, with adjustable opacity.
+- Ported Precision Mining highlight.
+- Ported `/sct timer <set|pause|resume|stop>` command.
+- Tracking Coleweight via `/sct cw track` command.
 
 </details>
 
 <details>
-<summary><strong>Mining Stats Overlay</strong></summary>
+<summary><strong>Mining/Foraging Stats Overlay</strong></summary>
 
-- Shows all mining‑related stats from tab.
+- Shows all mining/foraging‑related stats from tab.
 - Updates dynamically based on the targeted block.
-- Compacts Mining Fortune into a single context‑aware stat.
-
-</details>
-
-<details>
-<summary><strong>Foraging Stats Overlay</strong></summary>
-
-- Displays all foraging‑related stats from tab.
-- Updates dynamically based on the targeted tree.
-- Compacts Foraging Fortune into a single context‑aware stat.
+- Compacts Fortune into a single context‑aware stat.
 
 </details>
 
