@@ -24,6 +24,7 @@ import static io.github.chindeaone.collectiontracker.collections.CollectionsMana
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
 import static io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay.TrackingOptions.COLLECTION;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
+import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatFloat;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
 
 public class TextUtils {
@@ -597,6 +598,10 @@ public class TextUtils {
 
     public static String formatNumberOrPlaceholder(long value) {
         return value > 0 ? formatNumber(value) : "Calculating...";
+    }
+
+    public static String formatFloatOrPlaceholder(float value) {
+        return value > 0 ? formatFloat(value) : "Calculating...";
     }
 
     public static String formatTime(double time) {

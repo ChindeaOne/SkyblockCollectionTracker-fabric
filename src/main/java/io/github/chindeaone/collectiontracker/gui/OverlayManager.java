@@ -49,6 +49,13 @@ public class OverlayManager {
         }
     }
 
+    public static void setColeweightOverlayRendering(boolean allowed) {
+        AbstractOverlay overlay = overlays.get("Coleweight Tracker");
+        if (overlay != null) {
+            overlay.setRenderingAllowed(allowed);
+        }
+    }
+
     public static void overlayRegistration() {
         OverlayManager.add(new CollectionOverlay());
         OverlayManager.add(new MultiCollectionOverlay());
@@ -64,6 +71,7 @@ public class OverlayManager {
         OverlayManager.add(new TemporaryBuffsOverlay());
         OverlayManager.add(new TitleOverlay());
         OverlayManager.add(new TimerOverlay());
+        OverlayManager.add(new ColeweightOverlay());
     }
 
     public static boolean isCollectionOverlay(AbstractOverlay overlay) {

@@ -135,6 +135,17 @@ object RenderUtils {
     }
 
     @JvmStatic
+    fun renderColeweightStrings(context: GuiGraphics, lines: List<String>) {
+        var y = 0
+        val color = ColorUtils.SILVER_BLUE
+
+        for (line in lines) {
+            drawHelper(line, context, y, color)
+            y += fr.lineHeight
+        }
+    }
+
+    @JvmStatic
     fun renderStrings(context: GuiGraphics, lines: List<String>) {
         var y = 0
 
