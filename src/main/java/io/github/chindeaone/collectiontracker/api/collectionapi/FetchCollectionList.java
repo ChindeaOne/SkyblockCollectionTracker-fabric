@@ -42,7 +42,8 @@ public class FetchCollectionList {
                     HttpResponse.BodyHandlers.ofInputStream()
             );
 
-            if (response.statusCode() == 200) {
+            int status = response.statusCode();
+            if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
                     JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
 
@@ -60,7 +61,7 @@ public class FetchCollectionList {
                 hasCollectionList = true;
                 logger.info("[SCT]: Successfully received the collection list.");
             } else {
-                logger.error("[SCT]: Failed to fetch collection list. HTTP {}", response.statusCode());
+                logger.error("[SCT]: Failed to fetch collection list. HTTP {}", status);
             }
 
         } catch (IOException | InterruptedException e) {

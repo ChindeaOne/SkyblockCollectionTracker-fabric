@@ -58,6 +58,26 @@ public class FetchSkillTree {
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
             int status = response.statusCode();
+
+            if (status == 401) {
+                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
+                TokenManager.fetchAndStoreToken();
+
+                request = HttpRequest.newBuilder(uri)
+                        .timeout(Duration.ofSeconds(5))
+                        .header("Authorization", "Bearer " + TokenManager.getToken())
+                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                        .header("X-MINING", String.valueOf(mining))
+                        .header("X-FORAGING", String.valueOf(foraging))
+                        .header("User-Agent", URLManager.AGENT)
+                        .header("Accept", "application/json")
+                        .GET()
+                        .build();
+
+                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
+                status = response.statusCode();
+            }
+
             if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
                     JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();

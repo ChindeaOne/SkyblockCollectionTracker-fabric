@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.NonNull;
 
 import java.io.*;
 import java.net.URI;
@@ -45,25 +46,6 @@ public class FetchBazaarPrice {
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
             int status = response.statusCode();
-
-            if (status == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
-                TokenManager.fetchAndStoreToken();
-                token = TokenManager.getToken(); // get the new token
-
-                request = HttpRequest.newBuilder(uri)
-                        .timeout(Duration.ofSeconds(5))
-                        .header("X-UUID", uuid)
-                        .header("Authorization", "Bearer " + token)
-                        .header("X-COLLECTION", collection)
-                        .header("User-Agent", URLManager.AGENT)
-                        .header("Accept", "application/json")
-                        .GET()
-                        .build();
-                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-                status = response.statusCode();
-            }
-
             if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
                     JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
@@ -94,22 +76,7 @@ public class FetchBazaarPrice {
             URI uri = URI.create(URLManager.BAZAAR_URL);
 
             // For `gemstone` collection only, add all gemstones so it fetches prices for every type
-            List<String> newCollections = new ArrayList<>(collections);
-            if (newCollections.contains("gemstone")) {
-                newCollections.remove("gemstone");
-                newCollections.add("ruby");
-                newCollections.add("sapphire");
-                newCollections.add("topaz");
-                newCollections.add("amethyst");
-                newCollections.add("jade");
-                newCollections.add("jasper");
-                newCollections.add("amber");
-                newCollections.add("opal");
-                newCollections.add("aquamarine");
-                newCollections.add("peridot");
-                newCollections.add("citrine");
-                newCollections.add("onyx");
-            }
+            List<String> newCollections = addGemstones(collections);
 
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(5))
@@ -129,7 +96,7 @@ public class FetchBazaarPrice {
             if (status == 401) {
                 logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
                 TokenManager.fetchAndStoreToken();
-                token = TokenManager.getToken(); // get the new token
+                token = TokenManager.getToken();
 
                 request = HttpRequest.newBuilder(uri)
                         .timeout(Duration.ofSeconds(5))
@@ -171,5 +138,25 @@ public class FetchBazaarPrice {
         } catch (Exception e) {
             logger.error("[SCT]: Error fetching bazaar price for collections '{}': {}", collections, e.getMessage());
         }
+    }
+
+    private static @NonNull List<String> addGemstones(List<String> collections) {
+        List<String> newCollections = new ArrayList<>(collections);
+        if (newCollections.contains("gemstone")) {
+            newCollections.remove("gemstone");
+            newCollections.add("ruby");
+            newCollections.add("sapphire");
+            newCollections.add("topaz");
+            newCollections.add("amethyst");
+            newCollections.add("jade");
+            newCollections.add("jasper");
+            newCollections.add("amber");
+            newCollections.add("opal");
+            newCollections.add("aquamarine");
+            newCollections.add("peridot");
+            newCollections.add("citrine");
+            newCollections.add("onyx");
+        }
+        return newCollections;
     }
 }

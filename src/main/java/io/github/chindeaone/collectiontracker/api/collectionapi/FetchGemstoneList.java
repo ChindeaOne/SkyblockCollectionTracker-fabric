@@ -40,7 +40,8 @@ public class FetchGemstoneList {
                     HttpResponse.BodyHandlers.ofInputStream()
             );
 
-            if (response.statusCode() == 200) {
+            int status = response.statusCode();
+            if (status == 200) {
                 try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
                     JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
 
@@ -50,7 +51,7 @@ public class FetchGemstoneList {
 
                 logger.info("[SCT]: Successfully received the gemstone list.");
             } else {
-                logger.error("[SCT]: Failed to fetch gemstone list. HTTP {}", response.statusCode());
+                logger.error("[SCT]: Failed to fetch gemstone list. HTTP {}", status);
             }
 
         } catch (IOException | InterruptedException e) {

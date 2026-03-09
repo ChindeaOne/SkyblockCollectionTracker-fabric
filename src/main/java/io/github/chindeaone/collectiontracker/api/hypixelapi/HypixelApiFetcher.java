@@ -35,7 +35,7 @@ public class HypixelApiFetcher {
             if (status == 401) {
                 logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
                 TokenManager.fetchAndStoreToken();
-                token = TokenManager.getToken(); // get the new token
+                token = TokenManager.getToken();
 
                 request = buildCollectionRequest(uuid, token, collection, collectionSource);
                 HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
