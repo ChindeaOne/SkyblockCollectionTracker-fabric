@@ -7,6 +7,7 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,7 +44,14 @@ public class HypixelApiFetcher {
             }
 
             if (status == 200) {
-                return response.body();
+                String body = response.body();
+                if (body == null || body.trim().isEmpty() || body.equals("{}")) {
+                    ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Please enable it in the settings.", true);
+                    logger.warn("[SCT]: Collection API disabled for player.");
+                    TrackingHandler.stopTracking();
+                    return null;
+                }
+                return body;
             } else {
                 logger.error("[SCT]: Failed to fetch data. Server responded with code: {}", status);
                 TrackingHandler.stopTracking();
@@ -76,7 +84,14 @@ public class HypixelApiFetcher {
             }
 
             if (status == 200) {
-                return response.body();
+                String body = response.body();
+                if (body == null || body.trim().isEmpty() || body.equals("{}")) {
+                    ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Please enable it in the settings.", true);
+                    logger.warn("[SCT]: Collection API disabled for player.");
+                    MultiTrackingHandler.stopMultiTracking();
+                    return null;
+                }
+                return body;
             } else {
                 logger.error("[SCT]: Failed to fetch multi-collection data. Server responded with code: {}", status);
                 MultiTrackingHandler.stopMultiTracking();

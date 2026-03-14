@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -62,10 +64,20 @@ public class SkillApiFetcher {
             }
 
             if (status == 200) {
-                try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
+                try (InputStream body = response.body();
+                     Reader reader = new InputStreamReader(body, StandardCharsets.UTF_8)) {
+
+
                     Gson gson = new Gson();
                     Type mapType = new TypeToken<Map<String, Double>>() {}.getType();
                     Map<String, Double> skills = gson.fromJson(reader, mapType);
+
+                    if (skills == null || skills.isEmpty()) {
+                        ChatUtils.INSTANCE.sendMessage("§c[SCT] Skill API disabled. Please enable it in the settings.", true);
+                        logger.warn("[SCT]: Skill API disabled for player.");
+                        SkillTrackingHandler.stopTracking();
+                        return;
+                    }
 
                     SkillUtils.updateFromApi(skills);
                     logger.info("[SCT]: Successfully received the skill data.");
