@@ -24,7 +24,8 @@ public class SkillTrackingRates {
     private static long lastTamingXpGained = 0L;
 
     public static boolean afk = false;
-    private static int unchangedStreak = 0;
+    private static int skillUnchangedStreak = 0;
+    private static int tamingUnchangedStreak = 0;
     private static final int THRESHOLD = 2; // Number of checks before considering AFK
 
     public static void initTracking(int level, long xp) {
@@ -45,11 +46,11 @@ public class SkillTrackingRates {
         if (!SkillTrackingHandler.isSkillMaxed) {
             if (lastXpGained != skillXpGained) {
                 lastXpGained = skillXpGained;
-                unchangedStreak = 0;
+                skillUnchangedStreak = 0;
                 afk = false;
             } else {
-                unchangedStreak++;
-                if (unchangedStreak >= THRESHOLD) {
+                skillUnchangedStreak++;
+                if (skillUnchangedStreak >= THRESHOLD) {
                     afk = true;
                     SkillTrackingHandler.stopTracking();
                     return;
@@ -61,17 +62,17 @@ public class SkillTrackingRates {
         totalSkillXp = skillXp + skillXpGained;
     }
 
-    public static void calculateTamingRates(long value) {
+    public static synchronized void calculateTamingRates(long value) {
         tamingXpGained = value - tamingXp; // total gained since tracking started
 
-        // AFK detection in case taming tracking is enabled
+        // AFK detection (API calls only)
         if (lastTamingXpGained != tamingXpGained) {
             lastTamingXpGained = tamingXpGained;
-            unchangedStreak = 0;
+            tamingUnchangedStreak = 0;
             afk = false;
         } else {
-            unchangedStreak++;
-            if (unchangedStreak >= THRESHOLD) {
+            tamingUnchangedStreak++;
+            if (tamingUnchangedStreak >= THRESHOLD) {
                 afk = true;
                 SkillTrackingHandler.stopTracking();
                 return;
@@ -97,6 +98,7 @@ public class SkillTrackingRates {
         lastXpGained = 0L;
         lastTamingXpGained = 0L;
         afk = false;
-        unchangedStreak = 0;
+        skillUnchangedStreak = 0;
+        tamingUnchangedStreak = 0;
     }
 }
