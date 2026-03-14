@@ -79,7 +79,7 @@ public class TimerOverlay implements AbstractOverlay{
             isPaused = false;
             return;
         }
-        ChatUtils.INSTANCE.sendMessage("§aTimer set for " + duration + " seconds!", true);
+        sendCompleteTime(duration);
         coleweightTimerEnd = System.currentTimeMillis() + duration * 1000L;
         isPaused = false;
         hasEnded = false;
@@ -129,5 +129,13 @@ public class TimerOverlay implements AbstractOverlay{
         }
 
         return timerLines;
+    }
+
+    private void sendCompleteTime(int duration) {
+        int hours = duration / 3600;
+        int minutes = (duration % 3600) / 60;
+        int seconds = duration % 60;
+
+        ChatUtils.INSTANCE.sendMessage("§aTimer set for " + (hours > 1 ? hours + " hours " : (hours > 0) ? hours + " hour " : "") + (minutes > 1 ? minutes + " minutes " : (minutes > 0) ? minutes + " minute " : "") + (seconds > 1 ? seconds + " seconds " : (seconds > 0) ? seconds + " second " : "") + "!", true);
     }
 }

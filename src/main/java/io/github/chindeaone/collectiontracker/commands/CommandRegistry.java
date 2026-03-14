@@ -23,6 +23,8 @@ import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CommandRegistry {
 
@@ -340,12 +342,20 @@ public class CommandRegistry {
                 .then(ClientCommandManager.literal("timer")
 
                         .then(ClientCommandManager.literal("set")
-                                .then(ClientCommandManager.argument("time", IntegerArgumentType.integer(1))
+                                .then(ClientCommandManager.argument("time", StringArgumentType.greedyString())
                                         .executes(context -> {
-                                            int time = IntegerArgumentType.getInteger(context, "time");
+                                            String time =StringArgumentType.getString(context, "time");
+                                            int seconds = parseToSeconds(time);
+
+                                            if (seconds < 0) {
+                                                ChatUtils.INSTANCE.sendMessage("§cInvalid time format. Use formats like '1h30m', '45s', or '90'.", true);
+                                                return 1;
+                                            }
+
                                             TimerOverlay timer = OverlayManager.getTimerOverlay();
-                                            assert timer != null;
-                                            timer.setTimer(time);
+                                            if (timer != null) {
+                                                timer.setTimer(seconds);
+                                            }
                                             return 1;
                                         })
                                 )
@@ -449,4 +459,32 @@ public class CommandRegistry {
         }
         return builder.buildFuture();
     };
+
+    private static int parseToSeconds(String input) {
+        Pattern pattern = Pattern.compile("(\\d+)([hms])");
+        Matcher matcher = pattern.matcher(input.toLowerCase().replace(" ", ""));
+
+        int seconds = 0;
+        boolean found = false;
+
+        while (matcher.find()) {
+            int value = Integer.parseInt(matcher.group(1));
+            char unit = matcher.group(2).charAt(0);
+            switch (unit) {
+                case 'h' -> seconds += value * 3600;
+                case 'm' -> seconds += value * 60;
+                case 's' -> seconds += value;
+            }
+            found = true;
+        }
+
+        if (!found) {
+            try {
+                return Integer.parseInt(input.trim());
+            } catch (NumberFormatException e) {
+                return -1; // invalid input
+            }
+        }
+        return seconds;
+    }
 }
