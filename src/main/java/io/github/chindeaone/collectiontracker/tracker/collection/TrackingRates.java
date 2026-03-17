@@ -119,7 +119,7 @@ public class TrackingRates {
         long collectedSinceStart = currentCollection - sessionStartCollection;
 
         int priceNPC = NpcPrices.getNpcPrice(collection);
-        moneyMade.put("NPC", uptime > 0 ? (long) Math.floor(priceNPC * (double) collectedSinceStart) : 0);
+        moneyMade.put("NPC", uptime > 0 ? (long) Math.floor(priceNPC * (double) collectedSinceStart) : 0L);
 
         if (BazaarCollectionsManager.hasBazaarData) {
             switch (collectionType) {
@@ -210,7 +210,9 @@ public class TrackingRates {
         fillBazaarExtremesFromCurrent(); // Ensure extremes are initialized
 
         // Trigger tracking overlay update
-        if (!CollectionOverlay.trackingDirty) CollectionOverlay.trackingDirty = true;
+        if (isTrackingDataReady() && (!CollectionOverlay.trackingDirty)) {
+            CollectionOverlay.trackingDirty = true;
+        }
     }
 
     private static void fillBazaarExtremesFromCurrent() {
@@ -234,5 +236,15 @@ public class TrackingRates {
         lowestRatesPerHourBazaar.compute(key, (k, old) -> (old == null) ? value : Math.min(old, value));
 
         highestRatesPerHourBazaar.compute(key, (k, old) -> (old == null) ? value : Math.max(old, value));
+    }
+
+    private static boolean isTrackingDataReady() {
+        if (moneyMade.isEmpty()) return false;
+
+        // NPC data should always be present
+        if (!moneyMade.containsKey("NPC")) return false;
+
+        // If Bazaar is enabled, wait until at least one entry is present
+        return !BazaarCollectionsManager.hasBazaarData || !moneyPerHourBazaar.isEmpty();
     }
 }

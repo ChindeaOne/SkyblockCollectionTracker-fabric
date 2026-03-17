@@ -81,11 +81,12 @@ public class TextUtils {
         boolean hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
         if (!ConfigAccess.isUsingBazaar() && hasNpcPrice) {
+            long localMoneyPerHourNPC = moneyPerHourNPC;
             if (CollectionsManager.isRiftCollection(collection)) {
                 // Use motes instead of money for rift collections
-                return "Motes/h: " + formatNumberOrPlaceholder(moneyPerHourNPC);
+                return "Motes/h: " + formatNumberOrPlaceholder(localMoneyPerHourNPC);
             }
-            return "$/h (NPC): " + formatNumberOrPlaceholder(moneyPerHourNPC);
+            return "$/h (NPC): " + formatNumberOrPlaceholder(localMoneyPerHourNPC);
         }
 
         if (!ConfigAccess.isUsingBazaar()) return null;
@@ -132,12 +133,12 @@ public class TextUtils {
         boolean hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
         if (!ConfigAccess.isUsingBazaar() && hasNpcPrice) {
-            long moneyMadeNPC = moneyMade.get("NPC");
+            long localMoneyMadeNPC = moneyMade.getOrDefault("NPC", 0L);
             if (CollectionsManager.isRiftCollection(collection)) {
                 // Use motes instead of money for rift collections
-                return "Motes made: " + formatNumberOrPlaceholder(moneyMadeNPC);
+                return "Motes made: " + formatNumberOrPlaceholder(localMoneyMadeNPC);
             }
-            return "$ made (NPC): " + formatNumberOrPlaceholder(moneyMadeNPC);
+            return "$ made (NPC): " + formatNumberOrPlaceholder(localMoneyMadeNPC);
         }
 
         if (!ConfigAccess.isUsingBazaar()) return null;
