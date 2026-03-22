@@ -6,7 +6,6 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: ci
     permissions:
       contents: read
     strategy:
@@ -59,17 +58,3 @@ jobs:
           dependencies: |
             P7dR8mSH (required)
             Ha28R6CL (required)
-
-  post-cleanup:
-    needs: [publish]
-    if: always()
-    runs-on: ubuntu-latest
-    permissions:
-        deployments: write
-    steps:
-      - name: Delete deployment
-        uses: strumwolf/delete-deployment-environment@v3.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: ci
-          onlyRemoveDeployments: true
