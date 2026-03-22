@@ -81,6 +81,10 @@ public class TextUtils {
         boolean hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
         if (!ConfigAccess.isUsingBazaar() && hasNpcPrice) {
+            if (!moneyMade.containsKey("NPC")) {
+                return "$/h (NPC): Calculating...";
+            }
+
             long localMoneyPerHourNPC = moneyPerHourNPC;
             if (CollectionsManager.isRiftCollection(collection)) {
                 // Use motes instead of money for rift collections
@@ -133,6 +137,10 @@ public class TextUtils {
         boolean hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
         if (!ConfigAccess.isUsingBazaar() && hasNpcPrice) {
+            if (!moneyMade.containsKey("NPC")) {
+                return "$/h (NPC): Calculating...";
+            }
+
             long localMoneyMadeNPC = moneyMade.getOrDefault("NPC", 0L);
             if (CollectionsManager.isRiftCollection(collection)) {
                 // Use motes instead of money for rift collections

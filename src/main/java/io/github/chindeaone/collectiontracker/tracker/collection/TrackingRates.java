@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -210,7 +211,8 @@ public class TrackingRates {
         fillBazaarExtremesFromCurrent(); // Ensure extremes are initialized
 
         // Trigger tracking overlay update
-        if (isTrackingDataReady() && (!CollectionOverlay.trackingDirty)) {
+        if (!CollectionOverlay.trackingDirty) {
+            if (!isTrackingDataReady()) ChatUtils.INSTANCE.sendMessage("§cWarning! Some maps have not been fully initialized. You have the option to restart the tracker or wait for the next collection update.", true);
             CollectionOverlay.trackingDirty = true;
         }
     }
@@ -244,7 +246,7 @@ public class TrackingRates {
         // NPC data should always be present
         if (!moneyMade.containsKey("NPC")) return false;
 
-        // If Bazaar is enabled, wait until at least one entry is present
+        // If Bazaar enabled, make sure at least one entry is present
         return !BazaarCollectionsManager.hasBazaarData || !moneyPerHourBazaar.isEmpty();
     }
 }
