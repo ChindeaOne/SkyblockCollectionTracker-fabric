@@ -55,16 +55,16 @@ object CommissionFormat {
         CommissionType("Cliffside Veins Titanium", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Rampart's Quarry Titanium", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Upper Mines Titanium", Area.DWARVEN_MINES) { formatLine(it) },
-        CommissionType("Goblin Slayer", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Glacite Walker Slayer", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Treasure Hoarder Puncher", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Goblin Raid Slayer", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Goblin Raid", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Raffle", Area.DWARVEN_MINES) { formatLine(it) },
-        CommissionType("Golden Goblin Slayer", Area.DWARVEN_MINES) { formatLine(it) },
+        CommissionType("Elusive Goblin Slayer", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Star Sentry Puncher", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("Lucky Raffle", Area.DWARVEN_MINES) { formatLine(it) },
         CommissionType("2x Mithril Powder Collector", Area.DWARVEN_MINES) { formatLine(it) },
+        CommissionType("Goblin Slayer", Area.DWARVEN_MINES) { formatLine(it) },
 
         // Crystal Hollows
         CommissionType("Hard Stone Miner", Area.CRYSTAL_HOLLOWS) { formatLine(it) },
