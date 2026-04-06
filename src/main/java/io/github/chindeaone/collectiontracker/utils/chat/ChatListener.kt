@@ -408,7 +408,7 @@ object ChatListener {
         if (leaderboardRank != -1) {
             val rank = leaderboardRank + 1
             if (rank > 1000) return message // Don't show ranks for players outside of top 1000
-            val rankSuffix = ColeweightUtils.getCustomColor(rank, playerName.equals(PlayerData.playerName, ignoreCase = true))
+            val rankSuffix = ColeweightUtils.getCustomColor(rank, playerName.equals(PlayerData.playerName, ignoreCase = true), playerName)
 
             if (rankSuffix != Component.empty() && rankSuffix.string.isNotEmpty()) {
                 val newComponent = MutableComponent.create(message.contents).withStyle(message.style)

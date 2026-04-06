@@ -562,4 +562,16 @@ object ConfigHelper {
     fun changeBazaarPrice(type: Bazaar.BazaarPriceType) {
         bazaarConfig.bazaarPriceType = type
     }
+
+    @JvmStatic
+    fun setColeweightCustomColor(player: String, color: String) {
+        coleweightColor.customColors[player] = color
+    }
+
+    @JvmStatic
+    fun getColeweightColor(player: String): String? {
+        return coleweightColor.customColors[player]
+    }
+
+
 }

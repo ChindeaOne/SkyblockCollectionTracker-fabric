@@ -2,11 +2,12 @@ package io.github.chindeaone.collectiontracker.utils
 
 import com.google.gson.JsonObject
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.TextColor
 import java.awt.Color
 
-fun Int.toRankComponent(isMe: Boolean): Component = ColorUtils.customColorComponent(this, isMe)
+fun Int.toRankComponent(isMe: Boolean, playerName: String): Component = ColorUtils.customColorComponent(this, isMe, playerName)
 
 object ColorUtils {
     const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
@@ -83,8 +84,8 @@ object ColorUtils {
         return Color(r, g, b)
     }
 
-    fun customColorComponent(rank: Int, isMe: Boolean): Component {
-        val color = getRankColor(rank, isMe)
+    fun customColorComponent(rank: Int, isMe: Boolean, playerName: String): Component {
+        val color = getRankColor(rank, isMe, playerName)
         val text = "[⛏ #$rank]"
 
         return Component.literal(text).withStyle {
@@ -92,10 +93,18 @@ object ColorUtils {
         }
     }
 
-    fun getRankColor(rank: Int, isMe: Boolean): Color {
+    fun getRankColor(rank: Int, isMe: Boolean, playerName: String): Color {
         if (isMe && ConfigAccess.isCustomColorEnabled()) {
             return Color(ConfigAccess.getCustomColor().getEffectiveColourRGB())
         }
+
+        if (!playerName.isEmpty()) {
+            val hexString = ConfigHelper.getColeweightColor(playerName)
+            if (hexString != null) {
+                return Color.decode(hexString)
+            }
+        }
+
         return when (rank) {
             1 -> Color.BLACK
             2 -> Color(170, 0, 0)
@@ -113,6 +122,12 @@ object ColorUtils {
         return Component.literal(collection).withStyle {
             val colorInt = collectionColors[collection.lowercase()] ?: WHITE
             it.withColor(TextColor.fromRgb(colorInt))
+        }
+    }
+
+    fun coloredText(color: String): Component {
+        return Component.literal(color).withStyle{
+            it.withColor(TextColor.fromRgb(Color.decode(color).rgb))
         }
     }
 }

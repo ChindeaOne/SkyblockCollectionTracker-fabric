@@ -6,6 +6,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ColeweightColor {
 
     @Expose
@@ -20,4 +23,7 @@ public class ColeweightColor {
     @ConfigOption(name = "Rank Color", desc = "Set a custom color.")
     @ConfigEditorColour
     public ChromaColour customColor = ChromaColour.fromStaticRGB(0, 0, 0, 0);
+
+    @Expose
+    public Map<String, String> customColors = new HashMap<>();
 }

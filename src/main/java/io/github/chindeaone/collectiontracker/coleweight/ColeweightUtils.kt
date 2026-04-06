@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.coleweight
 
 import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
@@ -65,7 +67,7 @@ object ColeweightUtils {
 
     private fun displayColeweight(playerName: String, storage: ColeweightStorage, detailed: Boolean = false) {
         val isMe = playerName.equals(PlayerData.playerName, ignoreCase = true)
-        val rankComp = getCustomColor(storage.rank, isMe)
+        val rankComp = getCustomColor(storage.rank, isMe, playerName)
 
         val fullMessage = Component.empty().append(rankComp).append(" §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
 
@@ -99,14 +101,25 @@ object ColeweightUtils {
                 val rank = start + index + 1
                 val isMe = entry.name.equals(PlayerData.playerName, ignoreCase = true)
                 val message = Component.empty()
-                    .append(getCustomColor(rank, isMe))
+                    .append(getCustomColor(rank, isMe, entry.name))
                     .append(" §a${entry.name}: §b${entry.coleweight}")
                 ChatUtils.sendComponent(message, true)
             }
         }
     }
 
-    fun getCustomColor(rank: Int, isMe: Boolean): Component {
-        return rank.toRankComponent(isMe)
+    fun getCustomColor(rank: Int, isMe: Boolean, playerName: String): Component {
+        return rank.toRankComponent(isMe, playerName)
+    }
+
+    @JvmStatic
+    fun setPlayerCustomColor(playerName: String, hexColor: String) {
+        if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
+            ChatUtils.sendMessage("§cYou cannot set a custom color for yourself like this. Use the feature in `/sct`.", true)
+            return
+        }
+        ConfigHelper.setColeweightCustomColor(playerName, hexColor)
+        val color: Component = ColorUtils.coloredText(hexColor)
+        ChatUtils.sendComponent(Component.empty().append("§aCustom color for ").append(playerName).append("§a set to ").append(color).append("§a."), true)
     }
 }

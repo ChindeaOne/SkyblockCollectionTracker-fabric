@@ -238,6 +238,29 @@ public class CommandRegistry {
                                         })
                                 )
                         )
+                        // sct cw color set <ign> <color>
+                        .then(ClientCommandManager.literal("color")
+                                .then(ClientCommandManager.literal("set")
+                                        .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                                .suggests(PLAYER_SUGGESTIONS)
+                                                .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
+                                                        .executes(context -> {
+                                                            String name = StringArgumentType.getString(context, "player").trim();
+                                                            String color = StringArgumentType.getString(context, "hex color").trim();
+
+                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
+
+                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
+                                                                ChatUtils.INSTANCE.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                return 1;
+                                                            }
+                                                            ColeweightUtils.setPlayerCustomColor(name, formattedHex);
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
+                                )
+                        )
                         .then(ClientCommandManager.literal("track")
                                 .executes(context -> {
                                     ColeweightTrackingHandler.startTracking();
