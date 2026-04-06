@@ -2,11 +2,11 @@ import net.fabricmc.loom.task.RemapJarTask
 import sct.GitVersion
 
 plugins {
-    id("com.gradleup.shadow") version "9.3.1"
+    id("com.gradleup.shadow") version "9.4.1"
     id("net.fabricmc.fabric-loom-remap")
-    kotlin("jvm") version "2.0.0"
-    id("com.google.devtools.ksp") version "2.0.0-1.0.24"
-    kotlin("plugin.power-assert") version "2.0.0"
+    kotlin("jvm") version "2.3.20"
+    id("com.google.devtools.ksp") version "2.3.6"
+    kotlin("plugin.power-assert") version "2.3.20"
     `maven-publish`
 }
 
@@ -130,8 +130,7 @@ dependencies {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
-            enableLanguageFeature("BreakContinueInInlineLambdas")
+            languageVersion = "2.3"
         }
     }
 }
