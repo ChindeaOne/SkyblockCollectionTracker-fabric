@@ -50,6 +50,7 @@ public class CommandHelper {
                     new CommandEntry("/sct cw find [player]", "§eShows a player's Coleweight."),
                     new CommandEntry("/sct cw detailed [player]", "§eShows detailed Coleweight information."),
                     new CommandEntry("/sct cw lb <length>", "§eShows the Coleweight leaderboard."),
+                    new CommandEntry("/sct cw color set <player name> <hex color>", "§eSets a custom Coleweight rank color for a player."),
                     new CommandEntry("/sct cw track", "§eStarts Coleweight tracking."),
                     new CommandEntry("/sct cw stop", "§eStops Coleweight tracking."),
                     new CommandEntry("/sct cw pause", "§ePauses Coleweight tracking."),
