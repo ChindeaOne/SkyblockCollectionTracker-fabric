@@ -240,12 +240,20 @@ public class CommandRegistry {
                         )
                         // sct cw color set <ign> <color>
                         .then(ClientCommandManager.literal("color")
+                                .executes(context -> {
+                                    ChatUtils.INSTANCE.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
+                                    return 1;
+                                })
                                 .then(ClientCommandManager.literal("set")
-                                        .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                        .executes(context -> {
+                                            ChatUtils.INSTANCE.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
+                                            return 1;
+                                        })
+                                        .then(ClientCommandManager.argument("player name", StringArgumentType.string())
                                                 .suggests(PLAYER_SUGGESTIONS)
                                                 .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
                                                         .executes(context -> {
-                                                            String name = StringArgumentType.getString(context, "player").trim();
+                                                            String name = StringArgumentType.getString(context, "player name").trim();
                                                             String color = StringArgumentType.getString(context, "hex color").trim();
 
                                                             String formattedHex = color.startsWith("#") ? color : "#" + color;
