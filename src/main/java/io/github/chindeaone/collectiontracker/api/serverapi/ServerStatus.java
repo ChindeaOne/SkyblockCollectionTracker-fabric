@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.api.serverapi;
 
 import io.github.chindeaone.collectiontracker.api.URLManager;
+import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher;
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList;
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList;
 import io.github.chindeaone.collectiontracker.api.colors.FetchColors;
@@ -54,6 +55,6 @@ public class ServerStatus {
     }
 
     public static synchronized boolean hasData() {
-        return FetchColors.hasColors && FetchNpcPrices.hasNpcPrice && FetchCollectionList.hasCollectionList && FetchGemstoneList.hasGemstoneList && FetchSkillTree.hasSkillTree;
+        return FetchColors.hasColors && FetchNpcPrices.hasNpcPrice && FetchCollectionList.hasCollectionList && FetchGemstoneList.hasGemstoneList && FetchSkillTree.hasSkillTree && ColeweightFetcher.hasColeweightTopColors && ColeweightFetcher.hasColeweightLb;
     }
 }

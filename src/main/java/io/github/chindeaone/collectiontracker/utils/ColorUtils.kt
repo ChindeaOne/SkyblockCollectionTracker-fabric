@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.utils
 
 import com.google.gson.JsonObject
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
-import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import net.minecraft.network.chat.Component
