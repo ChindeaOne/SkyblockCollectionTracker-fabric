@@ -11,7 +11,9 @@ data class ColeweightStorage(
     val miscellaneous: Map<String, Float> = emptyMap(),
 
     val leaderboard: List<ColeweightPlayer> = emptyList(),
-    val tempLeaderboard: List<ColeweightPlayer> = emptyList()
+    val tempLeaderboard: List<ColeweightPlayer> = emptyList(),
+
+    val topColors: Map<String, String> = emptyMap()
 )
 
 data class ColeweightPlayer(

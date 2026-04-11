@@ -267,6 +267,39 @@ public class CommandRegistry {
                                                         })
                                                 )
                                         )
+                                        .then(ClientCommandManager.literal("global")
+                                                .executes(context -> {
+                                                    ChatUtils.INSTANCE.sendMessage("Usage: /sct cw color global <hex color>.",true);
+                                                    return 1;
+                                                })
+                                                .then(ClientCommandManager.argument("color", StringArgumentType.greedyString())
+                                                        .executes(context -> {
+                                                            String color = StringArgumentType.getString(context, "color").trim();
+                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
+
+                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
+                                                                ChatUtils.INSTANCE.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                return 1;
+                                                            }
+                                                            ColeweightUtils.setGlobalColor(formattedHex);
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
+                                )
+                                .then(ClientCommandManager.literal("remove")
+                                        .executes(context -> {
+                                            ChatUtils.INSTANCE.sendMessage("Usage: /sct cw color remove <player name>.",true);
+                                            return 1;
+                                        })
+                                        .then(ClientCommandManager.argument("player name", StringArgumentType.string())
+                                                .suggests(PLAYER_SUGGESTIONS)
+                                                .executes(context -> {
+                                                    String name = StringArgumentType.getString(context, "player name").trim();
+                                                    ColeweightUtils.removePlayerCustomColor(name);
+                                                    return 1;
+                                                })
+                                        )
                                 )
                         )
                         .then(ClientCommandManager.literal("track")

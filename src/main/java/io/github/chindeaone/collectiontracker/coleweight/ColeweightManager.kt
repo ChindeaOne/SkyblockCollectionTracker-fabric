@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.coleweight
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import io.github.chindeaone.collectiontracker.config.coleweightColor
 
 object ColeweightManager {
 
@@ -49,5 +50,19 @@ object ColeweightManager {
             entries[k] = v.asFloat
         }
         return entries
+    }
+
+    @JvmStatic
+    fun updateColeweightTopColors(data: String) {
+        val obj = JsonParser.parseString(data).asJsonObject
+        val colorMap = mutableMapOf<String, String>()
+
+        for ((name, color) in obj.entrySet()) {
+            colorMap[name.lowercase()] = color.asString
+        }
+
+        storage = storage.copy(
+            topColors = colorMap
+        )
     }
 }

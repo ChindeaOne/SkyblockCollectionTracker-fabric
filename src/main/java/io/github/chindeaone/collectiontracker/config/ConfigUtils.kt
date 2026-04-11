@@ -573,5 +573,8 @@ object ConfigHelper {
         return coleweightColor.customColors[player]
     }
 
-
+    @JvmStatic
+    fun removeColeweightCustomColor(player: String) {
+        coleweightColor.customColors.remove(player)
+    }
 }

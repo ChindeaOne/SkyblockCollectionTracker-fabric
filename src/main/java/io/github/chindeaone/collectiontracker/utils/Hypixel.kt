@@ -130,6 +130,7 @@ object Hypixel {
         if (!FetchColors.hasColors) CompletableFuture.runAsync { FetchColors.fetchColorsData() }
         if (!FetchWaypoints.hasWaypoints) CompletableFuture.runAsync { FetchWaypoints.fetchWaypoints() }
         if (!ColeweightFetcher.hasColeweightLb) CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
+        if (!ColeweightFetcher.hasColeweightTopColors) CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightTopColors() }
         if (!FetchSkillTree.hasSkillTree) CompletableFuture.runAsync { FetchSkillTree.fetchSkillTree(true, true) }
     }
 

@@ -122,4 +122,24 @@ object ColeweightUtils {
         val color: Component = ColorUtils.coloredText(hexColor)
         ChatUtils.sendComponent(Component.empty().append("§aCustom color for ").append(playerName).append("§a set to ").append(color).append("§a."), true)
     }
+
+    @JvmStatic
+    fun removePlayerCustomColor(playerName: String) {
+        if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
+            ChatUtils.sendMessage("§cYou cannot remove a custom color for yourself like this. Use the feature in `/sct`.", true)
+            return
+        }
+        ConfigHelper.removeColeweightCustomColor(playerName)
+        ChatUtils.sendMessage("§aCustom color for $playerName removed.", true)
+    }
+
+    @JvmStatic
+    fun setGlobalColor(color: String) {
+        val top10Cw = ColeweightManager.storage.leaderboard.take(10)
+        if (top10Cw.none { it.name.equals(PlayerData.playerName, ignoreCase = true) }) {
+            ChatUtils.sendMessage("§cYou must be in the top 10 of the Coleweight leaderboard to set a global color.", true)
+            return
+        }
+        ColeweightFetcher.setGlobalColor(PlayerData.playerName, color)
+    }
 }

@@ -3,9 +3,11 @@ package io.github.chindeaone.collectiontracker.api.coleweight;
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager;
+import io.github.chindeaone.collectiontracker.utils.ColorUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,6 +22,7 @@ public class ColeweightFetcher {
 
     private static final Logger logger = LogManager.getLogger(ColeweightFetcher.class);
     public static boolean hasColeweightLb = false;
+    public static boolean hasColeweightTopColors = false;
 
     public static void fetchColeweightDataAsync(String playerName, Runnable onComplete) {
         try {
@@ -227,5 +230,90 @@ public class ColeweightFetcher {
             logger.error("[SCT]: An error occurred while fetching Coleweight data. ", e);
         }
         return null;
+    }
+
+    public static void setGlobalColor(String player, String color) {
+        try {
+            URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/color");
+
+            HttpRequest request = HttpRequest.newBuilder(uri)
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer " + TokenManager.getToken())
+                    .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                    .header("X-NAME", player)
+                    .header("X-COLOR", color)
+                    .header("User-Agent", URLManager.AGENT)
+                    .header("Accept", "application/json")
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+            int status = response.statusCode();
+
+            if (status == 401) {
+                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retry...");
+                TokenManager.fetchAndStoreToken();
+                request = HttpRequest.newBuilder(uri)
+                        .timeout(Duration.ofSeconds(15))
+                        .header("Authorization", "Bearer " + TokenManager.getToken())
+                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                        .header("X-NAME", player)
+                        .header("X-COLOR", color)
+                        .header("User-Agent", URLManager.AGENT)
+                        .header("Accept", "application/json")
+                        .POST(HttpRequest.BodyPublishers.noBody())
+                        .build();
+
+                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+                status = response.statusCode();
+            }
+
+            if (status == 200) {
+                logger.info("[SCT]: Successfully set global Coleweight color for player: {}", player);
+                Minecraft.getInstance().execute(() ->
+                        ChatUtils.INSTANCE.sendComponent(Component.empty()
+                                .append("§aGlobal color set to ")
+                                .append(ColorUtils.INSTANCE.coloredText(color))
+                                .append("."), true));
+            } else {
+                logger.warn("[SCT]: Failed to set global Coleweight color for player: {}. HTTP status: {}", player, status);
+                Minecraft.getInstance().execute(() ->
+                        ChatUtils.INSTANCE.sendMessage("§cFailed to set global Coleweight color.", true)
+                );
+            }
+        } catch (Exception e) {
+            logger.error("[SCT]: An error occurred while setting global Coleweight color. ", e);
+        }
+    }
+
+    public static void fetchColeweightTopColors() {
+        try {
+            URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/colors");
+
+            HttpRequest request = HttpRequest.newBuilder(uri)
+                    .timeout(Duration.ofSeconds(5))
+                    .header("User-Agent", URLManager.AGENT)
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+            int status = response.statusCode();
+            if (status == 200) {
+                if (response.body() == null || response.body().isEmpty()) {
+                    logger.warn("Received empty response when fetching Coleweight top colors.");
+                    return;
+                }
+                ColeweightManager.updateColeweightTopColors(response.body());
+                hasColeweightTopColors = true;
+                logger.info("[SCT] Successfully fetched Coleweight top colors.");
+            } else {
+                logger.warn("[SCT]: Failed to fetch Coleweight top colors. HTTP status: {}", status);
+            }
+        } catch (Exception e) {
+            logger.error("[SCT]: An error occurred while fetching Coleweight top colors.", e);
+        }
     }
 }

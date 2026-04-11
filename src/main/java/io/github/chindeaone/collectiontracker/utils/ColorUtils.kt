@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import com.google.gson.JsonObject
+import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
+import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import net.minecraft.network.chat.Component
@@ -103,6 +105,10 @@ object ColorUtils {
             if (hexString != null) {
                 return Color.decode(hexString)
             }
+        }
+
+        ColeweightManager.storage.topColors[playerName.lowercase()]?.let {
+            return Color.decode(it)
         }
 
         return when (rank) {
