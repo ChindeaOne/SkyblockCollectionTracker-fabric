@@ -104,7 +104,7 @@ object ScoreboardUtils {
     fun getScoreboardTitle(client: Minecraft): String? {
         val world = client.level ?: return null
         val objective = world.scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR) ?: return null
-        val displayName = objective.displayName?.string ?: return null
+        val displayName = objective.displayName.string
         return displayName
     }
 

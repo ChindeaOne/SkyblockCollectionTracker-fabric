@@ -59,7 +59,7 @@ object TabData {
     private fun readTab(): List<String>? {
         val mc = Minecraft.getInstance()
         val player = mc.player ?: return null
-        val connection = player.connection ?: return null
+        val connection = player.connection
 
         val tabOverlay = mc.gui.tabList
 

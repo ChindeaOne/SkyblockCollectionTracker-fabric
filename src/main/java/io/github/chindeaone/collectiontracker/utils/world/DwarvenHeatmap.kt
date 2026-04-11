@@ -66,7 +66,7 @@ object DwarvenHeatmap {
 
     private fun isTrackedBlock(world: ClientLevel, pos: BlockPos): Boolean {
         val block = world.getBlockState(pos).block
-        val key = BuiltInRegistries.BLOCK.getKey(block) ?: return false
+        val key = BuiltInRegistries.BLOCK.getKey(block)
         val blockName = key.toString()
         return blockName in blockList && blockName !in excludedBlocks
     }
@@ -78,7 +78,7 @@ object DwarvenHeatmap {
                 for (z in -1..1) {
                     val checkPos = pos.offset(x, y, z)
                     val block = world.getBlockState(checkPos).block
-                    val key = BuiltInRegistries.BLOCK.getKey(block) ?: continue
+                    val key = BuiltInRegistries.BLOCK.getKey(block)
                     val blockName = key.toString()
                     if (blockName in blockList && isBlockExposed(world, checkPos)) score += blockPriority.getOrDefault(blockName, 0)
                 }
