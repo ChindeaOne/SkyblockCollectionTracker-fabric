@@ -7,7 +7,6 @@ plugins {
     kotlin("jvm") version "2.3.20"
     id("com.google.devtools.ksp") version "2.3.6"
     kotlin("plugin.power-assert") version "2.3.20"
-    `maven-publish`
 }
 
 val gitVersion = objects.newInstance(GitVersion::class)
@@ -210,15 +209,4 @@ tasks.shadowJar {
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "io.github.chindeaone.collectiontracker.deps.moulconfig")
     relocate("io.github.chindeaone.modrinthautoupdater", "io.github.chindeaone.collectiontracker.deps.modrinthautoupdater")
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            artifactId = project.property("archives_base_name").toString()
-            from(components["java"])
-        }
-    }
-
-    repositories {}
 }
