@@ -3,24 +3,19 @@ package io.github.chindeaone.collectiontracker.utils.chat
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
-import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
-import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
+import io.github.chindeaone.collectiontracker.utils.*
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
-import io.github.chindeaone.collectiontracker.utils.AbilityUtils
-import io.github.chindeaone.collectiontracker.utils.PlayerData
-import io.github.chindeaone.collectiontracker.utils.TimerState
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
 
 object ChatListener {
@@ -28,7 +23,6 @@ object ChatListener {
     enum class Patterns(pattern: String, vararg options: RegexOption) {
         // Skyhanni's skill pattern
         SKILL("""\+(?<gains>[\d,.]+)\s+(?<skillName>.+?)\s*\((?<current>[\d,]+)\s*/\s*(?<needed>[\d,]+)\)""", RegexOption.IGNORE_CASE),
-        SACKS("""^\[Sacks]\s*\+([0-9,]+)\s+items?\.\s*\(Last\s+([0-9]+)s\.?\)""", RegexOption.IGNORE_CASE),
         // Coleweight pattern
         NAME("""^(?:\[\d+]\s+)?(?:[^a-zA-Z0-9\s§]+\s*)?(?:(?:Guild|Party|Co-op)\s*>\s+|\[:v:]\s+)?(?:\[[^]]+]\s+)?([A-Za-z0-9_]{1,16})(?:\s+♲)?(?:\s+\[[^]]{1,6}])?\s*:\s*(.*)$""", RegexOption.IGNORE_CASE),        ABILITY("""^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!""", RegexOption.IGNORE_CASE),
         CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? ?Ability""", RegexOption.IGNORE_CASE),
@@ -38,8 +32,7 @@ object ChatListener {
         // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §aVIEW RULE"
         AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)!""", RegexOption.IGNORE_CASE),
         HOTM_RESET("""^Reset your Heart of the Mountain! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE),
-        HOTF_RESET("""^You have reset your Heart of the Forest! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE),
-        PRISTINE("""^PRISTINE! You found (?:[^\w\s] )?Flawed (.+?) Gemstone x(\d{1,3})!""", RegexOption.IGNORE_CASE);
+        HOTF_RESET("""^You have reset your Heart of the Forest! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE);
         val regex: Regex = Regex(pattern, options.toSet())
 
         fun find(input: CharSequence): MatchResult? = regex.find(input)
@@ -74,21 +67,23 @@ object ChatListener {
         val text = message.string
         val cleanText = text.removeColor()
 
-        collectionListener(cleanText)
+        sacksListener(message)
         petSummoned(text)
         abilityListener(cleanText)
         onCooldownListener(cleanText)
         abilitySwapListener(cleanText)
         consumableListener(cleanText)
         treeResetListener(cleanText)
-        pristineTracker(cleanText)
     }
 
-    private fun collectionListener(text: String) {
-        if (!TrackingHandler.isTracking) return
+    private fun sacksListener(component: Component) {
+        val normalTracking = TrackingHandler.isTracking && !TrackingHandler.isPaused
+        val multiTracking = MultiTrackingHandler.isMultiTracking && !MultiTrackingHandler.isMultiPaused
 
-        if (text.startsWith("[Sacks]")) {
-            parseSacksMessage(text)
+        if (!normalTracking && !multiTracking) return
+
+        if (component.string.startsWith("[Sacks]")) {
+            parseSacksMessage(component)
         }
     }
 
@@ -185,16 +180,6 @@ object ChatListener {
             Patterns.HOTM_RESET.find(text) != null -> FetchSkillTree.resetHotm()
             Patterns.HOTF_RESET.find(text) != null -> FetchSkillTree.resetHotf()
         }
-    }
-
-    private fun pristineTracker(text: String) {
-        if (!MultiTrackingHandler.isMultiTracking || MultiTrackingHandler.isMultiPaused || !CollectionTracker.collectionList.contains("gemstone")) return // Only track gemstones
-
-        val match = Patterns.PRISTINE.find(text) ?: return
-        val gemstone = match.groupValues[1].trim()
-        val amount = match.groupValues[2].toIntOrNull() ?: return
-
-        MultiTrackingRates.calculateMultiRates(gemstone = gemstone.lowercase(), amount = amount * 80)
     }
 
     // Listen to Autopet swap messages
@@ -448,17 +433,42 @@ object ChatListener {
         return message
     }
 
-    private fun parseSacksMessage(message: String) {
-        if (!ConfigAccess.isSacksTrackingEnabled()) return
+    private fun parseSacksMessage(message: Component) {
+        if (message.string.startsWith("[Sacks]")) {
+            if (message.string.contains("+") && message.string.contains("-")) return // ignore these because of /recipe commands
 
-        val match = Patterns.SACKS.find(message)
-        if (match != null) {
-            val itemsStr = match.groupValues[1].replace(",", "")
-            val items = itemsStr.toIntOrNull() ?: 0
+            val hoverComponent = message.siblings.firstNotNullOfOrNull { sibling ->
+                (sibling.style.hoverEvent as? HoverEvent.ShowText)?.value
+            } ?: return
 
-            SacksTrackingManager.onChatCollection(items)
+            val sacksDetails = mutableMapOf<String, Int>()
+            val siblings = hoverComponent.siblings
+
+            var i = 0
+            while (i < siblings.size) {
+                val componentText = siblings[i].string.trim()
+
+                if (componentText.startsWith("+")) {
+                    val amount = componentText.substringAfter("+").replace(",", "").toIntOrNull()
+
+                    if (amount != null && i + 1 < siblings.size) {
+                        val collectionName = siblings[i + 1].string.lowercase().replace(Regex("[^a-z0-9 ]"), "").trim()
+                        if (collectionName.isNotEmpty()) {
+                            sacksDetails[collectionName.lowercase()] = amount
+                            i += 2
+                            continue
+                        }
+                    }
+                }
+                i++
+            }
+
+            if (sacksDetails.isNotEmpty()) {
+                SacksTrackingManager.onSacksGain(sacksDetails)
+            }
         }
     }
+
 
     private fun parseSkillMessage(match: MatchResult) {
         val currentRaw = match.groups["current"]?.value ?: return
