@@ -10,33 +10,16 @@ import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.seconds
 
 object MultiDataFetcher {
 
     private val logger: Logger = LogManager.getLogger(MultiDataFetcher::class.java)
 
-    private val collectionCache: MutableMap<CacheKey, String> = ConcurrentHashMap<CacheKey, String>()
+    private val collectionCache: MutableMap<CacheKey, Map<String, Long>> = ConcurrentHashMap<CacheKey, Map<String, Long>>()
     private val cacheTimestamps: MutableMap<CacheKey, Long> = ConcurrentHashMap<CacheKey, Long>()
     private const val CACHE_LIFESPAN_MS: Long = 180000L // default 3 minutes
-    var scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
-    private val period = 200.seconds
 
-    fun scheduleMultiCollectionDataFetch() {
-        if (CollectionTracker.collectionList.size == 1 && CollectionTracker.collectionList.contains("gemstone")) {
-            logger.info("[SCT]: Only gemstone collection tracked. Performing a single API fetch.")
-            Executors.newSingleThreadExecutor().execute {
-                fetchMultiCollectionData()
-            }
-            return
-        }
-        scheduler.scheduleAtFixedRate(MultiDataFetcher::fetchMultiCollectionData, 1, period.inWholeSeconds, TimeUnit.SECONDS)
-    }
-
-    private fun fetchMultiCollectionData() {
+    fun fetchMultiCollectionData() {
         try {
             if (!ServerUtils.serverStatus) {
                 logger.warn("[SCT]: API server not online. Stopping the multi tracker.")
@@ -45,29 +28,41 @@ object MultiDataFetcher {
             }
             if (!isMultiTracking || isMultiPaused) return
 
-            val data = getData()
-            if (data.isEmpty()) {
-                logger.error("[SCT]: Failed to fetch or retrieve multi collection data from the cache.")
-                return
-            }
-            val jsonData = JsonParser.parseString(data).asJsonObject
-            val map = mutableMapOf<String, Long>()
+            var map = getCachedData()
 
-            for (entry in jsonData.entrySet()) {
-                val collectionName = entry.key
-                val collectionValue = entry.value.asLong
-                map[collectionName] = collectionValue
+            if (map == null) {
+                val data = fetchDataFromApi()
+                if (data == null) {
+                    logger.error("[SCT]: Failed to fetch multi collection data from the Hypixel API.")
+                    return
+                }
+
+                val jsonData = JsonParser.parseString(data).asJsonObject
+                val newMap = mutableMapOf<String, Long>()
+
+                for (entry in jsonData.entrySet()) {
+                    val collectionName = entry.key
+                    val collectionValue = entry.value.asLong
+                    newMap[collectionName] = collectionValue
+                }
+                map = newMap
+
+                val uuid = PlayerData.playerUUID
+                val collectionList = CollectionTracker.collectionList
+                val cacheKey = CacheKey(uuid, collectionList)
+                collectionCache[cacheKey] = map
+                cacheTimestamps[cacheKey] = System.currentTimeMillis()
             }
 
-            logger.info("[SCT]: Data successfully fetched or retrieved and displayed for player with UUID: {} and collections: {}", PlayerData.playerUUID, CollectionTracker.collectionList)
-            MultiTrackingRates.calculateMultiRates(map)
+            logger.info("[SCT]: Data successfully fetched or retrieved for player with UUID: {} and collections: {}", PlayerData.playerUUID, CollectionTracker.collectionList)
+            MultiTrackingRates.setCollections(map)
 
         } catch (e: Exception) {
             logger.error("[SCT]: Error fetching data from the Hypixel API: ${e.message}")
         }
     }
 
-    private fun getData(): String {
+    private fun getCachedData(): Map<String, Long>? {
         val uuid = PlayerData.playerUUID
         val collectionList = CollectionTracker.collectionList
 
@@ -77,8 +72,17 @@ object MultiDataFetcher {
         if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < CACHE_LIFESPAN_MS) {
             val elapsed: Long = System.currentTimeMillis() - lastFetched
             logger.info("[SCT]: Returning cached data for player with UUID: {} and collections: {} (last fetched {} ms ago)", uuid, collectionList, elapsed)
-            return collectionCache[cacheKey]!!
+            return collectionCache[cacheKey]
         }
+        return null
+    }
+
+    private fun fetchDataFromApi(): String? {
+        val uuid = PlayerData.playerUUID
+        val collectionList = CollectionTracker.collectionList
+
+        val cacheKey = CacheKey(uuid, collectionList)
+        val lastFetched = cacheTimestamps[cacheKey]
 
         if (lastFetched != null) {
             val elapsed = System.currentTimeMillis() - lastFetched
@@ -87,14 +91,7 @@ object MultiDataFetcher {
             logger.info("[SCT]: No cache present for player {} collections {}. Fetching data.", uuid, collectionList)
         }
 
-        val jsonData = HypixelApiFetcher.fetchMultiJsonData()
-
-        if (jsonData != null) {
-            collectionCache[cacheKey] = jsonData
-            cacheTimestamps[cacheKey] = System.currentTimeMillis()
-        }
-
-        return jsonData
+        return HypixelApiFetcher.fetchMultiJsonData()
     }
 
     fun clearCache() {

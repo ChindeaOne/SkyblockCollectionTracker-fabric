@@ -103,7 +103,6 @@ class ModLoader: ModInitializer {
             TabData.tickAndUpdateWidget(client)
             BlockWatcher.onClientTick(client)
             ScoreboardUtils.onTick(client)
-            InventoryListener.onTick(client)
             DeployableParser.onTick(client)
         }
     }

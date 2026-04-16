@@ -8,7 +8,6 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearCache
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.scheduler
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
@@ -19,7 +18,6 @@ import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatCo
 import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 object MultiTrackingHandler  {
@@ -47,14 +45,11 @@ object MultiTrackingHandler  {
 
     @JvmStatic
     fun startMultiTracking() {
-        if (scheduler.isShutdown) {
-            scheduler = Executors.newSingleThreadScheduledExecutor()
-        }
         initMultiTracking()
         OverlayManager.setMultiTrackingOverlayRendering(true)
         logger.info("[SCT]: Starting multi tracking for player ${PlayerData.playerName}")
 
-        MultiDataFetcher.scheduleMultiCollectionDataFetch()
+        MultiDataFetcher.fetchMultiCollectionData()
     }
 
     private fun initMultiTracking() {
@@ -69,7 +64,7 @@ object MultiTrackingHandler  {
 
     @JvmStatic
     fun stopMultiTrackingManual() {
-        if (!scheduler.isShutdown) {
+        if (isMultiTracking) {
             sendMultiRates()
             sendMessage("§cStopped multi-tracking!", true)
 
@@ -84,19 +79,13 @@ object MultiTrackingHandler  {
 
     @JvmStatic
     fun stopMultiTracking() {
-        if (!isMultiTracking) return
-        if (!scheduler.isShutdown) {
+        if (isMultiTracking) {
             if (!server) {
                 logger.info("[SCT]: Multi-tracking stopped because player disconnected from the server.")
-            } else if (MultiTrackingRates.afk) {
-                sendMultiRates()
-                sendMessage("§cYou have been marked as AFK. Stopping multi-tracker.", true)
-                logger.info("[SCT]: Multi-tracking stopped because the player went AFK or the API server is down")
             } else {
                 sendMessage("§cAPI server is down. Stopping multi-tracker.", true)
                 logger.info("[SCT]: Multi-tracking stopped because the API server is down.")
             }
-            MultiTrackingRates.afk = false
 
             resetMultiTrackingData(false)
         } else {
@@ -135,15 +124,6 @@ object MultiTrackingHandler  {
 
     private fun resetMultiTrackingData(restart: Boolean) {
         resetVariables()
-        scheduler.shutdown()
-        try {
-            if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow()
-            }
-        } catch (_: InterruptedException) {
-            scheduler.shutdownNow()
-            Thread.currentThread().interrupt()
-        }
         clearCache()
 
         val now = System.currentTimeMillis()
@@ -166,13 +146,11 @@ object MultiTrackingHandler  {
         isMultiPaused = false
         multiStartTime = 0
         multiLastTime = 0
-        MultiTrackingRates.afk = false
 
         clearMaps()
     }
 
     fun clearMaps() {
-        MultiTrackingRates.unchangedStreaks.clear()
         MultiTrackingRates.collectionAmounts.clear()
         MultiTrackingRates.collectionPerHour.clear()
         MultiTrackingRates.collectionMade.clear()
@@ -189,42 +167,41 @@ object MultiTrackingHandler  {
 
     @JvmStatic
     fun pauseMultiTracking() {
-        if (!scheduler.isShutdown) {
-            if (isMultiPaused) {
-                sendMessage("§cMulti-tracking is already paused!", true)
-                logger.warn("[SCT]: Attempted to pause multi-tracking, but multi-tracking is already paused.")
-                return
-            }
-            isMultiPaused = true
-            multiLastTime += (System.currentTimeMillis() - multiStartTime) / 1000
-            sendMessage("§7Multi-tracking paused.", true)
-            logger.info("[SCT]: Multi-tracking paused.")
-        } else {
+        if (!isMultiTracking) {
             sendMessage("§cNo multi-tracking active!", true)
             logger.warn("[SCT]: Attempted to pause multi-tracking, but no multi-tracking is active.")
         }
+
+        if (isMultiPaused) {
+            sendMessage("§cMulti-tracking is already paused!", true)
+            logger.warn("[SCT]: Attempted to pause multi-tracking, but multi-tracking is already paused.")
+            return
+        }
+        isMultiPaused = true
+        multiLastTime += (System.currentTimeMillis() - multiStartTime) / 1000
+        sendMessage("§7Multi-tracking paused.", true)
+        logger.info("[SCT]: Multi-tracking paused.")
+
     }
 
     @JvmStatic
     fun resumeMultiTracking() {
-        if (scheduler.isShutdown && !isMultiTracking) {
+        if (!isMultiTracking) {
             sendMessage("§cNo multi-tracking active!", true)
             logger.warn("[SCT]: Attempted to resume multi-tracking, but no multi-tracking is active.")
             return
         }
 
-        if (isMultiTracking && isMultiPaused) {
-            sendMessage("§7Resuming multi-tracking.", true)
-            logger.info("[SCT]: Resuming multi-tracking.")
-            multiStartTime = System.currentTimeMillis()
-            isMultiPaused = false
-        } else if (isMultiTracking) {
+        if (!isMultiPaused) {
             sendMessage("§cMulti-tracking is already active!", true)
             logger.warn("[SCT]: Attempted to resume multi-tracking, but multi-tracking is already active.")
-        } else {
-            sendMessage("§cTracking has not been started yet!", true)
-            logger.warn("[SCT]: Attempted to resume multi-tracking, but multi-tracking has not been started.")
+            return
         }
+
+        isMultiPaused = false
+        multiStartTime = System.currentTimeMillis()
+        sendMessage("§7Resuming multi-tracking.", true)
+        logger.info("[SCT]: Resuming multi-tracking.")
     }
 
     fun getMultiUptimeInSeconds(): Long {
@@ -377,9 +354,12 @@ object MultiTrackingHandler  {
         }
 
         if (ConfigAccess.getSummaryStats().name == "MONEY" || ConfigAccess.getSummaryStats().name == "BOTH") {
-            lines.add(
-                Component.literal("   §eTotal Profit: §f$${formatNumber(totalMoneyMade)}   §eRate: §f$${formatNumber(totalMoneyRate)}/h   §ePricing:§f" + if (useBazaar) " $bazaarSuffix" else " NPC"))
-            lines.add(Component.empty())
+            if (totalMoneyMade > 0) {
+                lines.add(
+                    Component.literal("   §eTotal Profit: §f$${formatNumber(totalMoneyMade)}   §eRate: §f$${formatNumber(totalMoneyRate)}/h   §ePricing:§f" + if (useBazaar) " $bazaarSuffix" else " NPC")
+                )
+                lines.add(Component.empty())
+            }
         }
         lines.addAll(collectionLines)
 

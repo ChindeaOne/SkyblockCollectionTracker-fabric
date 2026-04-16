@@ -48,7 +48,6 @@ public class HypixelApiFetcher {
                 if (body == null || body.trim().isEmpty() || body.equals("{}")) {
                     ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Please enable it in the settings.", true);
                     logger.warn("[SCT]: Collection API disabled for player.");
-                    TrackingHandler.stopTracking();
                     return null;
                 }
                 return body;

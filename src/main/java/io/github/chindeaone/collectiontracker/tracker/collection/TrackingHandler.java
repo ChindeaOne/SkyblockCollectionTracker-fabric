@@ -8,7 +8,6 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
-import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.Hypixel;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
@@ -19,12 +18,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
-import static io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.scheduler;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
 
@@ -46,16 +43,13 @@ public class TrackingHandler {
     private static long firstRestartTime;
 
     public static void startTracking() {
-        if (scheduler == null || scheduler.isShutdown()) {
-            scheduler = Executors.newSingleThreadScheduledExecutor();
-        }
 
         initTracking(System.currentTimeMillis());
         OverlayManager.setTrackingOverlayRendering(true);
 
         logger.info("[SCT]: Tracking started for player: {}", PlayerData.INSTANCE.getPlayerName());
 
-        DataFetcher.scheduleCollectionDataFetch();
+        DataFetcher.fetchData();
     }
 
     public static void initTracking(long now) {
@@ -70,7 +64,7 @@ public class TrackingHandler {
     }
 
     public static void stopTrackingManual() {
-        if (scheduler != null && !scheduler.isShutdown()) {
+        if (isTracking) {
             ChatUtils.INSTANCE.sendMessage("§cStopped tracking!", true);
 
             resetTrackingData(false);
@@ -84,22 +78,16 @@ public class TrackingHandler {
     }
 
     public static void stopTracking() {
-        if (!isTracking) return;
-        if (scheduler != null && !scheduler.isShutdown()) {
+        if (isTracking) {
 
             if (!Hypixel.INSTANCE.getServer()) {
                 logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
-            } else if (afk) {
-                ChatUtils.INSTANCE.sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true);
-                logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down");
             } else {
                 ChatUtils.INSTANCE.sendMessage("§cAPI server is down. Stopping the tracker.", true);
                 logger.info("[SCT]: Tracking stopped because the API server is down.");
             }
-            afk = false;
 
             resetTrackingData(false);
-
         } else {
             logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
         }
@@ -137,15 +125,6 @@ public class TrackingHandler {
         if (ConfigAccess.isShowTrackingRatesAtEndOfSession()) sendRates();
 
         resetVariables();
-        scheduler.shutdown();
-        try {
-            if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            scheduler.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
         // Clear cached data
         DataFetcher.clearAllCache();
 
@@ -173,8 +152,6 @@ public class TrackingHandler {
         startTime = 0;
         lastTime = 0;
 
-        SacksTrackingManager.reset();
-
         // Reset collection tracking
         lastApiCollection = -1L;
         sacksCollectionGained = 0L;
@@ -199,7 +176,7 @@ public class TrackingHandler {
     }
 
     public static void pauseTracking() {
-        if (scheduler != null && !scheduler.isShutdown()) {
+        if (isTracking) {
             if (isPaused) {
                 ChatUtils.INSTANCE.sendMessage("§cTracking is already paused!", true);
                 logger.warn("[SCT]: Attempted to pause tracking, but tracking is already paused.");
@@ -216,7 +193,7 @@ public class TrackingHandler {
     }
 
     public static void resumeTracking() {
-        if (scheduler == null || scheduler.isShutdown() && !isTracking) {
+        if (!isTracking) {
             ChatUtils.INSTANCE.sendMessage("§cNo tracking active!", true);
             logger.warn("[SCT]: Attempted to resume tracking, but no tracking is active.");
             return;
@@ -227,7 +204,7 @@ public class TrackingHandler {
             logger.info("[SCT]: Resuming tracking.");
             startTime = System.currentTimeMillis();
             isPaused = false;
-        } else if (isTracking) {
+        } else if (!isPaused) {
             ChatUtils.INSTANCE.sendMessage("§cTracking is already active!", true);
             logger.warn("[SCT]: Attempted to resume tracking, but tracking is already active.");
         } else {
