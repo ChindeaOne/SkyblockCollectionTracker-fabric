@@ -101,25 +101,6 @@ public class CollectionOverlay {
     public boolean showTrackingRatesAtEndOfSession = true;
 
     @Expose
-    @ConfigOption(
-            name = " §b[WIP]§r Sacks Tracking",
-            desc = "Toggle this to use Hypixel's sacks messages instead of api calls when tracking.\n§eRecommended to use only if you have a lot of sacks!"
-    )
-    @SerializedName("enableSacksTracking")
-    @ConfigEditorBoolean
-    public boolean enableSacksTracking = false;
-
-    @Expose
-    @ConfigOption(
-            name = "More Sacks Tracking Info",
-            desc = "§eFor some collections, it can be more accurate then API calls. " +
-                    "However, for now, API calls will still be used, and every API call will update the rates according to the API data, meaning rates can jump around."
-    )
-    @ConfigEditorInfoText
-    @SuppressWarnings("unused")
-    public boolean sacksInfo = true;
-
-    @Expose
     @ConfigLink(owner = CollectionOverlay.class, field = "collectionOverlay")
     public Position overlayPosition = new Position(50, 100);
 }

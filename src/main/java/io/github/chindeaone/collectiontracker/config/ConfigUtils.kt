@@ -141,7 +141,6 @@ val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbility
 // Collection Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
 val collectionOverlay: CollectionOverlay get() = trackingConfig.collectionOverlay
-val enableSacksTracking: Boolean get() = collectionOverlay.enableSacksTracking
 val statsText: List<CollectionOverlay.OverlayText> get() = collectionOverlay.statsText
 val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionOverlay.extraStatsText
 val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
@@ -262,9 +261,6 @@ object ConfigAccess {
 
     @JvmStatic
     fun isExplicitValues(): Boolean = explicitValues
-
-    @JvmStatic
-    fun isSacksTrackingEnabled(): Boolean = enableSacksTracking
 
     @JvmStatic
     fun isTamingTrackingEnabled(): Boolean = enableTamingTracking
