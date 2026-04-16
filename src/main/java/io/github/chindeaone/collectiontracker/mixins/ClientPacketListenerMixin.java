@@ -32,7 +32,7 @@ public class ClientPacketListenerMixin {
     }
 
     @Inject(method = "handleSystemChat", at = @At("HEAD"), cancellable = true)
-    private void onHandleSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
+    private void sct$onHandleSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
         String text = packet.content().getString();
         ChatListener.petSwapListener(text);
         if (ChatListener.dailyPerksUpdate(packet.content())) {
