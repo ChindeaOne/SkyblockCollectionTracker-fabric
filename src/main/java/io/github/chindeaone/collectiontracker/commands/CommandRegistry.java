@@ -107,9 +107,43 @@ public class CommandRegistry {
                             return 1;
                         })
                         .then(ClientCommandManager.argument("collection", StringArgumentType.greedyString())
-                                .suggests(COLLECTION_SUGGESTIONS)
+                                .suggests(MULTI_COLLECTION_SUGGESTIONS)
                                 .executes(context -> {
-                                    CollectionTracker.startTracking(StringArgumentType.getString(context, "collection").trim());
+                                    String input = StringArgumentType.getString(context, "collection").trim();
+                                    List<String> collections = CollectionsManager.getAllCollections();
+                                    List<String> foundCollections = new ArrayList<>();
+
+                                    String remaining = input;
+                                    while (!remaining.isEmpty()) {
+                                        boolean found = false;
+                                        List<String> sortedCollections = collections.stream()
+                                                .sorted((a, b) -> Integer.compare(b.length(), a.length()))
+                                                .toList();
+
+                                        for (String coll : sortedCollections) {
+                                            if (remaining.toLowerCase().startsWith(coll.toLowerCase())) {
+                                                foundCollections.add(coll);
+                                                remaining = remaining.substring(coll.length()).trim();
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found) {
+                                            // skip
+                                            int nextSpace = remaining.indexOf(' ');
+                                            if (nextSpace == -1) break;
+                                            remaining = remaining.substring(nextSpace).trim();
+                                        }
+                                    }
+
+                                    if (foundCollections.size() > 1 || (foundCollections.size() == 1 && foundCollections.getFirst().equalsIgnoreCase("gemstone"))) {
+                                        CollectionTracker.startMultiTracking(foundCollections);
+                                    } else if (foundCollections.size() == 1) {
+                                        CollectionTracker.startTracking(foundCollections.getFirst());
+                                    } else {
+                                        CollectionTracker.startTracking(input);
+                                    }
                                     return 1;
                                 })
                         )
@@ -117,28 +151,44 @@ public class CommandRegistry {
                 // sct stop
                 .then(ClientCommandManager.literal("stop")
                         .executes(context -> {
-                            TrackingHandler.stopTrackingManual();
+                            if (MultiTrackingHandler.isMultiTracking()) {
+                                MultiTrackingHandler.stopMultiTrackingManual();
+                            } else {
+                                TrackingHandler.stopTrackingManual();
+                            }
                             return 1;
                         })
                 )
                 // sct pause
                 .then(ClientCommandManager.literal("pause")
                         .executes(context -> {
-                            TrackingHandler.pauseTracking();
+                            if (MultiTrackingHandler.isMultiTracking()) {
+                                MultiTrackingHandler.pauseMultiTracking();
+                            } else {
+                                TrackingHandler.pauseTracking();
+                            }
                             return 1;
                         })
                 )
                 // sct resume
                 .then(ClientCommandManager.literal("resume")
                         .executes(context -> {
-                            TrackingHandler.resumeTracking();
+                            if (MultiTrackingHandler.isMultiPaused()) {
+                                MultiTrackingHandler.resumeMultiTracking();
+                            } else {
+                                TrackingHandler.resumeTracking();
+                            }
                             return 1;
                         })
                 )
                 // sct restart
                 .then(ClientCommandManager.literal("restart")
                         .executes(context -> {
-                            TrackingHandler.restartTracking();
+                            if (MultiTrackingHandler.isMultiTracking() || MultiTrackingHandler.isMultiPaused()) {
+                                MultiTrackingHandler.restartMultiTracking();
+                            } else {
+                                TrackingHandler.restartTracking();
+                            }
                             return 1;
                         })
                 )
@@ -338,71 +388,6 @@ public class CommandRegistry {
                             return 1;
                         })
                 )
-                .then(ClientCommandManager.literal("track-multi")
-                        .executes(context-> {
-                            ChatUtils.INSTANCE.sendMessage("Usage: /sct multi-track <collection1> <collection2> etc.",true);
-                            return 1;
-                        })
-                        .then(ClientCommandManager.argument("collections", StringArgumentType.greedyString())
-                                .suggests(MULTI_COLLECTION_SUGGESTIONS)
-                                .executes(context -> {
-                                    String collectionsArgs = StringArgumentType.getString(context, "collections").trim();
-                                    List<String> collections = CollectionsManager.getAllCollections();
-                                    List<String> foundCollections = new ArrayList<>();
-
-                                    String remaining = collectionsArgs;
-                                    while (!remaining.isEmpty()) {
-                                        boolean found = false;
-                                        List<String> sortedCollections = collections.stream()
-                                                .sorted((a, b) -> Integer.compare(b.length(), a.length()))
-                                                .toList();
-
-                                        for (String coll : sortedCollections) {
-                                            if (remaining.startsWith(coll)) {
-                                                foundCollections.add(coll);
-                                                remaining = remaining.substring(coll.length()).trim();
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-
-                                        if (!found) {
-                                            // skip
-                                            int nextSpace = remaining.indexOf(' ');
-                                            if (nextSpace == -1) break;
-                                            remaining = remaining.substring(nextSpace).trim();
-                                        }
-                                    }
-
-                                    CollectionTracker.startMultiTracking(foundCollections);
-                                    return 1;
-                                })
-                        )
-                )
-                .then(ClientCommandManager.literal("stop-multi")
-                        .executes(context -> {
-                            MultiTrackingHandler.stopMultiTrackingManual();
-                            return 1;
-                        })
-                )
-                .then(ClientCommandManager.literal("pause-multi")
-                        .executes(context -> {
-                            MultiTrackingHandler.pauseMultiTracking();
-                            return 1;
-                        })
-                )
-                .then(ClientCommandManager.literal("resume-multi")
-                        .executes(context -> {
-                            MultiTrackingHandler.resumeMultiTracking();
-                            return 1;
-                        })
-                )
-                .then(ClientCommandManager.literal("restart-multi")
-                        .executes(context -> {
-                            MultiTrackingHandler.restartMultiTracking();
-                            return 1;
-                        })
-                )
                 .then(ClientCommandManager.literal("timer")
 
                         .then(ClientCommandManager.literal("set")
@@ -451,16 +436,6 @@ public class CommandRegistry {
                 )
         ));
     }
-
-    private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_SUGGESTIONS = (context, builder) -> {
-        String arg = builder.getRemaining().toLowerCase();
-        for (String c : CollectionsManager.getAllCollections()) {
-            if (c.toLowerCase().startsWith(arg)) {
-                builder.suggest(c);
-            }
-        }
-        return builder.buildFuture();
-    };
 
     private static final SuggestionProvider<FabricClientCommandSource> MULTI_COLLECTION_SUGGESTIONS = (context, builder) -> {
         String arg = builder.getRemaining().toLowerCase();

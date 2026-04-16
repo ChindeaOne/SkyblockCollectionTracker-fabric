@@ -27,16 +27,11 @@ public class CommandHelper {
             new CommandPage("Collection Tracking", "§a", List.of(
                     new CommandEntry("/sct collections", "§eShows all available collections (page 1)."),
                     new CommandEntry("/sct collections <page | category>", "§eJumps to a specific collections page or category."),
-                    new CommandEntry("/sct track <collection>", "§eTracks your collection."),
+                    new CommandEntry("/sct track <collection 1> <collection 2> ...", "§eTracks one or more collections at once."),
                     new CommandEntry("/sct stop", "§eStops collection tracking."),
                     new CommandEntry("/sct pause", "§ePauses collection tracking."),
                     new CommandEntry("/sct resume", "§eResumes collection tracking."),
-                    new CommandEntry("/sct restart", "§eRestarts collection tracking."),
-                    new CommandEntry("/sct track-multi <col1> <col2> ...", "§eTracks multiple collections at once."),
-                    new CommandEntry("/sct stop-multi", "§eStops multi-collection tracking."),
-                    new CommandEntry("/sct pause-multi", "§ePauses multi-collection tracking."),
-                    new CommandEntry("/sct resume-multi", "§eResumes multi-collection tracking."),
-                    new CommandEntry("/sct restart-multi", "§eRestarts multi-collection tracking.")
+                    new CommandEntry("/sct restart", "§eRestarts collection tracking.")
             )),
             new CommandPage("Skill Tracking", "§6", List.of(
                     new CommandEntry("/sct skill track <skill>", "§eTracks your skill progress."),

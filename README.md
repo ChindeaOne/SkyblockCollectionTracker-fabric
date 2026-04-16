@@ -23,11 +23,10 @@
 <details>
 <summary><strong>Collection/Profit Tracker</strong></summary>
 
-- Tracks collections and profit over time using Hypixel’s API via `/sct track <collection>`.
-- Supports multi-tracking via `/sct track-multi <collection1> <collection2> ...`.
+- Tracks collections and profit over time using sacks messages, via `/sct track <collection>`.
+- Supports multi-tracking via `/sct track <collection1> <collection2> ...`.
 - Configurable overlay lines showing collection progress and profit rates.
 - Provides NPC/Bazaar prices for accurate profit tracking.
-- Optional Sack Tracking mode for faster live updates.
 - Detailed session summary at the end (best/worst rates, elapsed time, profit, etc.).
 - `/sct collections` for all available collections.
 
