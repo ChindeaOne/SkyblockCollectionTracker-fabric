@@ -4,8 +4,6 @@ import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import org.apache.logging.log4j.LogManager;
@@ -44,16 +42,14 @@ public class HypixelApiFetcher {
             }
 
             if (status == 200) {
-                String body = response.body();
-                if (body == null || body.trim().isEmpty() || body.equals("{}")) {
-                    ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Please enable it in the settings.", true);
-                    logger.warn("[SCT]: Collection API disabled for player.");
-                    return null;
-                }
-                return body;
+                return response.body();
+            } else if (status == 404) {
+                ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Total collection will be considered 0", true);
+                logger.warn("[SCT]: Collection API disabled for player.");
+                return null;
+
             } else {
-                logger.error("[SCT]: Failed to fetch data. Server responded with code: {}", status);
-                TrackingHandler.stopTracking();
+                logger.error("[SCT]: Failed to fetch collection data for uuid: {}", uuid);
             }
 
         } catch (Exception e) {
@@ -83,17 +79,13 @@ public class HypixelApiFetcher {
             }
 
             if (status == 200) {
-                String body = response.body();
-                if (body == null || body.trim().isEmpty() || body.equals("{}")) {
-                    ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Please enable it in the settings.", true);
-                    logger.warn("[SCT]: Collection API disabled for player.");
-                    MultiTrackingHandler.stopMultiTracking();
-                    return null;
-                }
-                return body;
+                return response.body();
+            } else if (status == 404) {
+                ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Total collection will be considered 0", true);
+                logger.warn("[SCT]: Collection API disabled for player.");
+                return null;
             } else {
                 logger.error("[SCT]: Failed to fetch multi-collection data. Server responded with code: {}", status);
-                MultiTrackingHandler.stopMultiTracking();
             }
         } catch (Exception e) {
             logger.error("[SCT]: An error occurred while fetching multi-collection data from the server", e);

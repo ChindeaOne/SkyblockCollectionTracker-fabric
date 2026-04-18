@@ -34,6 +34,12 @@ object MultiDataFetcher {
                 val data = fetchDataFromApi()
                 if (data == null) {
                     logger.error("[SCT]: Failed to fetch multi collection data from the Hypixel API.")
+                    val newMap = mutableMapOf<String, Long>()
+
+                    for (collection in CollectionTracker.collectionList) {
+                        newMap[collection] = 0
+                    }
+                    MultiTrackingRates.setCollections(newMap)
                     return
                 }
 

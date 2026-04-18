@@ -18,8 +18,8 @@ import static io.github.chindeaone.collectiontracker.tracker.collection.Tracking
 public class DataFetcher {
 
     private static final Logger logger = LogManager.getLogger(DataFetcher.class);
-    private static final Map<CacheKey, Long> collectionCache = new ConcurrentHashMap<>();
-    private static final Map<CacheKey, Long> cacheTimestamps = new ConcurrentHashMap<>();
+    private static final Map<String, Long> collectionCache = new ConcurrentHashMap<>();
+    private static final Map<String, Long> cacheTimestamps = new ConcurrentHashMap<>();
     private static final long CACHE_LIFESPAN_MS = 180_000L; // default 3 minutes
 
     public static void fetchData() {
@@ -34,20 +34,20 @@ public class DataFetcher {
             if (!isTracking || isPaused) return;
 
             String playerUUID = PlayerData.INSTANCE.getPlayerUUID();
-            Long collectionData = getCachedData(playerUUID, collection);
+            Long collectionData = getCachedData(collection);
 
             if (collectionData == null) {
                 String jsonData = fetchDataFromApi(playerUUID, collection);
                 if (jsonData == null) {
                     logger.error("[SCT]: Failed to fetch data from the Hypixel API");
-                    TrackingHandler.stopTracking();
+                    collectionData = 0L;
+                    TrackingRates.setCollection(collectionData);
                     return;
                 }
                 collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().getValue().getAsLong();
 
-                CacheKey cacheKey = new CacheKey(playerUUID, collection);
-                collectionCache.put(cacheKey, collectionData);
-                cacheTimestamps.put(cacheKey, System.currentTimeMillis());
+                collectionCache.put(collection, collectionData);
+                cacheTimestamps.put(collection, System.currentTimeMillis());
             }
 
             logger.info("[SCT]: Data successfully fetched or retrieved for player with UUID: {} and collection: {}", playerUUID, collection);
@@ -58,21 +58,19 @@ public class DataFetcher {
         }
     }
 
-    private static Long getCachedData(String playerUUID, String collection) {
-        CacheKey cacheKey = new CacheKey(playerUUID, collection);
-        Long lastFetched = cacheTimestamps.get(cacheKey);
+    private static Long getCachedData(String collection) {
+        Long lastFetched = cacheTimestamps.get(collection);
 
         if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < CACHE_LIFESPAN_MS) {
             long elapsed = System.currentTimeMillis() - lastFetched;
-            logger.info("[SCT]: Returning cached data for player with UUID: {} and collection: {} (last fetched {} ms ago)", playerUUID, collection, elapsed);
-            return collectionCache.get(cacheKey);
+            logger.info("[SCT]: Returning cached data for collection: {} (last fetched {} ms ago)", collection, elapsed);
+            return collectionCache.get(collection);
         }
         return null;
     }
 
     private static String fetchDataFromApi(String playerUUID, String collection) {
-        CacheKey cacheKey = new CacheKey(playerUUID, collection);
-        Long lastFetched = cacheTimestamps.get(cacheKey);
+        Long lastFetched = cacheTimestamps.get(collection);
 
         if (lastFetched != null) {
             long elapsed = System.currentTimeMillis() - lastFetched;
@@ -89,6 +87,4 @@ public class DataFetcher {
         cacheTimestamps.clear();
         logger.info("[SCT]: All collection data caches have been cleared.");
     }
-
-    private record CacheKey(String uuid, String collection) { }
 }
