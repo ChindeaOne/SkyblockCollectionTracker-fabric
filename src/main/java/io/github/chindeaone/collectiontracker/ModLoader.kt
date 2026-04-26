@@ -104,6 +104,7 @@ class ModLoader: ModInitializer {
             BlockWatcher.onClientTick(client)
             ScoreboardUtils.onTick(client)
             DeployableParser.onTick(client)
+            InventoryListener.onTick(client)
         }
     }
 }
