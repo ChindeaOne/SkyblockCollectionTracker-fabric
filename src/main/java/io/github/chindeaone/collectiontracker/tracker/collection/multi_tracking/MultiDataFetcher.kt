@@ -3,10 +3,12 @@ package io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking
 import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiPaused
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiTracking
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
+import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.ConcurrentHashMap
@@ -19,14 +21,14 @@ object MultiDataFetcher {
     private val cacheTimestamps: MutableMap<CacheKey, Long> = ConcurrentHashMap<CacheKey, Long>()
     private const val CACHE_LIFESPAN_MS: Long = 180000L // default 3 minutes
 
-    fun fetchMultiCollectionData() {
+    fun fetchMultiCollectionData(isInitialFetch: Boolean = true) {
         try {
             if (!ServerUtils.serverStatus) {
                 logger.warn("[SCT]: API server not online. Stopping the multi tracker.")
                 MultiTrackingHandler.stopMultiTracking()
                 return
             }
-            if (!isMultiTracking || isMultiPaused) return
+            if (!isInitialFetch && (!isMultiTracking || isMultiPaused)) return
 
             var map = getCachedData()
 
@@ -34,12 +36,9 @@ object MultiDataFetcher {
                 val data = fetchDataFromApi()
                 if (data == null) {
                     logger.error("[SCT]: Failed to fetch multi collection data from the Hypixel API.")
-                    val newMap = mutableMapOf<String, Long>()
-
-                    for (collection in CollectionTracker.collectionList) {
-                        newMap[collection] = 0
+                    Minecraft.getInstance().execute {
+                        Minecraft.getInstance().setScreen(CustomCollectionScreen(CollectionTracker.collectionList))
                     }
-                    MultiTrackingRates.setCollections(newMap)
                     return
                 }
 

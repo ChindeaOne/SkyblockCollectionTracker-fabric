@@ -3,11 +3,15 @@ package io.github.chindeaone.collectiontracker.tracker.collection;
 import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
+import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.ServerUtils;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,7 +26,7 @@ public class DataFetcher {
     private static final Map<String, Long> cacheTimestamps = new ConcurrentHashMap<>();
     private static final long CACHE_LIFESPAN_MS = 180_000L; // default 3 minutes
 
-    public static void fetchData() {
+    public static void fetchData(boolean isInitialFetch) {
         logger.info("[SCT]: Fetching collection data");
 
         try {
@@ -31,7 +35,7 @@ public class DataFetcher {
                 TrackingHandler.stopTracking();
                 return;
             }
-            if (!isTracking || isPaused) return;
+            if (!isInitialFetch && (!isTracking || isPaused)) return;
 
             String playerUUID = PlayerData.INSTANCE.getPlayerUUID();
             Long collectionData = getCachedData(collection);
@@ -40,8 +44,7 @@ public class DataFetcher {
                 String jsonData = fetchDataFromApi(playerUUID, collection);
                 if (jsonData == null) {
                     logger.error("[SCT]: Failed to fetch data from the Hypixel API");
-                    collectionData = 0L;
-                    TrackingRates.setCollection(collectionData);
+                    Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new CustomCollectionScreen(List.of(collection))));
                     return;
                 }
                 collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().getValue().getAsLong();

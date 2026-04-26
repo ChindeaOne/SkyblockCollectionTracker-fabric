@@ -51,12 +51,14 @@ public class TrackingRates {
     public static Map<String, Long> highestRatesPerHourBazaar = new ConcurrentHashMap<>();
 
     public static void setCollection(long value) {
+        long now = System.currentTimeMillis();
         lastApiCollection = value;
         if (sessionStartCollection == -1L) {
             sessionStartCollection = value;
+            TrackingHandler.initTracking(now);
         }
         collectionAmount = value;
-        lastCollectionTime = System.currentTimeMillis();
+        lastCollectionTime = now;
 
         updateValues(collectionAmount, 0);
     }

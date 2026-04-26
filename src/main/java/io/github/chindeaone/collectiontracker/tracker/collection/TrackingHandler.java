@@ -32,7 +32,6 @@ public class TrackingHandler {
 
     public static volatile boolean isTracking = false;
     public static boolean isPaused = false;
-    public static int apiCallCount = 0;
 
     public static long startTime;
     private static long lastTime;
@@ -43,13 +42,10 @@ public class TrackingHandler {
     private static long firstRestartTime;
 
     public static void startTracking() {
-
-        initTracking(System.currentTimeMillis());
-        OverlayManager.setTrackingOverlayRendering(true);
-
         logger.info("[SCT]: Tracking started for player: {}", PlayerData.INSTANCE.getPlayerName());
 
-        DataFetcher.fetchData();
+        OverlayManager.setTrackingOverlayRendering(true);
+        DataFetcher.fetchData(true);
     }
 
     public static void initTracking(long now) {
@@ -57,7 +53,6 @@ public class TrackingHandler {
 
         isTracking = true;
         isPaused = false;
-        apiCallCount = 0;
 
         startTime = now;
         lastTime = 0;
@@ -148,7 +143,6 @@ public class TrackingHandler {
     private static void resetVariables() {
         isTracking = false;
         isPaused = false;
-        apiCallCount = 0;
         startTime = 0;
         lastTime = 0;
 

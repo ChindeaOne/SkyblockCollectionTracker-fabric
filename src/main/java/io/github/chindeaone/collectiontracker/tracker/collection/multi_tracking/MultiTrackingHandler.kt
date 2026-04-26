@@ -45,14 +45,13 @@ object MultiTrackingHandler  {
 
     @JvmStatic
     fun startMultiTracking() {
-        initMultiTracking()
         OverlayManager.setMultiTrackingOverlayRendering(true)
         logger.info("[SCT]: Starting multi tracking for player ${PlayerData.playerName}")
 
         MultiDataFetcher.fetchMultiCollectionData()
     }
 
-    private fun initMultiTracking() {
+    fun initMultiTracking() {
         val now = System.currentTimeMillis()
         multiStartTime = now
         multiLastTrackTime = now

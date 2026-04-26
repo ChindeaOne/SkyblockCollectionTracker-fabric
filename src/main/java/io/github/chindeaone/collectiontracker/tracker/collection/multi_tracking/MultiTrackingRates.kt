@@ -35,7 +35,8 @@ object MultiTrackingRates {
     @JvmStatic
     fun setCollections(values: Map<String, Long>) {
         val now = System.currentTimeMillis()
-        println("[SCT DEBUG] setCollections called with values: $values")
+        MultiTrackingHandler.initMultiTracking()
+
         for ((coll, value) in values) {
             lastApiCollections[coll] = value
             lastCollectionTimes[coll] = now
@@ -44,7 +45,6 @@ object MultiTrackingRates {
 
                 // Initialize NPC money maps for gemstones
                 if (coll == "gemstone") {
-                    println("[SCT DEBUG] Initializing gemstone NPC money maps")
                     GemstonesManager.gemstones?.forEach { gemstoneType ->
                         val gemstoneKey = gemstoneType.lowercase()
                         GemstonePrices.multiGemstoneRecipes[gemstoneKey]?.keys?.forEach { tier ->
