@@ -469,7 +469,6 @@ object ChatListener {
         }
     }
 
-
     private fun parseSkillMessage(match: MatchResult) {
         val currentRaw = match.groups["current"]?.value ?: return
         val skillName = match.groups["skillName"]?.value?.trim() ?: return

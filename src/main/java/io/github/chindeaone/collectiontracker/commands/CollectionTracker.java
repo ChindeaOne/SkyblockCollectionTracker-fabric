@@ -37,7 +37,7 @@ public class CollectionTracker {
                 }
 
                 if (MultiTrackingHandler.isMultiTracking()) {
-                    ChatUtils.INSTANCE.sendMessage("§cCannot track collections normally while multi-tracking.", true);
+                    ChatUtils.INSTANCE.sendMessage("§cCannot track solo collections while multi-tracking.", true);
                     return;
                 }
 
@@ -49,7 +49,7 @@ public class CollectionTracker {
                 collection = coll.toLowerCase();
                 // Remove general gemstone from normal tracking
                 if (collection.equals("gemstone")) {
-                    ChatUtils.INSTANCE.sendMessage("§cThe `gemstone` collection isn't supported for normal tracking anymore. Use `/sct track-multi gemstone instead`!", true);
+                    ChatUtils.INSTANCE.sendMessage("§cThe `gemstone` collection isn't supported for normal tracking anymore. Use `/sct track-multi gemstone` instead!", true);
                     return;
                 }
 
@@ -95,7 +95,7 @@ public class CollectionTracker {
                 }
 
                 if (TrackingHandler.isTracking) {
-                    ChatUtils.INSTANCE.sendMessage("§cCannot multi-track collections while tracking a collection normally.", true);
+                    ChatUtils.INSTANCE.sendMessage("§cCannot multi-track collections while tracking a collection solo.", true);
                     return;
                 }
 
