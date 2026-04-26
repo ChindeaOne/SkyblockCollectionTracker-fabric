@@ -5,7 +5,6 @@ import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,7 +43,6 @@ public class HypixelApiFetcher {
             if (status == 200) {
                 return response.body();
             } else if (status == 404) {
-                ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Total collection will be considered 0", true);
                 logger.warn("[SCT]: Collection API disabled for player.");
                 return null;
 
@@ -81,7 +79,6 @@ public class HypixelApiFetcher {
             if (status == 200) {
                 return response.body();
             } else if (status == 404) {
-                ChatUtils.INSTANCE.sendMessage("§c[SCT] Collection API disabled. Total collection will be considered 0", true);
                 logger.warn("[SCT]: Collection API disabled for player.");
                 return null;
             } else {
