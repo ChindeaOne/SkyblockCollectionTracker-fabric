@@ -362,24 +362,40 @@ object MultiTrackingHandler  {
         }
         lines.addAll(collectionLines)
 
-        val summaryLine = Component.literal("   §dGemstones (${variant.lowercase()}): ")
-        when (ConfigAccess.getSummaryStats().name) {
-            "COLLECTION" -> {
-                val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
-                val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
-                summaryLine.append("§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)")
-            }
-            "MONEY" -> summaryLine.append("§a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)")
-            "BOTH" -> {
-                val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
-                val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
-                summaryLine.append("§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)   §a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)")
-            }
-        }
+        if (trackedCollections.contains("gemstone")) {
+            val summaryLine = Component.literal("   §dGemstones (${variant.lowercase()}): ")
+            when (ConfigAccess.getSummaryStats().name) {
+                "COLLECTION" -> {
+                    val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
+                    val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
+                    summaryLine.append("§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)")
+                }
 
-        lines.add(summaryLine)
-        if (ConfigAccess.isMultiDetailedSummaryEnabled()) {
-            lines.addAll(gemstoneLines)
+                "MONEY" -> summaryLine.append(
+                    "§a$${formatNumber(totalGemstoneMoneyMade)} §7($${
+                        formatNumber(
+                            totalGemstoneMoneyRate
+                        )
+                    }/h)"
+                )
+
+                "BOTH" -> {
+                    val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
+                    val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
+                    summaryLine.append(
+                        "§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)   §a$${
+                            formatNumber(
+                                totalGemstoneMoneyMade
+                            )
+                        } §7($${formatNumber(totalGemstoneMoneyRate)}/h)"
+                    )
+                }
+            }
+
+            lines.add(summaryLine)
+            if (ConfigAccess.isMultiDetailedSummaryEnabled()) {
+                lines.addAll(gemstoneLines)
+            }
         }
 
         lines.add(Component.empty())
