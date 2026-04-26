@@ -6,7 +6,6 @@ import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.ServerUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
