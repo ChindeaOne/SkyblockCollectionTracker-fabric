@@ -10,6 +10,9 @@ object IslandTracker {
 
     var currentForagingIsland: String? = null
         private set
+
+    var currentFarmingIsland: String? = null
+        private set
     
     var isInGalatea: Boolean = false
         private set
@@ -24,6 +27,7 @@ object IslandTracker {
         val lines = areaWidget.lines
         updateMiningIsland(lines)
         updateForagingIsland(lines)
+        updateFarmingIsland(lines)
     }
 
     private fun updateMiningIsland(lines: List<String>) {
@@ -42,6 +46,14 @@ object IslandTracker {
         } else {
             currentForagingIsland = null
             isInGalatea = false
+        }
+    }
+
+    private fun updateFarmingIsland(lines: List<String>) {
+        currentFarmingIsland = lines.firstNotNullOfOrNull { line ->
+            FarmingMapping.farmingAreas.firstOrNull { name ->
+                line.contains(name, ignoreCase = true)
+            }
         }
     }
 

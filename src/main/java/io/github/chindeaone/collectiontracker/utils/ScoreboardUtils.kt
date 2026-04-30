@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.world.scores.DisplaySlot
@@ -109,7 +109,7 @@ object ScoreboardUtils {
     }
 
     fun checkIfMineshaft(rawLines: List<String>) {
-        if (!MiningStatsWidget.currentMiningIsland.equals("Mineshaft")) {
+        if (!IslandTracker.currentMiningIsland.equals("Mineshaft")) {
             if (mineshaftType.isNotEmpty()) {
                 mineshaftType = ""
             }

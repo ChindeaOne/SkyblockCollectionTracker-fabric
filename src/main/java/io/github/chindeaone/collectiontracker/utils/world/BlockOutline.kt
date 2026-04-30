@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -26,7 +25,7 @@ object BlockOutline {
         if (!HypixelUtils.isOnSkyblock) return
         if (!FetchWaypoints.hasWaypoints) return
 
-        val currentIsland = MiningStatsWidget.currentMiningIsland
+        val currentIsland = IslandTracker.currentMiningIsland
         if (currentIsland != "Dwarven Mines" && currentIsland != "Mineshaft") return
 
         if (currentIsland == "Dwarven Mines" && !ConfigAccess.isMineshaftSpawnRoutesEnabled()) return

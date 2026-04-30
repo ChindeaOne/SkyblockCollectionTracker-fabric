@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.utils
 import com.google.gson.annotations.Expose
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.ConfigManager
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping.miningIslands
 
 object AbilityUtils {
@@ -193,7 +193,7 @@ object AbilityUtils {
             cooldown *= (1.0 - petReduction)
         }
         // Sky Mall
-        if (skyMallActive && miningIslands.contains(MiningStatsWidget.currentMiningIsland)) {
+        if (skyMallActive && miningIslands.contains(IslandTracker.currentMiningIsland)) {
             cooldown *= if (abilityName == "Pickobulus") {
                 0.765 // apparently it's more for pickobulus
             } else {
@@ -202,7 +202,7 @@ object AbilityUtils {
         }
 
         // Mayhem cooldown reduction
-        if (MiningStatsWidget.currentMiningIsland == "Mineshaft" && isMayhemCooldown) {
+        if (IslandTracker.currentMiningIsland == "Mineshaft" && isMayhemCooldown) {
             cooldown *= 0.75
         }
 

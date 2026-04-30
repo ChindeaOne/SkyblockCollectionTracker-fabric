@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
@@ -61,7 +61,7 @@ object DeployableParser {
             found = EntityUtils.findArmorStandByKeywords(candidates, MINING_DEPLOYABLE)
         }
 
-        val inMineshaft = MiningStatsWidget.currentMiningIsland?.contains("Mineshaft", ignoreCase = true)
+        val inMineshaft = IslandTracker.currentMiningIsland?.contains("Mineshaft", ignoreCase = true)
 
         if (found != null) {
             val (entity, detectedBuff) = found

@@ -12,9 +12,6 @@ object MiningStatsWidget {
 
     private var lastStats: List<String>? = null
     var rawStats: List<String> = emptyList()
-    @JvmStatic
-    var currentMiningIsland: String? = null
-        private set
 
     private var nextAllowedTime: Long = 0L
     private var firstInfoSeenTime: Long = 0L
@@ -24,7 +21,7 @@ object MiningStatsWidget {
         val now = System.currentTimeMillis()
         if (now < nextAllowedTime) return
 
-        currentMiningIsland = IslandTracker.currentMiningIsland
+        val currentMiningIsland = IslandTracker.currentMiningIsland
         if (currentMiningIsland == null) {
             rawStats = emptyList()
             lastStats = null
