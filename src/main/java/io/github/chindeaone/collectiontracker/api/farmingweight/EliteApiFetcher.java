@@ -63,6 +63,14 @@ public class EliteApiFetcher {
                             return;
                         }
 
+                        if (status == 429) {
+                            logger.warn("[SCT]: Rate limit exceeded for Farming Weight API. Limit: 10 requests per 10 minutes.");
+                            Minecraft.getInstance().execute(() ->
+                                    ChatUtils.sendMessage("§Farming weight fetching limit reached! Try again later.", true)
+                            );
+                            return;
+                        }
+
                         if (status == 200) {
                             if (response.body() == null || response.body().isEmpty()) {
                                 Minecraft.getInstance().execute(() ->

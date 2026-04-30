@@ -64,7 +64,7 @@ object FarmingweightUtils {
         val isMe = playerName.equals(PlayerData.playerName, ignoreCase = true)
         val rankComp = getRankComponent(storage.rank, isMe, playerName)
         val fullMessage = Component.empty().append(rankComp)
-            .append(" §b$playerName's Farming Weight: ${storage.weight}")
+            .append(" §e$playerName's Farming Weight: ${storage.weight}")
 
         Minecraft.getInstance().execute { ChatUtils.sendComponent(fullMessage, true) }
     }
