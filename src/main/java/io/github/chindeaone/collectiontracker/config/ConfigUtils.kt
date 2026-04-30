@@ -3,7 +3,9 @@ package io.github.chindeaone.collectiontracker.config
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
+import io.github.chindeaone.collectiontracker.config.categories.Farming
 import io.github.chindeaone.collectiontracker.config.categories.Foraging
+import io.github.chindeaone.collectiontracker.config.categories.farmingweight.Farmingweight
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Misc
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
@@ -11,6 +13,7 @@ import io.github.chindeaone.collectiontracker.config.categories.coleweight.Colew
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightColor
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.HeatmapConfig
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.PrecisionMiningConfig
+import io.github.chindeaone.collectiontracker.config.categories.farmingweight.FarmingweightColor
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
@@ -99,8 +102,8 @@ val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
 val coleweightConfig: Coleweight get() = miningConfig.coleweight
 val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityFormat
 val coleweightColor: ColeweightColor get() = coleweightConfig.coleweightColor
-val enableCustomColor: Boolean get() = coleweightColor.enableCustomColor
-val customColor: ChromaColour get() = coleweightColor.customColor
+val enableCustomCWColor: Boolean get() = coleweightColor.enableCustomColor
+val customCWColor: ChromaColour get() = coleweightColor.customColor
 val heatmapConfig: HeatmapConfig get() = coleweightConfig.heatmapConfig
 val enableHeatmap: Boolean get() = heatmapConfig.enableHeatmap
 val heatmapOpacity: Property<Float> get() = heatmapConfig.heatmapOpacity
@@ -137,6 +140,15 @@ val disableLotteryChatMessages: Boolean get() = lotteryConfig.disableLotteryChat
 val showAxeReadyAbilityTitle: Boolean get() = axeAbilityConfig.showAxeReadyAbilityTitle
 val showAxeExpiredAbilityTitle: Boolean get() = axeAbilityConfig.showAxeExpiredAbilityTitle
 val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbilityInForagingIslandsOnly
+
+// Farming Config Accessors
+val farmingConfig: Farming get() = modConfig.farming
+val farmingweightConfig: Farmingweight get() = farmingConfig.farmingweight
+val farmingweightRankingInChat: Boolean get() = farmingweightConfig.farmingweightRankingInChat
+val onlyOnFarmingIslands: Boolean get() = farmingweightConfig.onlyOnFarmingIslands
+val farmingweightColor: FarmingweightColor get() = farmingweightConfig.farmingweightColor
+val customFWColor: ChromaColour get() = farmingweightColor.customColor
+val enableCustomFWColor: Boolean get() = farmingweightColor.enableCustomColor
 
 // Collection Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
@@ -275,6 +287,24 @@ object ConfigAccess {
     fun isOnlyOnMiningIslands(): Boolean = onlyOnMiningIslands
 
     @JvmStatic
+    fun isCustomCwColorEnabled(): Boolean = enableCustomCWColor
+
+    @JvmStatic
+    fun getCustomCWColor(): ChromaColour = customCWColor
+
+    @JvmStatic
+    fun isFarmingweightRankingInChat(): Boolean = farmingweightRankingInChat
+
+    @JvmStatic
+    fun isOnlyOnFarmingIslands(): Boolean = onlyOnFarmingIslands
+
+    @JvmStatic
+    fun isCustomFWColorEnabled(): Boolean = enableCustomFWColor
+
+    @JvmStatic
+    fun getCustomFWColor(): ChromaColour = customFWColor
+
+    @JvmStatic
     fun isShowDetailedMiningFortune(): Boolean = showDetailedMiningFortune
 
     @JvmStatic
@@ -366,12 +396,6 @@ object ConfigAccess {
 
     @JvmStatic
     fun isAbilityCooldownOnly(): Boolean = abilityCooldownOnly
-
-    @JvmStatic
-    fun isCustomColorEnabled(): Boolean = enableCustomColor
-
-    @JvmStatic
-    fun getCustomColor(): ChromaColour = customColor
 
     @JvmStatic
     fun isServerLagProtectionEnabled(): Boolean = miscConfig.serverLagProtection
@@ -572,5 +596,20 @@ object ConfigHelper {
     @JvmStatic
     fun removeColeweightCustomColor(player: String) {
         coleweightColor.customColors.remove(player)
+    }
+
+    @JvmStatic
+    fun setFarmingweightCustomColor(player: String, color: String) {
+        farmingweightColor.customColors[player] = color
+    }
+
+    @JvmStatic
+    fun getFarmingweightColor(player: String): String? {
+        return farmingweightColor.customColors[player]
+    }
+
+    @JvmStatic
+    fun removeFarmingweightColor(player: String) {
+        farmingweightColor.customColors.remove(player)
     }
 }

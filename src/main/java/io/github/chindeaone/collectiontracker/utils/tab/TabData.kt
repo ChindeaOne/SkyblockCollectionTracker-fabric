@@ -42,7 +42,8 @@ object TabData {
             !ConfigAccess.isMineshaftRoutesEnabled() &&
             !ConfigAccess.isMineshaftSpawnRoutesEnabled() &&
             !ConfigAccess.isDeployableEnabled() &&
-            !ConfigAccess.isColeweightRankingInChat()) return
+            !ConfigAccess.isColeweightRankingInChat() &&
+            !ConfigAccess.isFarmingweightRankingInChat()) return
 
         val newList = readTab() ?: return
         if (newList.isEmpty()) return

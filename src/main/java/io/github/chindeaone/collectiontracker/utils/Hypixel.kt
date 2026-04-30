@@ -7,6 +7,7 @@ import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
 import io.github.chindeaone.collectiontracker.api.colors.FetchColors
+import io.github.chindeaone.collectiontracker.api.farmingweight.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
@@ -131,6 +132,8 @@ object Hypixel {
         if (!FetchWaypoints.hasWaypoints) CompletableFuture.runAsync { FetchWaypoints.fetchWaypoints() }
         if (!ColeweightFetcher.hasColeweightLb) CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightLbTop1k() }
         if (!ColeweightFetcher.hasColeweightTopColors) CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightTopColors() }
+        if (!EliteApiFetcher.hasFarmingweightLb) CompletableFuture.runAsync { EliteApiFetcher.fetchFarmingweightLbTop1k() }
+        if (!EliteApiFetcher.hasFarmingweightTopColors) CompletableFuture.runAsync { EliteApiFetcher.fetchFarmingweightTopColors() }
         if (!FetchSkillTree.hasSkillTree) CompletableFuture.runAsync { FetchSkillTree.fetchSkillTree(true, true) }
     }
 

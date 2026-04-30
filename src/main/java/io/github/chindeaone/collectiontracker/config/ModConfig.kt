@@ -37,6 +37,11 @@ class ModConfig : Config() {
     @Accordion
     val foraging: Foraging = Foraging()
     @Expose
+    @Category(name = "Farming", desc = "Farming config")
+    @SerializedName("farming")
+    @Accordion
+    val farming: Farming = Farming()
+    @Expose
     @Category(name = "Misc", desc = "Misc config")
     @SerializedName("misc")
     @Accordion

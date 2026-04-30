@@ -15,6 +15,6 @@ public class ChatHudMixin {
             argsOnly = true
     )
     private Component modifyVisualMessage(Component message) {
-        return ChatListener.coleweightHandle(message);
+        return ChatListener.farmingweightHandle(ChatListener.coleweightHandle(message));
     }
 }

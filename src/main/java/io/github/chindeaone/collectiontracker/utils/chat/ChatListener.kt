@@ -3,6 +3,8 @@ package io.github.chindeaone.collectiontracker.utils.chat
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
+import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
+import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
@@ -12,7 +14,8 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import io.github.chindeaone.collectiontracker.utils.*
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
+import io.github.chindeaone.collectiontracker.utils.world.FarmingMapping
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
@@ -67,6 +70,7 @@ object ChatListener {
         val text = message.string
         val cleanText = text.removeColor()
 
+        profileIdListener(cleanText)
         sacksListener(message)
         petSummoned(text)
         abilityListener(cleanText)
@@ -74,6 +78,15 @@ object ChatListener {
         abilitySwapListener(cleanText)
         consumableListener(cleanText)
         treeResetListener(cleanText)
+    }
+
+    private fun profileIdListener(cleanText: String) {
+        if (!cleanText.startsWith("Profile ID:")) return
+        val id = cleanText.substringAfter("Profile ID:").trim()
+        val isUuid = Regex("^[0-9a-fA-F-]{36}$").matches(id)
+        if (isUuid) {
+            PlayerData.updateProfileId(id)
+        }
     }
 
     private fun sacksListener(component: Component) {
@@ -381,7 +394,7 @@ object ChatListener {
         val text = message.string.removeColor()
 
         if (ConfigAccess.isOnlyOnMiningIslands()) {
-            if (!MiningMapping.miningIslands.contains(MiningStatsWidget.currentMiningIsland)) return message
+            if (!MiningMapping.miningIslands.contains(IslandTracker.currentMiningIsland)) return message
         }
 
         val match = Patterns.NAME.find(text)?: return message
@@ -395,42 +408,73 @@ object ChatListener {
             if (rank > 1000) return message // Don't show ranks for players outside of top 1000
             val rankSuffix = ColeweightUtils.getCustomColor(rank, playerName.equals(PlayerData.playerName, ignoreCase = true), playerName)
 
-            if (rankSuffix != Component.empty() && rankSuffix.string.isNotEmpty()) {
-                val newComponent = MutableComponent.create(message.contents).withStyle(message.style)
-                var nameFound = false
-                var hasRank = false
-
-                for (sibling in message.siblings) {
-                    if (hasRank) {
-                        newComponent.append(sibling)
-                        continue
-                    }
-
-                    val siblingText = sibling.string
-                    // Look for player name in the siblings
-                    if (!nameFound && siblingText.contains(playerName)) {
-                        nameFound = true
-                    }
-
-                    // Check for colon to add the rank suffix
-                    if (nameFound && siblingText.contains(":")) {
-                        val colonIndex = siblingText.indexOf(":")
-                        val before = siblingText.substring(0, colonIndex)
-                        val after = siblingText.substring(colonIndex)
-
-                        newComponent.append(Component.literal(before).withStyle(sibling.style))
-                        newComponent.append(Component.literal(" "))
-                        newComponent.append(rankSuffix)
-                        newComponent.append(Component.literal(after).withStyle(sibling.style))
-                        hasRank = true
-                    } else {
-                        newComponent.append(sibling)
-                    }
-                }
-                return if (hasRank) newComponent else message
-            }
+            return insertRankSuffix(message, playerName, rankSuffix)
         }
         return message
+    }
+
+    @JvmStatic
+    fun farmingweightHandle(message: Component): Component {
+        if (!HypixelUtils.isOnSkyblock) return message
+        if (!ConfigAccess.isFarmingweightRankingInChat()) return message
+
+        val text = message.string.removeColor()
+
+        if (ConfigAccess.isOnlyOnFarmingIslands()) {
+            if (!FarmingMapping.farmingAreas.contains(IslandTracker.currentFarmingIsland)) return message
+        }
+
+        val match = Patterns.NAME.find(text) ?: return message
+        val playerName = match.groupValues[1]
+
+        val storage = FarmingweightManager.storage
+        val leaderboardRank = storage.leaderboard.indexOfFirst { it.name.equals(playerName, ignoreCase = true) }
+
+        if (leaderboardRank != -1) {
+            val rank = leaderboardRank + 1
+            if (rank > 1000) return message
+            val rankSuffix = FarmingweightUtils.getRankComponent(rank, playerName.equals(PlayerData.playerName, ignoreCase = true), playerName)
+
+            return insertRankSuffix(message, playerName, rankSuffix)
+        }
+        return message
+    }
+
+    private fun insertRankSuffix(message: Component, playerName: String, rankSuffix: Component): Component {
+        if (rankSuffix == Component.empty() || rankSuffix.string.isEmpty()) return message
+
+        val newComponent = MutableComponent.create(message.contents).withStyle(message.style)
+        var nameFound = false
+        var hasRank = false
+
+        for (sibling in message.siblings) {
+            if (hasRank) {
+                newComponent.append(sibling)
+                continue
+            }
+
+            val siblingText = sibling.string
+            // Look for player name in the siblings
+            if (!nameFound && siblingText.contains(playerName)) {
+                nameFound = true
+            }
+
+            // Check for colon to add the rank suffix
+            if (nameFound && siblingText.contains(":")) {
+                val colonIndex = siblingText.indexOf(":")
+                val before = siblingText.substring(0, colonIndex)
+                val after = siblingText.substring(colonIndex)
+
+                newComponent.append(Component.literal(before).withStyle(sibling.style))
+                newComponent.append(Component.literal(" "))
+                newComponent.append(rankSuffix)
+                newComponent.append(Component.literal(after).withStyle(sibling.style))
+                hasRank = true
+            } else {
+                newComponent.append(sibling)
+            }
+        }
+        return if (hasRank) newComponent else message
     }
 
     private fun parseSacksMessage(message: Component) {
