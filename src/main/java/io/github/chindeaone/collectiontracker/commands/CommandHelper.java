@@ -53,6 +53,14 @@ public class CommandHelper {
                     new CommandEntry("/sct cw pause", "§ePauses Coleweight tracking."),
                     new CommandEntry("/sct cw resume", "§eResumes Coleweight tracking."),
                     new CommandEntry("/sct cw restart", "§eRestarts Coleweight tracking.")
+            )),
+            new CommandPage("Farming Weight", "§a", List.of(
+                    new CommandEntry("/sct fw", "§eShows your Farming Weight."),
+                    new CommandEntry("/sct fw find [player]", "§eShows a player's Farming Weight."),
+                    new CommandEntry("/sct fw lb <length>", "§eShows the Farming Weight leaderboard."),
+                    new CommandEntry("/sct fw color set <player name> <hex color>", "§eSets a custom Farming Weight rank color for a player (client side only)."),
+                    new CommandEntry("/sct fw color remove <player name>", "§eRemoves a player's custom Farming Weight rank color (client side only)."),
+                    new CommandEntry("/sct fw color set global <hex color>", "§eSets your own global Farming Weight rank color (available only for the top 10 players in Farming Weight).")
             ))
     );
 

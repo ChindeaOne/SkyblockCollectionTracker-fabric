@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
+import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
@@ -82,7 +83,7 @@ public class CommandRegistry {
                                     try {
                                         int page = Integer.parseInt(arg);
                                         if (page < 1) {
-                                            ChatUtils.INSTANCE.sendMessage("§cPage number must be at least 1.", true);
+                                            ChatUtils.sendMessage("§cPage number must be at least 1.", true);
                                         } else {
                                             CollectionList.sendCollectionList(page);
                                         }
@@ -91,7 +92,7 @@ public class CommandRegistry {
                                         Integer page = CollectionList.getPageForCategory(arg);
 
                                         if (page == null) {
-                                            ChatUtils.INSTANCE.sendMessage("§cUnknown category.", true);
+                                            ChatUtils.sendMessage("§cUnknown category.", true);
                                         } else {
                                             CollectionList.sendCollectionList(page);
                                         }
@@ -103,7 +104,7 @@ public class CommandRegistry {
                 // sct track <collection>
                 .then(ClientCommandManager.literal("track")
                         .executes(context -> {
-                            ChatUtils.INSTANCE.sendMessage("Usage: /sct track <collection>",true);
+                            ChatUtils.sendMessage("Usage: /sct track <collection>",true);
                             return 1;
                         })
                         .then(ClientCommandManager.argument("collection", StringArgumentType.greedyString())
@@ -197,7 +198,7 @@ public class CommandRegistry {
                         // sct skill track <skillName>
                         .then(ClientCommandManager.literal("track")
                                 .executes(context -> {
-                                    ChatUtils.INSTANCE.sendMessage("Usage: /sct skill track <skill>",true);
+                                    ChatUtils.sendMessage("Usage: /sct skill track <skill>",true);
                                     return 1;
                                 })
                                 .then(ClientCommandManager.argument("skillName", StringArgumentType.greedyString())
@@ -277,7 +278,7 @@ public class CommandRegistry {
                         // sct cw lb <length>
                         .then(ClientCommandManager.literal("lb")
                                 .executes(context -> {
-                                    ChatUtils.INSTANCE.sendMessage("Usage: /sct cw lb <length>.",true);
+                                    ChatUtils.sendMessage("Usage: /sct cw lb <length>.",true);
                                     return 1;
                                 })
                                 .then(ClientCommandManager.argument("position", IntegerArgumentType.integer())
@@ -291,12 +292,12 @@ public class CommandRegistry {
                         // sct cw color set <ign> <color>
                         .then(ClientCommandManager.literal("color")
                                 .executes(context -> {
-                                    ChatUtils.INSTANCE.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
+                                    ChatUtils.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
                                     return 1;
                                 })
                                 .then(ClientCommandManager.literal("set")
                                         .executes(context -> {
-                                            ChatUtils.INSTANCE.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
+                                            ChatUtils.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
                                             return 1;
                                         })
                                         .then(ClientCommandManager.argument("player name", StringArgumentType.string())
@@ -309,7 +310,7 @@ public class CommandRegistry {
                                                             String formattedHex = color.startsWith("#") ? color : "#" + color;
 
                                                             if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
-                                                                ChatUtils.INSTANCE.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
                                                                 return 1;
                                                             }
                                                             ColeweightUtils.setPlayerCustomColor(name, formattedHex);
@@ -319,7 +320,7 @@ public class CommandRegistry {
                                         )
                                         .then(ClientCommandManager.literal("global")
                                                 .executes(context -> {
-                                                    ChatUtils.INSTANCE.sendMessage("Usage: /sct cw color global <hex color>.",true);
+                                                    ChatUtils.sendMessage("Usage: /sct cw color global <hex color>.",true);
                                                     return 1;
                                                 })
                                                 .then(ClientCommandManager.argument("color", StringArgumentType.greedyString())
@@ -328,7 +329,7 @@ public class CommandRegistry {
                                                             String formattedHex = color.startsWith("#") ? color : "#" + color;
 
                                                             if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
-                                                                ChatUtils.INSTANCE.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
                                                                 return 1;
                                                             }
                                                             ColeweightUtils.setGlobalColor(formattedHex);
@@ -339,7 +340,7 @@ public class CommandRegistry {
                                 )
                                 .then(ClientCommandManager.literal("remove")
                                         .executes(context -> {
-                                            ChatUtils.INSTANCE.sendMessage("Usage: /sct cw color remove <player name>.",true);
+                                            ChatUtils.sendMessage("Usage: /sct cw color remove <player name>.",true);
                                             return 1;
                                         })
                                         .then(ClientCommandManager.argument("player name", StringArgumentType.string())
@@ -382,6 +383,103 @@ public class CommandRegistry {
                                 })
                         )
                 )
+                .then(ClientCommandManager.literal("fw")
+                        .executes(context -> {
+                            FarmingweightUtils.getFarmingweight(PlayerData.INSTANCE.getPlayerName());
+                            return 1;
+                        })
+                        .then(ClientCommandManager.literal("find")
+                                .executes(context -> {
+                                    FarmingweightUtils.getFarmingweight(PlayerData.INSTANCE.getPlayerName());
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                        .suggests(PLAYER_SUGGESTIONS)
+                                        .executes(context -> {
+                                            String playerName = StringArgumentType.getString(context, "player").trim();
+                                            FarmingweightUtils.getFarmingweight(playerName);
+                                            return 1;
+                                        })
+                                )
+                        )
+                        .then(ClientCommandManager.literal("lb")
+                                .executes(context -> {
+                                    ChatUtils.sendMessage("Usage: /sct fw lb <length>.", true);
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.argument("position", IntegerArgumentType.integer())
+                                        .executes(context -> {
+                                            int position = IntegerArgumentType.getInteger(context, "position");
+                                            FarmingweightUtils.getFarmingweightLeaderboard(position);
+                                            return 1;
+                                        })
+                                )
+                        )
+                        // sct fw color set <ign> <color>
+                        .then(ClientCommandManager.literal("color")
+                                .executes(context -> {
+                                    ChatUtils.sendMessage("Usage: /sct fw color set <player name> <hex color>.", true);
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.literal("set")
+                                        .executes(context -> {
+                                            ChatUtils.sendMessage("Usage: /sct fw color set <player name> <hex color>.", true);
+                                            return 1;
+                                        })
+                                        .then(ClientCommandManager.argument("player name", StringArgumentType.string())
+                                                .suggests(PLAYER_SUGGESTIONS)
+                                                .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
+                                                        .executes(context -> {
+                                                            String name = StringArgumentType.getString(context, "player name").trim();
+                                                            String color = StringArgumentType.getString(context, "hex color").trim();
+
+                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
+
+                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
+                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                return 1;
+                                                            }
+                                                            FarmingweightUtils.setPlayerCustomColor(name, formattedHex);
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
+                                        .then(ClientCommandManager.literal("global")
+                                                .executes(context -> {
+                                                    ChatUtils.sendMessage("Usage: /sct fw color global <hex color>.", true);
+                                                    return 1;
+                                                })
+                                                .then(ClientCommandManager.argument("color", StringArgumentType.greedyString())
+                                                        .executes(context -> {
+                                                            String color = StringArgumentType.getString(context, "color").trim();
+                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
+
+                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
+                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                return 1;
+                                                            }
+                                                            FarmingweightUtils.setGlobalColor(formattedHex);
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
+                                )
+                                .then(ClientCommandManager.literal("remove")
+                                        .executes(context -> {
+                                            ChatUtils.sendMessage("Usage: /sct fw color remove <player name>.", true);
+                                            return 1;
+                                        })
+                                        .then(ClientCommandManager.argument("player name", StringArgumentType.string())
+                                                .suggests(PLAYER_SUGGESTIONS)
+                                                .executes(context -> {
+                                                    String name = StringArgumentType.getString(context, "player name").trim();
+                                                    FarmingweightUtils.removePlayerCustomColor(name);
+                                                    return 1;
+                                                })
+                                        )
+                                )
+                        )
+                )
                 .then(ClientCommandManager.literal("changelog")
                         .executes(context -> {
                             Minecraft.getInstance().execute(GuiManager::openChangelog);
@@ -397,7 +495,7 @@ public class CommandRegistry {
                                             int seconds = parseToSeconds(time);
 
                                             if (seconds < 0) {
-                                                ChatUtils.INSTANCE.sendMessage("§cInvalid time format. Use formats like '1h30m', '45s', or '90'.", true);
+                                                ChatUtils.sendMessage("§cInvalid time format. Use formats like '1h30m', '45s', or '90'.", true);
                                                 return 1;
                                             }
 
