@@ -264,7 +264,7 @@ public class TrackingHandler {
             lines.add(Component.literal(String.format("   §6Best collection rate: §f%s coll/h", formatNumber(highestCollectionPerHour))));
         }
         if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Long.MAX_VALUE) {
-            lines.add(Component.literal(String.format("   §6Lowest collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour))));
+            lines.add(Component.literal(String.format("   §Worst collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour))));
         }
 
         if (!useBazaar) {
@@ -276,8 +276,8 @@ public class TrackingHandler {
             }
             if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
                 if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(Component.literal(String.format("   §6Lowest motes rate: §f%s/h", formatNumber(lowestRatePerHourNPC))));
-                } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal(String.format("   §6Lowest NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC))));
+                    lines.add(Component.literal(String.format("   §6Worst motes rate: §f%s/h", formatNumber(lowestRatePerHourNPC))));
+                } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal(String.format("   §6Worst NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC))));
             }
         } else {
             // Bazaar extremes per variant
