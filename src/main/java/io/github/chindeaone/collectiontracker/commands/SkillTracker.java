@@ -22,19 +22,19 @@ public class SkillTracker {
     public static void startTracking(String skill) {
         try {
             if (!HypixelUtils.isOnSkyblock()) {
-                ChatUtils.INSTANCE.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
+                ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
                 return;
             }
 
             try {
                 if (isTracking || isPaused) {
-                    ChatUtils.INSTANCE.sendMessage("§cAlready tracking a skill.", true);
+                    ChatUtils.sendMessage("§cAlready tracking a skill.", true);
                     return;
                 }
 
                 skillName = skill;
                 if (!SkillUtils.isValidSkill(skillName)) {
-                    ChatUtils.INSTANCE.sendMessage("§4" + skillName + " skill is not a real skill!", true);
+                    ChatUtils.sendMessage("§4" + skillName + " skill is not a real skill!", true);
                     return;
                 }
 
@@ -43,7 +43,7 @@ public class SkillTracker {
                         .thenRun(SkillTrackingHandler::startTracking);
             } catch (Exception e) {
                 logger.error("An error occurred while starting skill tracking: ", e);
-                ChatUtils.INSTANCE.sendMessage("§cAn error occurred while starting skill tracking. Please try again later.", true);
+                ChatUtils.sendMessage("§cAn error occurred while starting skill tracking. Please try again later.", true);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

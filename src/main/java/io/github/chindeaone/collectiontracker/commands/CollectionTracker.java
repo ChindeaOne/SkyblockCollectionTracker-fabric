@@ -27,34 +27,34 @@ public class CollectionTracker {
     public static void startTracking(String coll) {
         try {
             if (!HypixelUtils.isOnSkyblock()) {
-                ChatUtils.INSTANCE.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
+                ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
                 return;
             }
             try {
                 if (!ServerUtils.INSTANCE.getServerStatus()) {
-                    ChatUtils.INSTANCE.sendMessage("§cYou can't use any tracking commands at the moment.", true);
+                    ChatUtils.sendMessage("§cYou can't use any tracking commands at the moment.", true);
                     return;
                 }
 
                 if (MultiTrackingHandler.isMultiTracking()) {
-                    ChatUtils.INSTANCE.sendMessage("§cCannot track solo collections while multi-tracking.", true);
+                    ChatUtils.sendMessage("§cCannot track solo collections while multi-tracking.", true);
                     return;
                 }
 
                 if (TrackingHandler.isTracking || TrackingHandler.isPaused) {
-                    ChatUtils.INSTANCE.sendMessage("§cAlready tracking a collection.", true);
+                    ChatUtils.sendMessage("§cAlready tracking a collection.", true);
                     return;
                 }
 
                 collection = coll.toLowerCase();
                 // Remove general gemstone from normal tracking
                 if (collection.equals("gemstone")) {
-                    ChatUtils.INSTANCE.sendMessage("§cThe `gemstone` collection isn't supported for normal tracking anymore. Use `/sct track-multi gemstone` instead!", true);
+                    ChatUtils.sendMessage("§cThe `gemstone` collection isn't supported for normal tracking anymore. Use `/sct track-multi gemstone` instead!", true);
                     return;
                 }
 
                 if (!CollectionsManager.isValidCollection(collection)) {
-                    ChatUtils.INSTANCE.sendMessage("§4" + collection + " collection is not supported! Use `/sct collections` to see all supported collections.", true);
+                    ChatUtils.sendMessage("§4" + collection + " collection is not supported! Use `/sct collections` to see all supported collections.", true);
                     return;
                 }
                 // Set collection source
@@ -64,17 +64,17 @@ public class CollectionTracker {
 
                 // Check cooldown before fetching bazaar prices
                 if (System.currentTimeMillis() - TrackingHandler.lastTrackTime < TrackingHandler.COOLDOWN_MILLIS) {
-                    ChatUtils.INSTANCE.sendMessage("§cPlease wait before tracking another collection!", true);
+                    ChatUtils.sendMessage("§cPlease wait before tracking another collection!", true);
                     return;
                 } else {
-                    ChatUtils.INSTANCE.sendMessage("§aTracking " + collection + " collection.", true);
+                    ChatUtils.sendMessage("§aTracking " + collection + " collection.", true);
                 }
 
                 // Fetch bazaar data asynchronously
                 CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
                         .thenRun(TrackingHandler::startTracking);
             } catch (Exception e) {
-                ChatUtils.INSTANCE.sendMessage("§cAn error occurred while processing the command.", true);
+                ChatUtils.sendMessage("§cAn error occurred while processing the command.", true);
                 logger.error("[SCT]: Error processing command: ", e);
             }
         } catch (Exception e) {
@@ -85,27 +85,27 @@ public class CollectionTracker {
     public static void startMultiTracking(List<String> list) {
         try {
             if (!HypixelUtils.isOnSkyblock()) {
-                ChatUtils.INSTANCE.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
+                ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
                 return;
             }
             try {
                 if (!ServerUtils.INSTANCE.getServerStatus()) {
-                    ChatUtils.INSTANCE.sendMessage("§cYou can't use any tracking commands at the moment.", true);
+                    ChatUtils.sendMessage("§cYou can't use any tracking commands at the moment.", true);
                     return;
                 }
 
                 if (TrackingHandler.isTracking) {
-                    ChatUtils.INSTANCE.sendMessage("§cCannot multi-track collections while tracking a collection solo.", true);
+                    ChatUtils.sendMessage("§cCannot multi-track collections while tracking a collection solo.", true);
                     return;
                 }
 
                 if (MultiTrackingHandler.isMultiTracking() || MultiTrackingHandler.isMultiPaused()) {
-                    ChatUtils.INSTANCE.sendMessage("§cAlready multi-tracking collections.", true);
+                    ChatUtils.sendMessage("§cAlready multi-tracking collections.", true);
                     return;
                 }
 
                 if (list.isEmpty()) {
-                    ChatUtils.INSTANCE.sendMessage("§cNo valid collections provided!", true);
+                    ChatUtils.sendMessage("§cNo valid collections provided!", true);
                     return;
                 }
 
@@ -114,7 +114,7 @@ public class CollectionTracker {
                 for (String coll : list) {
                     coll = coll.toLowerCase().trim();
                     if (GemstonesManager.checkIfGemstone(coll)) {
-                        ChatUtils.INSTANCE.sendMessage("§cIndividual gemstones aren't supported. Please use `/sct track-multi gemstone`!", true);
+                        ChatUtils.sendMessage("§cIndividual gemstones aren't supported. Please use `/sct track-multi gemstone`!", true);
                         return;
                     }
                     if (CollectionsManager.isCollection(coll)) {
@@ -131,17 +131,17 @@ public class CollectionTracker {
                 }
 
                 if (System.currentTimeMillis() - MultiTrackingHandler.getMultiLastTrackTime() < MultiTrackingHandler.getCOOLDOWN_MILLIS()) {
-                    ChatUtils.INSTANCE.sendMessage("§cPlease wait before another multi-tracking!", true);
+                    ChatUtils.sendMessage("§cPlease wait before another multi-tracking!", true);
                     return;
                 } else {
-                    ChatUtils.INSTANCE.sendMessage("§aMulti-tracking " + String.join(", ", collectionList) + " collections.", true);
+                    ChatUtils.sendMessage("§aMulti-tracking " + String.join(", ", collectionList) + " collections.", true);
                 }
 
                 // Fetch bazaar data asynchronously
                 CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collectionList))
                         .thenRun(MultiTrackingHandler::startMultiTracking);
             } catch (Exception e) {
-                ChatUtils.INSTANCE.sendMessage("§cAn error occurred while processing the command.", true);
+                ChatUtils.sendMessage("§cAn error occurred while processing the command.", true);
                 logger.error("[SCT]: Error processing command: ", e);
             }
 

@@ -52,6 +52,7 @@ object ColeweightDataFetcher {
     @JvmStatic
     fun getData(): String {
         val uuid = PlayerData.playerUUID
+        val name = PlayerData.playerName
 
         val cacheKey = CacheKey(uuid)
         val lastFetched = cacheTimestamps[cacheKey]
@@ -62,7 +63,7 @@ object ColeweightDataFetcher {
             return cache[cacheKey] ?: ""
         }
 
-        val jsonData = ColeweightFetcher.fetchColeweightData()
+        val jsonData = ColeweightFetcher.fetchColeweightData(name, uuid)
 
         if (!jsonData.isNullOrEmpty()) {
             cache[cacheKey] = jsonData

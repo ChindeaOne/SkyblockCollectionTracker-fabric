@@ -73,7 +73,7 @@ public class SkillApiFetcher {
                     Map<String, Double> skills = gson.fromJson(reader, mapType);
 
                     if (skills == null || skills.isEmpty()) {
-                        ChatUtils.INSTANCE.sendMessage("§c[SCT] Skill API disabled. Please enable it in the settings.", true);
+                        ChatUtils.sendMessage("§c[SCT] Skill API disabled. Please enable it in the settings.", true);
                         logger.warn("[SCT]: Skill API disabled for player.");
                         SkillTrackingHandler.stopTracking();
                         return;

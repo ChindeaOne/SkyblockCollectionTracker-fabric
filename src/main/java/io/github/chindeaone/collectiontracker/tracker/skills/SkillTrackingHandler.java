@@ -38,10 +38,10 @@ public class SkillTrackingHandler {
         long now = System.currentTimeMillis();
 
         if (now - lastTrackedTime < TRACKING_INTERVAL) {
-            ChatUtils.INSTANCE.sendMessage("§cPlease wait a few seconds before tracking another skill!", true);
+            ChatUtils.sendMessage("§cPlease wait a few seconds before tracking another skill!", true);
             return;
         } else {
-            ChatUtils.INSTANCE.sendMessage("§aTracking " + skillName + " skill.", true);
+            ChatUtils.sendMessage("§aTracking " + skillName + " skill.", true);
         }
 
         if (scheduler == null || scheduler.isShutdown()) {
@@ -82,26 +82,26 @@ public class SkillTrackingHandler {
     public static void pauseTracking() {
         if (checkTracking()) return;
         if (isPaused) {
-            ChatUtils.INSTANCE.sendMessage("§cSkill tracking is already paused.", true);
+            ChatUtils.sendMessage("§cSkill tracking is already paused.", true);
             logger.warn("[SCT]: Skills tracking is already paused.");
             return;
         }
         isPaused = true;
         lastTime = (System.currentTimeMillis() - startTime) / 1000;
-        ChatUtils.INSTANCE.sendMessage("§7Paused tracking " + skillName.toLowerCase() + " skill.", true);
+        ChatUtils.sendMessage("§7Paused tracking " + skillName.toLowerCase() + " skill.", true);
         logger.info("[SCT]: Pausing tracking skill: {}", skillName);
     }
 
     public static void resumeTracking() {
         if (checkTracking()) return;
         if (!isPaused) {
-            ChatUtils.INSTANCE.sendMessage("§cSkill tracking is not paused.", true);
+            ChatUtils.sendMessage("§cSkill tracking is not paused.", true);
             logger.warn("[SCT]: Skills tracking is not paused.");
             return;
         }
         isPaused = false;
         startTime = System.currentTimeMillis();
-        ChatUtils.INSTANCE.sendMessage("§7Resumed tracking " + skillName.toLowerCase() + " skill.", true);
+        ChatUtils.sendMessage("§7Resumed tracking " + skillName.toLowerCase() + " skill.", true);
         logger.info("[SCT]: Resuming tracking skill: {}", skillName);
     }
 
@@ -111,10 +111,10 @@ public class SkillTrackingHandler {
         if (!Hypixel.INSTANCE.getServer()) {
             logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
         } else if (afk) {
-            ChatUtils.INSTANCE.sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true);
+            ChatUtils.sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true);
             logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down");
             } else {
-                ChatUtils.INSTANCE.sendMessage("§cAPI server is down. Stopping the skill tracker.", true);
+                ChatUtils.sendMessage("§cAPI server is down. Stopping the skill tracker.", true);
                 logger.info("[SCT]: Skill tracking stopped because the API server is down.");
             }
 
@@ -126,7 +126,7 @@ public class SkillTrackingHandler {
 
         resetTrackingData(false);
 
-        ChatUtils.INSTANCE.sendMessage("§cStopped tracking " + skillName.toLowerCase() + " skill!", true);
+        ChatUtils.sendMessage("§cStopped tracking " + skillName.toLowerCase() + " skill!", true);
         logger.info("[SCT]: Stopped tracking skill: {}", skillName);
     }
 
@@ -165,7 +165,7 @@ public class SkillTrackingHandler {
 
     private static boolean checkTracking() {
         if (!isTracking) {
-            ChatUtils.INSTANCE.sendMessage("§cNo skill is being tracked currently!", true);
+            ChatUtils.sendMessage("§cNo skill is being tracked currently!", true);
             logger.warn("[SCT]: No skill is being tracked currently.");
             return true;
         }
@@ -186,7 +186,7 @@ public class SkillTrackingHandler {
         }
 
         if (restartCount >= allowedHourlyRestarts) {
-            ChatUtils.INSTANCE.sendMessage("§cHourly restart limit reached. Please wait before restarting again.", true);
+            ChatUtils.sendMessage("§cHourly restart limit reached. Please wait before restarting again.", true);
             logger.warn("[SCT]: Hourly restart limit reached for skill tracking.");
             return;
         }

@@ -72,7 +72,7 @@ public class TextUtils {
     private static String handleMoneyPerHour() {
         if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableBazaar();
-            ChatUtils.INSTANCE.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
+            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
             return null;
         }
 
@@ -127,7 +127,7 @@ public class TextUtils {
     private static String handleMoneyMade() {
         if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableBazaar();
-            ChatUtils.INSTANCE.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
+            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
             return null;
         }
 
@@ -203,21 +203,21 @@ public class TextUtils {
         list.clear();
         if (!BazaarCollectionsManager.hasBazaarData) {
             ConfigHelper.disableExtraStats();
-            ChatUtils.INSTANCE.sendMessage("§cNo Bazaar data available for extra stats!", true);
+            ChatUtils.sendMessage("§cNo Bazaar data available for extra stats!", true);
             list.clear();
             return;
         }
 
         if (collectionType.equals("normal") && ConfigAccess.isShowExtraStats()) {
             ConfigHelper.disableExtraStats();
-            ChatUtils.INSTANCE.sendMessage("§cExtra stats are redundant here!", true);
+            ChatUtils.sendMessage("§cExtra stats are redundant here!", true);
             list.clear();
             return;
         }
 
         if (ConfigAccess.isShowExtraStats() && !ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableExtraStats();
-            ChatUtils.INSTANCE.sendMessage("§cDisabled extra stats since you don't use Bazaar prices!", true);
+            ChatUtils.sendMessage("§cDisabled extra stats since you don't use Bazaar prices!", true);
             list.clear();
             return;
         }
@@ -414,7 +414,7 @@ public class TextUtils {
     private static String handleMoneyPerHourMulti(String coll) {
         if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableBazaar();
-            ChatUtils.INSTANCE.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
+            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
             return null;
         }
 
@@ -484,7 +484,7 @@ public class TextUtils {
     private static String handleMoneyMadeMulti(String coll) {
         if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableBazaar();
-            ChatUtils.INSTANCE.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
+            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
             return null;
         }
 

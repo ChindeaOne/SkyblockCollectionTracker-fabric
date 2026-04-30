@@ -36,7 +36,7 @@ object ColeweightUtils {
             return
         }
 
-        ColeweightFetcher.fetchColeweightDataAsync(playerName) {
+        ColeweightFetcher.fetchColeweightDataAsync(playerName, PlayerData.playerUUID) {
             playerCooldowns[playerName] = System.currentTimeMillis()
             lastPlayer = playerName
             displayColeweight(playerName, ColeweightManager.storage, detailed)
@@ -135,11 +135,14 @@ object ColeweightUtils {
 
     @JvmStatic
     fun setGlobalColor(color: String) {
+        val playerName = PlayerData.playerName
+        val uuid = PlayerData.playerUUID
+
         val top10Cw = ColeweightManager.storage.leaderboard.take(10)
-        if (top10Cw.none { it.name.equals(PlayerData.playerName, ignoreCase = true) }) {
+        if (top10Cw.none { it.name.equals(playerName, ignoreCase = true) }) {
             ChatUtils.sendMessage("§cYou must be in the top 10 of the Coleweight leaderboard to set a global color.", true)
             return
         }
-        ColeweightFetcher.setGlobalColor(PlayerData.playerName, color)
+        ColeweightFetcher.setGlobalColor(playerName,uuid, color)
     }
 }

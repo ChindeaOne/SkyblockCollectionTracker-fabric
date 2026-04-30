@@ -74,7 +74,7 @@ public class TimerOverlay implements AbstractOverlay{
 
     public void setTimer(int duration) {
         if (duration == 0) {
-            ChatUtils.INSTANCE.sendMessage("§cTimer cancelled!", true);
+            ChatUtils.sendMessage("§cTimer cancelled!", true);
             hasEnded = true;
             isPaused = false;
             return;
@@ -87,17 +87,17 @@ public class TimerOverlay implements AbstractOverlay{
 
     public void pauseTimer() {
         if (hasEnded) {
-            ChatUtils.INSTANCE.sendMessage("§cTimer has already ended!", true);
+            ChatUtils.sendMessage("§cTimer has already ended!", true);
             return;
         }
         if (!isPaused && coleweightTimerEnd > System.currentTimeMillis()) {
             remainingTime = coleweightTimerEnd - System.currentTimeMillis();
             isPaused = true;
-            ChatUtils.INSTANCE.sendMessage("§eTimer paused!", true);
+            ChatUtils.sendMessage("§eTimer paused!", true);
         } else {
             coleweightTimerEnd = System.currentTimeMillis() + remainingTime;
             isPaused = false;
-            ChatUtils.INSTANCE.sendMessage("§aTimer resumed!", true);
+            ChatUtils.sendMessage("§aTimer resumed!", true);
         }
     }
 
@@ -124,7 +124,7 @@ public class TimerOverlay implements AbstractOverlay{
             }
             timerLines.add("§bTimer: §e" + timeFormat + pauseTarget);
         } else {
-            ChatUtils.INSTANCE.sendMessage("§cTimer finished!", true);
+            ChatUtils.sendMessage("§cTimer finished!", true);
             hasEnded = true;
         }
 
@@ -136,6 +136,6 @@ public class TimerOverlay implements AbstractOverlay{
         int minutes = (duration % 3600) / 60;
         int seconds = duration % 60;
 
-        ChatUtils.INSTANCE.sendMessage("§aTimer set for " + (hours > 1 ? hours + " hours " : (hours > 0) ? hours + " hour " : "") + (minutes > 1 ? minutes + " minutes " : (minutes > 0) ? minutes + " minute " : "") + (seconds > 1 ? seconds + " seconds " : (seconds > 0) ? seconds + " second " : "") + "!", true);
+        ChatUtils.sendMessage("§aTimer set for " + (hours > 1 ? hours + " hours " : (hours > 0) ? hours + " hour " : "") + (minutes > 1 ? minutes + " minutes " : (minutes > 0) ? minutes + " minute " : "") + (seconds > 1 ? seconds + " seconds " : (seconds > 0) ? seconds + " second " : "") + "!", true);
     }
 }

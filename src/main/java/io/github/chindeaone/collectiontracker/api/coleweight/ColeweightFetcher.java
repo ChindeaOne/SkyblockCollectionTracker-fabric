@@ -5,7 +5,6 @@ import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager;
 import io.github.chindeaone.collectiontracker.utils.ColorUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.LogManager;
@@ -24,14 +23,14 @@ public class ColeweightFetcher {
     public static boolean hasColeweightLb = false;
     public static boolean hasColeweightTopColors = false;
 
-    public static void fetchColeweightDataAsync(String playerName, Runnable onComplete) {
+    public static void fetchColeweightDataAsync(String playerName, String uuid, Runnable onComplete) {
         try {
             URI uri = URI.create(URLManager.COLEWEIGHT_URL);
 
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(15))
                     .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                    .header("X-UUID", uuid)
                     .header("X-NAME", playerName)
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
@@ -49,7 +48,7 @@ public class ColeweightFetcher {
                                 HttpRequest retryRequest = HttpRequest.newBuilder(uri)
                                         .timeout(Duration.ofSeconds(15))
                                         .header("Authorization", "Bearer " + TokenManager.getToken())
-                                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                                        .header("X-UUID", uuid)
                                         .header("X-NAME", playerName)
                                         .header("User-Agent", URLManager.AGENT)
                                         .header("Accept", "application/json")
@@ -61,7 +60,7 @@ public class ColeweightFetcher {
                                 if (status == 200) {
                                     if (retryResponse.body() == null || retryResponse.body().isEmpty()) {
                                         Minecraft.getInstance().execute(() ->
-                                                ChatUtils.INSTANCE.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
+                                                ChatUtils.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
                                         );
                                         logger.warn("[SCT]: Received empty response when fetching Coleweight data for player: {}", playerName);
                                         return;
@@ -71,7 +70,7 @@ public class ColeweightFetcher {
                                     if (onComplete != null) onComplete.run();
                                 } else {
                                     Minecraft.getInstance().execute(() ->
-                                            ChatUtils.INSTANCE.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
+                                            ChatUtils.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
                                     );
                                     logger.warn("[SCT]: Failed to fetch Coleweight data for player: {} after token refresh. HTTP status: {}", playerName, status);
                                 }
@@ -84,7 +83,7 @@ public class ColeweightFetcher {
                         if (status == 200) {
                             if (response.body() == null || response.body().isEmpty()) {
                                 Minecraft.getInstance().execute(() ->
-                                        ChatUtils.INSTANCE.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
+                                        ChatUtils.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
                                 );
                                 logger.warn("[SCT]: Received empty response when fetching Coleweight data for player: {}", playerName);
                                 return;
@@ -94,7 +93,7 @@ public class ColeweightFetcher {
                             if (onComplete != null) onComplete.run();
                         } else {
                             Minecraft.getInstance().execute(() ->
-                                    ChatUtils.INSTANCE.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
+                                    ChatUtils.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
                             );
                             logger.warn("[SCT]: Failed to fetch Coleweight data for player: {}. HTTP status: {}", playerName, status);
                         }
@@ -125,7 +124,7 @@ public class ColeweightFetcher {
                         if (status == 200) {
                             if (response.body() == null || response.body().isEmpty()) {
                                 Minecraft.getInstance().execute(() ->
-                                        ChatUtils.INSTANCE.sendMessage("§cCouldn't fetch Coleweight leaderboard data.", true)
+                                        ChatUtils.sendMessage("§cCouldn't fetch Coleweight leaderboard data.", true)
                                 );
                                 logger.warn("[SCT]: Received empty response when fetching Coleweight leaderboard data.");
                                 return;
@@ -182,15 +181,15 @@ public class ColeweightFetcher {
         }
     }
 
-    public static String fetchColeweightData() {
+    public static String fetchColeweightData(String playerName, String uuid) {
         try {
             URI uri = URI.create(URLManager.COLEWEIGHT_URL);
 
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(15))
                     .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
-                    .header("X-NAME", PlayerData.INSTANCE.getPlayerName())
+                    .header("X-UUID", uuid)
+                    .header("X-NAME", playerName)
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
                     .GET()
@@ -206,8 +205,8 @@ public class ColeweightFetcher {
                 request = HttpRequest.newBuilder(uri)
                         .timeout(Duration.ofSeconds(15))
                         .header("Authorization", "Bearer " + TokenManager.getToken())
-                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
-                        .header("X-NAME", PlayerData.INSTANCE.getPlayerName())
+                        .header("X-UUID", uuid)
+                        .header("X-NAME", playerName)
                         .header("User-Agent", URLManager.AGENT)
                         .header("Accept", "application/json")
                         .GET()
@@ -217,13 +216,13 @@ public class ColeweightFetcher {
             }
 
             if (status == 200) {
-                logger.info("[SCT]: Successfully fetched Coleweight data for player: {}", PlayerData.INSTANCE.getPlayerName());
+                logger.info("[SCT]: Successfully fetched Coleweight data for player: {}", playerName);
                 return response.body();
             } else {
                 Minecraft.getInstance().execute(() ->
-                        ChatUtils.INSTANCE.sendMessage("§cCouldn't find your coleweight.", true)
+                        ChatUtils.sendMessage("§cCouldn't find your coleweight.", true)
                 );
-                logger.warn("[SCT]: Failed to fetch Coleweight data for player: {}. HTTP status: {}", PlayerData.INSTANCE.getPlayerName(), status);
+                logger.warn("[SCT]: Failed to fetch Coleweight data for player: {}. HTTP status: {}", playerName, status);
                 return null;
             }
         } catch (Exception e) {
@@ -232,15 +231,15 @@ public class ColeweightFetcher {
         return null;
     }
 
-    public static void setGlobalColor(String player, String color) {
+    public static void setGlobalColor(String playerName, String uuid, String color) {
         try {
             URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/color");
 
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(15))
                     .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
-                    .header("X-NAME", player)
+                    .header("X-UUID", uuid)
+                    .header("X-NAME", playerName)
                     .header("X-COLOR", color)
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
@@ -257,8 +256,8 @@ public class ColeweightFetcher {
                 request = HttpRequest.newBuilder(uri)
                         .timeout(Duration.ofSeconds(15))
                         .header("Authorization", "Bearer " + TokenManager.getToken())
-                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
-                        .header("X-NAME", player)
+                        .header("X-UUID", uuid)
+                        .header("X-NAME", playerName)
                         .header("X-COLOR", color)
                         .header("User-Agent", URLManager.AGENT)
                         .header("Accept", "application/json")
@@ -270,16 +269,16 @@ public class ColeweightFetcher {
             }
 
             if (status == 200) {
-                logger.info("[SCT]: Successfully set global Coleweight color for player: {}", player);
+                logger.info("[SCT]: Successfully set global Coleweight color for player: {}", playerName);
                 Minecraft.getInstance().execute(() ->
                         ChatUtils.INSTANCE.sendComponent(Component.empty()
                                 .append("§aGlobal color set to ")
                                 .append(ColorUtils.INSTANCE.coloredText(color))
                                 .append("."), true));
             } else {
-                logger.warn("[SCT]: Failed to set global Coleweight color for player: {}. HTTP status: {}", player, status);
+                logger.warn("[SCT]: Failed to set global Coleweight color for player: {}. HTTP status: {}", playerName, status);
                 Minecraft.getInstance().execute(() ->
-                        ChatUtils.INSTANCE.sendMessage("§cFailed to set global Coleweight color.", true)
+                        ChatUtils.sendMessage("§cFailed to set global Coleweight color.", true)
                 );
             }
         } catch (Exception e) {

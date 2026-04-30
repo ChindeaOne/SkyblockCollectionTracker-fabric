@@ -101,7 +101,7 @@ public class SkillOverlay implements AbstractOverlay {
         }
 
         if (ConfigAccess.isTamingTrackingEnabled() && SkillTrackingHandler.getUptimeInSeconds() > 1 && tamingXp == 0) {
-            ChatUtils.INSTANCE.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true);
+            ChatUtils.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true);
             ConfigHelper.disableTamingTracking();
             return tamingOverlayLines;
         }

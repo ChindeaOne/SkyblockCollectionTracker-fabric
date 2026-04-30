@@ -14,6 +14,7 @@ object ChatUtils {
 
     private val PREFIX: Component = Component.empty().append(ColorUtils.gradientText("[SCT] ")).withStyle(ChatFormatting.ITALIC)
 
+    @JvmStatic
     fun sendMessage(message: String, prefix: Boolean = true) {
         val messageComponent = Component.literal(message)
         val text = if (prefix) {

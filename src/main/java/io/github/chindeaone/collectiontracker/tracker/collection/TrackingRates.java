@@ -116,7 +116,7 @@ public class TrackingRates {
 
         // Trigger tracking overlay update
         if (!CollectionOverlay.trackingDirty) {
-            if (!isTrackingDataReady()) ChatUtils.INSTANCE.sendMessage("§cWarning! Some maps have not been fully initialized. You have the option to restart the tracker or wait for the next collection update.", true);
+            if (!isTrackingDataReady()) ChatUtils.sendMessage("§cWarning! Some maps have not been fully initialized. You have the option to restart the tracker or wait for the next collection update.", true);
             CollectionOverlay.trackingDirty = true;
         }
     }
