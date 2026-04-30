@@ -149,6 +149,7 @@ tasks.processResources {
         put("COLORS_URL", System.getenv("COLORS_URL") ?: "")
         put("SKILLS_URL", System.getenv("SKILLS_URL") ?: "")
         put("COLEWEIGHT_URL", System.getenv("COLEWEIGHT_URL") ?: "")
+        put("FARMINGWEIGHT_URL", System.getenv("FARMINGWEIGHT_URL") ?: "")
         put("WAYPOINTS_URL", System.getenv("WAYPOINTS_URL") ?: "")
         put("SKILLTREE_URL", System.getenv("SKILLTREE_URL") ?: "")
         put("AGENT", System.getenv("AGENT") ?: "")

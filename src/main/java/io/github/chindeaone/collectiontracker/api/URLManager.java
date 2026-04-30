@@ -18,6 +18,7 @@ public class URLManager {
     public static final String COLORS_URL;
     public static final String SKILLS_URL;
     public static final String COLEWEIGHT_URL;
+    public static final String FARMINGWEIGHT_URL;
     public static final String WAYPOINTS_URL;
     public static final String SKILLTREE_URL;
     public static final String AGENT;
@@ -42,6 +43,7 @@ public class URLManager {
         COLORS_URL = props.getProperty("COLORS_URL");
         SKILLS_URL = props.getProperty("SKILLS_URL");
         COLEWEIGHT_URL = props.getProperty("COLEWEIGHT_URL");
+        FARMINGWEIGHT_URL = props.getProperty("FARMINGWEIGHT_URL");
         WAYPOINTS_URL = props.getProperty("WAYPOINTS_URL");
         SKILLTREE_URL = props.getProperty("SKILLTREE_URL");
         AGENT = props.getProperty("AGENT");
