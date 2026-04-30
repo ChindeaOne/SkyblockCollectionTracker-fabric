@@ -4,11 +4,13 @@ import com.google.gson.JsonObject
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.TextColor
 import java.awt.Color
 
-fun Int.toRankComponent(isMe: Boolean, playerName: String): Component = ColorUtils.customColorComponent(this, isMe, playerName)
+fun Int.toCWRankComponent(isMe: Boolean, playerName: String): Component = ColorUtils.customCWColorComponent(this, isMe, playerName)
+fun Int.toFWRankComponent(isMe: Boolean, playerName: String): Component = ColorUtils.customFWColorComponent(this, isMe, playerName)
 
 object ColorUtils {
     const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
@@ -85,8 +87,8 @@ object ColorUtils {
         return Color(r, g, b)
     }
 
-    fun customColorComponent(rank: Int, isMe: Boolean, playerName: String): Component {
-        val color = getRankColor(rank, isMe, playerName)
+    fun customCWColorComponent(rank: Int, isMe: Boolean, playerName: String): Component {
+        val color = getCWRankColor(rank, isMe, playerName)
         val text = "[⛏ #$rank]"
 
         return Component.literal(text).withStyle {
@@ -94,9 +96,18 @@ object ColorUtils {
         }
     }
 
-    fun getRankColor(rank: Int, isMe: Boolean, playerName: String): Color {
-        if (isMe && ConfigAccess.isCustomColorEnabled()) {
-            return Color(ConfigAccess.getCustomColor().getEffectiveColourRGB())
+    fun customFWColorComponent(rank: Int, isMe: Boolean, playerName: String): Component {
+        val color = getFWRankColor(rank, isMe, playerName)
+        val text = "[🌾 #$rank]"
+
+        return Component.literal(text).withStyle {
+            it.withColor(TextColor.fromRgb(color.rgb))
+        }
+    }
+
+    fun getCWRankColor(rank: Int, isMe: Boolean, playerName: String): Color {
+        if (isMe && ConfigAccess.isCustomCwColorEnabled()) {
+            return Color(ConfigAccess.getCustomCWColor().getEffectiveColourRGB())
         }
 
         if (!playerName.isEmpty()) {
@@ -107,6 +118,35 @@ object ColorUtils {
         }
 
         ColeweightManager.storage.topColors[playerName.lowercase()]?.let {
+            return Color.decode(it)
+        }
+
+        return when (rank) {
+            1 -> Color.BLACK
+            2 -> Color(170, 0, 0)
+            3 -> Color(0, 170, 0)
+            in 4..25 -> Color(255, 170, 0)
+            in 26..100 -> Color(0, 170, 170)
+            in 101..250 -> Color(85, 255, 255)
+            in 251..500 -> Color(85, 85, 255)
+            in 501..1000 -> Color(170, 170, 170)
+            else -> Color.WHITE
+        }
+    }
+
+    fun getFWRankColor(rank: Int, isMe: Boolean, playerName: String): Color {
+        if (isMe && ConfigAccess.isCustomFWColorEnabled()) {
+            return Color(ConfigAccess.getCustomFWColor().getEffectiveColourRGB())
+        }
+
+        if (!playerName.isEmpty()) {
+            val hexString = ConfigHelper.getFarmingweightColor(playerName)
+            if (hexString != null) {
+                return Color.decode(hexString)
+            }
+        }
+
+        FarmingweightManager.storage.topColors[playerName.lowercase()]?.let {
             return Color.decode(it)
         }
 

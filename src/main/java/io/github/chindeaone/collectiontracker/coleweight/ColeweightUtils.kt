@@ -6,7 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
-import io.github.chindeaone.collectiontracker.utils.toRankComponent
+import io.github.chindeaone.collectiontracker.utils.toCWRankComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 
@@ -109,7 +109,7 @@ object ColeweightUtils {
     }
 
     fun getCustomColor(rank: Int, isMe: Boolean, playerName: String): Component {
-        return rank.toRankComponent(isMe, playerName)
+        return rank.toCWRankComponent(isMe, playerName)
     }
 
     @JvmStatic
