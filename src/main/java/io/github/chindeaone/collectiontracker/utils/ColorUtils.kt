@@ -122,14 +122,14 @@ object ColorUtils {
         }
 
         return when (rank) {
-            1 -> Color.BLACK
-            2 -> Color(170, 0, 0)
-            3 -> Color(0, 170, 0)
-            in 4..25 -> Color(255, 170, 0)
-            in 26..100 -> Color(0, 170, 170)
-            in 101..250 -> Color(85, 255, 255)
-            in 251..500 -> Color(85, 85, 255)
-            in 501..1000 -> Color(170, 170, 170)
+            1 -> Color(0, 191, 255)
+            2 -> Color(255, 215, 0)
+            3 -> Color(192, 192, 192)
+            in 4..25 -> Color(70, 130, 180)
+            in 26..100 -> Color(0, 255, 255)
+            in 101..250 -> Color(176, 196, 222)
+            in 251..500 -> Color(47, 79, 79)
+            in 501..1000 -> Color(112, 128, 144)
             else -> Color.WHITE
         }
     }
@@ -151,14 +151,14 @@ object ColorUtils {
         }
 
         return when (rank) {
-            1 -> Color.BLACK
-            2 -> Color(170, 0, 0)
-            3 -> Color(0, 170, 0)
-            in 4..25 -> Color(255, 170, 0)
-            in 26..100 -> Color(0, 170, 170)
-            in 101..250 -> Color(85, 255, 255)
-            in 251..500 -> Color(85, 85, 255)
-            in 501..1000 -> Color(170, 170, 170)
+            1 -> Color(255, 215, 0)
+            2 -> Color(255, 140, 0)
+            3 -> Color(139, 69, 19)
+            in 4..25 -> Color(34, 139, 34)
+            in 26..100 -> Color(173, 255, 47)
+            in 101..250 -> Color(218, 165, 32)
+            in 251..500 -> Color(244, 164, 96)
+            in 501..1000 -> Color(107, 142, 35)
             else -> Color.WHITE
         }
     }
