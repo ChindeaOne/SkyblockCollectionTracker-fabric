@@ -7,6 +7,7 @@ import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget;
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher;
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -74,7 +75,7 @@ public class MiningStatsOverlay implements AbstractOverlay{
     }
 
     private List<String> getMiningLines() {
-        if (ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly() && !MiningMapping.INSTANCE.getMiningIslands().contains(MiningStatsWidget.getCurrentMiningIsland())) return Collections.emptyList();
+        if (ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly() && !MiningMapping.INSTANCE.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
         List<String> raw = MiningStatsWidget.INSTANCE.getRawStats();
         if (raw.isEmpty()) return Collections.emptyList();
 

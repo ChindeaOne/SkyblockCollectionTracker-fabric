@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.parser;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils;
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget;
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping;
 
 import java.util.ArrayList;
@@ -149,7 +149,7 @@ public class MiningStatsParser {
 
         MiningContext(String blockType) {
             this.blockType = blockType;
-            this.island = MiningStatsWidget.getCurrentMiningIsland();
+            this.island = IslandTracker.getCurrentMiningIsland();
             this.isGemstone = "gemstones".equals(blockType);
 
             if (isGemstone) {
