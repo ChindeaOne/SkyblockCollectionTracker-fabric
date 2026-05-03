@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.farmingweight
 
-import io.github.chindeaone.collectiontracker.api.farmingweight.EliteApiFetcher
+import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -49,8 +49,8 @@ object FarmingweightUtils {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
             return
         }
-        if (position > 10000) {
-            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 10000.", true)
+        if (position > 100000) {
+            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 100000.", true)
             return
         }
 
