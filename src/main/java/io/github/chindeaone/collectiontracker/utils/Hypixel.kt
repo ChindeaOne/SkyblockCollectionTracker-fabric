@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
 import io.github.chindeaone.collectiontracker.api.colors.FetchColors
-import io.github.chindeaone.collectiontracker.api.farmingweight.EliteApiFetcher
+import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus

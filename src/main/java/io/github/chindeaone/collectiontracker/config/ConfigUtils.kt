@@ -157,6 +157,7 @@ val statsText: List<CollectionOverlay.OverlayText> get() = collectionOverlay.sta
 val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionOverlay.extraStatsText
 val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
 val explicitValues: Boolean get() = trackingConfig.explicitValues
+val leaderboardTracking: Boolean get() = collectionOverlay.leaderboardTracking
 
 // Multi Collection Tracking Config Accessors
 val multiCollectionOverlay: MultiCollectionOverlay get() = trackingConfig.multiCollectionOverlay
@@ -453,6 +454,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getSummaryStats(): MultiCollectionOverlay.SummaryStats = summaryStats
+
+    @JvmStatic
+    fun isLeaderboardTrackingEnabled(): Boolean = leaderboardTracking
 }
 
 /**
@@ -503,6 +507,11 @@ object ConfigHelper {
     @JvmStatic
     fun disableForagingStats() {
         foragingOverlay.enableForagingStatsOverlay = false
+    }
+
+    @JvmStatic
+    fun disableLeaderboardTracking() {
+        collectionOverlay.leaderboardTracking = false
     }
 
     @JvmStatic

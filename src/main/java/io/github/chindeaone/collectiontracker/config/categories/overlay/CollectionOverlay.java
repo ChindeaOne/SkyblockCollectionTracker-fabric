@@ -101,6 +101,14 @@ public class CollectionOverlay {
     public boolean showTrackingRatesAtEndOfSession = true;
 
     @Expose
+    @ConfigOption(
+            name = "Leaderboard Tracking",
+            desc = "Shows current position, eta until next position and other info in the overlay while tracking."
+    )
+    @ConfigEditorBoolean
+    public boolean leaderboardTracking = false;
+
+    @Expose
     @ConfigLink(owner = CollectionOverlay.class, field = "collectionOverlay")
     public Position overlayPosition = new Position(50, 100);
 }
