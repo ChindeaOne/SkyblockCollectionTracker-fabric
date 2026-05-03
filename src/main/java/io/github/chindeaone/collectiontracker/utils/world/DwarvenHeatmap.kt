@@ -20,17 +20,15 @@ object DwarvenHeatmap {
         "minecraft:clay" // tungsten
     )
 
-    private val excludedBlocks = setOf(
+    private val badBlocks = setOf(
         "minecraft:infested_cobblestone", // tungsten
-        "minecraft:brown_terracotta" // umber
+        "minecraft:terracotta" // umber
     )
 
-    private val blockPriority = mapOf(
-        "minecraft:clay" to 2, // tungsten
-        "minecraft:infested_cobblestone" to 1, // tungsten
+    private val goodBlocks = mapOf(
+        "minecraft:clay" to 3, // tungsten
         "minecraft:smooth_red_sandstone" to 3, // umber
-        "minecraft:terracotta" to 2, // umber
-        "minecraft:brown_terracotta" to 1 // umber
+        "minecraft:brown_terracotta" to 2 // umber
     )
 
     fun render (context: WorldRenderContext) {
@@ -55,7 +53,11 @@ object DwarvenHeatmap {
 
                     val score = calculateBlockScore(world, checkPos)
                     if (score > 0) {
-                        val (r, g, b) = priorityColor(score)
+                        val block = world.getBlockState(checkPos).block
+                        val key = BuiltInRegistries.BLOCK.getKey(block)
+                        val blockName = key.toString()
+
+                        val (r, g, b) = priorityColor(blockName)
                         BlockOutline.renderBlockHighlight(buffers, checkPos, camera, r, g, b)
                     }
                 }
@@ -67,7 +69,7 @@ object DwarvenHeatmap {
         val block = world.getBlockState(pos).block
         val key = BuiltInRegistries.BLOCK.getKey(block)
         val blockName = key.toString()
-        return blockName in blockList && blockName !in excludedBlocks
+        return blockName in blockList && blockName !in badBlocks
     }
 
     private fun calculateBlockScore(world: ClientLevel, pos: BlockPos): Int {
@@ -79,20 +81,18 @@ object DwarvenHeatmap {
                     val block = world.getBlockState(checkPos).block
                     val key = BuiltInRegistries.BLOCK.getKey(block)
                     val blockName = key.toString()
-                    if (blockName in blockList && isBlockExposed(world, checkPos)) score += blockPriority.getOrDefault(blockName, 0)
+                    if (blockName in blockList && isBlockExposed(world, checkPos)) score += goodBlocks.getOrDefault(blockName, 0)
                 }
             }
         }
         return score
     }
 
-    private fun priorityColor(score: Int): Triple<Float, Float, Float> {
-        return when {
-            score >= 19 -> Triple(4f / 255f, 4f / 255f, 4f / 255f) // black
-            score >= 14 -> Triple(49f / 255f, 41f / 255f, 165f / 255f) // dark blue
-            score >= 8 -> Triple(104f / 255f, 210f / 255f, 249f /255f) // blue
-            score >= 4 -> Triple(145f / 255f , 23f / 255f , 23f / 255f )  // red
-            else       -> Triple(20f / 255f, 90f / 255f, 38f / 255f )  // green
+    private fun priorityColor(blockName: String): Triple<Float, Float, Float> {
+        return when (blockName) {
+            "minecraft:smooth_red_sandstone", "minecraft:clay" -> Triple(0f / 255f, 100f / 255f, 0f / 255f)
+            "minecraft:brown_terracotta" -> Triple(144f / 255f, 238f / 255f, 144f / 255f)
+            else -> Triple(0f / 255f, 255f / 255f, 0f / 255f)
         }
     }
 
