@@ -47,6 +47,9 @@ jobs:
       SKILLS_URL: ${{ secrets.SKILLS_URL }}
       COLEWEIGHT_URL: ${{ secrets.COLEWEIGHT_URL }}
       WAYPOINTS_URL: ${{ secrets.WAYPOINTS_URL }}
+      FARMINGWEIGHT_URL: ${{ secrets.FARMINGWEIGHT_URL }}
+      COLLECTION_LEADERBOARD_URL: ${{ secrets.COLLECTION_LEADERBOARD_URL }}
+      SKILLTREE_URL: ${{ secrets.SKILLTREE_URL }}
       AGENT: ${{ secrets.AGENT }}
     steps:
       - name: checkout repository
