@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.api;
 
+import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpClient;
@@ -19,6 +21,7 @@ public class URLManager {
     public static final String SKILLS_URL;
     public static final String COLEWEIGHT_URL;
     public static final String FARMINGWEIGHT_URL;
+    public static final String COLLECTION_LEADERBOARD_URL;
     public static final String WAYPOINTS_URL;
     public static final String SKILLTREE_URL;
     public static final String AGENT;
@@ -44,9 +47,10 @@ public class URLManager {
         SKILLS_URL = props.getProperty("SKILLS_URL");
         COLEWEIGHT_URL = props.getProperty("COLEWEIGHT_URL");
         FARMINGWEIGHT_URL = props.getProperty("FARMINGWEIGHT_URL");
+        COLLECTION_LEADERBOARD_URL = props.getProperty("COLLECTION_LEADERBOARD_URL");
         WAYPOINTS_URL = props.getProperty("WAYPOINTS_URL");
         SKILLTREE_URL = props.getProperty("SKILLTREE_URL");
-        AGENT = props.getProperty("AGENT");
+        AGENT = props.getProperty("AGENT") + "/" + SkyblockCollectionTracker.VERSION;
     }
 
     public static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()

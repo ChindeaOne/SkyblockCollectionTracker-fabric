@@ -1,9 +1,10 @@
-package io.github.chindeaone.collectiontracker.api.farmingweight;
+package io.github.chindeaone.collectiontracker.api.eliteapi;
 
 import io.github.chindeaone.collectiontracker.api.URLManager;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager;
 import io.github.chindeaone.collectiontracker.utils.ColorUtils;
+import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -255,6 +256,56 @@ public class EliteApiFetcher {
         } catch (Exception e) {
             logger.error("[SCT]: An error occurred while fetching Farming Weight top colors.", e);
         }
+    }
+
+    public static String fetchCollectionLeaderboard(String collection) {
+        try {
+            URI uri = URI.create(URLManager.COLLECTION_LEADERBOARD_URL + "/" + collection);
+
+            HttpRequest request = HttpRequest.newBuilder(uri)
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer " + TokenManager.getToken())
+                    .header("X-NAME", PlayerData.INSTANCE.getPlayerName())
+                    .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                    .header("X-PROFILEID", PlayerData.INSTANCE.getProfileId())
+                    .header("User-Agent", URLManager.AGENT)
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+            int status = response.statusCode();
+
+            if (status == 401) {
+                logger.warn("[SCT]: Invalid or expired token for leaderboard. Fetching a new one and retrying...");
+                TokenManager.fetchAndStoreToken();
+                String token = TokenManager.getToken();
+
+                request = HttpRequest.newBuilder(uri)
+                        .timeout(Duration.ofSeconds(15))
+                        .header("Authorization", "Bearer " + token)
+                        .header("X-NAME", PlayerData.INSTANCE.getPlayerName())
+                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                        .header("X-PROFILEID", PlayerData.INSTANCE.getProfileId())
+                        .header("User-Agent", URLManager.AGENT)
+                        .header("Accept", "application/json")
+                        .GET()
+                        .build();
+
+                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+                status = response.statusCode();
+            }
+
+            if (status == 200) {
+                return response.body();
+            } else {
+                logger.error("[SCT]: Failed to fetch leaderboard data. Server responded with code: {}", status);
+            }
+        } catch (Exception e) {
+            logger.error("[SCT]: An error occurred while fetching leaderboard data", e);
+        }
+        return null;
     }
 
     private static HttpRequest buildPlayerRequest(URI uri, String uuid, String profileId) {
