@@ -30,6 +30,12 @@ import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNu
 public class TextUtils {
 
     public static void updateTrackingLines(List<String> list) {
+        if (ConfigAccess.isLeaderboardTrackingEnabled() && TrackingHandler.getUptimeInSeconds() > 1 && playerCurrentRank == -1) {
+            ChatUtils.sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true);
+            ConfigHelper.disableLeaderboardTracking();
+            return;
+        }
+
         list.clear();
         if (ConfigAccess.getStatsText().isEmpty()) return;
 
@@ -44,6 +50,31 @@ public class TextUtils {
                 case COLLECTION_SINCE_LAST_TIMER -> addIfNotNull(list, handleCollectionSinceLastTimer());
             }
         }
+
+        if (ConfigAccess.isLeaderboardTrackingEnabled()) {
+            addIfNotNull(list, "");
+            addIfNotNull(list, handleNextPosition());
+            addIfNotNull(list, handleCollectionTillNextRank());
+            addIfNotNull(list, handleEta());
+        }
+    }
+
+    private static String handleNextPosition() {
+        if (playerCurrentRank == 1) return null;
+        if (nextRankUsername == null) return "Next Position: Calculating...";
+        return String.format("Next Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount));
+    }
+
+    private static String handleCollectionTillNextRank() {
+        if (playerCurrentRank == 1) return null;
+        if (collectionTillNextRank == -1) return "Till Next Rank: Calculating...";
+        return "Till Next Rank: " + formatNumber(collectionTillNextRank);
+    }
+
+    private static String handleEta() {
+        if (playerCurrentRank == 1) return null;
+        if (etaToNextRank == null || etaToNextRank.isEmpty()) return "ETA: Calculating...";
+        return "ETA: " + etaToNextRank;
     }
 
     private static void addIfNotNull(List<String> list, String line) {
@@ -52,8 +83,12 @@ public class TextUtils {
 
     private static String handleCollection() {
         if (CollectionsManager.collectionSource.equals("sacks")) return null;
+        String rankSuffix = "";
+        if (ConfigAccess.isLeaderboardTrackingEnabled() && playerCurrentRank != -1) {
+            rankSuffix = " [#" + playerCurrentRank + "]";
+        }
         return collectionAmount >= 0
-                ? formatCollectionName(collection) + " collection: " + formatNumber(collectionAmount)
+                ? formatCollectionName(collection) + " collection: " + formatNumber(collectionAmount) + rankSuffix
                 : formatCollectionName(collection) + " collection: Calculating...";
     }
 

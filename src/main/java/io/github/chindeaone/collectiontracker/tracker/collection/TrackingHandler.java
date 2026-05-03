@@ -121,7 +121,11 @@ public class TrackingHandler {
 
         resetVariables();
         // Clear cached data
-        DataFetcher.clearAllCache();
+        if (restart) {
+            DataFetcher.clearCollectionCache();
+        } else {
+            DataFetcher.clearAllCache();
+        }
 
         // Reset uptime
         long now = System.currentTimeMillis();
@@ -158,6 +162,13 @@ public class TrackingHandler {
 
         // Reset highest/lowest rates
         resetLowestHighestRates();
+
+        // Reset leaderboard tracking
+        playerCurrentRank = -1;
+        nextRankUsername = null;
+        nextRankAmount = -1L;
+        etaToNextRank = null;
+        collectionTillNextRank = -1L;
     }
 
     private static void resetLowestHighestRates() {

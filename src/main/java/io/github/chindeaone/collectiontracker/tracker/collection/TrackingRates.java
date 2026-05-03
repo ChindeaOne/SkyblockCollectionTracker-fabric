@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManag
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import org.apache.logging.log4j.LogManager;
@@ -50,6 +51,13 @@ public class TrackingRates {
     public static Map<String, Long> lowestRatesPerHourBazaar = new ConcurrentHashMap<>();
     public static Map<String, Long> highestRatesPerHourBazaar = new ConcurrentHashMap<>();
 
+    // Leaderboard tracking data
+    public static volatile int playerCurrentRank = -1;
+    public static volatile String nextRankUsername = null;
+    public static volatile long nextRankAmount = -1L;
+    public static volatile String etaToNextRank = null;
+    public static volatile long collectionTillNextRank = -1L;
+
     public static void setCollection(long value) {
         long now = System.currentTimeMillis();
         lastApiCollection = value;
@@ -69,6 +77,57 @@ public class TrackingRates {
         long currentCollection = lastApiCollection + sacksCollectionGained; // increase current collection
 
         updateValues(currentCollection, value);
+    }
+
+    public static void updateLeaderboardStats() {
+        if (LeaderboardManager.shouldRefetch(collectionAmount)) {
+            DataFetcher.fetchLeaderboardData(true);
+        }
+
+        LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry();
+        if (playerEntry != null) {
+            int oldRank = playerCurrentRank;
+            playerCurrentRank = playerEntry.getRank();
+            if (oldRank != -1 && playerCurrentRank < oldRank) {
+                logger.info("[SCT]: Player rank updated from #{} to #{}", oldRank, playerCurrentRank);
+            }
+        } else {
+            playerCurrentRank = -1;
+        }
+
+        LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntry();
+        if (nextEntry != null) {
+            nextRankUsername = nextEntry.getUsername();
+            nextRankAmount = nextEntry.getAmount();
+            collectionTillNextRank = nextRankAmount - collectionAmount;
+
+            if (collectionPerHour > 0) {
+                long seconds = (long) (collectionTillNextRank / (collectionPerHour / 3600.0));
+                etaToNextRank = formatETA(seconds);
+            } else {
+                etaToNextRank = null;
+            }
+        } else {
+            nextRankUsername = null;
+            nextRankAmount = -1L;
+            collectionTillNextRank = -1L;
+            etaToNextRank = null;
+        }
+    }
+
+    private static String formatETA(long seconds) {
+        if (seconds < 0) return "0s";
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+
+        if (hours > 0) {
+            return String.format("%dh %dm", hours, minutes);
+        } else if (minutes > 0) {
+            return String.format("%dm %ds", minutes, secs);
+        } else {
+            return String.format("%ds", secs);
+        }
     }
 
     private static void updateValues(long currentCollection, long collectionSinceLastVal) {
@@ -119,6 +178,8 @@ public class TrackingRates {
             if (!isTrackingDataReady()) ChatUtils.sendMessage("§cWarning! Some maps have not been fully initialized. You have the option to restart the tracker or wait for the next collection update.", true);
             CollectionOverlay.trackingDirty = true;
         }
+
+        if (ConfigAccess.isLeaderboardTrackingEnabled()) updateLeaderboardStats();
     }
 
     private static void updateBazaarMaps(long collectedSinceStart, long uptime) {
