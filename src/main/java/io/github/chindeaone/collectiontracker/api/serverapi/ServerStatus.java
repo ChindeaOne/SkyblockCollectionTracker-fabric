@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher;
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList;
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList;
 import io.github.chindeaone.collectiontracker.api.colors.FetchColors;
+import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher;
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices;
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree;
 import org.apache.logging.log4j.LogManager;
@@ -55,6 +56,14 @@ public class ServerStatus {
     }
 
     public static synchronized boolean hasData() {
-        return FetchColors.hasColors && FetchNpcPrices.hasNpcPrice && FetchCollectionList.hasCollectionList && FetchGemstoneList.hasGemstoneList && FetchSkillTree.hasSkillTree && ColeweightFetcher.hasColeweightTopColors && ColeweightFetcher.hasColeweightLb;
+        return FetchColors.hasColors &&
+                FetchNpcPrices.hasNpcPrice &&
+                FetchCollectionList.hasCollectionList &&
+                FetchGemstoneList.hasGemstoneList &&
+                FetchSkillTree.hasSkillTree &&
+                ColeweightFetcher.hasColeweightTopColors &&
+                ColeweightFetcher.hasColeweightLb &&
+                EliteApiFetcher.hasFarmingweightTopColors &&
+                EliteApiFetcher.hasFarmingweightLb;
     }
 }
