@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.ServerUtils;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -125,6 +126,7 @@ public class DataFetcher {
                 String jsonData = EliteApiFetcher.fetchCollectionLeaderboard(collection);
                 if (jsonData == null) {
                     logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API");
+                    ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true);
                     return;
                 }
 
