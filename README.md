@@ -28,6 +28,7 @@
 - Configurable overlay lines showing collection progress and profit rates.
 - Provides NPC/Bazaar prices for accurate profit tracking.
 - Detailed session summary at the end (best/worst rates, elapsed time, profit, etc.).
+- Provides leaderboard tracking for all collections, with data from Elite API.
 - `/sct collections` for all available collections.
 
 </details>
@@ -50,6 +51,14 @@
 - Ported Precision Mining highlight.
 - Ported `/sct timer <set|pause|resume|stop>` command.
 - Tracking Coleweight via `/sct cw track` command.
+
+</details>
+
+<details>
+<summary><strong>Farming Weight</strong></summary>
+
+- Provides commands like `/sct fw find` and `/sct fw lb` to access farming weight data from Elite API.
+- Displays farming weight rank in chat for the top 1000 players, with customizable rank colors.
 
 </details>
 
@@ -102,6 +111,7 @@
 
 - Displays ordered waypoints in mineshafts, only for jasper and crystal mineshafts.
 - Displays ordered waypoints for mineshaft spawning routes.
+- Displays ordered waypoints for dwarven metals and pure ores routes.
 - All routes used are from Mining Cult.
 
 </details>
