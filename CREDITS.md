@@ -11,4 +11,4 @@
 
 ### APIs & Data
 - **Kaeso** – [Elite API](https://api.eliteskyblock.com/) for farming weight and leaderboards
-- **Coflnet ** – [SkyCofl](https://sky.coflnet.com/wiki/api) for auction house data
+- **Coflnet** – [SkyCofl](https://sky.coflnet.com/wiki/api) for auction house data
