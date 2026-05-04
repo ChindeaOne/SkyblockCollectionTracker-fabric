@@ -103,7 +103,7 @@ public class CollectionOverlay {
     @Expose
     @ConfigOption(
             name = "Leaderboard Tracking",
-            desc = "Shows current position, eta until next position and other info in the overlay while tracking."
+            desc = "Shows your rank, next player, progress to the next rank, and ETA in the overlay."
     )
     @ConfigEditorBoolean
     public boolean leaderboardTracking = false;
