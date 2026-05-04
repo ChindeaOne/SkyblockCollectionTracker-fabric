@@ -1,11 +1,11 @@
-package io.github.chindeaone.collectiontracker.config.categories.mining;
+package io.github.chindeaone.collectiontracker.config.categories.mining.routes;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class MiningRoutesConfig {
+public class MineshaftRoutes {
 
     public enum MineshaftSpawnRoutes {
         GEMSTONES("gemstone_spawn"),
@@ -38,7 +38,7 @@ public class MiningRoutesConfig {
 
     @Expose
     @ConfigOption(
-            name = "Enable routes for Mineshaft spawns",
+            name = "Enable Mineshaft Spawn Routes",
             desc = "Enables routes for spawning Mineshafts."
     )
     @ConfigEditorBoolean
@@ -46,9 +46,9 @@ public class MiningRoutesConfig {
 
     @Expose
     @ConfigOption(
-            name = "Mineshaft Spawn Routes",
+            name = "Mineshaft Spawn Route",
             desc = "Select the route you want to use to spawn Mineshafts.\n§eRoutes provided by Mining Cult."
     )
     @ConfigEditorDropdown
-    public MineshaftSpawnRoutes mineshaftSpawnRoutes = MineshaftSpawnRoutes.GEMSTONES;
+    public MineshaftSpawnRoutes selectedMineshaftSpawnRoute = MineshaftSpawnRoutes.GEMSTONES;
 }

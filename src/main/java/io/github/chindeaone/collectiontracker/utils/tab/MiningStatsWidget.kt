@@ -17,6 +17,10 @@ object MiningStatsWidget {
     private var firstInfoSeenTime: Long = 0L
     private var wasReset: Boolean = false
 
+    private var lastMineshaftEnabled = false
+    private var lastMetalEnabled = false
+    private var lastOresEnabled = false
+
     fun onTabWidgetsUpdate() {
         val now = System.currentTimeMillis()
         if (now < nextAllowedTime) return
@@ -38,10 +42,38 @@ object MiningStatsWidget {
         }
 
         if (currentMiningIsland == "Dwarven Mines") {
-            if (ConfigAccess.isMineshaftSpawnRoutesEnabled()) {
-                WaypointsUtils.selectCategory(ConfigAccess.getMineshaftSpawnRoutes().type)
+            val routes = listOf(
+                Triple(ConfigAccess.isMineshaftSpawnRoutesEnabled(), lastMineshaftEnabled, ConfigAccess::setMineshaftSpawnRoutesEnabled),
+                Triple(ConfigAccess.isDwarvenMetalRoutesEnabled(), lastMetalEnabled, ConfigAccess::setDwarvenMetalRoutesEnabled),
+                Triple(ConfigAccess.isPureOresRoutesEnabled(), lastOresEnabled, ConfigAccess::setPureOresRoutesEnabled)
+            )
+
+            val selectedIndex = routes.indexOfFirst { it.first && !it.second }
+
+            if (selectedIndex != -1) {
+                val otherEnabled = routes.indices.any { it != selectedIndex && routes[it].second }
+                if (otherEnabled) {
+                    ChatUtils.sendMessage("§cCannot enable another route. Disable the current one first.", true)
+                    routes[selectedIndex].third(false)
+                }
+            }
+
+            lastMineshaftEnabled = ConfigAccess.isMineshaftSpawnRoutesEnabled()
+            lastMetalEnabled = ConfigAccess.isDwarvenMetalRoutesEnabled()
+            lastOresEnabled = ConfigAccess.isPureOresRoutesEnabled()
+
+            val category = when {
+                lastMineshaftEnabled -> ConfigAccess.getMineshaftSpawnRoutes().type
+                lastMetalEnabled -> ConfigAccess.getDwarvenMetalRoutes().type
+                lastOresEnabled -> ConfigAccess.getPureOresRoutes().type
+                else -> null
+            }
+
+            if (category != null) {
+                WaypointsUtils.selectCategory(category)
             } else {
                 WaypointsUtils.currentCategory = null
+                WaypointsUtils.reset()
             }
         } else if (currentMiningIsland != "Mineshaft") {
             WaypointsUtils.currentCategory = null

@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.config.categories;
 import com.google.gson.annotations.Expose;
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight;
 import io.github.chindeaone.collectiontracker.config.categories.mining.*;
+import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;

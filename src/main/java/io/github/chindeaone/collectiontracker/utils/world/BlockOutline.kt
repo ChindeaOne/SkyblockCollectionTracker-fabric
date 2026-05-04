@@ -28,13 +28,13 @@ object BlockOutline {
         val currentIsland = IslandTracker.currentMiningIsland
         if (currentIsland != "Dwarven Mines" && currentIsland != "Mineshaft") return
 
-        if (currentIsland == "Dwarven Mines" && !ConfigAccess.isMineshaftSpawnRoutesEnabled()) return
+        if (currentIsland == "Dwarven Mines" && !ConfigAccess.isMineshaftSpawnRoutesEnabled() && !ConfigAccess.isDwarvenMetalRoutesEnabled() && !ConfigAccess.isPureOresRoutesEnabled()) return
         if (currentIsland == "Mineshaft" && !ConfigAccess.isMineshaftRoutesEnabled()) return
 
         val camera = context.worldState().cameraRenderState
         val buffers = context.consumers()
 
-        WaypointsUtils.getCurrentTarget()
+        WaypointsUtils.updateCurrentIndex()
         val category = WaypointsUtils.currentCategory ?: return
         val allWaypoints = WaypointsUtils.getWaypointsForCategory(category)
         if (allWaypoints.isEmpty()) return

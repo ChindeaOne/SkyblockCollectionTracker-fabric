@@ -20,10 +20,13 @@ import io.github.chindeaone.collectiontracker.config.categories.foraging.Lottery
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable
-import io.github.chindeaone.collectiontracker.config.categories.mining.MiningRoutesConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MineshaftRoutes
+import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.PickaxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.SkyMallConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.TemporaryBuffsConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.routes.DwarvenMetalsRoutes
+import io.github.chindeaone.collectiontracker.config.categories.mining.routes.PureOresRoutes
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
@@ -89,9 +92,16 @@ val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChat
 val showPickaxeReadyAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeReadyAbilityTitle
 val showPickaxeExpiredAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeExpiredAbilityTitle
 val pickaxeAbilityInMiningIslandsOnly: Boolean get() = pickaxeAbilityConfig.pickaxeAbilityInMiningIslandsOnly
-val enableMineshaftRoutes: Boolean get() = miningRoutesConfig.enableMineshaftRoutes
-val enableMineshaftSpawnRoutes: Boolean get() = miningRoutesConfig.enableMineshaftSpawnRoutes
-val mineshaftSpawnRoutes: MiningRoutesConfig.MineshaftSpawnRoutes get() = miningRoutesConfig.mineshaftSpawnRoutes
+val mineshaftRoutesConfig: MineshaftRoutes get() = miningRoutesConfig.mineshaftRoutes
+val enableMineshaftRoutes: Boolean get() = mineshaftRoutesConfig.enableMineshaftRoutes
+val enableMineshaftSpawnRoutes: Boolean get() = mineshaftRoutesConfig.enableMineshaftSpawnRoutes
+val mineshaftSpawnRoutes: MineshaftRoutes.MineshaftSpawnRoutes get() = mineshaftRoutesConfig.selectedMineshaftSpawnRoute
+val dwarvenMetalsRoutesConfig: DwarvenMetalsRoutes get() = miningRoutesConfig.dwarvenMetalsRoutes
+val enableDwarvenMetalRoutes: Boolean get() = dwarvenMetalsRoutesConfig.enableDwarvenMetalRoutes
+val dwarvenMetalRoutes: DwarvenMetalsRoutes.DwarvenMetalRoutes get() = dwarvenMetalsRoutesConfig.selectedDwarvenMetalRoute
+val pureOresRoutesConfig: PureOresRoutes get() = miningRoutesConfig.pureOresRoutes
+val enablePureOresRoutes: Boolean get() = pureOresRoutesConfig.enablePureOresRoutes
+val pureOresRoutes: PureOresRoutes.PureOreRoutes get() = pureOresRoutesConfig.selectedPureOresRoute
 val enableTempBuffTracker: Boolean get() = temporaryBuffsConfig.enableTempBuffTracker
 val refinedCacaoTime: Long get() = temporaryBuffsConfig.refinedCacaoTime
 val filetTime: Long get() = temporaryBuffsConfig.filetTime
@@ -414,7 +424,19 @@ object ConfigAccess {
     fun isMineshaftSpawnRoutesEnabled(): Boolean = enableMineshaftSpawnRoutes
 
     @JvmStatic
-    fun getMineshaftSpawnRoutes(): MiningRoutesConfig.MineshaftSpawnRoutes = mineshaftSpawnRoutes
+    fun getMineshaftSpawnRoutes(): MineshaftRoutes.MineshaftSpawnRoutes = mineshaftSpawnRoutes
+
+    @JvmStatic
+    fun isDwarvenMetalRoutesEnabled(): Boolean = enableDwarvenMetalRoutes
+
+    @JvmStatic
+    fun getDwarvenMetalRoutes(): DwarvenMetalsRoutes.DwarvenMetalRoutes = dwarvenMetalRoutes
+
+    @JvmStatic
+    fun isPureOresRoutesEnabled(): Boolean = enablePureOresRoutes
+
+    @JvmStatic
+    fun getPureOresRoutes(): PureOresRoutes.PureOreRoutes = pureOresRoutes
 
     @JvmStatic
     fun isTempBuffTrackerEnabled(): Boolean = enableTempBuffTracker
@@ -457,6 +479,21 @@ object ConfigAccess {
 
     @JvmStatic
     fun isLeaderboardTrackingEnabled(): Boolean = leaderboardTracking
+
+    @JvmStatic
+    fun setMineshaftSpawnRoutesEnabled(enabled: Boolean) {
+        mineshaftRoutesConfig.enableMineshaftSpawnRoutes = enabled
+    }
+
+    @JvmStatic
+    fun setDwarvenMetalRoutesEnabled(enabled: Boolean) {
+        dwarvenMetalsRoutesConfig.enableDwarvenMetalRoutes = enabled
+    }
+
+    @JvmStatic
+    fun setPureOresRoutesEnabled(enabled: Boolean) {
+        pureOresRoutesConfig.enablePureOresRoutes = enabled
+    }
 }
 
 /**

@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import com.google.gson.JsonObject
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.Vec3
@@ -52,10 +53,7 @@ object WaypointsUtils {
         waypointCategories.clear()
         data.keySet().forEach { categoryName ->
             val obj = data.getAsJsonObject(categoryName)
-            val sortedPos = obj.keySet()
-                .filter { it.toIntOrNull() != null }
-                .sortedBy { it.toInt() }
-                .map { key ->
+            val sortedPos = obj.keySet().map { key ->
                     val pos = obj.getAsJsonObject(key)
                     val blockPos = BlockPos(
                         pos.get("x").asInt,
@@ -76,15 +74,18 @@ object WaypointsUtils {
         }
     }
 
-    fun getCurrentTarget(): Pair<String, BlockPos>? {
-        val category = currentCategory ?: return null
-        val list = waypointCategories[category] ?: return null
+    fun updateCurrentIndex() {
+        val category = currentCategory ?: return
+        val list = waypointCategories[category] ?: return
+        val shouldCycle = category == ConfigAccess.getPureOresRoutes().type
 
         while (currentIndex < list.size && isPlayerNear(list[currentIndex].second)) {
             currentIndex++
-        }
 
-        return if (currentIndex < list.size) list[currentIndex] else null
+            if (shouldCycle && currentIndex >= list.size) {
+                currentIndex = 0
+            }
+        }
     }
 
     private fun isPlayerNear(pos: BlockPos): Boolean {
