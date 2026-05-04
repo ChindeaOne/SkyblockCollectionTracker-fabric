@@ -11,7 +11,7 @@ public class HeatmapConfig {
     @Expose
     @ConfigOption(
             name = "Enable Heatmap",
-            desc = "Toggles the Heatmap for Glacite Tunnels."
+            desc = "Toggles the Heatmap for Glacite Tunnels.\n§eColor mapping: §2dark green §f> §alight green."
     )
     @ConfigEditorBoolean
     public boolean enableHeatmap = false;
