@@ -300,6 +300,25 @@ public class CommandRegistry {
                                             ChatUtils.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
                                             return 1;
                                         })
+                                        .then(ClientCommandManager.literal("global")
+                                                .executes(context -> {
+                                                    ChatUtils.sendMessage("Usage: /sct cw color global <hex color>.",true);
+                                                    return 1;
+                                                })
+                                                .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
+                                                        .executes(context -> {
+                                                            String color = StringArgumentType.getString(context, "hex color").trim();
+                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
+
+                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
+                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                return 1;
+                                                            }
+                                                            ColeweightUtils.setGlobalColor(formattedHex);
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
                                         .then(ClientCommandManager.argument("player name", StringArgumentType.string())
                                                 .suggests(PLAYER_SUGGESTIONS)
                                                 .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
@@ -314,25 +333,6 @@ public class CommandRegistry {
                                                                 return 1;
                                                             }
                                                             ColeweightUtils.setPlayerCustomColor(name, formattedHex);
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                        .then(ClientCommandManager.literal("global")
-                                                .executes(context -> {
-                                                    ChatUtils.sendMessage("Usage: /sct cw color global <hex color>.",true);
-                                                    return 1;
-                                                })
-                                                .then(ClientCommandManager.argument("color", StringArgumentType.greedyString())
-                                                        .executes(context -> {
-                                                            String color = StringArgumentType.getString(context, "color").trim();
-                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
-
-                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
-                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
-                                                                return 1;
-                                                            }
-                                                            ColeweightUtils.setGlobalColor(formattedHex);
                                                             return 1;
                                                         })
                                                 )
@@ -426,6 +426,25 @@ public class CommandRegistry {
                                             ChatUtils.sendMessage("Usage: /sct fw color set <player name> <hex color>.", true);
                                             return 1;
                                         })
+                                        .then(ClientCommandManager.literal("global")
+                                                .executes(context -> {
+                                                    ChatUtils.sendMessage("Usage: /sct fw color global <hex color>.", true);
+                                                    return 1;
+                                                })
+                                                .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
+                                                        .executes(context -> {
+                                                            String color = StringArgumentType.getString(context, "hex color").trim();
+                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
+
+                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
+                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                return 1;
+                                                            }
+                                                            FarmingweightUtils.setGlobalColor(formattedHex);
+                                                            return 1;
+                                                        })
+                                                )
+                                        )
                                         .then(ClientCommandManager.argument("player name", StringArgumentType.string())
                                                 .suggests(PLAYER_SUGGESTIONS)
                                                 .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
@@ -440,25 +459,6 @@ public class CommandRegistry {
                                                                 return 1;
                                                             }
                                                             FarmingweightUtils.setPlayerCustomColor(name, formattedHex);
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                        .then(ClientCommandManager.literal("global")
-                                                .executes(context -> {
-                                                    ChatUtils.sendMessage("Usage: /sct fw color global <hex color>.", true);
-                                                    return 1;
-                                                })
-                                                .then(ClientCommandManager.argument("color", StringArgumentType.greedyString())
-                                                        .executes(context -> {
-                                                            String color = StringArgumentType.getString(context, "color").trim();
-                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
-
-                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
-                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
-                                                                return 1;
-                                                            }
-                                                            FarmingweightUtils.setGlobalColor(formattedHex);
                                                             return 1;
                                                         })
                                                 )

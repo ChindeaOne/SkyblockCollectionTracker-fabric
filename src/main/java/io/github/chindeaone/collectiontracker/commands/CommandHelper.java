@@ -24,7 +24,7 @@ public class CommandHelper {
                     new CommandEntry("/sct commands <page>", "§eJumps to a specific commands page."),
                     new CommandEntry("/sct changelog", "§eShows all recent changes to the mod.")
             )),
-            new CommandPage("Collection Tracking", "§a", List.of(
+            new CommandPage("Collection Tracking", "§3", List.of(
                     new CommandEntry("/sct collections", "§eShows all available collections (page 1)."),
                     new CommandEntry("/sct collections <page | category>", "§eJumps to a specific collections page or category."),
                     new CommandEntry("/sct track <collection 1> <collection 2> ...", "§eTracks one or more collections at once."),
