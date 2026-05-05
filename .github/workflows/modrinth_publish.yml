@@ -40,6 +40,7 @@ jobs:
         with:
           modrinth-id: iYI2Iw6k
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-unfeature-mode: none
 
           version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
           name: "${{ github.event.release.name }}"
