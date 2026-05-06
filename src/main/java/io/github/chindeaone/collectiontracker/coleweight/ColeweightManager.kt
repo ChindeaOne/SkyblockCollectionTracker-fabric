@@ -35,7 +35,7 @@ object ColeweightManager {
         }
 
         storage = if (isTop) {
-            storage.copy(leaderboard = list)
+            storage.copy(leaderboard = list, leaderboardSet = list.map { it.name }.toHashSet())
         } else {
             storage.copy(tempLeaderboard = list)
         }

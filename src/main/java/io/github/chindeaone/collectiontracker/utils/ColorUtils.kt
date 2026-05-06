@@ -89,7 +89,7 @@ object ColorUtils {
 
     fun customCWColorComponent(rank: Int, isMe: Boolean, playerName: String): Component {
         val color = getCWRankColor(rank, isMe, playerName)
-        val text = "[⛏ #$rank]"
+        val text = "[⛏ $rank]"
 
         return Component.literal(text).withStyle {
             it.withColor(TextColor.fromRgb(color.rgb))
@@ -98,7 +98,7 @@ object ColorUtils {
 
     fun customFWColorComponent(rank: Int, isMe: Boolean, playerName: String): Component {
         val color = getFWRankColor(rank, isMe, playerName)
-        val text = "[🌾 #$rank]"
+        val text = "[🌾 $rank]"
 
         return Component.literal(text).withStyle {
             it.withColor(TextColor.fromRgb(color.rgb))

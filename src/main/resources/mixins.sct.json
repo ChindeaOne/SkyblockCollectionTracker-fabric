@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AccessorGuiContainer",
-    "ChatHudMixin",
+    "ChatWeightMixin",
     "ClientPacketListenerMixin",
     "ParticleMixin",
     "ChatScreenMixin"
