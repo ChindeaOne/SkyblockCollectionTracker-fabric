@@ -35,7 +35,10 @@ object FarmingweightUtils {
             return
         }
 
-        val resolvedProfileId = PlayerData.profileId
+        val resolvedProfileId = if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
+            PlayerData.profileId
+        } else null
+
         EliteApiFetcher.fetchFarmingweightDataAsync(playerName, PlayerData.playerUUID, resolvedProfileId) {
             playerCooldowns[playerName] = System.currentTimeMillis()
             lastPlayer = playerName

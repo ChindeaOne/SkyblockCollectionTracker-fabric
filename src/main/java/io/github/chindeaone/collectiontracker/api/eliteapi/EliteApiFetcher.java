@@ -27,7 +27,7 @@ public class EliteApiFetcher {
     public static void fetchFarmingweightDataAsync(String playerName, String uuid, String profileId, Runnable onComplete) {
         try {
             URI uri = URI.create(URLManager.FARMINGWEIGHT_URL);
-            HttpRequest request = buildPlayerRequest(uri, uuid, profileId);
+            HttpRequest request = buildPlayerRequest(uri, playerName, uuid, profileId);
 
             HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                     .thenAccept(response -> {
@@ -37,7 +37,7 @@ public class EliteApiFetcher {
                             logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
                             try {
                                 TokenManager.fetchAndStoreToken();
-                                HttpRequest retryRequest = buildPlayerRequest(uri, uuid, profileId);
+                                HttpRequest retryRequest = buildPlayerRequest(uri, playerName, uuid, profileId);
                                 HttpResponse<String> retryResponse = HTTP_CLIENT.send(retryRequest, HttpResponse.BodyHandlers.ofString());
                                 status = retryResponse.statusCode();
 
@@ -65,7 +65,7 @@ public class EliteApiFetcher {
                         }
 
                         if (status == 429) {
-                            logger.warn("[SCT]: Rate limit exceeded for Farming Weight API. Limit: 10 requests per 10 minutes.");
+                            logger.warn("[SCT]: Rate limit exceeded for Farming Weight API. Limit: 10 requests every 30 minutes.");
                             Minecraft.getInstance().execute(() ->
                                     ChatUtils.sendMessage("§Farming weight fetching limit reached! Try again later.", true)
                             );
@@ -297,6 +297,11 @@ public class EliteApiFetcher {
                 status = response.statusCode();
             }
 
+            if (status == 429) {
+                logger.warn("[SCT]: Rate limit exceeded for Farming Weight API. Limit: 10 requests every hour.");
+                return null;
+            }
+
             if (status == 200) {
                 return response.body();
             } else {
@@ -308,14 +313,18 @@ public class EliteApiFetcher {
         return null;
     }
 
-    private static HttpRequest buildPlayerRequest(URI uri, String uuid, String profileId) {
+    private static HttpRequest buildPlayerRequest(URI uri, String playerName, String uuid, String profileId) {
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
                 .timeout(Duration.ofSeconds(15))
                 .header("Authorization", "Bearer " + TokenManager.getToken())
+                .header("X-NAME", playerName)
                 .header("X-UUID", uuid)
-                .header("X-PROFILEID", profileId)
                 .header("User-Agent", URLManager.AGENT)
                 .header("Accept", "application/json");
+
+        if (profileId != null) {
+            builder.header("X-PROFILEID", profileId);
+        }
 
         return builder.GET().build();
     }
