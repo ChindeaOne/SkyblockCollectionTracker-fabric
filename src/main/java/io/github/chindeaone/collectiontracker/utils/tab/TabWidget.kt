@@ -28,7 +28,7 @@ enum class TabWidget(headerRegex: String) {
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)+Profile: §r§.(?<profile>[\\w\\s]+[^ §]).*",
+        "(?:§.)+Profile: §r§.(?<profile>[\\w\\s ♲Ⓑ☀]+)",
     ),
     SB_LEVEL(
         // language=RegExp
@@ -370,7 +370,6 @@ enum class TabWidget(headerRegex: String) {
                     tabLines = tabLines,
                     startIndex = start,
                     headerRegexes = headerPatterns,
-                    maxBodyLines = 10
                 )
                 w.isPresent = true
             }
@@ -379,15 +378,14 @@ enum class TabWidget(headerRegex: String) {
         private fun sliceSection(
             tabLines: List<String>,
             startIndex: Int,
-            headerRegexes: List<Regex>,
-            maxBodyLines: Int
+            headerRegexes: List<Regex>
         ): List<String> {
-            val out = ArrayList<String>(1 + maxBodyLines)
+            val out = ArrayList<String>(11)
             out += tabLines[startIndex]
 
             var bodyCount = 0
             var i = startIndex + 1
-            while (i < tabLines.size && bodyCount < maxBodyLines) {
+            while (i < tabLines.size && bodyCount < 10) {
                 val line = tabLines[i]
 
                 if (headerRegexes.any { it.matches(line) }) break
