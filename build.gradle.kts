@@ -109,7 +109,10 @@ fabricApi {
 
 dependencies {
     minecraft("com.mojang:minecraft:${sc.current.version}")
-    mappings(loom.officialMojangMappings())
+    @Suppress("UnstableApiUsage")
+    mappings(loom.layered {
+        officialMojangMappings()
+    })
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
 
     // Fabric API
