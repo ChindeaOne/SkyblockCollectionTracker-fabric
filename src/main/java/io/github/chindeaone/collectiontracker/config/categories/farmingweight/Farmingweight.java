@@ -10,7 +10,7 @@ public class Farmingweight {
     @Expose
     @ConfigOption(
             name = "Farming Weight ranks in chat",
-            desc = "Enable Farming Weight ranks in chat."
+            desc = "Enable Farming Weight ranks in chat.\n§eNote: If you use Skyhanni's chat formatting, make sure you have at least §bPlayer Name §evisible!"
     )
     @ConfigEditorBoolean
     public boolean farmingweightRankingInChat = false;

@@ -20,7 +20,7 @@ public class ColeweightColor {
     public boolean enableCustomColor = false;
 
     @Expose
-    @ConfigOption(name = "Rank Color", desc = "Set a custom color.")
+    @ConfigOption(name = "Rank Color", desc = "Set a custom color.\n§cNote: Animated chroma doesn't work yet.")
     @ConfigEditorColour
     public ChromaColour customColor = ChromaColour.fromStaticRGB(0, 0, 0, 0);
 
