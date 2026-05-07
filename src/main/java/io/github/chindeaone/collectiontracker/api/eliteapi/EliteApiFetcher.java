@@ -260,6 +260,7 @@ public class EliteApiFetcher {
 
     public static String fetchCollectionLeaderboard(String collection) {
         try {
+            collection = collection.replace(" ", "-");
             URI uri = URI.create(URLManager.COLLECTION_LEADERBOARD_URL + "/" + collection);
 
             HttpRequest request = HttpRequest.newBuilder(uri)
