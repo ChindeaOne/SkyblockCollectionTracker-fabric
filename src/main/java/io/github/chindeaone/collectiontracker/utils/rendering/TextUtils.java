@@ -30,7 +30,7 @@ import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNu
 public class TextUtils {
 
     public static void updateTrackingLines(List<String> list) {
-        if (ConfigAccess.isLeaderboardTrackingEnabled() && TrackingHandler.getUptimeInSeconds() > 1 && playerCurrentRank == -1) {
+        if (ConfigAccess.isLeaderboardTrackingEnabled() && !TrackingHandler.leaderboardTrackingInitialized) {
             ChatUtils.sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true);
             ConfigHelper.disableLeaderboardTracking();
             return;

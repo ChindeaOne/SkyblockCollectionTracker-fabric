@@ -76,18 +76,18 @@ public class TrackingRates {
         sacksCollectionGained += value; // update sacks gained
         long currentCollection = lastApiCollection + sacksCollectionGained; // increase current collection
 
+        if (LeaderboardManager.shouldRefetch(currentCollection)) {
+            DataFetcher.fetchLeaderboardData();
+        }
+
         updateValues(currentCollection, value);
     }
 
     public static void updateLeaderboardStats() {
-        if (LeaderboardManager.shouldRefetch(collectionAmount)) {
-            DataFetcher.fetchLeaderboardData(true);
-        }
-
         LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry();
         if (playerEntry != null) {
             int oldRank = playerCurrentRank;
-            playerCurrentRank = playerEntry.getRank();
+            playerCurrentRank = playerEntry.rank();
             if (oldRank != -1 && playerCurrentRank < oldRank) {
                 logger.info("[SCT]: Player rank updated from #{} to #{}", oldRank, playerCurrentRank);
             }
@@ -97,8 +97,8 @@ public class TrackingRates {
 
         LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntry();
         if (nextEntry != null) {
-            nextRankUsername = nextEntry.getUsername();
-            nextRankAmount = nextEntry.getAmount();
+            nextRankUsername = nextEntry.username();
+            nextRankAmount = nextEntry.amount();
             collectionTillNextRank = nextRankAmount - collectionAmount;
 
             if (collectionPerHour > 0) {

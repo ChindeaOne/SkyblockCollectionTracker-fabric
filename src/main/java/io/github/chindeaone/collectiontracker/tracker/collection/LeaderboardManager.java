@@ -1,59 +1,60 @@
 package io.github.chindeaone.collectiontracker.tracker.collection;
 
-import io.github.chindeaone.collectiontracker.utils.PlayerData;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class LeaderboardManager {
-    private static final List<LeaderboardEntry> currentLeaderboard = Collections.synchronizedList(new ArrayList<>());
+    private static volatile List<LeaderboardEntry> currentLeaderboard = List.of();
 
     public static void updateLeaderboard(List<LeaderboardEntry> entries) {
-        currentLeaderboard.clear();
-        currentLeaderboard.addAll(entries);
+        currentLeaderboard = List.copyOf(entries);
     }
 
     public static LeaderboardEntry getPlayerEntry() {
-        String currentPlayer = PlayerData.INSTANCE.getPlayerName();
-        synchronized (currentLeaderboard) {
-            for (LeaderboardEntry entry : currentLeaderboard) {
-                if (currentPlayer.equalsIgnoreCase(entry.getUsername())) {
-                    return entry;
-                }
+        List<LeaderboardEntry> lb = currentLeaderboard;
+        if (lb.isEmpty()) return null;
+
+        LeaderboardEntry current = null;
+        for (LeaderboardEntry entry : lb) {
+            if (TrackingRates.collectionAmount >= entry.amount()) {
+                break;
             }
+            current = entry;
         }
-        return null;
+        return current;
     }
 
     public static LeaderboardEntry getNextRankEntry() {
-        LeaderboardEntry playerEntry = getPlayerEntry();
-        synchronized (currentLeaderboard) {
-            if (playerEntry == null) {
-                // If player is not in leaderboard, next rank is the last entry in leaderboard
-                if (!currentLeaderboard.isEmpty()) {
-                    return currentLeaderboard.getLast();
-                }
-                return null;
-            }
+        List<LeaderboardEntry> lb = currentLeaderboard;
+        if (lb.isEmpty()) {
+            return null;
+        }
 
-            LeaderboardEntry prevEntry = null;
-            for (LeaderboardEntry entry : currentLeaderboard) {
-                if (playerEntry.getRank() == entry.getRank()) {
-                    return prevEntry;
-                }
-                prevEntry = entry;
+        LeaderboardEntry previous = null;
+
+        for (LeaderboardEntry entry : lb) {
+            if (TrackingRates.collectionAmount >= entry.amount()) {
+                return previous;
             }
+            previous = entry;
         }
         return null;
     }
 
-    public static void clear() {
-        currentLeaderboard.clear();
+    public static boolean shouldRefetch(long collectionAmount) {
+        List<LeaderboardEntry> lb = currentLeaderboard;
+
+        if (lb.isEmpty()) {
+            return true;
+        }
+        LeaderboardEntry playerEntry = getPlayerEntry();
+        if (playerEntry != null && playerEntry.rank() == 1) {
+            return false;
+        }
+
+        return collectionAmount > lb.getFirst().amount();
     }
 
-    public static boolean shouldRefetch(long collectionAmount) {
-        if (currentLeaderboard.isEmpty()) return true;
-        return collectionAmount > currentLeaderboard.getFirst().getAmount();
+    public static void clear() {
+        currentLeaderboard = List.of();
     }
 }

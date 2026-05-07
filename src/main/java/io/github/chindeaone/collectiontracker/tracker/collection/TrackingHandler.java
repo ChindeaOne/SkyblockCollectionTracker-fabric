@@ -32,6 +32,7 @@ public class TrackingHandler {
 
     public static volatile boolean isTracking = false;
     public static boolean isPaused = false;
+    public static boolean leaderboardTrackingInitialized = false;
 
     public static long startTime;
     private static long lastTime;
@@ -53,6 +54,7 @@ public class TrackingHandler {
 
         isTracking = true;
         isPaused = false;
+        leaderboardTrackingInitialized = ConfigAccess.isLeaderboardTrackingEnabled();
 
         startTime = now;
         lastTime = 0;
@@ -147,6 +149,7 @@ public class TrackingHandler {
     private static void resetVariables() {
         isTracking = false;
         isPaused = false;
+        leaderboardTrackingInitialized = false;
         startTime = 0;
         lastTime = 0;
 

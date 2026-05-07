@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isPaused;
@@ -34,8 +35,9 @@ public class DataFetcher {
     private static final Map<String, Long> leaderboardCacheTimestamps = new ConcurrentHashMap<>();
     private static final long CACHE_LIFESPAN_MS = 180_000L; // 3 minutes
     private static final long LEADERBOARD_CACHE_LIFESPAN_MS = 3_600_000L; // 1 hour
+    private static final AtomicBoolean leaderboardFetchInProgress = new AtomicBoolean(false);
 
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
 
     public static void fetchData(boolean isInitialFetch) {
         logger.info("[SCT]: Fetching collection data");
@@ -65,11 +67,10 @@ public class DataFetcher {
             }
 
             logger.info("[SCT]: Data successfully fetched or retrieved for player with UUID: {} and collection: {}", playerUUID, collection);
-            TrackingRates.setCollection(collectionData);
-
             // Fetch leaderboard data asynchronously with the collection data
-            if (ConfigAccess.isLeaderboardTrackingEnabled()) fetchLeaderboardData(false);
+            fetchLeaderboardData();
 
+            TrackingRates.setCollection(collectionData);
         } catch (Exception e) {
             logger.error("[SCT]: Error fetching data from the Hypixel API: {}", e.getMessage(), e);
         }
@@ -107,22 +108,26 @@ public class DataFetcher {
 
     public static void clearAllCache() {
         clearCollectionCache();
+        leaderboardFetchInProgress.set(false);
         leaderboardCacheTimestamps.clear();
         LeaderboardManager.clear();
         logger.info("[SCT]: All data caches, including leaderboard, have been cleared.");
     }
 
-    public static void fetchLeaderboardData(boolean force) {
+    public static void fetchLeaderboardData() {
+        if (!ConfigAccess.isLeaderboardTrackingEnabled()) return;
+        if (!leaderboardFetchInProgress.compareAndSet(false, true)) {
+            return;
+        }
+
         executor.execute(() -> {
             try {
-                if (!force) {
-                    Long lastFetched = leaderboardCacheTimestamps.get(collection);
-                    if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
-                        return;
-                    }
+                Long lastFetched = leaderboardCacheTimestamps.get(collection);
+                if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
+                    return;
                 }
-
                 logger.info("[SCT]: Fetching leaderboard data for collection: {}", collection);
+
                 String jsonData = EliteApiFetcher.fetchCollectionLeaderboard(collection);
                 if (jsonData == null) {
                     logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API");
@@ -132,22 +137,19 @@ public class DataFetcher {
 
                 JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
                 JsonArray entriesArray = jsonObject.getAsJsonArray("entries");
-                List<LeaderboardEntry> entries = new ArrayList<>();
+                List<LeaderboardEntry> entries = new ArrayList<>(entriesArray.size());
 
                 for (int i = 0; i < entriesArray.size(); i++) {
                     JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
-                    String username = entryObject.get("username").getAsString();
-                    int rank = entryObject.get("rank").getAsInt();
-                    long amount = entryObject.get("amount").getAsLong();
-                    entries.add(new LeaderboardEntry(username, rank, amount));
+                    entries.add(new LeaderboardEntry(
+                            entryObject.get("username").getAsString(),
+                            entryObject.get("rank").getAsInt(),
+                            entryObject.get("amount").getAsLong()
+                    ));
                 }
-
                 LeaderboardManager.updateLeaderboard(entries);
                 leaderboardCacheTimestamps.put(collection, System.currentTimeMillis());
                 logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", collection);
-
-                TrackingRates.updateLeaderboardStats();
-
             } catch (Exception e) {
                 logger.error("[SCT]: Error fetching leaderboard data: {}", e.getMessage(), e);
             }
