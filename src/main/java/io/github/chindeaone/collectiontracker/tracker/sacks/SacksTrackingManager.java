@@ -9,8 +9,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SacksTrackingManager {
 
@@ -31,8 +30,8 @@ public class SacksTrackingManager {
         String type = CollectionsManager.collectionType;
         long totalAmount = 0;
 
-        Map<String, Integer> normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.enchantedRecipe);
-        Map<String, Integer> normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.superEnchantedRecipe);
+        Map<String, Integer> normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.enchantedRecipe, false, collectionName);
+        Map<String, Integer> normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.superEnchantedRecipe, true, collectionName);
 
         for (Map.Entry<String, Integer> entry : sacksDetails.entrySet()) {
             String itemName = entry.getKey();
@@ -41,7 +40,7 @@ public class SacksTrackingManager {
             boolean isEnchanted = !normalizedEnchantedMap.isEmpty() && normalizedEnchantedMap.keySet().stream().anyMatch(itemName::contains);
             boolean isSuperEnchanted = !normalizedSuperEnchantedMap.isEmpty() && normalizedSuperEnchantedMap.keySet().stream().anyMatch(itemName::contains);
 
-            if (!itemName.contains(collectionName)) continue;
+            if (!itemName.equals(collectionName) && !isEnchanted && !isSuperEnchanted) continue;
 
             if (type.equals("gemstone")) {
                 totalAmount += (long) amount * getGemstoneMultiplier(itemName);
@@ -70,14 +69,12 @@ public class SacksTrackingManager {
             String type = CollectionsManager.multiCollectionTypes.get(coll);
 
             long totalAmount = 0;
-            Map<String, Integer> normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.multiEnchantedRecipes.getOrDefault(coll, new HashMap<>()));
-            Map<String, Integer> normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.multiSuperEnchantedRecipes.getOrDefault(coll, new HashMap<>()));
+            Map<String, Integer> normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.multiEnchantedRecipes.getOrDefault(coll, new HashMap<>()), false, coll);
+            Map<String, Integer> normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.multiSuperEnchantedRecipes.getOrDefault(coll, new HashMap<>()), true, coll);
 
             for (Map.Entry<String, Integer> entry : sacksDetails.entrySet()) {
                 String itemName = entry.getKey();
                 int amount = entry.getValue();
-
-                if (!itemName.contains(coll)) continue;
 
                 if ("gemstone".equals(type) || GemstonesManager.checkIfGemstone(coll)) {
                     long gain = (long) amount * getGemstoneMultiplier(itemName);
@@ -85,6 +82,8 @@ public class SacksTrackingManager {
                 } else if ("enchanted".equals(type)) {
                     boolean isEnchanted = !normalizedEnchantedMap.isEmpty() && normalizedEnchantedMap.keySet().stream().anyMatch(itemName::contains);
                     boolean isSuperEnchanted = !normalizedSuperEnchantedMap.isEmpty() && normalizedSuperEnchantedMap.keySet().stream().anyMatch(itemName::contains);
+
+                    if (!itemName.equals(coll) && !isEnchanted && !isSuperEnchanted) continue;
 
                     if (isSuperEnchanted) {
                         long gain = (long) amount * normalizedSuperEnchantedMap.values().iterator().next();
@@ -146,12 +145,49 @@ public class SacksTrackingManager {
         };
     }
 
-    private static Map<String, Integer> normalizeMap(Map<String, Integer> map) {
+    private static Map<String, Integer> normalizeMap(Map<String, Integer> map, boolean isSuperEnchanted, String collectionName) {
         Map <String, Integer> normalizedMap = new HashMap<>();
         for (Map.Entry<String, Integer> entry : map.entrySet()) {
             String key = entry.getKey().toLowerCase().replace("_", " ");
-            normalizedMap.put(key, entry.getValue());
+            if (isSuperEnchanted && superEnchantedSpecialItemNames.contains(collectionName) || !isSuperEnchanted && enchantedSpecialItemNames.contains(collectionName)) {
+                normalizedMap.put(specialItems(collectionName, isSuperEnchanted), entry.getValue());
+            } else normalizedMap.put(key, entry.getValue());
         }
+
         return normalizedMap;
     }
+
+    private static String specialItems(String collection, boolean isSuperEnchanted) {
+        if (isSuperEnchanted) {
+            return switch (collection) {
+                case "red mushroom" -> "enchanted red mushroom block";
+                case "brown mushroom" -> "enchanted brown mushroom block";
+                case "nether wart" -> "mutant nether wart";
+                case "melon slice" -> "enchanted melon";
+                case "raw porkchop" -> "enchanted cooked porkchop";
+                case "raw cod" -> "enchanted cooked cod";
+                default -> "";
+            };
+        } else {
+            return switch (collection) {
+                case "cocoa beans" -> "enchanted cocoa beans";
+                case "nether wart" -> "enchanted nether wart";
+                case "melon slice" -> "enchanted melon slice";
+                case "raw rabbit" -> "enchanted raw rabbit";
+                case "raw mutton" -> "enchanted raw mutton";
+                case "raw porkchop" -> "enchanted raw porkchop";
+                case "end stone" -> "enchanted end stone";
+                case "nether quartz" -> "enchanted nether quartz";
+                case "slimeball" -> "enchanted slimeball";
+                case "lily pad" -> "enchanted lily pad";
+                case "ink sac" -> "enchanted ink sac";
+                case "raw cod" -> "enchanted raw cod";
+                case "tropical fish" -> "enchanted tropical fish";
+                default -> "";
+            };
+        }
+    }
+
+    private static final List<String> enchantedSpecialItemNames = Arrays.asList("cocoa beans", "nether wart", "melon slice", "raw rabbit", "raw mutton", "raw porkchop", "end stone", "nether quartz", "slimeball", "lily pad", "ink sac", "raw cod", "tropical fish");
+    private static final List<String> superEnchantedSpecialItemNames = Arrays.asList("red mushroom", "brown mushroom", "nether wart", "melon slice", "raw porkchop", "raw cod");
 }
