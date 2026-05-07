@@ -23,6 +23,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,7 +109,7 @@ public class CommandRegistry {
                             return 1;
                         })
                         .then(ClientCommandManager.argument("collection", StringArgumentType.greedyString())
-                                .suggests(MULTI_COLLECTION_SUGGESTIONS)
+                                .suggests(COLLECTION_SUGGESTIONS)
                                 .executes(context -> {
                                     String input = StringArgumentType.getString(context, "collection").trim();
                                     List<String> collections = CollectionsManager.getAllCollections();
@@ -535,7 +536,7 @@ public class CommandRegistry {
         ));
     }
 
-    private static final SuggestionProvider<FabricClientCommandSource> MULTI_COLLECTION_SUGGESTIONS = (context, builder) -> {
+    private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_SUGGESTIONS = (context, builder) -> {
         String arg = builder.getRemaining().toLowerCase();
         String prefix;
         String lastWord;
@@ -560,7 +561,9 @@ public class CommandRegistry {
         }
 
         for (String c : CollectionsManager.getAllCollections()) {
-            if (c.toLowerCase().startsWith(lastWord)) {
+            boolean matches = Arrays.stream(c.toLowerCase().split("\\s+")).anyMatch(word -> word.startsWith(lastWord));
+
+            if (matches) {
                 builder.suggest(prefix + c);
             }
         }
