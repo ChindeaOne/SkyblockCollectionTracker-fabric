@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
@@ -36,8 +34,6 @@ public class DataFetcher {
     private static final long CACHE_LIFESPAN_MS = 180_000L; // 3 minutes
     private static final long LEADERBOARD_CACHE_LIFESPAN_MS = 3_600_000L; // 1 hour
     private static final AtomicBoolean leaderboardFetchInProgress = new AtomicBoolean(false);
-
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
 
     public static void fetchData(boolean isInitialFetch) {
         logger.info("[SCT]: Fetching collection data");
@@ -66,11 +62,8 @@ public class DataFetcher {
                 cacheTimestamps.put(collection, System.currentTimeMillis());
             }
 
-            logger.info("[SCT]: Data successfully fetched or retrieved for player with UUID: {} and collection: {}", playerUUID, collection);
-            // Fetch leaderboard data asynchronously with the collection data
-            fetchLeaderboardData();
-
             TrackingRates.setCollection(collectionData);
+            logger.info("[SCT]: Data successfully fetched or retrieved for player with UUID: {} and collection: {}", playerUUID, collection);
         } catch (Exception e) {
             logger.error("[SCT]: Error fetching data from the Hypixel API: {}", e.getMessage(), e);
         }
@@ -116,43 +109,42 @@ public class DataFetcher {
 
     public static void fetchLeaderboardData() {
         if (!ConfigAccess.isLeaderboardTrackingEnabled()) return;
-        if (!leaderboardFetchInProgress.compareAndSet(false, true)) {
-            return;
-        }
+        if (!leaderboardFetchInProgress.compareAndSet(false, true)) return;
 
-        executor.execute(() -> {
-            try {
-                Long lastFetched = leaderboardCacheTimestamps.get(collection);
-                if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
-                    return;
-                }
-                logger.info("[SCT]: Fetching leaderboard data for collection: {}", collection);
-
-                String jsonData = EliteApiFetcher.fetchCollectionLeaderboard(collection);
-                if (jsonData == null) {
-                    logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API");
-                    ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true);
-                    return;
-                }
-
-                JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
-                JsonArray entriesArray = jsonObject.getAsJsonArray("entries");
-                List<LeaderboardEntry> entries = new ArrayList<>(entriesArray.size());
-
-                for (int i = 0; i < entriesArray.size(); i++) {
-                    JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
-                    entries.add(new LeaderboardEntry(
-                            entryObject.get("username").getAsString(),
-                            entryObject.get("rank").getAsInt(),
-                            entryObject.get("amount").getAsLong()
-                    ));
-                }
-                LeaderboardManager.updateLeaderboard(entries);
-                leaderboardCacheTimestamps.put(collection, System.currentTimeMillis());
-                logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", collection);
-            } catch (Exception e) {
-                logger.error("[SCT]: Error fetching leaderboard data: {}", e.getMessage(), e);
+        try {
+            Long lastFetched = leaderboardCacheTimestamps.get(collection);
+            if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
+                return;
             }
-        });
+            logger.info("[SCT]: Fetching leaderboard data for collection: {}", collection);
+
+            String jsonData = EliteApiFetcher.fetchCollectionLeaderboard(collection);
+            if (jsonData == null) {
+                logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API");
+                ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true);
+                return;
+            }
+
+            JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
+            JsonArray entriesArray = jsonObject.getAsJsonArray("entries");
+            List<LeaderboardEntry> entries = new ArrayList<>(entriesArray.size());
+
+            for (int i = 0; i < entriesArray.size(); i++) {
+                JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
+                if (entryObject.get("username").getAsString().equalsIgnoreCase(PlayerData.INSTANCE.getPlayerName())) continue;
+                entries.add(new LeaderboardEntry(
+                        entryObject.get("username").getAsString(),
+                        entryObject.get("rank").getAsInt(),
+                        entryObject.get("amount").getAsLong()
+                ));
+            }
+            LeaderboardManager.set(entries);
+            leaderboardCacheTimestamps.put(collection, System.currentTimeMillis());
+            logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", collection);
+        } catch (Exception e) {
+            logger.error("[SCT]: Error fetching leaderboard data: {}", e.getMessage(), e);
+        } finally {
+            leaderboardFetchInProgress.set(false);
+        }
     }
 }

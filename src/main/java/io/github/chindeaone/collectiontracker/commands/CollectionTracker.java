@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.api.bazaarapi.FetchBazaarPrice;
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager;
+import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
@@ -70,8 +71,9 @@ public class CollectionTracker {
                     ChatUtils.sendMessage("§aTracking " + collection + " collection.", true);
                 }
 
-                // Fetch bazaar data asynchronously
+                // Fetch bazaar data and leaderboard data asynchronously
                 CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
+                        .thenRunAsync(DataFetcher::fetchLeaderboardData)
                         .thenRun(TrackingHandler::startTracking);
             } catch (Exception e) {
                 ChatUtils.sendMessage("§cAn error occurred while processing the command.", true);

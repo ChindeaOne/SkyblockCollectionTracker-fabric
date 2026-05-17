@@ -75,11 +75,6 @@ public class TrackingRates {
         // 'value' here is what you gained from sacks since last check
         sacksCollectionGained += value; // update sacks gained
         long currentCollection = lastApiCollection + sacksCollectionGained; // increase current collection
-
-        if (LeaderboardManager.shouldRefetch(currentCollection)) {
-            DataFetcher.fetchLeaderboardData();
-        }
-
         updateValues(currentCollection, value);
     }
 
