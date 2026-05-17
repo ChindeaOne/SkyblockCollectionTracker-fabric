@@ -477,38 +477,63 @@ object ChatListener {
     }
 
     private fun parseSacksMessage(message: Component) {
-        if (message.string.startsWith("[Sacks]")) {
-            if (message.string.contains("+") && message.string.contains("-")) return // ignore these because of /recipe commands
+        val sacksDetails = mutableMapOf<String, Int>()
+        var hasGains = false
+        val processedHovers = mutableSetOf<Component>()
 
-            val hoverComponent = message.siblings.firstNotNullOfOrNull { sibling ->
-                (sibling.style.hoverEvent as? HoverEvent.ShowText)?.value
-            } ?: return
+        for (sibling in message.siblings) {
+            val hoverComponent = (sibling.style.hoverEvent as? HoverEvent.ShowText)?.value ?:continue
 
-            val sacksDetails = mutableMapOf<String, Int>()
-            val siblings = hoverComponent.siblings
+            if (!processedHovers.add(hoverComponent)) continue
+
+            val hoverText = hoverComponent.string
+            val isAddition = "Added items:" in hoverText
+            val isRemoval = "Removed items:" in hoverText
+
+            if (!isAddition && !isRemoval) continue
+
+            val hoverSiblings = mutableListOf<Component>()
+            fun collect(c: Component) {
+                hoverSiblings.add(c)
+                c.siblings.forEach { collect(it) }
+            }
+            collect(hoverComponent)
 
             var i = 0
-            while (i < siblings.size) {
-                val componentText = siblings[i].string.trim()
+            while (i < hoverSiblings.size) {
+                val text = hoverSiblings[i].string.trim()
 
-                if (componentText.startsWith("+")) {
-                    val amount = componentText.substringAfter("+").replace(",", "").toIntOrNull()
+                if (text.startsWith("+") || text.startsWith("-")) {
+                    val amount = text.filter { it.isDigit() }.toIntOrNull()
 
-                    if (amount != null && i + 1 < siblings.size) {
-                        val collectionName = siblings[i + 1].string.lowercase().replace(Regex("[^a-z0-9 ]"), "").trim()
-                        if (collectionName.isNotEmpty()) {
-                            sacksDetails[collectionName.lowercase()] = amount
-                            i += 2
-                            continue
+                    if (amount != null) {
+                        for (j in i + 1 until hoverSiblings.size) {
+                            val sibling = hoverSiblings[j].string.trim()
+
+                            if (sibling.isNotEmpty() && !sibling.startsWith("+") && !sibling.startsWith("-") && !sibling.contains("Sack)")) {
+                                val collectionName = sibling.lowercase().replace(Regex("[^a-z0-9 ]"), "").trim()
+                                val currentVal = sacksDetails.getOrDefault(collectionName, 0)
+
+                                if (isAddition) {
+                                    sacksDetails[collectionName] = currentVal + amount
+                                    hasGains = true
+                                } else {
+                                    sacksDetails[collectionName] = currentVal - amount
+                                }
+                                i = j
+                                break
+                            }
                         }
                     }
                 }
                 i++
             }
+        }
 
-            if (sacksDetails.isNotEmpty()) {
-                SacksTrackingManager.onSacksGain(sacksDetails)
-            }
+        val finalGains = sacksDetails.filterValues { it > 0 }
+
+        if (hasGains && finalGains.isNotEmpty()) {
+            SacksTrackingManager.onSacksGain(finalGains)
         }
     }
 
