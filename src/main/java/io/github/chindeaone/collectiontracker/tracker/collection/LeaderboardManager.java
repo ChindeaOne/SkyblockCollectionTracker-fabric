@@ -1,26 +1,27 @@
 package io.github.chindeaone.collectiontracker.tracker.collection;
 
+import java.util.Collections;
 import java.util.List;
 
 public class LeaderboardManager {
     private static volatile List<LeaderboardEntry> currentLeaderboard = List.of();
 
-    public static void updateLeaderboard(List<LeaderboardEntry> entries) {
-        currentLeaderboard = List.copyOf(entries);
+    public static void set(List<LeaderboardEntry> entries) {
+        currentLeaderboard = entries;
     }
 
     public static LeaderboardEntry getPlayerEntry() {
         List<LeaderboardEntry> lb = currentLeaderboard;
-        if (lb.isEmpty()) return null;
-
-        LeaderboardEntry current = null;
-        for (LeaderboardEntry entry : lb) {
-            if (TrackingRates.collectionAmount >= entry.amount()) {
-                break;
-            }
-            current = entry;
+        if (lb.isEmpty()) {
+            return null;
         }
-        return current;
+
+        int index = findBinaryIndex(lb, TrackingRates.collectionAmount);
+        if (index < lb.size()) {
+            return lb.get(index);
+        }
+
+        return null;
     }
 
     public static LeaderboardEntry getNextRankEntry() {
@@ -29,32 +30,30 @@ public class LeaderboardManager {
             return null;
         }
 
-        LeaderboardEntry previous = null;
+        int index = findBinaryIndex(lb, TrackingRates.collectionAmount);
 
-        for (LeaderboardEntry entry : lb) {
-            if (TrackingRates.collectionAmount >= entry.amount()) {
-                return previous;
-            }
-            previous = entry;
+        if (index > 0) {
+            return lb.get(index - 1);
         }
+
         return null;
     }
 
-    public static boolean shouldRefetch(long collectionAmount) {
-        List<LeaderboardEntry> lb = currentLeaderboard;
+    public static int findBinaryIndex(List<LeaderboardEntry> lb, long targetAmount) {
+        int index = Collections.binarySearch(lb, new LeaderboardEntry("", 0, targetAmount),
+                (a, b) -> Long.compare(b.amount(), a.amount()));
 
-        if (lb.isEmpty()) {
-            return true;
+        if (index < 0) {
+            index = -index - 1;
         }
-        LeaderboardEntry playerEntry = getPlayerEntry();
-        if (playerEntry != null && playerEntry.rank() == 1) {
-            return false;
-        }
-
-        return collectionAmount > lb.getFirst().amount();
+        return index;
     }
 
     public static void clear() {
         currentLeaderboard = List.of();
+    }
+
+    public static boolean isEmpty() {
+        return currentLeaderboard.isEmpty();
     }
 }
