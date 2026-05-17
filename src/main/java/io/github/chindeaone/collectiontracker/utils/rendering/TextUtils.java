@@ -13,6 +13,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
@@ -60,19 +61,19 @@ public class TextUtils {
     }
 
     private static String handleNextPosition() {
-        if (playerCurrentRank == 1) return null;
+        if (LeaderboardManager.isEmpty() || playerCurrentRank == 1) return null;
         if (nextRankUsername == null) return "Next Position: Calculating...";
         return String.format("Next Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount));
     }
 
     private static String handleCollectionTillNextRank() {
-        if (playerCurrentRank == 1) return null;
-        if (collectionTillNextRank == -1) return "Till Next Rank: Calculating...";
-        return "Till Next Rank: " + formatNumber(collectionTillNextRank);
+        if (LeaderboardManager.isEmpty() || playerCurrentRank == 1) return null;
+        if (collectionTillNextRank == -1) return "Till Next Position: Calculating...";
+        return "Till Next Position: " + formatNumber(collectionTillNextRank);
     }
 
     private static String handleEta() {
-        if (playerCurrentRank == 1) return null;
+        if (LeaderboardManager.isEmpty() || playerCurrentRank == 1) return null;
         if (etaToNextRank == null || etaToNextRank.isEmpty()) return "ETA: Calculating...";
         return "ETA: " + etaToNextRank;
     }

@@ -278,7 +278,7 @@ public class TrackingHandler {
             lines.add(Component.literal(String.format("   §6Best collection rate: §f%s coll/h", formatNumber(highestCollectionPerHour))));
         }
         if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Long.MAX_VALUE) {
-            lines.add(Component.literal(String.format("   §Worst collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour))));
+            lines.add(Component.literal(String.format("   §6Worst collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour))));
         }
 
         if (!useBazaar) {
