@@ -297,43 +297,33 @@ public class CommandRegistry {
                                     return 1;
                                 })
                                 .then(ClientCommandManager.literal("set")
-                                        .executes(context -> {
-                                            ChatUtils.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
-                                            return 1;
-                                        })
-                                        .then(ClientCommandManager.literal("global")
-                                                .executes(context -> {
-                                                    ChatUtils.sendMessage("Usage: /sct cw color global <hex color>.",true);
-                                                    return 1;
-                                                })
+                                        .then(ClientCommandManager.argument("target", StringArgumentType.string())
+                                                .suggests(((context, builder) -> {
+                                                    String remaining = builder.getRemaining().toLowerCase();
+                                                    if ("global".startsWith(remaining)) builder.suggest("global");
+                                                    for (String playerName : context.getSource().getOnlinePlayerNames()) {
+                                                        if (playerName.toLowerCase().startsWith(remaining)) builder.suggest(playerName);
+                                                    }
+                                                    return builder.buildFuture();
+                                                }))
                                                 .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
                                                         .executes(context -> {
+                                                            String target = StringArgumentType.getString(context, "target").trim();
                                                             String color = StringArgumentType.getString(context, "hex color").trim();
                                                             String formattedHex = color.startsWith("#") ? color : "#" + color;
 
                                                             if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
-                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
+                                                                ChatUtils.sendMessage("§cInvalid color format.", true);
                                                                 return 1;
                                                             }
-                                                            ColeweightUtils.setGlobalColor(formattedHex);
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                        .then(ClientCommandManager.argument("player name", StringArgumentType.string())
-                                                .suggests(PLAYER_SUGGESTIONS)
-                                                .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
-                                                        .executes(context -> {
-                                                            String name = StringArgumentType.getString(context, "player name").trim();
-                                                            String color = StringArgumentType.getString(context, "hex color").trim();
 
-                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
-
-                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
-                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
-                                                                return 1;
+                                                            if (target.equalsIgnoreCase("global")) {
+                                                                ColeweightUtils.setGlobalColor(formattedHex);
+                                                                ChatUtils.sendMessage("§aGlobal coleweight color set to " + formattedHex, true);
+                                                            } else {
+                                                                ColeweightUtils.setPlayerCustomColor(target, formattedHex);
+                                                                ChatUtils.sendMessage("§aColeweight color for " + target + " set to " + formattedHex, true);
                                                             }
-                                                            ColeweightUtils.setPlayerCustomColor(name, formattedHex);
                                                             return 1;
                                                         })
                                                 )
@@ -423,17 +413,22 @@ public class CommandRegistry {
                                     return 1;
                                 })
                                 .then(ClientCommandManager.literal("set")
-                                        .executes(context -> {
-                                            ChatUtils.sendMessage("Usage: /sct fw color set <player name> <hex color>.", true);
-                                            return 1;
-                                        })
-                                        .then(ClientCommandManager.literal("global")
-                                                .executes(context -> {
-                                                    ChatUtils.sendMessage("Usage: /sct fw color global <hex color>.", true);
-                                                    return 1;
-                                                })
+                                        .then(ClientCommandManager.argument("target", StringArgumentType.string())
+                                                .suggests(((context, builder) -> {
+                                                    String remaining = builder.getRemaining().toLowerCase();
+                                                    if ("global".startsWith(remaining)) {
+                                                        builder.suggest("global");
+                                                    }
+                                                    for (String playerName : context.getSource().getOnlinePlayerNames()) {
+                                                        if (playerName.toLowerCase().startsWith(remaining)) {
+                                                            builder.suggest(playerName);
+                                                        }
+                                                    }
+                                                    return builder.buildFuture();
+                                                }))
                                                 .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
                                                         .executes(context -> {
+                                                            String target = StringArgumentType.getString(context, "target").trim();
                                                             String color = StringArgumentType.getString(context, "hex color").trim();
                                                             String formattedHex = color.startsWith("#") ? color : "#" + color;
 
@@ -441,25 +436,15 @@ public class CommandRegistry {
                                                                 ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
                                                                 return 1;
                                                             }
-                                                            FarmingweightUtils.setGlobalColor(formattedHex);
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                        .then(ClientCommandManager.argument("player name", StringArgumentType.string())
-                                                .suggests(PLAYER_SUGGESTIONS)
-                                                .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
-                                                        .executes(context -> {
-                                                            String name = StringArgumentType.getString(context, "player name").trim();
-                                                            String color = StringArgumentType.getString(context, "hex color").trim();
 
-                                                            String formattedHex = color.startsWith("#") ? color : "#" + color;
-
-                                                            if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$")) {
-                                                                ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true);
-                                                                return 1;
+                                                            // 3. Handle the logic internally based on the "target" string
+                                                            if (target.equalsIgnoreCase("global")) {
+                                                                FarmingweightUtils.setGlobalColor(formattedHex);
+                                                                ChatUtils.sendMessage("§aGlobal farmingweight color set to " + formattedHex, true);
+                                                            } else {
+                                                                FarmingweightUtils.setPlayerCustomColor(target, formattedHex);
+                                                                ChatUtils.sendMessage("§aFarmingweight color for " + target + " set to " + formattedHex, true);
                                                             }
-                                                            FarmingweightUtils.setPlayerCustomColor(name, formattedHex);
                                                             return 1;
                                                         })
                                                 )
