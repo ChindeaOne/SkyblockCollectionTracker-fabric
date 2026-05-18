@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
+import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.leaderboardTrackingInitialized;
 import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates.*;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
 import static io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatNumberOrPlaceholder;
@@ -25,6 +26,28 @@ public class SkillOverlay implements AbstractOverlay {
     private final List<String> skillOverlayLines = new ArrayList<>();
     private final List<String> tamingOverlayLines = new ArrayList<>();
     private boolean renderingAllowed  = true;
+
+    private void addLeaderboardLines(List<String> list, int rank, String nextUser, long nextAmount, long tillNext, String eta) {
+        if (!ConfigAccess.isSkillLeaderboardEnabled()) return;
+
+        list.add("");
+
+        if (rank == 1) return;
+
+        if (nextUser != null) {
+            list.add(String.format("Next Position (%s): %s", nextUser, formatNumber(nextAmount)));
+            list.add("Till Next Position: " + formatNumber(tillNext));
+            if (eta != null && !eta.isEmpty()) {
+                list.add("ETA: " + eta);
+            } else {
+                list.add("ETA: Calculating...");
+            }
+        } else {
+            list.add("Next Position: Calculating...");
+            list.add("Till Next Position: Calculating...");
+            list.add("ETA: Calculating...");
+        }
+    }
 
     @Override
     public String overlayLabel() {
@@ -82,11 +105,23 @@ public class SkillOverlay implements AbstractOverlay {
     public List<String> getSkillLines() {
         skillOverlayLines.clear();
 
-        skillOverlayLines.add(skillName + " Experience");
-        skillOverlayLines.add(skillName + " Level: " + formatNumber(skillLevel));
+        String rankSuffix = "";
+        if (ConfigAccess.isSkillLeaderboardEnabled() && skillCurrentRank != -1) {
+            rankSuffix = " [#" + skillCurrentRank + "]";
+        }
+
+        skillOverlayLines.add(skillName + " Level: " + formatNumber(skillLevel) + rankSuffix);
         skillOverlayLines.add("Total " + skillName + " XP: " + formatNumberOrPlaceholder(totalSkillXp));
         skillOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(skillXpGained));
         skillOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(skillPerHour));
+
+        if (ConfigAccess.isSkillLeaderboardEnabled() && !leaderboardTrackingInitialized) {
+            ChatUtils.sendMessage("§cCan't enable skill leaderboard mid tracking. Enable this before tracking a skill!", true);
+            ConfigHelper.disableSkillLeaderboardTracking();
+        }
+
+        addLeaderboardLines(skillOverlayLines, skillCurrentRank, skillNextRankUsername, skillNextRankAmount, skillTillNextRank, skillEtaToNextRank);
+
         skillOverlayLines.add("Uptime: " + SkillTrackingHandler.getUptime());
 
         return skillOverlayLines;
@@ -110,11 +145,17 @@ public class SkillOverlay implements AbstractOverlay {
             return tamingOverlayLines;
         }
 
-        tamingOverlayLines.add("Taming Experience");
-        tamingOverlayLines.add("Taming Level: " + formatNumber(tamingLevel));
-        tamingOverlayLines.add("Total Taming XP: " + formatNumberOrPlaceholder(tamingXp));
+        String rankSuffix = "";
+        if (ConfigAccess.isSkillLeaderboardEnabled() && tamingCurrentRank != -1) {
+            rankSuffix = " [#" + tamingCurrentRank + "]";
+        }
+
+        tamingOverlayLines.add("Taming Level: " + formatNumber(tamingLevel) + rankSuffix);
+        tamingOverlayLines.add("Total Taming XP: " + formatNumberOrPlaceholder(tamingXp + tamingXpGained));
         tamingOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(tamingXpGained));
         tamingOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(tamingPerHour));
+
+        addLeaderboardLines(tamingOverlayLines, tamingCurrentRank, tamingNextRankUsername, tamingNextRankAmount, tamingTillNextRank, tamingEtaToNextRank);
 
         return tamingOverlayLines;
     }

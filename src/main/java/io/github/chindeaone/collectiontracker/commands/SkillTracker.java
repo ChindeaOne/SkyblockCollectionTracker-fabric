@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.commands;
 
 import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess;
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
@@ -38,8 +40,14 @@ public class SkillTracker {
                     return;
                 }
 
-                // Fetch skill data asynchronously
+                // Fetch skill data and leaderboard data asynchronously
                 CompletableFuture.runAsync(SkillApiFetcher::fetchSkillsData)
+                        .thenRunAsync(() -> SkillFetcher.fetchSkillLeaderboardData(skillName))
+                        .thenRunAsync(() -> {
+                            if (ConfigAccess.isTamingTrackingEnabled()) {
+                                SkillFetcher.fetchSkillLeaderboardData("Taming");
+                            }
+                        })
                         .thenRun(SkillTrackingHandler::startTracking);
             } catch (Exception e) {
                 logger.error("An error occurred while starting skill tracking: ", e);

@@ -6,6 +6,8 @@ import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.Hypixel;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
+import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,6 +24,7 @@ public class SkillTrackingHandler {
 
     public static boolean isTracking = false;
     public static boolean isPaused = false;
+    public static boolean leaderboardTrackingInitialized = false;
 
     public static long startTime;
     private static long lastTime;
@@ -56,6 +59,10 @@ public class SkillTrackingHandler {
         Double skillXp = SkillUtils.getSkillValue(skillName);
 
         SkillTrackingRates.initTracking(skillLevel != null ? skillLevel : 0, skillXp != null ? skillXp.longValue() : 0L);
+        SkillTrackingRates.updateSkillLeaderboardStats();
+        if (ConfigAccess.isTamingTrackingEnabled()) {
+            SkillTrackingRates.updateTamingLeaderboardStats();
+        }
 
         if (!isSkillMaxed || ConfigAccess.isTamingTrackingEnabled()) {
             // Track only via API
@@ -74,6 +81,7 @@ public class SkillTrackingHandler {
 
         isTracking = true;
         isPaused = false;
+        leaderboardTrackingInitialized = ConfigAccess.isSkillLeaderboardEnabled();
 
         startTime = now;
         lastTime = 0;
@@ -147,6 +155,7 @@ public class SkillTrackingHandler {
 
         isTracking = false;
         isPaused = false;
+        leaderboardTrackingInitialized = false;
 
         startTime = 0;
         lastTime = 0;
@@ -160,6 +169,8 @@ public class SkillTrackingHandler {
         OverlayManager.setSkillOverlayRendering(false);
 
         SkillFetcher.clearCache();
+        LeaderboardManager.clear();
+        DataFetcher.clearAllCache();
         SkillTrackingRates.resetSession();
     }
 
