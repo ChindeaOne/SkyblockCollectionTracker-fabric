@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.config.categories;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardOverlay;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -28,6 +29,12 @@ public class Tracking {
     @SerializedName("skillOverlay")
     @Accordion
     public SkillOverlay skillOverlay = new SkillOverlay();
+
+    @Expose
+    @ConfigOption(name = "Leaderboard Overlay", desc = "")
+    @SerializedName("leaderboardOverlay")
+    @Accordion
+    public LeaderboardOverlay leaderboardOverlay = new LeaderboardOverlay();
 
     @Expose
     @ConfigOption(

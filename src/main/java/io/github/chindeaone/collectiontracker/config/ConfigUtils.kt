@@ -30,6 +30,7 @@ import io.github.chindeaone.collectiontracker.config.categories.mining.routes.Pu
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
+import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay
@@ -167,7 +168,9 @@ val statsText: List<CollectionOverlay.OverlayText> get() = collectionOverlay.sta
 val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionOverlay.extraStatsText
 val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
 val explicitValues: Boolean get() = trackingConfig.explicitValues
-val leaderboardTracking: Boolean get() = collectionOverlay.leaderboardTracking
+val leaderboardOverlay: LeaderboardOverlay get() = trackingConfig.leaderboardOverlay
+val collectionLeaderboard: Boolean get() = leaderboardOverlay.collectionLeaderboard
+val skillLeaderboard: Boolean get() = leaderboardOverlay.skillLeaderboard
 
 // Multi Collection Tracking Config Accessors
 val multiCollectionOverlay: MultiCollectionOverlay get() = trackingConfig.multiCollectionOverlay
@@ -478,7 +481,10 @@ object ConfigAccess {
     fun getSummaryStats(): MultiCollectionOverlay.SummaryStats = summaryStats
 
     @JvmStatic
-    fun isLeaderboardTrackingEnabled(): Boolean = leaderboardTracking
+    fun isCollectionLeaderboardEnabled(): Boolean = collectionLeaderboard
+
+    @JvmStatic
+    fun isSkillLeaderboardEnabled(): Boolean = skillLeaderboard
 
     @JvmStatic
     fun setMineshaftSpawnRoutesEnabled(enabled: Boolean) {
@@ -547,8 +553,13 @@ object ConfigHelper {
     }
 
     @JvmStatic
-    fun disableLeaderboardTracking() {
-        collectionOverlay.leaderboardTracking = false
+    fun disableCollectionLeaderboardTracking() {
+        leaderboardOverlay.collectionLeaderboard = false
+    }
+
+    @JvmStatic
+    fun disableSkillLeaderboardTracking() {
+        leaderboardOverlay.skillLeaderboard = false
     }
 
     @JvmStatic
