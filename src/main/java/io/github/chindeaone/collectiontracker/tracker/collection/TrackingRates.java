@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.utils.StringUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -94,7 +95,7 @@ public class TrackingRates {
 
             if (collectionPerHour > 0) {
                 long seconds = (long) (collectionTillNextRank / (collectionPerHour / 3600.0));
-                etaToNextRank = formatETA(seconds);
+                etaToNextRank = StringUtils.formatETA(seconds);
             } else {
                 etaToNextRank = null;
             }
@@ -103,21 +104,6 @@ public class TrackingRates {
             nextRankAmount = -1L;
             collectionTillNextRank = -1L;
             etaToNextRank = null;
-        }
-    }
-
-    private static String formatETA(long seconds) {
-        if (seconds < 0) return "0s";
-        long hours = seconds / 3600;
-        long minutes = (seconds % 3600) / 60;
-        long secs = seconds % 60;
-
-        if (hours > 0) {
-            return String.format("%dh %dm", hours, minutes);
-        } else if (minutes > 0) {
-            return String.format("%dm %ds", minutes, secs);
-        } else {
-            return String.format("%ds", secs);
         }
     }
 

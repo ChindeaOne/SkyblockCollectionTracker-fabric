@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardEntry;
+import io.github.chindeaone.collectiontracker.utils.StringUtils;
 
 import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
 import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.getUptimeInSeconds;
@@ -111,7 +112,7 @@ public class SkillTrackingRates {
         LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry(skillName, totalSkillXp);
         skillCurrentRank = (playerEntry != null) ? playerEntry.rank() : -1;
 
-        LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntry(skillName, totalSkillXp);
+        LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntryForSkill(skillName, totalSkillXp);
         if (nextEntry != null) {
             skillNextRankUsername = nextEntry.username();
             skillNextRankAmount = nextEntry.amount();
@@ -131,7 +132,7 @@ public class SkillTrackingRates {
         LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry("Taming", tamingXp + tamingXpGained);
         tamingCurrentRank = (playerEntry != null) ? playerEntry.rank() : -1;
 
-        LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntry("Taming", tamingXp + tamingXpGained);
+        LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntryForSkill("Taming", tamingXp + tamingXpGained);
         if (nextEntry != null) {
             tamingNextRankUsername = nextEntry.username();
             tamingNextRankAmount = nextEntry.amount();
@@ -147,8 +148,8 @@ public class SkillTrackingRates {
 
     public static void updateSkillEta() {
         if (skillPerHour > 0 && skillTillNextRank > 0) {
-            double hours = (double) skillTillNextRank / skillPerHour;
-            skillEtaToNextRank = formatEta(hours);
+            long seconds = (long) (skillTillNextRank / (skillPerHour / 3600.0));
+            skillEtaToNextRank = StringUtils.formatETA(seconds);
         } else {
             skillEtaToNextRank = null;
         }
@@ -156,24 +157,10 @@ public class SkillTrackingRates {
 
     public static void updateTamingEta() {
         if (tamingPerHour > 0 && tamingTillNextRank > 0) {
-            double hours = (double) tamingTillNextRank / tamingPerHour;
-            tamingEtaToNextRank = formatEta(hours);
+            long seconds = (long) (tamingTillNextRank / (tamingPerHour / 3600.0));
+            tamingEtaToNextRank = StringUtils.formatETA(seconds);
         } else {
             tamingEtaToNextRank = null;
-        }
-    }
-
-    public static String formatEta(double hours) {
-        if (hours >= 1) {
-            long totalSeconds = (long) (hours * 3600);
-            long hh = totalSeconds / 3600;
-            long mm = (totalSeconds % 3600) / 60;
-            long ss = totalSeconds % 60;
-            return String.format("%02d:%02d:%02d", hh, mm, ss);
-        } else {
-            long minutes = (long) (hours * 60);
-            long seconds = (long) ((hours * 60 - minutes) * 60);
-            return String.format("%02d:%02d", minutes, seconds);
         }
     }
 

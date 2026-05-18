@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import java.util.concurrent.ConcurrentHashMap
 
 object MultiTrackingRates {
@@ -147,7 +148,7 @@ object MultiTrackingRates {
             val currentRate = collectionPerHour["gemstone"] ?: 0L
             if (currentRate > 0) {
                 val seconds = (collectionTillNextRank / (currentRate / 3600.0)).toLong()
-                etaToNextRank = formatETA(seconds)
+                etaToNextRank = StringUtils.formatETA(seconds)
             } else {
                 etaToNextRank = null
             }
@@ -156,19 +157,6 @@ object MultiTrackingRates {
             nextRankAmount = -1L
             collectionTillNextRank = -1L
             etaToNextRank = null
-        }
-    }
-
-    private fun formatETA(seconds: Long): String {
-        if (seconds < 0) return "0s"
-        val hours = seconds / 3600
-        val minutes = (seconds % 3600) / 60
-        val secs = seconds % 60
-
-        return when {
-            hours > 0 -> String.format("%dh %dm", hours, minutes)
-            minutes > 0 -> String.format("%dm %ds", minutes, secs)
-            else -> String.format("%ds", secs)
         }
     }
 
