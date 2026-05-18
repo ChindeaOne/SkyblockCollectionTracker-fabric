@@ -6,7 +6,6 @@ import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.Hypixel;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
-import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -169,7 +168,6 @@ public class SkillTrackingHandler {
         OverlayManager.setSkillOverlayRendering(false);
 
         SkillFetcher.clearCache();
-        LeaderboardManager.clear();
         DataFetcher.clearAllCache();
         SkillTrackingRates.resetSession();
     }
