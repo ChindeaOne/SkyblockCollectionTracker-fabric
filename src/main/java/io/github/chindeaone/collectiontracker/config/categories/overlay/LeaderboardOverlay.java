@@ -2,8 +2,11 @@ package io.github.chindeaone.collectiontracker.config.categories.overlay;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LeaderboardOverlay {
 
@@ -29,4 +32,41 @@ public class LeaderboardOverlay {
     )
     @ConfigEditorBoolean
     public boolean skillLeaderboard = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Enable Custom Goal",
+            desc = "Enables a custom goal for the leaderboard overlay. This will show your progress towards the custom goal instead of the next player on the leaderboard"
+    )
+    @ConfigEditorBoolean
+    public boolean customGoal = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Custom Goal Type",
+            desc = "Select whether your custom goals use position-based or amount-based targets\n§ePosition: Target a specific rank\n§eAmount: Target a specific collection/skill amount"
+    )
+    @ConfigEditorDropdown
+    public CustomGoalType customGoalType = CustomGoalType.AMOUNT;
+
+    @Expose
+    public Map<String, CustomGoalEntry> customGoals = new HashMap<>();
+
+    public static class CustomGoalEntry {
+        @Expose
+        public Integer position;
+
+        @Expose
+        public Long amount;
+
+        public CustomGoalEntry(Integer position, Long amount) {
+            this.position = position;
+            this.amount = amount;
+        }
+    }
+
+    public enum CustomGoalType {
+        POSITION,
+        AMOUNT
+    }
 }

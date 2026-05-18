@@ -171,6 +171,9 @@ val explicitValues: Boolean get() = trackingConfig.explicitValues
 val leaderboardOverlay: LeaderboardOverlay get() = trackingConfig.leaderboardOverlay
 val collectionLeaderboard: Boolean get() = leaderboardOverlay.collectionLeaderboard
 val skillLeaderboard: Boolean get() = leaderboardOverlay.skillLeaderboard
+val customGoal: Boolean get() = leaderboardOverlay.customGoal
+val customGoalType: LeaderboardOverlay.CustomGoalType get() = leaderboardOverlay.customGoalType
+val customGoals: Map<String, LeaderboardOverlay.CustomGoalEntry> get() = leaderboardOverlay.customGoals
 
 // Multi Collection Tracking Config Accessors
 val multiCollectionOverlay: MultiCollectionOverlay get() = trackingConfig.multiCollectionOverlay
@@ -486,6 +489,21 @@ object ConfigAccess {
     @JvmStatic
     fun isSkillLeaderboardEnabled(): Boolean = skillLeaderboard
 
+
+    @JvmStatic
+    fun isCustomGoalEnabled(): Boolean = customGoal
+
+    @JvmStatic
+    fun getCustomGoalType(): LeaderboardOverlay.CustomGoalType = customGoalType
+
+    @JvmStatic
+    fun getCustomGoals(): Map<String, LeaderboardOverlay.CustomGoalEntry> = customGoals
+
+    @JvmStatic
+    fun getCustomGoalEntry(name: String): LeaderboardOverlay.CustomGoalEntry? {
+        return customGoals[name.lowercase()]
+    }
+
     @JvmStatic
     fun setMineshaftSpawnRoutesEnabled(enabled: Boolean) {
         mineshaftRoutesConfig.enableMineshaftSpawnRoutes = enabled
@@ -560,6 +578,24 @@ object ConfigHelper {
     @JvmStatic
     fun disableSkillLeaderboardTracking() {
         leaderboardOverlay.skillLeaderboard = false
+    }
+
+    @JvmStatic
+    fun setCustomGoalType(type: LeaderboardOverlay.CustomGoalType) {
+        leaderboardOverlay.customGoalType = type
+    }
+
+    @JvmStatic
+    fun setCustomGoal(name: String, position: Int?, amount: Long?) {
+        val lowercase = name.lowercase()
+        if (position == null && amount == null) {
+            leaderboardOverlay.customGoals.remove(lowercase)
+        } else {
+            val existingEntry = leaderboardOverlay.customGoals[lowercase]
+            val finalPosition = position ?: existingEntry?.position
+            val finalAmount = amount ?: existingEntry?.amount
+            leaderboardOverlay.customGoals[lowercase] = LeaderboardOverlay.CustomGoalEntry(finalPosition, finalAmount)
+        }
     }
 
     @JvmStatic
