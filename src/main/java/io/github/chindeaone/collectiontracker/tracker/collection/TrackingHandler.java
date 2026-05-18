@@ -54,7 +54,7 @@ public class TrackingHandler {
 
         isTracking = true;
         isPaused = false;
-        leaderboardTrackingInitialized = ConfigAccess.isLeaderboardTrackingEnabled();
+        leaderboardTrackingInitialized = ConfigAccess.isCollectionLeaderboardEnabled();
 
         startTime = now;
         lastTime = 0;

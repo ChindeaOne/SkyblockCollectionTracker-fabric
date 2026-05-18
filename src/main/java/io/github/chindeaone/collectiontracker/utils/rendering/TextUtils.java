@@ -15,6 +15,7 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarTyp
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.StringUtils;
@@ -31,9 +32,9 @@ import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNu
 public class TextUtils {
 
     public static void updateTrackingLines(List<String> list) {
-        if (ConfigAccess.isLeaderboardTrackingEnabled() && !TrackingHandler.leaderboardTrackingInitialized) {
+        if (ConfigAccess.isCollectionLeaderboardEnabled() && !TrackingHandler.leaderboardTrackingInitialized) {
             ChatUtils.sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true);
-            ConfigHelper.disableLeaderboardTracking();
+            ConfigHelper.disableCollectionLeaderboardTracking();
             return;
         }
 
@@ -52,7 +53,7 @@ public class TextUtils {
             }
         }
 
-        if (ConfigAccess.isLeaderboardTrackingEnabled()) {
+        if (ConfigAccess.isCollectionLeaderboardEnabled()) {
             addIfNotNull(list, "");
             addIfNotNull(list, handleNextPosition());
             addIfNotNull(list, handleCollectionTillNextRank());
@@ -78,6 +79,24 @@ public class TextUtils {
         return "ETA: " + etaToNextRank;
     }
 
+    private static String handleMultiNextPosition() {
+        if (LeaderboardManager.isEmpty() || MultiTrackingRates.getPlayerCurrentRank() == 1) return null;
+        if (MultiTrackingRates.getNextRankUsername() == null) return "Next Position: Calculating...";
+        return String.format("Next Position (%s): %s", MultiTrackingRates.getNextRankUsername(), formatNumber(MultiTrackingRates.getNextRankAmount()));
+    }
+
+    private static String handleMultiCollectionTillNextRank() {
+        if (LeaderboardManager.isEmpty() || MultiTrackingRates.getPlayerCurrentRank() == 1) return null;
+        if (MultiTrackingRates.getCollectionTillNextRank() == -1) return "Till Next Position: Calculating...";
+        return "Till Next Position: " + formatNumber(MultiTrackingRates.getCollectionTillNextRank());
+    }
+
+    private static String handleMultiEta() {
+        if (LeaderboardManager.isEmpty() || MultiTrackingRates.getPlayerCurrentRank() == 1) return null;
+        if (MultiTrackingRates.getEtaToNextRank() == null || MultiTrackingRates.getEtaToNextRank().isEmpty()) return "ETA: Calculating...";
+        return "ETA: " + MultiTrackingRates.getEtaToNextRank();
+    }
+
     private static void addIfNotNull(List<String> list, String line) {
         if (line != null) list.add(line);
     }
@@ -85,7 +104,7 @@ public class TextUtils {
     private static String handleCollection() {
         if (CollectionsManager.collectionSource.equals("sacks")) return null;
         String rankSuffix = "";
-        if (ConfigAccess.isLeaderboardTrackingEnabled() && playerCurrentRank != -1) {
+        if (ConfigAccess.isCollectionLeaderboardEnabled() && playerCurrentRank != -1) {
             rankSuffix = " [#" + playerCurrentRank + "]";
         }
         return collectionAmount >= 0
@@ -338,6 +357,15 @@ public class TextUtils {
     }
 
     public static void updateMultiTrackingLines(List<String> list, List<String> expanded, boolean showPrefixes) {
+        if (ConfigAccess.isCollectionLeaderboardEnabled() && !MultiTrackingHandler.getLeaderboardTrackingInitialized()) {
+            List<String> tracked = io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList;
+            if (tracked.size() == 1 && tracked.contains("gemstone")) {
+                ChatUtils.sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true);
+                ConfigHelper.disableCollectionLeaderboardTracking();
+                return;
+            }
+        }
+
         list.clear();
         for (String coll : CollectionTracker.collectionList) {
             if ("gemstone".equals(coll)) {
@@ -393,6 +421,8 @@ public class TextUtils {
             }
         }
 
+        handleMultiLeaderboard(list);
+
         String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
         String type = ConfigAccess.getBazaarType() == BazaarType.ENCHANTED_VERSION ? "Enchanted version" : "Super Enchanted version";
         String variant = ConfigAccess.getGemstoneVariant().toString();
@@ -430,8 +460,12 @@ public class TextUtils {
     }
 
     private static String handleCollectionMulti(String coll) {
+        String rankSuffix = "";
+        if ("gemstone".equals(coll) && ConfigAccess.isCollectionLeaderboardEnabled() && MultiTrackingRates.getPlayerCurrentRank() != -1) {
+            rankSuffix = " [#" + MultiTrackingRates.getPlayerCurrentRank() + "]";
+        }
         return MultiTrackingRates.INSTANCE.getCollectionAmounts().getOrDefault(coll, -1L) >= 0
-                ? formatCollectionName(coll) + " collection: " + formatNumber(MultiTrackingRates.INSTANCE.getCollectionAmounts().getOrDefault(coll, 0L))
+                ? formatCollectionName(coll) + " collection: " + formatNumber(MultiTrackingRates.INSTANCE.getCollectionAmounts().getOrDefault(coll, 0L)) + rankSuffix
                 : formatCollectionName(coll) + " collection: Calculating...";
     }
 
@@ -653,5 +687,17 @@ public class TextUtils {
         int precision = ConfigAccess.getAbilityPrecision();
         String formatString = "%." + precision + "fs";
         return String.format(formatString, time);
+    }
+
+    private static void handleMultiLeaderboard(List<String> list) {
+        if (ConfigAccess.isCollectionLeaderboardEnabled()) {
+            List<String> tracked = io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList;
+            if (tracked.size() == 1 && tracked.contains("gemstone")) {
+                addIfNotNull(list, "");
+                addIfNotNull(list, handleMultiNextPosition());
+                addIfNotNull(list, handleMultiCollectionTillNextRank());
+                addIfNotNull(list, handleMultiEta());
+            }
+        }
     }
 }

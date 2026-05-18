@@ -107,18 +107,19 @@ public class DataFetcher {
         logger.info("[SCT]: All data caches, including leaderboard, have been cleared.");
     }
 
-    public static void fetchLeaderboardData() {
-        if (!ConfigAccess.isLeaderboardTrackingEnabled()) return;
+    public static void fetchLeaderboardData(String targetCollection) {
+        if (targetCollection == null || targetCollection.isEmpty()) return;
+        if (!ConfigAccess.isCollectionLeaderboardEnabled()) return;
         if (!leaderboardFetchInProgress.compareAndSet(false, true)) return;
 
         try {
-            Long lastFetched = leaderboardCacheTimestamps.get(collection);
+            Long lastFetched = leaderboardCacheTimestamps.get(targetCollection);
             if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
                 return;
             }
-            logger.info("[SCT]: Fetching leaderboard data for collection: {}", collection);
+            logger.info("[SCT]: Fetching leaderboard data for collection: {}", targetCollection);
 
-            String jsonData = EliteApiFetcher.fetchCollectionLeaderboard(collection);
+            String jsonData = EliteApiFetcher.fetchCollectionLeaderboard(targetCollection);
             if (jsonData == null) {
                 logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API");
                 ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true);
@@ -139,8 +140,8 @@ public class DataFetcher {
                 ));
             }
             LeaderboardManager.set(entries);
-            leaderboardCacheTimestamps.put(collection, System.currentTimeMillis());
-            logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", collection);
+            leaderboardCacheTimestamps.put(targetCollection, System.currentTimeMillis());
+            logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", targetCollection);
         } catch (Exception e) {
             logger.error("[SCT]: Error fetching leaderboard data: {}", e.getMessage(), e);
         } finally {

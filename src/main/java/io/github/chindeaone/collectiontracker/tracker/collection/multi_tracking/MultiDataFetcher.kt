@@ -4,6 +4,7 @@ import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen
+import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiPaused
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiTracking
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -102,6 +103,7 @@ object MultiDataFetcher {
     fun clearCache() {
         collectionCache.clear()
         cacheTimestamps.clear()
+        DataFetcher.clearAllCache()
         logger.info("[SCT]: Multi collection data cache cleared.")
     }
 

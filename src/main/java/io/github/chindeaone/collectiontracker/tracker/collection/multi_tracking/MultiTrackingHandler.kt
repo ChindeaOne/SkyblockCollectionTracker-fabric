@@ -31,6 +31,8 @@ object MultiTrackingHandler  {
     var isMultiTracking = false
     @JvmStatic
     var isMultiPaused = false
+    @JvmStatic
+    var leaderboardTrackingInitialized = false
 
     @JvmStatic
     var multiStartTime: Long = 0
@@ -59,6 +61,7 @@ object MultiTrackingHandler  {
 
         isMultiTracking = true
         isMultiPaused = false
+        leaderboardTrackingInitialized = ConfigAccess.isCollectionLeaderboardEnabled()
     }
 
     @JvmStatic
@@ -145,6 +148,7 @@ object MultiTrackingHandler  {
         isMultiPaused = false
         multiStartTime = 0
         multiLastTime = 0
+        leaderboardTrackingInitialized = false
 
         clearMaps()
     }

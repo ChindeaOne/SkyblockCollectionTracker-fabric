@@ -94,14 +94,15 @@ object RenderUtils {
                         }
                     }
 
-                    // Check if it's a gemstone variant
-                    if (foundCollName.contains(" ")) {
+                    if (foundCollName.contains("Next Position") || foundCollName.contains("Till Next Position") || foundCollName.contains("ETA")) {
+                        color = ColorUtils.collectionColors["gemstone"]!!
+                    } else if (foundCollName.contains(" ")) {
                         val firstWord = foundCollName.split(" ")[0].lowercase()
                         val gemstoneTypes = arrayOf("ruby", "sapphire", "topaz", "amethyst", "jade", "jasper", "amber", "opal", "aquamarine", "peridot", "citrine", "onyx")
                         color = if (gemstoneTypes.contains(firstWord)) {
                             ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN
                         } else {
-                            ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: ColorUtils.GREEN
+                            ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN
                         }
                     } else {
                         color = ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: ColorUtils.GREEN

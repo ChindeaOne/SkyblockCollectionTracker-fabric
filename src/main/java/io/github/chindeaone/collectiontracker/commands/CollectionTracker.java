@@ -73,7 +73,7 @@ public class CollectionTracker {
 
                 // Fetch bazaar data and leaderboard data asynchronously
                 CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
-                        .thenRunAsync(DataFetcher::fetchLeaderboardData)
+                        .thenRunAsync(() -> DataFetcher.fetchLeaderboardData(collection))
                         .thenRun(TrackingHandler::startTracking);
             } catch (Exception e) {
                 ChatUtils.sendMessage("§cAn error occurred while processing the command.", true);
@@ -141,6 +141,12 @@ public class CollectionTracker {
 
                 // Fetch bazaar data asynchronously
                 CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collectionList))
+                        .thenRunAsync(() -> {
+                            if (collectionList.size() == 1 && collectionList.contains("gemstone")) {
+                                String collection = "gemstone";
+                                DataFetcher.fetchLeaderboardData(collection);
+                            }
+                        })
                         .thenRun(MultiTrackingHandler::startMultiTracking);
             } catch (Exception e) {
                 ChatUtils.sendMessage("§cAn error occurred while processing the command.", true);

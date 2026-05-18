@@ -81,11 +81,7 @@ public class TrackingRates {
     public static void updateLeaderboardStats() {
         LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry();
         if (playerEntry != null) {
-            int oldRank = playerCurrentRank;
             playerCurrentRank = playerEntry.rank();
-            if (oldRank != -1 && playerCurrentRank < oldRank) {
-                logger.info("[SCT]: Player rank updated from #{} to #{}", oldRank, playerCurrentRank);
-            }
         } else {
             playerCurrentRank = -1;
         }
@@ -174,7 +170,7 @@ public class TrackingRates {
             CollectionOverlay.trackingDirty = true;
         }
 
-        if (ConfigAccess.isLeaderboardTrackingEnabled()) updateLeaderboardStats();
+        if (ConfigAccess.isCollectionLeaderboardEnabled()) updateLeaderboardStats();
     }
 
     private static void updateBazaarMaps(long collectedSinceStart, long uptime) {

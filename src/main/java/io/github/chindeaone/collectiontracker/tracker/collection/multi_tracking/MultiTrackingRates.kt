@@ -6,7 +6,10 @@ import io.github.chindeaone.collectiontracker.collections.GemstonesManager
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager
 import java.util.concurrent.ConcurrentHashMap
 
 object MultiTrackingRates {
@@ -31,6 +34,13 @@ object MultiTrackingRates {
     // Bazaar
     val moneyMadeBazaar = ConcurrentHashMap<String, Long>()
     val moneyPerHourBazaar = ConcurrentHashMap<String, Long>()
+
+    // Leaderboard tracking data
+    @JvmStatic var playerCurrentRank = -1
+    @JvmStatic var nextRankUsername: String? = null
+    @JvmStatic var nextRankAmount = -1L
+    @JvmStatic var etaToNextRank: String? = null
+    @JvmStatic var collectionTillNextRank = -1L
 
     @JvmStatic
     fun setCollections(values: Map<String, Long>) {
@@ -113,6 +123,52 @@ object MultiTrackingRates {
 
         if (!MultiCollectionOverlay.trackingDirty) {
             MultiCollectionOverlay.trackingDirty = true
+        }
+
+        updateMultiLeaderboardStats()
+    }
+
+    @JvmStatic
+    fun updateMultiLeaderboardStats() {
+        if (!ConfigAccess.isCollectionLeaderboardEnabled() ||
+            CollectionTracker.collectionList.size != 1 ||
+            !CollectionTracker.collectionList.contains("gemstone")) return
+
+        val currentGemstoneAmount = collectionAmounts["gemstone"] ?: 0L
+        val playerEntry = LeaderboardManager.getPlayerEntry(currentGemstoneAmount)
+        playerCurrentRank = playerEntry?.rank() ?: -1
+
+        val nextEntry = LeaderboardManager.getNextRankEntry(currentGemstoneAmount)
+        if (nextEntry != null) {
+            nextRankUsername = nextEntry.username()
+            nextRankAmount = nextEntry.amount()
+            collectionTillNextRank = nextRankAmount - currentGemstoneAmount
+
+            val currentRate = collectionPerHour["gemstone"] ?: 0L
+            if (currentRate > 0) {
+                val seconds = (collectionTillNextRank / (currentRate / 3600.0)).toLong()
+                etaToNextRank = formatETA(seconds)
+            } else {
+                etaToNextRank = null
+            }
+        } else {
+            nextRankUsername = null
+            nextRankAmount = -1L
+            collectionTillNextRank = -1L
+            etaToNextRank = null
+        }
+    }
+
+    private fun formatETA(seconds: Long): String {
+        if (seconds < 0) return "0s"
+        val hours = seconds / 3600
+        val minutes = (seconds % 3600) / 60
+        val secs = seconds % 60
+
+        return when {
+            hours > 0 -> String.format("%dh %dm", hours, minutes)
+            minutes > 0 -> String.format("%dm %ds", minutes, secs)
+            else -> String.format("%ds", secs)
         }
     }
 
