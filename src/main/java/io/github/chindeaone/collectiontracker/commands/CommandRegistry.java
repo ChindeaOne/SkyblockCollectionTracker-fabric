@@ -5,6 +5,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
+import io.github.chindeaone.collectiontracker.config.ConfigHelper;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardOverlay;
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
@@ -518,6 +520,54 @@ public class CommandRegistry {
                                 })
                         )
                 )
+                // sct setCustomGoalPosition -> set custom position goal
+                .then(ClientCommandManager.literal("setCustomGoalPosition")
+                        .executes(context -> {
+                            ChatUtils.sendMessage("§cUsage: /sct setCustomGoalPosition <collection/skill name> <position>", true);
+                            return 1;
+                        })
+                        .then(ClientCommandManager.argument("name", StringArgumentType.word())
+                                .suggests(COLLECTION_AND_SKILL_SUGGESTIONS)
+                                .then(ClientCommandManager.argument("position", IntegerArgumentType.integer(1))
+                                        .executes(context -> {
+                                            String name = StringArgumentType.getString(context, "name").trim();
+                                            int position = IntegerArgumentType.getInteger(context, "position");
+                                            
+                                            ConfigHelper.setCustomGoalType(LeaderboardOverlay.CustomGoalType.POSITION);
+                                            ConfigHelper.setCustomGoal(name, position, null);
+                                            ChatUtils.sendMessage("§aCustom goal set for " + name + " at position " + position, true);
+                                            return 1;
+                                        })
+                                )
+                        )
+                )
+                // sct setCustomGoalAmount -> set custom amount goal
+                .then(ClientCommandManager.literal("setCustomGoalAmount")
+                        .executes(context -> {
+                            ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true);
+                            return 1;
+                        })
+                        .then(ClientCommandManager.argument("name", StringArgumentType.word())
+                                .suggests(COLLECTION_AND_SKILL_SUGGESTIONS)
+                                .then(ClientCommandManager.argument("amount", StringArgumentType.greedyString())
+                                        .executes(context -> {
+                                            String name = StringArgumentType.getString(context, "name").trim();
+                                            String amountStr = StringArgumentType.getString(context, "amount").trim();
+                                            long amount = parseAmount(amountStr);
+
+                                            if (amount < 0) {
+                                                ChatUtils.sendMessage("§cInvalid value!", true);
+                                                return 1;
+                                            }
+                                            
+                                            ConfigHelper.setCustomGoalType(LeaderboardOverlay.CustomGoalType.AMOUNT);
+                                            ConfigHelper.setCustomGoal(name, null, amount);
+                                            ChatUtils.sendMessage("§aCustom goal set for " + name + " at amount " + amountStr, true);
+                                            return 1;
+                                        })
+                                )
+                        )
+                )
         ));
     }
 
@@ -575,6 +625,23 @@ public class CommandRegistry {
         return builder.buildFuture();
     };
 
+    private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_AND_SKILL_SUGGESTIONS = (context, builder) -> {
+        String arg = builder.getRemaining().toLowerCase();
+        // Suggest collections
+        for (String collection : CollectionsManager.getAllCollections()) {
+            if (collection.toLowerCase().startsWith(arg)) {
+                builder.suggest(collection);
+            }
+        }
+        // Suggest skills
+        for (String skill : SkillUtils.getDisplayNames()) {
+            if (skill.toLowerCase().startsWith(arg)) {
+                builder.suggest(skill);
+            }
+        }
+        return builder.buildFuture();
+    };
+
     private static final SuggestionProvider<FabricClientCommandSource> PLAYER_SUGGESTIONS = (context, builder) -> {
         String remaining = builder.getRemaining().toLowerCase();
         for (String playerName : context.getSource().getOnlinePlayerNames()) {
@@ -611,5 +678,27 @@ public class CommandRegistry {
             }
         }
         return seconds;
+    }
+
+    private static long parseAmount(String input) {
+        input = input.toLowerCase().trim();
+
+        if (input.matches("\\d+[kmb]")) {
+            long number = Long.parseLong(input.replaceAll("[^0-9]", ""));
+            char suffix = input.charAt(input.length() - 1);
+
+            return switch (suffix) {
+                case 'k' -> number * 1_000L;
+                case 'm' -> number * 1_000_000L;
+                case 'b' -> number * 1_000_000_000L;
+                default -> -1;
+            };
+        }
+
+        try {
+            return Long.parseLong(input);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 }

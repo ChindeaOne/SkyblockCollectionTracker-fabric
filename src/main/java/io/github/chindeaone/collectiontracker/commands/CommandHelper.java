@@ -22,7 +22,9 @@ public class CommandHelper {
                     new CommandEntry("/sct edit title", "§eOpens the title position editor."),
                     new CommandEntry("/sct commands", "§eShows this message."),
                     new CommandEntry("/sct commands <page>", "§eJumps to a specific commands page."),
-                    new CommandEntry("/sct changelog", "§eShows all recent changes to the mod.")
+                    new CommandEntry("/sct changelog", "§eShows all recent changes to the mod."),
+                    new CommandEntry("/sct setCustomGoalPosition <name> <position>", "§eSets a custom leaderboard position goal for a collection or skill."),
+                    new CommandEntry("/sct setCustomGoalAmount <name> <amount>", "§eSets a custom amount goal (e.g. 10m, 1b) for a collection or skill.")
             )),
             new CommandPage("Collection Tracking", "§3", List.of(
                     new CommandEntry("/sct collections", "§eShows all available collections (page 1)."),
