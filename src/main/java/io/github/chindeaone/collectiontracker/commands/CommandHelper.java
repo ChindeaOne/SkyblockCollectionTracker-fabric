@@ -54,7 +54,8 @@ public class CommandHelper {
                     new CommandEntry("/sct cw stop", "§eStops Coleweight tracking."),
                     new CommandEntry("/sct cw pause", "§ePauses Coleweight tracking."),
                     new CommandEntry("/sct cw resume", "§eResumes Coleweight tracking."),
-                    new CommandEntry("/sct cw restart", "§eRestarts Coleweight tracking.")
+                    new CommandEntry("/sct cw restart", "§eRestarts Coleweight tracking."),
+                    new CommandEntry("/sct timer <set | pause | resume | stop>", "§eManages the timer.")
             )),
             new CommandPage("Farming Weight", "§a", List.of(
                     new CommandEntry("/sct fw", "§eShows your Farming Weight."),

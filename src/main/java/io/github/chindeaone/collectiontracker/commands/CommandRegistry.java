@@ -468,14 +468,15 @@ public class CommandRegistry {
                                 )
                         )
                 )
+                // sct changelog -> opens the changelog GUI
                 .then(ClientCommandManager.literal("changelog")
                         .executes(context -> {
                             Minecraft.getInstance().execute(GuiManager::openChangelog);
                             return 1;
                         })
                 )
+                // sct timer -> timer commands
                 .then(ClientCommandManager.literal("timer")
-
                         .then(ClientCommandManager.literal("set")
                                 .then(ClientCommandManager.argument("time", StringArgumentType.greedyString())
                                         .executes(context -> {
