@@ -20,6 +20,7 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionFormat
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
@@ -129,10 +130,13 @@ object CommissionKeybinds {
             return
         }
 
-        attachListener(screen.menu)
-
         val title = screen.title.string
-        if (!title.contains("Commissions", ignoreCase = true)) return
+        if (!title.contains("Commissions", ignoreCase = true)) {
+            detachListener()
+            return
+        }
+
+        attachListener(screen.menu)
 
         val now = System.currentTimeMillis()
         if (now - openedAt < CLICK_DEBOUNCE_MS) return
@@ -150,10 +154,22 @@ object CommissionKeybinds {
 
         if (slotIndex !in screen.menu.slots.indices) return
         val slot = screen.menu.getSlot(slotIndex)
+        val clickedItem = slot.item.copy()
         if (!slot.hasItem()) return
 
         val player = client.player ?: return
         val gm = client.gameMode ?: return
+
+        // Check if claimed commission is completed
+        val clickedTooltipLines = clickedItem.getTooltipLines(
+            Item.TooltipContext.of(client.level!!.registryAccess()),
+            player,
+            AbilityItemParser.tooltipFlag()
+        ).map { it.string }
+
+        if (clickedTooltipLines.any { it.contains("COMPLETED", ignoreCase = true) }) {
+            CommissionsTracker.onCommissionClaimed()
+        }
 
         gm.handleInventoryMouseClick(
             screen.menu.containerId,
