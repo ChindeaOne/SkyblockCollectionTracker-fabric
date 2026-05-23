@@ -20,6 +20,9 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
+import io.github.chindeaone.collectiontracker.utils.parser.CommissionFormat
+import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.minecraft.client.Minecraft
@@ -28,13 +31,14 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.ContainerListener
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.lwjgl.glfw.GLFW
 import java.util.*
 
-object CommissionsKeybinds {
+object CommissionKeybinds {
 
     private var lastClick = -1L
     private var openedAt = 0L
@@ -45,19 +49,68 @@ object CommissionsKeybinds {
         ConfigAccess.getKeybindConfig().commission3,
         ConfigAccess.getKeybindConfig().commission4
     )
-    private val logger: Logger = LogManager.getLogger(CommissionsKeybinds::class.java)
+    private val logger: Logger = LogManager.getLogger(CommissionKeybinds::class.java)
 
     private var attachedMenu: AbstractContainerMenu? = null
     private val wasDown = HashMap<Int, Boolean>()
     private const val CLICK_DEBOUNCE_MS = 300L
+
+    private val COMMISSION_SLOTS = mapOf(11 to 0, 12 to 1, 14 to 2, 15 to 3)
 
     private var keyGuardActive = false
     private val guardedScreens: MutableSet<Screen> =
         Collections.newSetFromMap(WeakHashMap())
 
     private val menuListener = object : ContainerListener {
-        override fun slotChanged(menu: AbstractContainerMenu, slotId: Int, stack: ItemStack) = Unit
+        override fun slotChanged(menu: AbstractContainerMenu, slotId: Int, stack: ItemStack) {
+            val commissionIndex = COMMISSION_SLOTS[slotId] ?: return
+            if (stack.isEmpty) return
+
+            val client = Minecraft.getInstance()
+            val player = client.player ?: return
+            val level = client.level ?: return
+
+            val tooltipContext = Item.TooltipContext.of(level.registryAccess())
+            val tooltipLines = stack.getTooltipLines(
+                tooltipContext,
+                player,
+                AbilityItemParser.tooltipFlag()
+            ).map { it.string }
+
+            val name = findCommissionName(tooltipLines) ?: return
+            val progress = findProgress(tooltipLines)
+
+            CommissionWidget.updateCommission(commissionIndex, "$name: $progress")
+        }
+
         override fun dataChanged(menu: AbstractContainerMenu, property: Int, value: Int) = Unit
+    }
+
+    private fun findCommissionName(lines: List<String>): String? {
+        for (line in lines) {
+            val trimmed = line.trim()
+            if (trimmed.isEmpty()) continue
+
+            for (type in CommissionFormat.COMMISSIONS) {
+                if (trimmed.equals(type.name, ignoreCase = true)) {
+                    return type.name
+                }
+            }
+        }
+        return null
+    }
+
+    private fun findProgress(lines: List<String>): String {
+        if (lines.any { it.contains("COMPLETED", ignoreCase = true) }) return "DONE"
+
+        val progressIdx = lines.indexOfFirst { it.contains("Progress", ignoreCase = true) }
+        if (progressIdx != -1) {
+            for (i in progressIdx..minOf(progressIdx + 2, lines.size - 1)) {
+                val match = Regex("\\d+(?:\\.\\d+)?%").find(lines[i])
+                if (match != null) return match.value
+            }
+        }
+        return "0%"
     }
 
     fun initKeyGuards() {
@@ -95,9 +148,8 @@ object CommissionsKeybinds {
             else -> return
         }
 
-        if (slotIndex !in 0 until screen.menu.slots.size) return
+        if (slotIndex !in screen.menu.slots.indices) return
         val slot = screen.menu.getSlot(slotIndex)
-        val clickedName = slot.item.copy().displayName.string
         if (!slot.hasItem()) return
 
         val player = client.player ?: return
@@ -112,7 +164,6 @@ object CommissionsKeybinds {
         )
 
         lastClick = now
-        logger.info("Clicked $clickedName")
     }
 
     private fun resolveCommissionIndex(client: Minecraft): Int? {

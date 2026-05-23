@@ -5,7 +5,7 @@ package io.github.chindeaone.collectiontracker
 
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
-import io.github.chindeaone.collectiontracker.utils.CommissionsKeybinds
+import io.github.chindeaone.collectiontracker.utils.CommissionKeybinds
 import io.github.chindeaone.collectiontracker.utils.Hypixel
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
@@ -46,7 +46,7 @@ class ModLoader: ModInitializer {
 
         CommandRegistry.init()
 
-        CommissionsKeybinds.initKeyGuards()
+        CommissionKeybinds.initKeyGuards()
         OutlineTypes.init()
     }
 
@@ -99,7 +99,7 @@ class ModLoader: ModInitializer {
             SkyblockCollectionTracker.onTick(client)
             ServerUtils.onTick(client)
             Hypixel.onTick(client)
-            CommissionsKeybinds.onClientTick(client)
+            CommissionKeybinds.onClientTick(client)
             TabData.tickAndUpdateWidget(client)
             BlockWatcher.onClientTick(client)
             ScoreboardUtils.onTick(client)

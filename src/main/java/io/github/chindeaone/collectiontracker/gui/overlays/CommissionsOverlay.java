@@ -5,7 +5,7 @@ import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionFormat;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.tab.CommissionsWidget;
+import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -72,7 +72,7 @@ public class CommissionsOverlay implements AbstractOverlay{
     }
 
     private List<String> getCommissionsLines() {
-        List<String> raw = CommissionsWidget.INSTANCE.getRawCommissions();
+        List<String> raw = CommissionWidget.INSTANCE.getRawCommissions();
         if (raw.isEmpty()) return Collections.emptyList();
 
         formattedCommissions.clear();

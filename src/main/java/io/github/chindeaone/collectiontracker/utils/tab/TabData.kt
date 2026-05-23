@@ -52,7 +52,7 @@ object TabData {
         TabWidget.update(tabCache)
 
         IslandTracker.update()
-        CommissionsWidget.onTabWidgetsUpdate()
+        CommissionWidget.onTabWidgetsUpdate()
         MiningStatsWidget.onTabWidgetsUpdate()
         ForagingStatsWidget.onTabWidgetsUpdate()
     }
