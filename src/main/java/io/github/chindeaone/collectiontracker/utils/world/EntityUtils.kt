@@ -18,10 +18,7 @@ object EntityUtils {
         val searchBox = player.boundingBox.inflate(30.0)
 
         return level.entitiesForRendering().asSequence().filter { entity ->
-            entity is ArmorStand &&
-                    entity.boundingBox.intersects(searchBox) &&
-                    player.hasLineOfSight(entity) &&
-                    isLookingAt(player, entity)
+            entity is ArmorStand && entity.boundingBox.intersects(searchBox)
         }
     }
 
@@ -39,11 +36,5 @@ object EntityUtils {
     fun getArmorStandsAround(level: Level, pos: BlockPos, xz: Double, y: Double): List<ArmorStand> {
         val searchBox = AABB(pos).inflate(xz, y, xz)
         return level.getEntitiesOfClass(ArmorStand::class.java, searchBox)
-    }
-
-    private fun isLookingAt(player: Entity, target: Entity, threshold: Double = 0.5): Boolean {
-        val lookVec = player.lookAngle
-        val toTargetVec = target.position().subtract(player.eyePosition).normalize()
-        return lookVec.dot(toTargetVec) > threshold
     }
 }
