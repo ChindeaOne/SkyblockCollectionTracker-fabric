@@ -17,6 +17,14 @@ public class TemporaryBuffsConfig {
     public boolean enableTempBuffTracker = false;
 
     @Expose
+    @ConfigOption(
+            name = "Show Expired Title",
+            desc = "Shows a title when a temporary buff expires."
+    )
+    @ConfigEditorBoolean
+    public boolean showTempBuffExpiredTitle = false;
+
+    @Expose
     @ConfigLink(owner = TemporaryBuffsConfig.class, field = "tempBuffTracker")
     public Position tempBuffPosition = new Position(400, 100);
 

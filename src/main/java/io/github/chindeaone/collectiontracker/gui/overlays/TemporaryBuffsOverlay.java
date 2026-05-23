@@ -8,15 +8,19 @@ import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TemporaryBuffsOverlay implements AbstractOverlay{
 
     private final Position position = ConfigAccess.getTempBuffPosition();
     private final List<String> tempBuffLines = new ArrayList<>();
+    private final Map<String, Boolean> activeStates = new HashMap<>();
     private boolean renderingAllowed = true;
 
     @Override
@@ -77,12 +81,26 @@ public class TemporaryBuffsOverlay implements AbstractOverlay{
 
         long now = System.currentTimeMillis();
 
-        addBuffLine("§6Refined Dark Cacao Truffle", TemporaryBuffsParser.getRefinedCacaoTime(), now);
-        addBuffLine("§9Filet O' Fortune", TemporaryBuffsParser.getFiletTime(), now);
-        addBuffLine("§5Chilled Pristine Potato", TemporaryBuffsParser.getPristinePotatoTime(), now);
-        addBuffLine("§aPowder Pumpkin", TemporaryBuffsParser.getPowderPumpkinTime(), now);
+        processBuff("§6Refined Dark Cacao Truffle", TemporaryBuffsParser.getRefinedCacaoTime(), now);
+        processBuff("§9Filet O' Fortune", TemporaryBuffsParser.getFiletTime(), now);
+        processBuff("§5Chilled Pristine Potato", TemporaryBuffsParser.getPristinePotatoTime(), now);
+        processBuff("§aPowder Pumpkin", TemporaryBuffsParser.getPowderPumpkinTime(), now);
 
         return tempBuffLines;
+    }
+
+    private void processBuff(String displayName, long expireTime, long now) {
+        boolean isActive = expireTime > now;
+        boolean wasActive = activeStates.getOrDefault(displayName, false);
+
+        if (wasActive && !isActive && ConfigAccess.isShowTempBuffExpiredTitle()) {
+            RenderUtils.showTitle(Component.literal(displayName + " §cExpired!"), ConfigAccess.getTitleDisplayTimer());
+        }
+        activeStates.put(displayName, isActive);
+
+        if (isActive) {
+            addBuffLine(displayName, expireTime, now);
+        }
     }
 
     private void addBuffLine(String buffName, long expireTime, long now) {

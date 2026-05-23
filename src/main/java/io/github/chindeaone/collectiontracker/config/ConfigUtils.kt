@@ -105,6 +105,7 @@ val pureOresRoutesConfig: PureOresRoutes get() = miningRoutesConfig.pureOresRout
 val enablePureOresRoutes: Boolean get() = pureOresRoutesConfig.enablePureOresRoutes
 val pureOresRoutes: PureOresRoutes.PureOreRoutes get() = pureOresRoutesConfig.selectedPureOresRoute
 val enableTempBuffTracker: Boolean get() = temporaryBuffsConfig.enableTempBuffTracker
+val showTempBuffExpiredTitle: Boolean get() = temporaryBuffsConfig.showTempBuffExpiredTitle
 val refinedCacaoTime: Long get() = temporaryBuffsConfig.refinedCacaoTime
 val filetTime: Long get() = temporaryBuffsConfig.filetTime
 val pristinePotatoTime: Long get() = temporaryBuffsConfig.pristinePotatoTime
@@ -450,6 +451,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun isTempBuffTrackerEnabled(): Boolean = enableTempBuffTracker
+
+    @JvmStatic
+    fun isShowTempBuffExpiredTitle(): Boolean = showTempBuffExpiredTitle
 
     @JvmStatic
     fun getRefinedCacaoTime(): Long = refinedCacaoTime
