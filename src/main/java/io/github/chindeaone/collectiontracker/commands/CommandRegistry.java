@@ -13,6 +13,7 @@ import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.gui.overlays.TimerOverlay;
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler;
+import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
@@ -567,6 +568,16 @@ public class CommandRegistry {
                                             return 1;
                                         })
                                 )
+                        )
+                )
+                // sct commissions reset -> resets commissions tracker
+                .then(ClientCommandManager.literal("commissions")
+                        .then(ClientCommandManager.literal("reset")
+                                .executes(context -> {
+                                    CommissionsTracker.INSTANCE.reset();
+                                    ChatUtils.sendMessage("§aCommissions tracker has been reset.", true);
+                                    return 1;
+                                })
                         )
                 )
         ));
