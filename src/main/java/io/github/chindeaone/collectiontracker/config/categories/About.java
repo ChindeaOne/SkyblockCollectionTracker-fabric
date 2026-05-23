@@ -21,7 +21,7 @@ public class About {
 
     @ConfigOption(
             name = "§aInfo",
-            desc = "§eThis mod is meant to track all collections in Hypixel Skyblock and provide some nice qol features."
+            desc = "§eThis mod is meant to track all collections in Hypixel Skyblock and provide some nice qol features.\n\n\nUse §b/sct commands §eto see all available commands."
     )
     @ConfigEditorInfoText
     public boolean info = true;
@@ -29,7 +29,12 @@ public class About {
     @Expose
     @ConfigOption(
             name = "§bUpdate Stream",
-            desc = "Choose update checks: NONE = no update checks; RELEASE = check stable releases only; BETA = include beta updates."
+            desc = """
+                    Choose how you want to be notified about updates:§f
+                     - §cNONE§e: No update checks§f
+                     - §aRELEASE§e: Notifies when a new stable version is available§f
+                     - §bBETA§e: Notifies about both stable and beta versions
+                    """
     )
     @ConfigEditorDropdown
     public UpdateType update = UpdateType.RELEASE; //Default to RELEASE updates

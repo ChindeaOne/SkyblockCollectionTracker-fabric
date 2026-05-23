@@ -10,7 +10,7 @@ public class TemporaryBuffsConfig {
 
     @Expose
     @ConfigOption(
-            name = "Enable Temporary Buffs Tracker",
+            name = "Enable Tracker",
             desc = "Toggles an overlay that tracks mining temporary buffs."
     )
     @ConfigEditorBoolean

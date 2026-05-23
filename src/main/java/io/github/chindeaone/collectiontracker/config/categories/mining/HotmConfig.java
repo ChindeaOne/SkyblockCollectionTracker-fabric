@@ -8,7 +8,7 @@ public class HotmConfig {
 
     @Expose
     @ConfigOption(
-            name = "Professional mining speed",
+            name = "Professional Mining Speed",
             desc = "Input your mining speed from Professional perk."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 755, minStep = 1)
@@ -16,7 +16,7 @@ public class HotmConfig {
 
     @Expose
     @ConfigOption(
-            name = "Strong Arm mining speed",
+            name = "Strong Arm Mining Speed",
             desc = "Input your mining speed from Strong Arm perk."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 505, minStep = 1)

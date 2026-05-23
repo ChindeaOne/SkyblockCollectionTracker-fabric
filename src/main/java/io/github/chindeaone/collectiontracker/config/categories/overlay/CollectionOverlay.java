@@ -84,8 +84,8 @@ public class CollectionOverlay {
 
     @Expose
     @ConfigOption(
-            name = "Overlay Text Color",
-            desc = "Toggle this to enable color-coded overlay."
+            name = "Custom Collection Color",
+            desc = "Toggle this to enable color-coded collections."
     )
     @SerializedName("overlayTextColor")
     @ConfigEditorBoolean

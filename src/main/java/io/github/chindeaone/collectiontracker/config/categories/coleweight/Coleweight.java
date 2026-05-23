@@ -11,7 +11,7 @@ public class Coleweight {
 
     @Expose
     @ConfigOption(
-            name = "Coleweight ranks in chat",
+            name = "Coleweight Ranks in chat",
             desc = "Enable Coleweight ranks in chat.\n§eNote: If you use Skyhanni's chat formatting, make sure you have at least §bPlayer Name §evisible!"
     )
     @ConfigEditorBoolean
