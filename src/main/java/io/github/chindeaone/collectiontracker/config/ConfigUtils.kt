@@ -28,7 +28,7 @@ import io.github.chindeaone.collectiontracker.config.categories.mining.Temporary
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.DwarvenMetalsRoutes
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.PureOresRoutes
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
-import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsOverlay
+import io.github.chindeaone.collectiontracker.config.categories.overlay.Commissions
 import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardOverlay
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
@@ -47,7 +47,7 @@ val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config!
 val trackingPosition: Position get() = modConfig.trackingOverlay.collectionOverlay.overlayPosition
 val miningStatsPosition: Position get() = modConfig.mining.miningStatsOverlay.miningStatsOverlayPosition
 val foragingStatsPosition: Position get() = modConfig.foraging.foragingStatsOverlay.foragingStatsOverlayPosition
-val commissionsPosition: Position get() = modConfig.mining.commissionsOverlay.commissionsOverlayPosition
+val commissionsPosition: Position get() = modConfig.mining.commissions.commissionsOverlayPosition
 val skillPosition: Position get() = modConfig.trackingOverlay.skillOverlay.skillOverlayPosition
 val skyMallPosition: Position get() = modConfig.mining.hotmConfig.skyMallConfig.skyMallPosition
 val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryConfig.lotteryPosition
@@ -75,8 +75,9 @@ val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
 // Mining Config Accessors
 val miningConfig: Mining get() = modConfig.mining
 val miningRoutesConfig: MiningRoutesConfig get() = miningConfig.miningRoutesConfig
-val commissionsOverlay: CommissionsOverlay get() = miningConfig.commissionsOverlay
-val keybindConfig: KeybindConfig get() = commissionsOverlay.commissions
+val commissions: Commissions get() = miningConfig.commissions
+val keybindConfig: KeybindConfig get() = commissions.commissionsKeybinds
+val enableCommissionsTracking: Boolean get() = commissions.enableCommissionsTracking
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
@@ -268,7 +269,10 @@ object ConfigAccess {
     fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionOverlay.showTrackingRatesAtEndOfSession
 
     @JvmStatic
-    fun isCommissionsEnabled(): Boolean = commissionsOverlay.enableCommissionsOverlay
+    fun isCommissionsEnabled(): Boolean = commissions.enableCommissionsOverlay
+
+    @JvmStatic
+    fun isCommissionsTrackingEnabled(): Boolean = enableCommissionsTracking
 
     @JvmStatic
     fun isCommissionsKeybindsEnabled(): Boolean = keybindConfig.enableCommissionsKeybinds
@@ -552,7 +556,7 @@ object ConfigHelper {
 
     @JvmStatic
     fun disableCommissions() {
-        commissionsOverlay.enableCommissionsOverlay = false
+        commissions.enableCommissionsOverlay = false
     }
 
     @JvmStatic

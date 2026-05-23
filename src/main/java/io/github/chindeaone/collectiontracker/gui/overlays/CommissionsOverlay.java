@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionFormat;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget;
+import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -99,6 +100,17 @@ public class CommissionsOverlay implements AbstractOverlay{
                 case GLACITE_TUNNELS -> formattedCommissions.addFirst("§b§l" + detectedArea.getDisplayName());
             }
         }
+
+        // Commissions tracker
+        if (ConfigAccess.isCommissionsTrackingEnabled() && CommissionsTracker.INSTANCE.getCompletedCount() > 0) {
+            if (!formattedCommissions.isEmpty()) {
+                formattedCommissions.add("");
+            }
+            formattedCommissions.add("§6Commissions Completed: §e" + CommissionsTracker.INSTANCE.getCompletedCount());
+            formattedCommissions.add("§6Commissions/h: §e" + String.format("%.2f", CommissionsTracker.INSTANCE.getCommissionsPerHour()));
+            formattedCommissions.add("§6Uptime: §e" + CommissionsTracker.INSTANCE.getUptime());
+        }
+
         return formattedCommissions;
     }
 }
