@@ -127,6 +127,7 @@ object ScoreboardUtils {
             val category = when {
                 foundType.endsWith("_C") -> "crystal"
                 foundType == "JASP_1" -> "jasper"
+                foundType == "TUNG_1" -> "tungsten_shaft"
                 else -> null
             }
 

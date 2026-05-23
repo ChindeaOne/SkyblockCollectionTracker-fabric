@@ -9,7 +9,7 @@ public class DwarvenMetalsRoutes {
 
     public enum DwarvenMetalRoutes {
         PURE_UMBER("pure_umber"),
-        HYBRID_METALS("hybrid_metals"),;
+        HYBRID_METALS("hybrid_metals");
 
         private final String type;
 
