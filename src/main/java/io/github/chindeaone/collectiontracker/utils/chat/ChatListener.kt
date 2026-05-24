@@ -71,7 +71,6 @@ object ChatListener {
         val cleanText = text.removeColor()
 
         profileIdListener(cleanText)
-        sacksListener(message)
         petSummoned(text)
         abilityListener(cleanText)
         onCooldownListener(cleanText)
@@ -89,7 +88,8 @@ object ChatListener {
         }
     }
 
-    private fun sacksListener(component: Component) {
+    fun sacksListener(component: Component, actionBar: Boolean) {
+        if (actionBar) return
         val normalTracking = TrackingHandler.isTracking && !TrackingHandler.isPaused
         val multiTracking = MultiTrackingHandler.isMultiTracking && !MultiTrackingHandler.isMultiPaused
 

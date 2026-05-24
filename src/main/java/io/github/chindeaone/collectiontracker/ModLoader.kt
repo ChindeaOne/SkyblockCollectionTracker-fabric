@@ -57,6 +57,7 @@ class ModLoader: ModInitializer {
         })
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
         ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.onChatMessage(message) }
+        ClientReceiveMessageEvents.GAME_CANCELED.register { message, actionBar -> ChatListener.sacksListener(message, actionBar) }
 
         UseItemCallback.EVENT.register { player, _, hand -> InventoryListener.checkHandItem(player, hand) }
         WorldRenderEvents.END_MAIN.register { context ->
