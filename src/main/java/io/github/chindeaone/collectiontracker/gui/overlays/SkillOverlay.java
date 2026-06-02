@@ -20,7 +20,7 @@ import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackin
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
 import static io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatNumberOrPlaceholder;
 
-public class SkillOverlay implements AbstractOverlay {
+public class SkillOverlay extends AbstractOverlay {
 
     private final Position position = ConfigAccess.getSkillPosition();
     private final List<String> skillOverlayLines = new ArrayList<>();

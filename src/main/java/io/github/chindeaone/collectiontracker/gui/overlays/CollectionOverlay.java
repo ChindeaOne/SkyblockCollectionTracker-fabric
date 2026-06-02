@@ -18,13 +18,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CollectionOverlay implements AbstractOverlay{
+public class CollectionOverlay extends AbstractOverlay{
 
     public static volatile boolean trackingDirty = false;
     private final Position position = ConfigAccess.getTrackingPosition();
     public final List<String> overlayLines = new ArrayList<>();
     public final List<String> extraOverlayLines = new ArrayList<>();
-    private boolean renderingAllowed  = true;
 
     @Override
     public String overlayLabel() {
@@ -38,16 +37,6 @@ public class CollectionOverlay implements AbstractOverlay{
     @Override
     public boolean isEnabled() {
         return TrackingHandler.isTracking && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override
@@ -108,35 +97,6 @@ public class CollectionOverlay implements AbstractOverlay{
         if (line.contains("Instant")) {
             changeBazaarPriceType();
         }
-    }
-
-    @Override
-    public boolean isHovered(double mouseX, double mouseY) {
-        if (!isEnabled()) return false;
-
-        List<String> mainLines = getCollectionLines();
-        if (mainLines.isEmpty()) return false;
-
-        Position pos = this.position();
-        float scale = pos.getScale();
-        Font fr = Minecraft.getInstance().font;
-
-        int totalLines = mainLines.size();
-
-        if (ConfigAccess.isShowExtraStats()) {
-            List<String> extraLines = getCollectionExtraLines();
-            if (!extraLines.isEmpty()) {
-                totalLines += 1; // add separator line
-                totalLines += extraLines.size();
-            }
-        }
-
-        int height = (int) (fr.lineHeight * totalLines * scale);
-        int width = (int) (pos.getWidth() * scale);
-        int x = pos.getX();
-        int y = pos.getY();
-
-        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
     private @NotNull List<String> getCollectionLines() {

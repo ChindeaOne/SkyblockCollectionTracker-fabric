@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SkyMallOverlay implements AbstractOverlay {
+public class SkyMallOverlay extends AbstractOverlay {
 
     private final Position position = ConfigAccess.getSkyMallPosition();
     private final List<String> skyMallOverlayLines = new ArrayList<>();

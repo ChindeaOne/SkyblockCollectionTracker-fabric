@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ForagingStatsOverlay implements AbstractOverlay{
+public class ForagingStatsOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getForagingStatsPosition();
     private final List<String> formattedForagingStats = new ArrayList<>();

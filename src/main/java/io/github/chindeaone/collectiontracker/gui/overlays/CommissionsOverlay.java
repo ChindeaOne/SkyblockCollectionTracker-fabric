@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CommissionsOverlay implements AbstractOverlay{
+public class CommissionsOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getCommissionsPosition();
     private final List<String> formattedCommissions = new ArrayList<>();

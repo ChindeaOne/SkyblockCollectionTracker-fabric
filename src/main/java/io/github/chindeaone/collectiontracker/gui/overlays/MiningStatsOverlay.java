@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MiningStatsOverlay implements AbstractOverlay{
+public class MiningStatsOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getMiningStatsPosition();
     private final List<String> formattedMiningStats = new ArrayList<>();

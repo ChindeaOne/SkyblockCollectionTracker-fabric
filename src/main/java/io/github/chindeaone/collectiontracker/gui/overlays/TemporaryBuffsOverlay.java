@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TemporaryBuffsOverlay implements AbstractOverlay{
+public class TemporaryBuffsOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getTempBuffPosition();
     private final List<String> tempBuffLines = new ArrayList<>();

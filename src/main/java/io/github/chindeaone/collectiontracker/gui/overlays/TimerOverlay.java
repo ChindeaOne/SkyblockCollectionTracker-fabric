@@ -12,7 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TimerOverlay implements AbstractOverlay{
+public class TimerOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getColeweightTimerPosition();
     private final List<String> timerLines = new ArrayList<>();

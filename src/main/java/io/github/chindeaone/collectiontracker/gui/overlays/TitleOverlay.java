@@ -5,7 +5,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import net.minecraft.client.gui.GuiGraphics;
 
-public class TitleOverlay implements AbstractOverlay{
+public class TitleOverlay extends AbstractOverlay{
 
     private boolean renderingAllowed  = true;
 

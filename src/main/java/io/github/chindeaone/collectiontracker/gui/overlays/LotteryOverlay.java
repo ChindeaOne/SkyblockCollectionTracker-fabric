@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class LotteryOverlay implements AbstractOverlay {
+public class LotteryOverlay extends AbstractOverlay {
 
     private final Position position = ConfigAccess.getLotteryPosition();
     private final List<String> lotteryOverlayLines = new ArrayList<>();

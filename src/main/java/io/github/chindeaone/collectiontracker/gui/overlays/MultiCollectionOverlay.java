@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiCollectionOverlay implements AbstractOverlay{
+public class MultiCollectionOverlay extends AbstractOverlay{
 
     public static volatile boolean trackingDirty = false;
     private final Position position = ConfigAccess.getMultiOverlayPosition();

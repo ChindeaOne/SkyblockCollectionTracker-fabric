@@ -8,33 +8,40 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A general interface for all overlays.
+ * A general abstract class for all overlays.
  */
-public interface AbstractOverlay {
-    String overlayLabel();
+public abstract class AbstractOverlay {
+    protected boolean renderingAllowed = true;
 
-    Position position();
+    public abstract String overlayLabel();
 
-    boolean isEnabled();
+    public abstract Position position();
 
-    boolean isRenderingAllowed();
-    void setRenderingAllowed(boolean allowed);
+    public abstract boolean isEnabled();
 
-    default boolean shouldRender() {
+    public boolean isRenderingAllowed() {
+        return renderingAllowed;
+    }
+
+    public void setRenderingAllowed(boolean allowed) {
+        this.renderingAllowed = allowed;
+    }
+
+    public boolean shouldRender() {
         return isEnabled() && isRenderingAllowed();
     }
 
-    void render(GuiGraphics context);
+    public abstract void render(GuiGraphics context);
 
-    void updateDimensions();
+    public abstract void updateDimensions();
 
-    default void handleLineAction(String line) {}
+    public void handleLineAction(String line) {}
 
-    default List<String> getLines() {
+    public List<String> getLines() {
         return Collections.emptyList();
     }
 
-    default boolean handleMouseClick(double mouseX, double mouseY) {
+    public boolean handleMouseClick(double mouseX, double mouseY) {
         if (!isEnabled() || !isHovered(mouseX, mouseY)) return false;
 
         List<String> lines = getLines();
@@ -61,7 +68,20 @@ public interface AbstractOverlay {
         return false;
     }
 
-    default boolean isHovered(double mouseX, double mouseY) {
-        return false;
+    public boolean isHovered(double mouseX, double mouseY) {
+        Position pos = this.position();
+        if (pos == null) return false;
+
+        int yPadding = 4;
+        int x = pos.getX();
+        int y = pos.getY();
+        float s = pos.getScale();
+        int w = Math.round(pos.getWidth() * s);
+
+        double x2 = x + w;
+        double y1 = y - (yPadding * s);
+        double y2 = y + (pos.getHeight() + yPadding) * s;
+
+        return mouseX >= x && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
     }
 }

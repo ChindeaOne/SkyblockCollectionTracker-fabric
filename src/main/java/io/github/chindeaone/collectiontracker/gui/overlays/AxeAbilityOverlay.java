@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AxeAbilityOverlay implements AbstractOverlay{
+public class AxeAbilityOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getAxeAbilityPosition();
     private final List<String> axeAbilityOverlayLines = new ArrayList<>();

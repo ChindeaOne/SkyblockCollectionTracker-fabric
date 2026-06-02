@@ -12,7 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeployableOverlay implements AbstractOverlay {
+public class DeployableOverlay extends AbstractOverlay {
 
     private final Position position = ConfigAccess.getDeployablePosition();
     private final List<String> deployableLines = new ArrayList<>();

@@ -16,11 +16,10 @@ import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatFloatOrPlaceholder;
 
-public class ColeweightOverlay implements AbstractOverlay{
+public class ColeweightOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getColeweightTrackerPosition();
     private final List<String> trackerLines = new ArrayList<>();
-    private boolean renderingAllowed  = true;
     public static volatile boolean trackingDirty = false;
 
     @Override
@@ -36,16 +35,6 @@ public class ColeweightOverlay implements AbstractOverlay{
     @Override
     public boolean isEnabled() {
         return ColeweightTrackingHandler.isTracking && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override

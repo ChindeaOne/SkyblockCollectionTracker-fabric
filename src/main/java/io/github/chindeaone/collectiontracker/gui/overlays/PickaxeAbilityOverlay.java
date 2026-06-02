@@ -17,11 +17,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PickaxeAbilityOverlay implements AbstractOverlay{
+public class PickaxeAbilityOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getPickaxeAbilityPosition();
     private final List<String> pickaxeAbilityOverlayLines = new ArrayList<>();
-    private boolean renderingAllowed  = true;
     private boolean expiredTitleShown = true;
     private boolean readyTitleShown = true;
 
@@ -38,16 +37,6 @@ public class PickaxeAbilityOverlay implements AbstractOverlay{
     @Override
     public boolean isEnabled() {
         return ConfigAccess.isPickaxeAbilityDisplayed() && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override
