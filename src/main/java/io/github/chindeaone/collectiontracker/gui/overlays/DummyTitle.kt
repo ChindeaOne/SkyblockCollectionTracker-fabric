@@ -16,7 +16,7 @@ import net.minecraft.network.chat.Component
 import org.jetbrains.annotations.NotNull
 import kotlin.math.roundToInt
 
-class TitleDummy(
+class DummyTitle(
     private val oldScreen: AbstractContainerScreen<*>?
 ) : Screen(Component.literal("Title Dummy")) {
 
@@ -96,8 +96,13 @@ class TitleDummy(
     }
 
     private fun isMouseOver(mouseX: Int, mouseY: Int, pos: Position): Boolean {
-        val sw = (pos.width * pos.scale).roundToInt()
-        val sh = (pos.height * pos.scale).roundToInt()
-        return mouseX >= pos.x && mouseX <= pos.x + sw && mouseY >= pos.y && mouseY <= pos.y + sh
+        val yPadding = 4
+        val s = pos.scale
+        val sw = (pos.width * s).roundToInt()
+
+        val y1 = (pos.y - yPadding * s).roundToInt()
+        val y2 = (pos.y + (pos.height + yPadding) * s).roundToInt()
+
+        return mouseX >= pos.x && mouseX <= pos.x + sw && mouseY >= y1 && mouseY <= y2
     }
 }

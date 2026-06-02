@@ -42,28 +42,33 @@ public class Position {
     }
 
     public void setPosition(int x, int y) {
-        int screenWidth = ScaleUtils.INSTANCE.getWidth();
-        int screenHeight = ScaleUtils.INSTANCE.getHeight();
+        int screenWidth = ScaleUtils.INSTANCE.getScaledWidth();
+        int screenHeight = ScaleUtils.INSTANCE.getScaledHeight();
 
-        int scaledWidth = Math.round(width * scale);
-        int scaledHeight = Math.round(height * scale);
+        int yPadding = 4;
+        int scaledYPadding = Math.round(yPadding * this.scale);
+
+        int scaledWidth = Math.round(this.width * this.scale);
+        int scaledHeight = Math.round(this.height * this.scale);
 
         int maxX = screenWidth - scaledWidth;
-        int maxY = screenHeight - scaledHeight;
+        int maxY = screenHeight - (scaledHeight + scaledYPadding);
 
         if (maxX < 0) maxX = 0;
-        if (maxY < 0) maxY = 0;
+        if (maxY < scaledYPadding) maxY = scaledYPadding;
 
-        this.X = Math.max(0, Math.min(x, maxX));
-        this.Y = Math.max(0, Math.min(y, maxY));
+        this.X = Math.clamp(x, 0, maxX);
+        this.Y = Math.clamp(y, scaledYPadding, maxY);
     }
 
     public void setScaling(float scale) {
         this.scale = scale;
+        setPosition(this.X, this.Y);
     }
 
     public void setDimensions(int width, int height) {
         this.width = width;
         this.height = height;
+        setPosition(this.X, this.Y);
     }
 }
