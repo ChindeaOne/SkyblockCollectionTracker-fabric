@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
+import kotlin.math.sqrt
 
 object RenderUtils {
 
@@ -33,21 +34,26 @@ object RenderUtils {
         context.pose().popMatrix()
     }
 
-    @JvmStatic
     fun drawDummyFrame(context: GuiGraphics, pos: Position, label: String) {
+        val yPadding = 4
+        val totalBoxHeight = pos.height + yPadding * 2
+        val radius = (totalBoxHeight / 4).coerceAtMost(6)
+
         drawOverlayFrame(context, pos) {
-            context.fill(0, 0, pos.width, pos.height, DUMMY_BG)
+            drawRoundedRect(context, 0, -yPadding, pos.width, totalBoxHeight, radius, DUMMY_BG)
 
-            val overlayText = Component.literal(label)
-                .withStyle(ChatFormatting.GREEN)
-
+            val overlayText = Component.literal(label).withStyle(ChatFormatting.GREEN)
             val textScale = 0.8f
-            val centerX = pos.width / 2f
-            val yTop = (pos.height - fr.lineHeight * textScale) / 2f
+
+            val textHeight = fr.lineHeight * textScale
+            val centerYInBox = (totalBoxHeight - textHeight) / 2f
+
+            val xPos = (pos.width / 2f) / textScale
+            val yPos = (centerYInBox - yPadding * textScale) / textScale
 
             context.pose().pushMatrix()
             context.pose().scale(textScale, textScale)
-            context.drawCenteredString(fr, overlayText, (centerX / textScale).toInt(), (yTop / textScale).toInt(), ColorUtils.WHITE)
+            context.drawCenteredString(fr, overlayText, xPos.toInt(), yPos.toInt(), ColorUtils.WHITE)
             context.pose().popMatrix()
         }
     }
@@ -56,7 +62,56 @@ object RenderUtils {
     fun renderTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
         var y = 0
 
+        val allLines = mutableListOf<String>()
+        allLines.addAll(lines)
+        if (extraLines.isNotEmpty()) {
+            allLines.add("")
+            allLines.addAll(extraLines)
+        }
+
+        val maxTextWidth = allLines.maxOfOrNull { fr.width(it) } ?: 0
+        val totalTextHeight = allLines.size * fr.lineHeight
+
+        val padding = 8
+        val overlayW = maxTextWidth + padding * 2
+        val overlayH = totalTextHeight + padding * 2
+
+        val radius = (overlayH / 12).coerceAtLeast(1)
+
         val color: Int = if (withColor) (ColorUtils.collectionColors[CollectionTracker.collection]) ?: ColorUtils.GREEN  else ColorUtils.GREEN
+
+        if (color != ColorUtils.GREEN) {
+            val outlineShade = ColorUtils.DARK_GRAY
+
+            val startX = -padding
+            val startY = -padding
+            val baseR = radius.coerceAtMost(overlayW / 2).coerceAtMost(overlayH / 2)
+
+            if (baseR >= 3) {
+                drawOverlayOutline(context, startX, startY, overlayW, overlayH, baseR, outlineShade)
+                drawOverlayOutline(
+                    context,
+                    startX + 1,
+                    startY + 1,
+                    overlayW - 2,
+                    overlayH - 2,
+                    (baseR - 1).coerceAtLeast(1),
+                    color
+                )
+                drawOverlayOutline(
+                    context,
+                    startX + 2,
+                    startY + 2,
+                    overlayW - 4,
+                    overlayH - 4,
+                    (baseR - 2).coerceAtLeast(1),
+                    outlineShade
+                )
+            } else {
+                drawOverlayOutline(context, startX, startY, overlayW, overlayH, baseR, outlineShade)
+            }
+        }
+
         for (line in lines) {
             drawHelper(line, context, y, color)
             y += fr.lineHeight
@@ -156,14 +211,11 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun drawEditorHudText(context: GuiGraphics, activePosition: Position?) {
-        val textScale = 0.8f
+        val textScale = 0.75f
 
-        val resizeText = Component.literal("Use mouse wheel to resize the overlay")
-            .withStyle(ChatFormatting.GREEN)
-        val resetText = Component.literal("Right click to reset the scale")
-            .withStyle(ChatFormatting.GREEN)
+        val resizeText = Component.literal("Use mouse wheel to resize the overlay").withStyle(ChatFormatting.YELLOW)
+        val resetText = Component.literal("Middle click to reset the scale").withStyle(ChatFormatting.YELLOW)
 
         val textWidth = fr.width(resizeText)
         val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
@@ -188,19 +240,24 @@ object RenderUtils {
             val y = ScaleUtils.mouseY - 12
 
             val scaleStr = String.format("%.2f", activePosition.scale)
-            val positionText = Component.literal("X: ${activePosition.x} Y: ${activePosition.y} Scale: $scaleStr")
-                .withStyle(ChatFormatting.YELLOW)
+
+            val positionText = Component.literal("OVERLAY POSITION").withStyle(ChatFormatting.BLUE)
+                .append(Component.literal(" (top-left corner)").withStyle(ChatFormatting.DARK_GRAY))
+                .append("\n")
+                .append(Component.literal("X: ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal("${activePosition.x}").withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal("  Y: ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal("${activePosition.y}").withStyle(ChatFormatting.YELLOW)
+                .append(Component.literal("  Scale: ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(scaleStr).withStyle(ChatFormatting.AQUA)))
 
             drawTooltipsHelper(context, positionText, x, y)
         }
     }
 
-    @JvmStatic
-    fun drawEditorHudTitle(context: GuiGraphics, activePosition: Position?) {
-        val textScale = 0.8f
-
-        val resizeText = Component.literal("You can move the title position only vertically!")
-            .withStyle(ChatFormatting.GREEN)
+    fun drawEditorHudTitle(context: GuiGraphics, pos: Position?) {
+        val textScale = 0.75f
+        val resizeText = Component.literal("You can move the title position only vertically!").withStyle(ChatFormatting.GREEN)
 
         val textWidth = fr.width(resizeText)
         val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
@@ -211,39 +268,42 @@ object RenderUtils {
         context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), ColorUtils.WHITE, true)
         context.pose().popMatrix()
 
-        if (activePosition != null) {
+        if (pos != null) {
             val x = ScaleUtils.mouseX + 12
             val y = ScaleUtils.mouseY - 12
 
-            val positionText = Component.literal("Y: ${activePosition.y}")
-                .withStyle(ChatFormatting.YELLOW)
+            val positionText = Component.literal("TITLE POSITION").withStyle(ChatFormatting.BLUE)
+                .append("\n")
+                .append(Component.literal("Vertical Y: ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal("${pos.y}").withStyle(ChatFormatting.YELLOW))
 
             drawTooltipsHelper(context, positionText, x, y)
         }
     }
 
     private fun drawTooltipsHelper(context: GuiGraphics, positionText: Component, x: Int, y: Int) {
-        val textScale = 0.8f
+        val textScale = 0.75f
+        val padding = 2
+        val space = 2
 
-        val positionWidth = fr.width(positionText) * textScale
-        val positionHeight = fr.lineHeight * textScale
-        val positionY = when {
-            y < 8 -> 4f
-            y + fr.lineHeight > context.guiHeight() -> (context.guiHeight() - fr.lineHeight - 6).toFloat()
-            else -> y.toFloat()
-        }
-        val positionX = if (x + positionWidth > context.guiWidth()) {
-            (context.guiWidth() - positionWidth - 6)
-        } else {
-            x.toFloat()
-        }
+        val lines = fr.split(positionText, 1000)
+        val maxTextWidth = lines.maxOfOrNull { fr.width(it) } ?: 0
 
-        drawTooltipBox(context, positionX, positionY, positionWidth, positionHeight)
+        val positionWidth = maxTextWidth * textScale
+        val maxHeight = (lines.size * fr.lineHeight + (lines.size - 1) * space) * textScale
+
+        val positionY = (y.toFloat()).coerceIn(8f, context.guiHeight() - maxHeight - padding * 2 - 8f)
+        val positionX = (x.toFloat()).coerceIn(8f, context.guiWidth() - positionWidth - padding * 2 - 8f)
+
+        drawTooltipBox(context, positionX, positionY, positionWidth, maxHeight)
 
         context.pose().pushMatrix()
         context.pose().translate(positionX, positionY)
         context.pose().scale(textScale, textScale)
-        context.drawString(fr, positionText, 0, 0, ColorUtils.YELLOW, true)
+        lines.forEachIndexed { index, line ->
+            val yOffset = index * (fr.lineHeight + space)
+            context.drawString(fr, line, 0, yOffset, ColorUtils.YELLOW, true)
+        }
         context.pose().popMatrix()
     }
 
@@ -310,7 +370,7 @@ object RenderUtils {
         val startX = (screenWidth - overlayWidth) / 2
         val startY = (screenHeight - overlayHeight) / 2
 
-        context.fill((startX - 10), startY - 10, startX + overlayWidth + 10, startY + overlayHeight + 10, -0x7f000000)
+        drawRoundedRect(context, startX - 10, startY - 10, overlayWidth + 20, overlayHeight + 20, 8, -0x6f000000)
 
         // Render current version first
         SkyblockCollectionTracker.VERSION.let { version ->
@@ -396,5 +456,70 @@ object RenderUtils {
         context.fill(x1, y2 - 1, x2, y2, borderColor) // Bottom
         context.fill(x1, y1, x1 + 1, y2, borderColor) // Left
         context.fill(x2 - 1, y1, x2, y2, borderColor) // Right
+    }
+
+    private fun drawRoundedRect(context: GuiGraphics, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
+        if (radius <= 0) {
+            context.fill(x, y, x + width, y + height, color)
+            return
+        }
+
+        val r = radius.coerceAtMost(width / 2).coerceAtMost(height / 2)
+        val alpha = (color shr 24 and 0xFF)
+        val rgb = color and 0xFFFFFF
+
+        // main
+        context.fill(x + r, y, x + width - r, y + r, color)
+        context.fill(x, y + r, x + width, y + height - r, color)
+        context.fill(x + r, y + height - r, x + width - r, y + height, color)
+
+        // corners with AA
+        for (cx in 0 until r) {
+            for (cy in 0 until r) {
+                val dx = (r - cx - 0.5)
+                val dy = (r - cy - 0.5)
+                val dist = sqrt(dx * dx + dy * dy)
+
+                val currAlpha = when {
+                    dist < r - 1.0 -> alpha // fully opaque
+                    dist < r -> ((r - dist) * alpha).toInt()
+                    else -> 0
+                }
+
+                if (currAlpha > 0) {
+                    val newColor = (currAlpha shl 24) or rgb
+
+                    context.fill(x + cx, y + cy, x + cx + 1, y + cy + 1, newColor) // top left
+                    context.fill(x + width - cx - 1, y + cy, x + width - cx, y + cy + 1, newColor) // top right
+                    context.fill(x + cx, y + height - cy - 1, x + cx + 1, y + height - cy, newColor) // bottom left
+                    context.fill(x + width - cx - 1, y + height - cy - 1, x + width - cx, y + height - cy, newColor) // bottom right
+                }
+            }
+        }
+    }
+
+    private fun drawOverlayOutline(context: GuiGraphics, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
+        val r = radius.coerceAtMost(width / 2).coerceAtMost(height / 2)
+
+        context.fill(x + r, y, x + width - r, y + 1, color)
+        context.fill(x + r, y + height - 1, x + width - r, y + height, color)
+        context.fill(x, y + r, x + 1, y + height - r, color)
+        context.fill(x + width - 1, y + r, x + width, y + height - r, color)
+
+        val innerR = r - 1
+        for (cx in 0 until r) {
+            for (cy in 0 until r) {
+                val dx = (r - cx - 0.5)
+                val dy = (r - cy - 0.5)
+                val dist = sqrt(dx * dx + dy * dy)
+
+                if (dist < r && dist >= innerR) {
+                    context.fill(x + cx, y + cy, x + cx + 1, y + cy + 1, color) // top left
+                    context.fill(x + width - cx - 1, y + cy, x + width - cx, y + cy + 1, color) // top right
+                    context.fill(x + cx, y + height - cy - 1, x + cx + 1, y + height - cy, color) // bottom left
+                    context.fill(x + width - cx - 1, y + height - cy - 1, x + width - cx, y + height - cy, color) // bottom right
+                }
+            }
+        }
     }
 }

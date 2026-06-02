@@ -19,6 +19,7 @@ object ColorUtils {
     const val YELLOW: Int = 0xFFFFFF55.toInt()
     const val AQUA: Int = 0xFF55FFFF.toInt()
     const val GRAY: Int = 0xFFAAAAAA.toInt()
+    const val DARK_GRAY: Int = 0xFFAAAAAA.toInt()
     const val SILVER_BLUE: Int = 0xFF7FB4DB.toInt()
 
     val skillColors: MutableMap<String, Int> = HashMap()
