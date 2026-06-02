@@ -8,7 +8,7 @@ import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.screenTo
 import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.gui.overlays.ChangelogOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyOverlay
-import io.github.chindeaone.collectiontracker.gui.overlays.TitleDummy
+import io.github.chindeaone.collectiontracker.gui.overlays.DummyTitle
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
@@ -63,6 +63,6 @@ object GuiManager {
         val current = Minecraft.getInstance().screen
         val old = current as? AbstractContainerScreen<*>
 
-        screenToOpen = TitleDummy(old)
+        screenToOpen = DummyTitle(old)
     }
 }
