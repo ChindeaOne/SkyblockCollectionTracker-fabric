@@ -212,44 +212,22 @@ object RenderUtils {
     }
 
     fun drawEditorHudText(context: GuiGraphics, activePosition: Position?) {
-        val textScale = 0.75f
-
-        val resizeText = Component.literal("Use mouse wheel to resize the overlay").withStyle(ChatFormatting.YELLOW)
-        val resetText = Component.literal("Middle click to reset the scale").withStyle(ChatFormatting.YELLOW)
-
-        val textWidth = fr.width(resizeText)
-        val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
-        val textY = 10f
-
-        context.pose().pushMatrix()
-        context.pose().scale(textScale, textScale)
-        context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), ColorUtils.WHITE, true)
-        context.pose().popMatrix()
-
-        val resetWidth = fr.width(resetText)
-        val resetX = (context.guiWidth() / 2f) - (resetWidth * textScale / 2f)
-        val resetY = textY + fr.lineHeight + 2f
-
-        context.pose().pushMatrix()
-        context.pose().scale(textScale, textScale)
-        context.drawString(fr, resetText, (resetX / textScale).toInt(), (resetY / textScale).toInt(), ColorUtils.WHITE, true)
-        context.pose().popMatrix()
-
         if (activePosition != null) {
             val x = ScaleUtils.mouseX + 12
             val y = ScaleUtils.mouseY - 12
 
-            val scaleStr = String.format("%.2f", activePosition.scale)
+            val scaleStr = String.format("%.2f\n\n", activePosition.scale)
 
-            val positionText = Component.literal("OVERLAY POSITION").withStyle(ChatFormatting.BLUE)
-                .append(Component.literal(" (top-left corner)").withStyle(ChatFormatting.DARK_GRAY))
-                .append("\n")
-                .append(Component.literal("X: ").withStyle(ChatFormatting.GRAY))
+            val positionText = Component.literal("Position Editor\n").withStyle(ChatFormatting.BLUE)
+                .append(Component.literal(" X: ").withStyle(ChatFormatting.GRAY))
                 .append(Component.literal("${activePosition.x}").withStyle(ChatFormatting.YELLOW))
                 .append(Component.literal("  Y: ").withStyle(ChatFormatting.GRAY))
-                .append(Component.literal("${activePosition.y}").withStyle(ChatFormatting.YELLOW)
+                .append(Component.literal("${activePosition.y}").withStyle(ChatFormatting.YELLOW))
                 .append(Component.literal("  Scale: ").withStyle(ChatFormatting.GRAY))
-                .append(Component.literal(scaleStr).withStyle(ChatFormatting.AQUA)))
+                .append(Component.literal(scaleStr).withStyle(ChatFormatting.AQUA))
+                .append(Component.literal("Use mouse wheel to resize the overlay\n").withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal("Use middle click to reset the scale\n").withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal("Right-click to open the config").withStyle(ChatFormatting.RED))
 
             drawTooltipsHelper(context, positionText, x, y)
         }
@@ -257,7 +235,7 @@ object RenderUtils {
 
     fun drawEditorHudTitle(context: GuiGraphics, pos: Position?) {
         val textScale = 0.75f
-        val resizeText = Component.literal("You can move the title position only vertically!").withStyle(ChatFormatting.GREEN)
+        val resizeText = Component.literal("").withStyle(ChatFormatting.GREEN)
 
         val textWidth = fr.width(resizeText)
         val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
@@ -272,17 +250,17 @@ object RenderUtils {
             val x = ScaleUtils.mouseX + 12
             val y = ScaleUtils.mouseY - 12
 
-            val positionText = Component.literal("TITLE POSITION").withStyle(ChatFormatting.BLUE)
-                .append("\n")
-                .append(Component.literal("Vertical Y: ").withStyle(ChatFormatting.GRAY))
-                .append(Component.literal("${pos.y}").withStyle(ChatFormatting.YELLOW))
+            val positionText = Component.literal("Position Editor\n").withStyle(ChatFormatting.BLUE)
+                .append(Component.literal(" Y: ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal("${pos.y}\n\n").withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal("You can only move the title vertically").withStyle(ChatFormatting.YELLOW))
 
             drawTooltipsHelper(context, positionText, x, y)
         }
     }
 
     private fun drawTooltipsHelper(context: GuiGraphics, positionText: Component, x: Int, y: Int) {
-        val textScale = 0.75f
+        val textScale = 0.85f
         val padding = 2
         val space = 2
 
