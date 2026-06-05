@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class ForagingStatsOverlay {
+public class ForagingStatsConfig {
 
     @Expose
     @ConfigOption(
@@ -25,6 +25,6 @@ public class ForagingStatsOverlay {
     public boolean showDetailedFortune = false;
 
     @Expose
-    @ConfigLink(owner = ForagingStatsOverlay.class, field = "foragingStatsOverlay")
+    @ConfigLink(owner = ForagingStatsConfig.class, field = "enableForagingStatsOverlay")
     public Position foragingStatsOverlayPosition = new Position(50, 200);
 }

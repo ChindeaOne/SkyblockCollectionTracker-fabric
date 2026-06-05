@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.notenoughupdates.moulconfig.annotations.*;
 
-public class MiningStatsOverlay {
+public class MiningStatsConfig {
 
     @Expose
     @ConfigOption(
@@ -30,6 +30,6 @@ public class MiningStatsOverlay {
     public boolean showDetailedFortune = false;
 
     @Expose
-    @ConfigLink(owner = MiningStatsOverlay.class, field = "miningStatsOverlay")
+    @ConfigLink(owner = MiningStatsConfig.class, field = "enableMiningStatsOverlay")
     public Position miningStatsOverlayPosition = new Position(50, 150);
 }

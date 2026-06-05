@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LeaderboardOverlay {
+public class LeaderboardConfig {
 
     @ConfigOption(
             name = "§eLeaderboard Overlay",

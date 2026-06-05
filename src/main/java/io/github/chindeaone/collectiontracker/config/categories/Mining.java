@@ -1,11 +1,11 @@
 package io.github.chindeaone.collectiontracker.config.categories;
 
 import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight;
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightConfig;
 import io.github.chindeaone.collectiontracker.config.categories.mining.*;
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.Commissions;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsConfig;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsConfig;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -15,17 +15,17 @@ public class Mining {
     @Expose
     @ConfigOption(name = "Coleweight", desc = "")
     @Accordion
-    public Coleweight coleweight = new Coleweight();
+    public ColeweightConfig coleweightConfig = new ColeweightConfig();
 
     @Expose
     @ConfigOption(name = "Commissions", desc = "")
     @Accordion
-    public Commissions commissions = new Commissions();
+    public CommissionsConfig commissionsConfig = new CommissionsConfig();
 
     @Expose
     @ConfigOption(name = "Mining Stats Overlay", desc = "")
     @Accordion
-    public MiningStatsOverlay miningStatsOverlay = new MiningStatsOverlay();
+    public MiningStatsConfig miningStatsConfig = new MiningStatsConfig();
 
     @Expose
     @ConfigOption(name = "HOTM perks", desc = "")
@@ -39,7 +39,7 @@ public class Mining {
     @Expose
     @ConfigOption(name = "Lantern Deployable", desc = "")
     @Accordion
-    public LanternDeployable lanternDeployable = new LanternDeployable();
+    public LanternDeployableConfig lanternDeployableConfig = new LanternDeployableConfig();
 
     @Expose
     @ConfigOption(name = "Temporary Buffs Tracker", desc = "")

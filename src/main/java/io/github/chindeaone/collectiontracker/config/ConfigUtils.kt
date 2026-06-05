@@ -5,21 +5,21 @@ import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Farming
 import io.github.chindeaone.collectiontracker.config.categories.Foraging
-import io.github.chindeaone.collectiontracker.config.categories.farmingweight.Farmingweight
+import io.github.chindeaone.collectiontracker.config.categories.farmingweight.FarmingweightConfig
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Misc
 import io.github.chindeaone.collectiontracker.config.categories.Tracking
-import io.github.chindeaone.collectiontracker.config.categories.coleweight.Coleweight
-import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightColor
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightConfig
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightColorConfig
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.HeatmapConfig
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.PrecisionMiningConfig
-import io.github.chindeaone.collectiontracker.config.categories.farmingweight.FarmingweightColor
+import io.github.chindeaone.collectiontracker.config.categories.farmingweight.FarmingweightColorConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployable
+import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployableConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MineshaftRoutes
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.PickaxeAbilityConfig
@@ -27,13 +27,13 @@ import io.github.chindeaone.collectiontracker.config.categories.mining.SkyMallCo
 import io.github.chindeaone.collectiontracker.config.categories.mining.TemporaryBuffsConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.DwarvenMetalsRoutes
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.PureOresRoutes
-import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay
-import io.github.chindeaone.collectiontracker.config.categories.overlay.Commissions
-import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsOverlay
-import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardOverlay
-import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsOverlay
-import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay
-import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay
+import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -44,21 +44,21 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config!!
 
 // Position Config Accessor
-val trackingPosition: Position get() = modConfig.trackingOverlay.collectionOverlay.overlayPosition
-val miningStatsPosition: Position get() = modConfig.mining.miningStatsOverlay.miningStatsOverlayPosition
-val foragingStatsPosition: Position get() = modConfig.foraging.foragingStatsOverlay.foragingStatsOverlayPosition
-val commissionsPosition: Position get() = modConfig.mining.commissions.commissionsOverlayPosition
-val skillPosition: Position get() = modConfig.trackingOverlay.skillOverlay.skillOverlayPosition
+val trackingPosition: Position get() = modConfig.trackingOverlay.collectionConfig.overlayPosition
+val miningStatsPosition: Position get() = modConfig.mining.miningStatsConfig.miningStatsOverlayPosition
+val foragingStatsPosition: Position get() = modConfig.foraging.foragingStatsConfig.foragingStatsOverlayPosition
+val commissionsPosition: Position get() = modConfig.mining.commissionsConfig.commissionsOverlayPosition
+val skillPosition: Position get() = modConfig.trackingOverlay.skillConfig.skillOverlayPosition
 val skyMallPosition: Position get() = modConfig.mining.hotmConfig.skyMallConfig.skyMallPosition
 val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryConfig.lotteryPosition
 val pickaxeAbilityPosition: Position get() = modConfig.mining.hotmConfig.pickaxeAbilityConfig.pickaxeAbilityPosition
 val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilityConfig.axeAbilityPosition
-val deployablePosition: Position get() = modConfig.mining.lanternDeployable.deployablePosition
+val deployablePosition: Position get() = modConfig.mining.lanternDeployableConfig.deployablePosition
 val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tempBuffPosition
 val titlePosition: Position get() = modConfig.misc.titlePosition
-val multiOverlayPosition: Position get() = modConfig.trackingOverlay.multiCollectionOverlay.multiOverlayPosition
-val coleweightTimerPosition: Position get() = modConfig.mining.coleweight.coleweightTimerPosition
-val coleweightTrackerPosition: Position get() = modConfig.mining.coleweight.coleweightTrackerPosition
+val multiOverlayPosition: Position get() = modConfig.trackingOverlay.multiCollectionConfig.multiOverlayPosition
+val coleweightTimerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTimerPosition
+val coleweightTrackerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTrackerPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -75,13 +75,13 @@ val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
 // Mining Config Accessors
 val miningConfig: Mining get() = modConfig.mining
 val miningRoutesConfig: MiningRoutesConfig get() = miningConfig.miningRoutesConfig
-val commissions: Commissions get() = miningConfig.commissions
-val keybindConfig: KeybindConfig get() = commissions.commissionsKeybinds
-val enableCommissionsTracking: Boolean get() = commissions.enableCommissionsTracking
+val commissionsConfig: CommissionsConfig get() = miningConfig.commissionsConfig
+val keybindConfig: KeybindConfig get() = commissionsConfig.keybindConfig
+val enableCommissionsTracking: Boolean get() = commissionsConfig.enableCommissionsTracking
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
-val lanternDeployable: LanternDeployable get() = miningConfig.lanternDeployable
+val lanternDeployableConfig: LanternDeployableConfig get() = miningConfig.lanternDeployableConfig
 val temporaryBuffsConfig: TemporaryBuffsConfig get() = miningConfig.temporaryBuffsConfig
 val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
@@ -112,11 +112,11 @@ val pristinePotatoTime: Long get() = temporaryBuffsConfig.pristinePotatoTime
 val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
 
 // Coleweight Config Accessors
-val coleweightConfig: Coleweight get() = miningConfig.coleweight
+val coleweightConfig: ColeweightConfig get() = miningConfig.coleweightConfig
 val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityFormat
-val coleweightColor: ColeweightColor get() = coleweightConfig.coleweightColor
-val enableCustomCWColor: Boolean get() = coleweightColor.enableCustomColor
-val customCWColor: ChromaColour get() = coleweightColor.customColor
+val coleweightColorConfig: ColeweightColorConfig get() = coleweightConfig.coleweightColorConfig
+val enableCustomCWColor: Boolean get() = coleweightColorConfig.enableCustomColor
+val customCWColor: ChromaColour get() = coleweightColorConfig.customColor
 val heatmapConfig: HeatmapConfig get() = coleweightConfig.heatmapConfig
 val enableHeatmap: Boolean get() = heatmapConfig.enableHeatmap
 val heatmapOpacity: Property<Float> get() = heatmapConfig.heatmapOpacity
@@ -125,22 +125,22 @@ val enablePrecisionMiningHighlight: Boolean get() = precisionMiningConfig.enable
 val drawLineToPrecisionMining: Boolean get() = precisionMiningConfig.drawLineToPrecisionMining
 
 // Overlays
-val miningStatsOverlay: MiningStatsOverlay get() = miningConfig.miningStatsOverlay
-val enableMiningStatsOverlay: Boolean get() = miningStatsOverlay.enableMiningStatsOverlay
-val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsOverlay.miningStatsOverlayInMiningIslandsOnly
+val miningStatsConfig: MiningStatsConfig get() = miningConfig.miningStatsConfig
+val enableMiningStatsConfig: Boolean get() = miningStatsConfig.enableMiningStatsOverlay
+val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsConfig.miningStatsOverlayInMiningIslandsOnly
 val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
 val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
-val showDetailedMiningFortune : Boolean get() = miningStatsOverlay.showDetailedFortune
+val showDetailedMiningFortune : Boolean get() = miningStatsConfig.showDetailedFortune
 val professionalMS: Property<Int> get() = hotmConfig.professionalMS
 val strongArmMS: Property<Int> get() = hotmConfig.strongArmMS
-val enableDeployable: Boolean get() = lanternDeployable.enableDeployable
-val showDeployableTitle: Boolean get() = lanternDeployable.showDeployableTitle
+val enableDeployable: Boolean get() = lanternDeployableConfig.enableDeployable
+val showDeployableTitle: Boolean get() = lanternDeployableConfig.showDeployableTitle
 
 // Foraging Config Accessors
 val foragingConfig: Foraging get() = modConfig.foraging
-val foragingOverlay: ForagingStatsOverlay get() = foragingConfig.foragingStatsOverlay
-val enableForagingStatsOverlay: Boolean get() = foragingOverlay.enableForagingStatsOverlay
-val showDetailedForagingFortune: Boolean get() = foragingOverlay.showDetailedFortune
+val foragingStatsConfig: ForagingStatsConfig get() = foragingConfig.foragingStatsConfig
+val enableForagingStatsOverlay: Boolean get() = foragingStatsConfig.enableForagingStatsOverlay
+val showDetailedForagingFortune: Boolean get() = foragingStatsConfig.showDetailedFortune
 val hotfConfig: HotfConfig get() = foragingConfig.hotfConfig
 val axeAbilityConfig: AxeAbilityConfig get() = hotfConfig.axeAbilityConfig
 val cotfLevel: Property<Int> get() = hotfConfig.cotfLevel
@@ -156,37 +156,37 @@ val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbility
 
 // Farming Config Accessors
 val farmingConfig: Farming get() = modConfig.farming
-val farmingweightConfig: Farmingweight get() = farmingConfig.farmingweight
+val farmingweightConfig: FarmingweightConfig get() = farmingConfig.farmingweightConfig
 val farmingweightRankingInChat: Boolean get() = farmingweightConfig.farmingweightRankingInChat
 val onlyOnFarmingIslands: Boolean get() = farmingweightConfig.onlyOnFarmingIslands
-val farmingweightColor: FarmingweightColor get() = farmingweightConfig.farmingweightColor
-val customFWColor: ChromaColour get() = farmingweightColor.customColor
-val enableCustomFWColor: Boolean get() = farmingweightColor.enableCustomColor
+val farmingweightColorConfig: FarmingweightColorConfig get() = farmingweightConfig.farmingweightColorConfig
+val customFWColor: ChromaColour get() = farmingweightColorConfig.customColor
+val enableCustomFWColor: Boolean get() = farmingweightColorConfig.enableCustomColor
 
 // Collection Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.trackingOverlay
-val collectionOverlay: CollectionOverlay get() = trackingConfig.collectionOverlay
-val statsText: List<CollectionOverlay.OverlayText> get() = collectionOverlay.statsText
-val extraStatsText: List<CollectionOverlay.OverlayExtraText> get() = collectionOverlay.extraStatsText
-val showExtraStats: Boolean get() = collectionOverlay.showExtraStats
+val collectionConfig: CollectionConfig get() = trackingConfig.collectionConfig
+val statsText: List<CollectionConfig.OverlayText> get() = collectionConfig.statsText
+val extraStatsText: List<CollectionConfig.OverlayExtraText> get() = collectionConfig.extraStatsText
+val showExtraStats: Boolean get() = collectionConfig.showExtraStats
 val explicitValues: Boolean get() = trackingConfig.explicitValues
-val leaderboardOverlay: LeaderboardOverlay get() = trackingConfig.leaderboardOverlay
+val leaderboardOverlay: LeaderboardConfig get() = trackingConfig.leaderboardConfig
 val collectionLeaderboard: Boolean get() = leaderboardOverlay.collectionLeaderboard
 val skillLeaderboard: Boolean get() = leaderboardOverlay.skillLeaderboard
 val customGoal: Boolean get() = leaderboardOverlay.customGoal
-val customGoalType: LeaderboardOverlay.CustomGoalType get() = leaderboardOverlay.customGoalType
-val customGoals: Map<String, LeaderboardOverlay.CustomGoalEntry> get() = leaderboardOverlay.customGoals
+val customGoalType: LeaderboardConfig.CustomGoalType get() = leaderboardOverlay.customGoalType
+val customGoals: Map<String, LeaderboardConfig.CustomGoalEntry> get() = leaderboardOverlay.customGoals
 
 // Multi Collection Tracking Config Accessors
-val multiCollectionOverlay: MultiCollectionOverlay get() = trackingConfig.multiCollectionOverlay
-val trackingOptions: MultiCollectionOverlay.TrackingOptions get() = multiCollectionOverlay.trackingOptions
+val multiCollectionOverlay: MultiCollectionConfig get() = trackingConfig.multiCollectionConfig
+val trackingOptions: MultiCollectionConfig.TrackingOptions get() = multiCollectionOverlay.trackingOptions
 val multiTrackingSummary: Boolean get() = multiCollectionOverlay.multiTrackingSummary
 val multiDetailedSummary: Boolean get() = multiCollectionOverlay.multiDetailedSummary
-val summaryStats: MultiCollectionOverlay.SummaryStats get() = multiCollectionOverlay.summaryStats
+val summaryStats: MultiCollectionConfig.SummaryStats get() = multiCollectionOverlay.summaryStats
 
 // Skills Tracking Config Accessors
-val skillOverlay: SkillOverlay get() = trackingConfig.skillOverlay
-val enableTamingTracking: Boolean get() = skillOverlay.enableTamingTracking
+val skillConfig: SkillConfig get() = trackingConfig.skillConfig
+val enableTamingTracking: Boolean get() = skillConfig.enableTamingTracking
 
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
@@ -264,13 +264,13 @@ object ConfigAccess {
     fun hasCheckedUpdate(): Boolean = hasCheckedUpdate
 
     @JvmStatic
-    fun isOverlayTextColorEnabled(): Boolean = collectionOverlay.overlayTextColor
+    fun isOverlayTextColorEnabled(): Boolean = collectionConfig.overlayTextColor
 
     @JvmStatic
-    fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionOverlay.showTrackingRatesAtEndOfSession
+    fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionConfig.showTrackingRatesAtEndOfSession
 
     @JvmStatic
-    fun isCommissionsEnabled(): Boolean = commissions.enableCommissionsOverlay
+    fun isCommissionsEnabled(): Boolean = commissionsConfig.enableCommissionsOverlay
 
     @JvmStatic
     fun isCommissionsTrackingEnabled(): Boolean = enableCommissionsTracking
@@ -279,19 +279,19 @@ object ConfigAccess {
     fun isCommissionsKeybindsEnabled(): Boolean = keybindConfig.enableCommissionsKeybinds
 
     @JvmStatic
-    fun isMiningStatsEnabled(): Boolean = enableMiningStatsOverlay
+    fun isMiningStatsEnabled(): Boolean = enableMiningStatsConfig
 
     @JvmStatic
     fun isMiningStatsOverlayInMiningIslandsOnly(): Boolean = miningStatsOverlayInMiningIslandsOnly
 
     @JvmStatic
-    fun getStatsText(): List<CollectionOverlay.OverlayText> = statsText
+    fun getStatsText(): List<CollectionConfig.OverlayText> = statsText
 
     @JvmStatic
     fun isShowExtraStats(): Boolean = showExtraStats
 
     @JvmStatic
-    fun getExtraStatsText(): List<CollectionOverlay.OverlayExtraText> = extraStatsText
+    fun getExtraStatsText(): List<CollectionConfig.OverlayExtraText> = extraStatsText
 
     @JvmStatic
     fun isExplicitValues(): Boolean = explicitValues
@@ -480,7 +480,7 @@ object ConfigAccess {
     fun isDrawLineToPrecisionMiningEnabled(): Boolean = drawLineToPrecisionMining
 
     @JvmStatic
-    fun getTrackingOptions(): MultiCollectionOverlay.TrackingOptions = trackingOptions
+    fun getTrackingOptions(): MultiCollectionConfig.TrackingOptions = trackingOptions
 
     @JvmStatic
     fun isMultiTrackingSummaryEnabled(): Boolean = multiTrackingSummary
@@ -489,7 +489,7 @@ object ConfigAccess {
     fun isMultiDetailedSummaryEnabled(): Boolean = multiDetailedSummary
 
     @JvmStatic
-    fun getSummaryStats(): MultiCollectionOverlay.SummaryStats = summaryStats
+    fun getSummaryStats(): MultiCollectionConfig.SummaryStats = summaryStats
 
     @JvmStatic
     fun isCollectionLeaderboardEnabled(): Boolean = collectionLeaderboard
@@ -502,13 +502,13 @@ object ConfigAccess {
     fun isCustomGoalEnabled(): Boolean = customGoal
 
     @JvmStatic
-    fun getCustomGoalType(): LeaderboardOverlay.CustomGoalType = customGoalType
+    fun getCustomGoalType(): LeaderboardConfig.CustomGoalType = customGoalType
 
     @JvmStatic
-    fun getCustomGoals(): Map<String, LeaderboardOverlay.CustomGoalEntry> = customGoals
+    fun getCustomGoals(): Map<String, LeaderboardConfig.CustomGoalEntry> = customGoals
 
     @JvmStatic
-    fun getCustomGoalEntry(name: String): LeaderboardOverlay.CustomGoalEntry? {
+    fun getCustomGoalEntry(name: String): LeaderboardConfig.CustomGoalEntry? {
         return customGoals[name.lowercase()]
     }
 
@@ -555,27 +555,27 @@ object ConfigHelper {
 
     @JvmStatic
     fun disableExtraStats() {
-        collectionOverlay.showExtraStats = false
+        collectionConfig.showExtraStats = false
     }
 
     @JvmStatic
     fun disableCommissions() {
-        commissions.enableCommissionsOverlay = false
+        commissionsConfig.enableCommissionsOverlay = false
     }
 
     @JvmStatic
     fun disableMiningStats() {
-        miningConfig.miningStatsOverlay.enableMiningStatsOverlay = false
+        miningConfig.miningStatsConfig.enableMiningStatsOverlay = false
     }
 
     @JvmStatic
     fun disableTamingTracking() {
-        skillOverlay.enableTamingTracking = false
+        skillConfig.enableTamingTracking = false
     }
 
     @JvmStatic
     fun disableForagingStats() {
-        foragingOverlay.enableForagingStatsOverlay = false
+        foragingStatsConfig.enableForagingStatsOverlay = false
     }
 
     @JvmStatic
@@ -589,7 +589,7 @@ object ConfigHelper {
     }
 
     @JvmStatic
-    fun setCustomGoalType(type: LeaderboardOverlay.CustomGoalType) {
+    fun setCustomGoalType(type: LeaderboardConfig.CustomGoalType) {
         leaderboardOverlay.customGoalType = type
     }
 
@@ -602,7 +602,7 @@ object ConfigHelper {
             val existingEntry = leaderboardOverlay.customGoals[lowercase]
             val finalPosition = position ?: existingEntry?.position
             val finalAmount = amount ?: existingEntry?.amount
-            leaderboardOverlay.customGoals[lowercase] = LeaderboardOverlay.CustomGoalEntry(finalPosition, finalAmount)
+            leaderboardOverlay.customGoals[lowercase] = LeaderboardConfig.CustomGoalEntry(finalPosition, finalAmount)
         }
     }
 
@@ -676,7 +676,7 @@ object ConfigHelper {
 
     @JvmStatic
     fun setShowExtraStats(show: Boolean) {
-        collectionOverlay.showExtraStats = show
+        collectionConfig.showExtraStats = show
     }
 
     @JvmStatic
@@ -686,31 +686,31 @@ object ConfigHelper {
 
     @JvmStatic
     fun setColeweightCustomColor(player: String, color: String) {
-        coleweightColor.customColors[player] = color
+        coleweightColorConfig.customColors[player] = color
     }
 
     @JvmStatic
     fun getColeweightColor(player: String): String? {
-        return coleweightColor.customColors[player]
+        return coleweightColorConfig.customColors[player]
     }
 
     @JvmStatic
     fun removeColeweightCustomColor(player: String) {
-        coleweightColor.customColors.remove(player)
+        coleweightColorConfig.customColors.remove(player)
     }
 
     @JvmStatic
     fun setFarmingweightCustomColor(player: String, color: String) {
-        farmingweightColor.customColors[player] = color
+        farmingweightColorConfig.customColors[player] = color
     }
 
     @JvmStatic
     fun getFarmingweightColor(player: String): String? {
-        return farmingweightColor.customColors[player]
+        return farmingweightColorConfig.customColors[player]
     }
 
     @JvmStatic
     fun removeFarmingweightColor(player: String) {
-        farmingweightColor.customColors.remove(player)
+        farmingweightColorConfig.customColors.remove(player)
     }
 }

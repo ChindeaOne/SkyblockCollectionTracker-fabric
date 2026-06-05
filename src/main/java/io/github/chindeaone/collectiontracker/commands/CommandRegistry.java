@@ -6,7 +6,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardOverlay;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardConfig;
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
@@ -535,7 +535,7 @@ public class CommandRegistry {
                                             String name = StringArgumentType.getString(context, "name").trim();
                                             int position = IntegerArgumentType.getInteger(context, "position");
                                             
-                                            ConfigHelper.setCustomGoalType(LeaderboardOverlay.CustomGoalType.POSITION);
+                                            ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.POSITION);
                                             ConfigHelper.setCustomGoal(name, position, null);
                                             ChatUtils.sendMessage("§aCustom goal set for " + name + " at position " + position, true);
                                             return 1;
@@ -562,7 +562,7 @@ public class CommandRegistry {
                                                 return 1;
                                             }
                                             
-                                            ConfigHelper.setCustomGoalType(LeaderboardOverlay.CustomGoalType.AMOUNT);
+                                            ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.AMOUNT);
                                             ConfigHelper.setCustomGoal(name, null, amount);
                                             ChatUtils.sendMessage("§aCustom goal set for " + name + " at amount " + amountStr, true);
                                             return 1;

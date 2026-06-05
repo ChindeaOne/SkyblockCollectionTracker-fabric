@@ -2,10 +2,7 @@ package io.github.chindeaone.collectiontracker.config.categories;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardOverlay;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillOverlay;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.*;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -14,27 +11,27 @@ public class Tracking {
 
     @Expose
     @ConfigOption(name = "Collection Overlay", desc = "")
-    @SerializedName("collection_overlay")
+    @SerializedName("collectionConfig")
     @Accordion
-    public CollectionOverlay collectionOverlay = new CollectionOverlay();
+    public CollectionConfig collectionConfig = new CollectionConfig();
 
     @Expose
     @ConfigOption(name = "Multi-Collection Overlay", desc = "")
-    @SerializedName("multi_collection_overlay")
+    @SerializedName("multiCollectionConfig")
     @Accordion
-    public MultiCollectionOverlay multiCollectionOverlay = new MultiCollectionOverlay();
+    public MultiCollectionConfig multiCollectionConfig = new MultiCollectionConfig();
 
     @Expose
     @ConfigOption(name = "Skill Overlay", desc = "")
-    @SerializedName("skillOverlay")
+    @SerializedName("skillConfig")
     @Accordion
-    public SkillOverlay skillOverlay = new SkillOverlay();
+    public SkillConfig skillConfig = new SkillConfig();
 
     @Expose
     @ConfigOption(name = "Leaderboard Overlay", desc = "")
-    @SerializedName("leaderboardOverlay")
+    @SerializedName("leaderboardConfig")
     @Accordion
-    public LeaderboardOverlay leaderboardOverlay = new LeaderboardOverlay();
+    public LeaderboardConfig leaderboardConfig = new LeaderboardConfig();
 
     @Expose
     @ConfigOption(

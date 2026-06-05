@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class MultiCollectionOverlay {
+public class MultiCollectionConfig {
 
     public enum TrackingOptions {
         COLLECTION("Collection"),
@@ -67,6 +67,6 @@ public class MultiCollectionOverlay {
     public SummaryStats summaryStats = SummaryStats.BOTH; // Default to showing both collection and money
 
     @Expose
-    @ConfigLink(owner = MultiCollectionOverlay.class, field = "multiCollectionOverlay")
+    @ConfigLink(owner = MultiCollectionConfig.class, field = "trackingOptions")
     public Position multiOverlayPosition = new Position(50,100);
 }

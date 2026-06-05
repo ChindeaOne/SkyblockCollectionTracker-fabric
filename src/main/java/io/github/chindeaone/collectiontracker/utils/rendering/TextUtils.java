@@ -12,7 +12,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionOverlay;
+import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig;
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
@@ -24,7 +24,7 @@ import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
-import static io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionOverlay.TrackingOptions.COLLECTION;
+import static io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig.TrackingOptions.COLLECTION;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatFloat;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
@@ -41,7 +41,7 @@ public class TextUtils {
         list.clear();
         if (ConfigAccess.getStatsText().isEmpty()) return;
 
-        for (CollectionOverlay.OverlayText id : ConfigAccess.getStatsText()) {
+        for (CollectionConfig.OverlayText id : ConfigAccess.getStatsText()) {
             switch (id) {
                 case COLLECTION -> addIfNotNull(list, handleCollection());
                 case COLLECTION_SESSION -> addIfNotNull(list, handleCollectionSession());
@@ -280,7 +280,7 @@ public class TextUtils {
         list.clear();
 
         list.add("§6§lExtra Stats:");
-        for (CollectionOverlay.OverlayExtraText id : ConfigAccess.getExtraStatsText()) {
+        for (CollectionConfig.OverlayExtraText id : ConfigAccess.getExtraStatsText()) {
             switch (id) {
                 case BAZAAR_PRICE_TYPE -> addIfNotNull(list, handleBazaarPriceType());
                 case BAZAAR_ITEM -> addIfNotNull(list, handleBazaarItem());

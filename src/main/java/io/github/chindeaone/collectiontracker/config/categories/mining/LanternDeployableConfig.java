@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class LanternDeployable {
+public class LanternDeployableConfig {
 
     @Expose
     @ConfigOption(
@@ -25,6 +25,6 @@ public class LanternDeployable {
     public boolean showDeployableTitle = false;
 
     @Expose
-    @ConfigLink(owner = LanternDeployable.class, field = "Lantern Deployable")
+    @ConfigLink(owner = LanternDeployableConfig.class, field = "enableDeployable")
     public Position deployablePosition = new Position(300, 100);
 }

@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ColeweightColor {
+public class ColeweightColorConfig {
 
     @Expose
     @ConfigOption(

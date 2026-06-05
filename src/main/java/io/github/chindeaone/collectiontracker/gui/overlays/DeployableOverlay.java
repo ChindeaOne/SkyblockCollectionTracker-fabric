@@ -20,7 +20,7 @@ public class DeployableOverlay extends AbstractOverlay {
 
     @Override
     public String overlayLabel() {
-        return "Mining Deployable";
+        return "Lantern Deployable";
     }
 
     @Override

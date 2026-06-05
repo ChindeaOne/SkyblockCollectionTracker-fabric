@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FarmingweightColor {
+public class FarmingweightColorConfig {
 
     @Expose
     @ConfigOption(

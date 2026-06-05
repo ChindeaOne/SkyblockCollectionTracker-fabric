@@ -5,7 +5,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class Farmingweight {
+public class FarmingweightConfig {
 
     @Expose
     @ConfigOption(
@@ -26,6 +26,6 @@ public class Farmingweight {
     @Expose
     @ConfigOption(name = "Custom Farming Weight Rank Color", desc = "")
     @Accordion
-    public FarmingweightColor farmingweightColor = new FarmingweightColor();
+    public FarmingweightColorConfig farmingweightColorConfig = new FarmingweightColorConfig();
 }
 
