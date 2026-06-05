@@ -44,6 +44,6 @@ public class AxeAbilityConfig {
     public String abilityNameAxe = "";
 
     @Expose
-    @ConfigLink(owner = AxeAbilityConfig.class, field = "Axe Ability")
+    @ConfigLink(owner = AxeAbilityConfig.class, field = "displayAxeAbility")
     public Position axeAbilityPosition = new Position(500, 200);
 }

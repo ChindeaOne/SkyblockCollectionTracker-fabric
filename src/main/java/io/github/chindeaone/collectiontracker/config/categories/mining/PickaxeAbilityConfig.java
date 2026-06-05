@@ -47,6 +47,6 @@ public class PickaxeAbilityConfig {
     public String lastPet = "";
 
     @Expose
-    @ConfigLink(owner = PickaxeAbilityConfig.class, field = "Pickaxe Ability")
+    @ConfigLink(owner = PickaxeAbilityConfig.class, field = "displayPickaxeAbility")
     public Position pickaxeAbilityPosition = new Position(500, 150);
 }

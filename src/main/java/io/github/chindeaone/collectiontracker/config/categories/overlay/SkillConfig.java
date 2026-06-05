@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 
-public class SkillOverlay {
+public class SkillConfig {
 
     @Expose
     @ConfigOption(
@@ -17,6 +17,6 @@ public class SkillOverlay {
     public boolean enableTamingTracking = false;
 
     @Expose
-    @ConfigLink(owner = SkillOverlay.class, field = "skillOverlay")
+    @ConfigLink(owner = SkillConfig.class, field = "enableTamingTracking")
     public Position skillOverlayPosition = new Position(50, 250);
 }

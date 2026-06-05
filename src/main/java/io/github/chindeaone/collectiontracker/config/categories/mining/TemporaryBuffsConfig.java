@@ -25,7 +25,7 @@ public class TemporaryBuffsConfig {
     public boolean showTempBuffExpiredTitle = false;
 
     @Expose
-    @ConfigLink(owner = TemporaryBuffsConfig.class, field = "tempBuffTracker")
+    @ConfigLink(owner = TemporaryBuffsConfig.class, field = "enableTempBuffTracker")
     public Position tempBuffPosition = new Position(400, 100);
 
     @Expose

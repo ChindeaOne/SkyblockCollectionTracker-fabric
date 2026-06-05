@@ -4,10 +4,9 @@ import com.google.gson.annotations.Expose;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class Coleweight {
+public class ColeweightConfig {
 
     @Expose
     @ConfigOption(
@@ -36,7 +35,7 @@ public class Coleweight {
     @Expose
     @ConfigOption(name = "Custom Coleweight Rank Color", desc = "")
     @Accordion
-    public ColeweightColor coleweightColor = new ColeweightColor();
+    public ColeweightColorConfig coleweightColorConfig = new ColeweightColorConfig();
 
     @Expose
     @ConfigOption(name = "Dwarven Heatmap", desc = "")
@@ -49,10 +48,8 @@ public class Coleweight {
     public PrecisionMiningConfig precisionMiningConfig = new PrecisionMiningConfig();
 
     @Expose
-    @ConfigLink(owner = Coleweight.class, field = "Coleweight Timer")
     public Position coleweightTimerPosition = new Position(300, 200);
 
     @Expose
-    @ConfigLink(owner = Coleweight.class, field = "Coleweight Tracker")
     public Position coleweightTrackerPosition = new Position(400, 200);
 }

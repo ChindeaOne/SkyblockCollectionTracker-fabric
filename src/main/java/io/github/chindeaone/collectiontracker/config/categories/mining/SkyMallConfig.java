@@ -36,6 +36,6 @@ public class SkyMallConfig {
     public boolean disableSkyMallChatMessages = false;
 
     @Expose
-    @ConfigLink(owner = SkyMallConfig.class, field = "SkyMall")
+    @ConfigLink(owner = SkyMallConfig.class, field = "enableSkyMall")
     public Position skyMallPosition = new Position(500, 50);
 }

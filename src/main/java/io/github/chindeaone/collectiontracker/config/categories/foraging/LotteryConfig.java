@@ -36,6 +36,6 @@ public class LotteryConfig {
     public boolean disableLotteryChatMessages = false;
 
     @Expose
-    @ConfigLink(owner = HotfConfig.class, field = "Lottery")
+    @ConfigLink(owner = LotteryConfig.class, field = "enableLottery")
     public Position lotteryPosition = new Position(500, 100);
 }

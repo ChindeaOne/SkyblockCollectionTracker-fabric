@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class Commissions {
+public class CommissionsConfig {
 
     @Expose
     @ConfigOption(
@@ -18,7 +18,7 @@ public class Commissions {
     public boolean enableCommissionsOverlay = false;
 
     @Expose
-    @ConfigLink(owner = Commissions.class, field = "commissionsOverlay")
+    @ConfigLink(owner = CommissionsConfig.class, field = "enableCommissionsOverlay")
     public Position commissionsOverlayPosition = new Position(50, 50);
 
     @Expose
@@ -32,5 +32,5 @@ public class Commissions {
     @Expose
     @ConfigOption(name = "Commissions Keybinds", desc = "")
     @Accordion
-    public KeybindConfig commissionsKeybinds = new KeybindConfig();
+    public KeybindConfig keybindConfig = new KeybindConfig();
 }

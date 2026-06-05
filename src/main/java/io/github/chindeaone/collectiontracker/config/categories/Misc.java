@@ -74,6 +74,6 @@ public class Misc {
     public boolean serverLagProtection = false;
 
     @Expose
-    @ConfigLink(owner = Misc.class, field = "Titles")
+    @ConfigLink(owner = Misc.class, field = "editTitlePosition")
     public Position titlePosition = new Position(0, 0);
 }

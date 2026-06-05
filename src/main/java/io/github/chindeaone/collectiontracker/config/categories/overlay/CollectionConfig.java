@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CollectionOverlay {
+public class CollectionConfig {
 
     public enum OverlayText {
         COLLECTION("§aGold collection§f: 200.000M"),
@@ -101,6 +101,6 @@ public class CollectionOverlay {
     public boolean showTrackingRatesAtEndOfSession = true;
 
     @Expose
-    @ConfigLink(owner = CollectionOverlay.class, field = "collectionOverlay")
+    @ConfigLink(owner = CollectionConfig.class, field = "statsText")
     public Position overlayPosition = new Position(50, 100);
 }
