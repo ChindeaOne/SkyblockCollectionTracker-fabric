@@ -1,89 +1,72 @@
-package io.github.chindeaone.collectiontracker.gui;
+package io.github.chindeaone.collectiontracker.gui
 
-import io.github.chindeaone.collectiontracker.gui.overlays.*;
+import io.github.chindeaone.collectiontracker.gui.overlays.*
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+object OverlayManager {
 
-public class OverlayManager {
+    private val overlays: MutableMap<String, AbstractOverlay> = linkedMapOf()
+    private var globalRenderingAllowed: Boolean = true
 
-    private static final Map<String, AbstractOverlay> overlays = new LinkedHashMap<>();
-    private static boolean globalRenderingAllowed = true;
+    private const val TRACKING_LABEL = "Collection Tracker"
+    private const val MULTI_LABEL = "Multi-Collection Tracker"
+    private const val SKILL_LABEL = "Skill Tracker"
+    private const val COLEWEIGHT_LABEL = "Coleweight Tracker"
 
-    public static void add(AbstractOverlay overlay) {
-        overlays.put(overlay.overlayLabel(), overlay);
+    fun add(overlay: AbstractOverlay) {
+        overlays[overlay.overlayLabel()] = overlay
     }
 
-    public static Collection<AbstractOverlay> all() {
-        return overlays.values();
+    @JvmStatic
+    fun all(): Collection<AbstractOverlay> = overlays.values
+
+    fun setGlobalRendering(allowed: Boolean) {
+        globalRenderingAllowed = allowed
+        overlays.values.forEach { it.isRenderingAllowed = allowed }
     }
 
-    public static void setGlobalRendering(boolean allowed) {
-        globalRenderingAllowed = allowed;
-        overlays.values().forEach(o -> o.setRenderingAllowed(allowed));
+    fun isInEditorMode(): Boolean = !globalRenderingAllowed
+
+    private fun setOverlayRendering(label: String, allowed: Boolean) {
+        overlays[label]?.isRenderingAllowed = allowed
     }
 
-    public static boolean isInEditorMode() {
-        return !globalRenderingAllowed;
+    @JvmStatic
+    fun setTrackingOverlayRendering(allowed: Boolean) = setOverlayRendering(TRACKING_LABEL, allowed)
+
+    fun setMultiTrackingOverlayRendering(allowed: Boolean) = setOverlayRendering(MULTI_LABEL, allowed)
+
+    @JvmStatic
+    fun setSkillOverlayRendering(allowed: Boolean) = setOverlayRendering(SKILL_LABEL, allowed)
+
+    fun setColeweightOverlayRendering(allowed: Boolean) = setOverlayRendering(COLEWEIGHT_LABEL, allowed)
+
+    fun overlayRegistration() {
+        listOf(
+                CollectionOverlay(),
+                MultiCollectionOverlay(),
+                MiningStatsOverlay(),
+                CommissionsOverlay(),
+                SkillOverlay(),
+                ForagingStatsOverlay(),
+                SkyMallOverlay(),
+                LotteryOverlay(),
+                PickaxeAbilityOverlay(),
+                AxeAbilityOverlay(),
+                DeployableOverlay(),
+                TemporaryBuffsOverlay(),
+                TitleOverlay(),
+                TimerOverlay(),
+                ColeweightOverlay()
+        ).forEach { add(it) }
     }
 
-    public static void setTrackingOverlayRendering(boolean allowed) {
-        AbstractOverlay overlay = overlays.get("Collection Tracker");
-        if (overlay != null) {
-            overlay.setRenderingAllowed(allowed);
-        }
+    @JvmStatic
+    fun isCollectionOverlay(overlay: AbstractOverlay): Boolean {
+        val label = overlay.overlayLabel()
+        return label == TRACKING_LABEL || label == MULTI_LABEL
     }
 
-    public static void setMultiTrackingOverlayRendering(boolean allowed) {
-        AbstractOverlay overlay = overlays.get("Multi-Collection Tracker");
-        if (overlay != null) {
-            overlay.setRenderingAllowed(allowed);
-        }
-    }
-
-    public static void setSkillOverlayRendering(boolean allowed) {
-        AbstractOverlay overlay = overlays.get("Skill Tracker");
-        if (overlay != null) {
-            overlay.setRenderingAllowed(allowed);
-        }
-    }
-
-    public static void setColeweightOverlayRendering(boolean allowed) {
-        AbstractOverlay overlay = overlays.get("Coleweight Tracker");
-        if (overlay != null) {
-            overlay.setRenderingAllowed(allowed);
-        }
-    }
-
-    public static void overlayRegistration() {
-        OverlayManager.add(new CollectionOverlay());
-        OverlayManager.add(new MultiCollectionOverlay());
-        OverlayManager.add(new MiningStatsOverlay());
-        OverlayManager.add(new CommissionsOverlay());
-        OverlayManager.add(new SkillOverlay());
-        OverlayManager.add(new ForagingStatsOverlay());
-        OverlayManager.add(new SkyMallOverlay());
-        OverlayManager.add(new LotteryOverlay());
-        OverlayManager.add(new PickaxeAbilityOverlay());
-        OverlayManager.add(new AxeAbilityOverlay());
-        OverlayManager.add(new DeployableOverlay());
-        OverlayManager.add(new TemporaryBuffsOverlay());
-        OverlayManager.add(new TitleOverlay());
-        OverlayManager.add(new TimerOverlay());
-        OverlayManager.add(new ColeweightOverlay());
-    }
-
-    public static boolean isCollectionOverlay(AbstractOverlay overlay) {
-        return overlay.overlayLabel().equals("Collection Tracker") || overlay.overlayLabel().equals("Multi-Collection Tracker");
-    }
-
-    public static TimerOverlay getTimerOverlay() {
-        for (AbstractOverlay overlay : overlays.values()) {
-            if (overlay instanceof TimerOverlay) {
-                return (TimerOverlay) overlay;
-            }
-        }
-        return null;
-    }
+    @JvmStatic
+    fun getTimerOverlay(): TimerOverlay? = overlays.values.filterIsInstance<TimerOverlay>().firstOrNull()
 }
+

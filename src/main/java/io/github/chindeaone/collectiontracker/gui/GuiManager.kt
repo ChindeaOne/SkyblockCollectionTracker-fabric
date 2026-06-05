@@ -21,6 +21,7 @@ object GuiManager {
 
     var editor: MoulConfigEditor<ModConfig>? = null
 
+    @JvmStatic
     fun getEditorInstance() = editor ?: MoulConfigEditor(configManager.processor).also { editor = it }
 
     fun openConfigGui(search: String? = null) {
@@ -32,6 +33,7 @@ object GuiManager {
         openEditor(editor)
     }
 
+    @JvmStatic
     fun openEditor(editor: MoulConfigEditor<*>) {
         screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
     }

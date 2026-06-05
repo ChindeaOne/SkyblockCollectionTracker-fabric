@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.core.Position;
+import io.github.chindeaone.collectiontracker.gui.GuiManager;
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -83,5 +85,18 @@ public abstract class AbstractOverlay {
         double y2 = y + (pos.getHeight() + yPadding) * s;
 
         return mouseX >= x && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
+    }
+
+    public void jumpToConfig() {
+        Position pos = this.position();
+
+        MoulConfigEditor<?> editor = GuiManager.getEditorInstance();
+        var option = editor.getOptionFromField(pos.link);
+        if (option == null) return;
+
+        System.out.println("Jumping to config for " + overlayLabel() + " at " + pos.link);
+        editor.search("");
+        if (!editor.goToOption(option)) return;
+        GuiManager.openEditor(editor);
     }
 }

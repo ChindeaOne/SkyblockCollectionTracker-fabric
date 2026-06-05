@@ -83,24 +83,30 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
         val mx = event.x.toInt()
         val my = event.y.toInt()
 
-        if (event.button() == 0) {
-            for (overlay in OverlayManager.all()) {
-                if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
+        for (overlay in OverlayManager.all()) {
+            when (event.button()) {
+                0 -> {
+                    if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
 
-                if (isMouseOver(mx, my, overlay.position())) {
-                    dragging = overlay
-                    dragOffsetX = mx - overlay.position().x
-                    dragOffsetY = my - overlay.position().y
+                    if (isMouseOver(mx, my, overlay.position())) {
+                        dragging = overlay
+                        dragOffsetX = mx - overlay.position().x
+                        dragOffsetY = my - overlay.position().y
+                        return true
+                    }
+                }
+                1 -> if (overlay.overlayLabel() != "Global Title" && isMouseOver(mx, my, overlay.position())) {
+                    OverlayManager.setGlobalRendering(true)
+                    overlay.jumpToConfig()
                     return true
                 }
-            }
-        } else if (event.button() == 2) {
-            for (overlay in OverlayManager.all()) {
-                if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
+                2 -> {
+                    if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
 
-                if (isMouseOver(mx, my, overlay.position())) {
-                    overlay.position().setScaling(1.0f)
-                    return true
+                    if (isMouseOver(mx, my, overlay.position())) {
+                        overlay.position().setScaling(1.0f)
+                        return true
+                    }
                 }
             }
         }
@@ -132,4 +138,3 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
         return v.coerceIn(0.1f, 10.0f)
     }
 }
-

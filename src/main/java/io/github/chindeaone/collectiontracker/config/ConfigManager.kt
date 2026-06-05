@@ -18,10 +18,13 @@ import java.util.*
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import com.google.gson.Gson
+import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import java.nio.file.AtomicMoveNotSupportedException
+import kotlin.jvm.java
 
 class ConfigManager {
 
@@ -74,6 +77,40 @@ class ConfigManager {
         val driver = ConfigProcessorDriver(processor)
         driver.warnForPrivateFields = false
         driver.processConfig(config)
+        findPositionLinks(config, Collections.newSetFromMap(IdentityHashMap()))
+    }
+
+    private fun findPositionLinks(obj: Any?, visited: MutableSet<Any>) {
+        if (obj == null) return
+        val cls = obj.javaClass
+        if (!cls.name.startsWith("io.github.chindeaone.collectiontracker")) return
+        if (!visited.add(obj)) return
+
+        var currClass: Class<*>? = cls
+        while (currClass != null && currClass.name.startsWith("io.github.chindeaone.collectiontracker")) {
+            for (field in currClass.declaredFields) {
+                if (field.isSynthetic) continue
+                try {
+                    field.isAccessible = true
+                    val type = field.type
+
+                    if (Position::class.java.isAssignableFrom(type)) {
+                        val position = field.get(obj) as? Position ?: continue
+                        val configLink = field.getAnnotation(ConfigLink::class.java)
+                        if (configLink != null) {
+                            position.setLink(configLink)
+                        }
+                    } else {
+                        if (type.isPrimitive || type.isEnum || type.name.startsWith("java.") || type.name.startsWith("com.google.gson.")) continue
+                        val value = field.get(obj) ?: continue
+                        findPositionLinks(value, visited)
+                    }
+                } catch (e: Exception) {
+                    logger.error("[SCT] Failed to link field '${field.name}'", e)
+                }
+            }
+            currClass = currClass.superclass
+        }
     }
 
     private fun tryReadConfig() {

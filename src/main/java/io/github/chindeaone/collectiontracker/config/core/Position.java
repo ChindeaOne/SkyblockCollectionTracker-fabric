@@ -1,7 +1,10 @@
 package io.github.chindeaone.collectiontracker.config.core;
 
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils;
+
+import java.lang.reflect.Field;
 
 public class Position {
 
@@ -15,6 +18,16 @@ public class Position {
     private int width = 100;
     @Expose
     private int height = 20;
+
+    public transient Field link;
+
+    public void setLink(ConfigLink configLink) {
+        try {
+            this.link = configLink.owner().getDeclaredField(configLink.field());
+        } catch (NoSuchFieldException e) {
+            System.err.println("Failed to set ConfigLink for " + configLink.field() + " in " + configLink.owner());
+        }
+    }
 
     public Position(int x, int y) {
         this.X = x;
