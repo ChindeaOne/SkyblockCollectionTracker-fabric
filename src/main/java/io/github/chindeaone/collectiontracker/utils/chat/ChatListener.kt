@@ -77,6 +77,7 @@ object ChatListener {
         abilitySwapListener(cleanText)
         consumableListener(cleanText)
         treeResetListener(cleanText)
+        sacksListener(message, actionBar = false)
     }
 
     private fun profileIdListener(cleanText: String) {
