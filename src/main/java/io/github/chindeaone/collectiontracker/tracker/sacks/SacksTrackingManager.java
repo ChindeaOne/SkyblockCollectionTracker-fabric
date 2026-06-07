@@ -165,7 +165,10 @@ public class SacksTrackingManager {
                 case "nether wart" -> "mutant nether wart";
                 case "melon slice" -> "enchanted melon";
                 case "raw porkchop" -> "enchanted cooked porkchop";
+                case "lily pad" -> "condensed lily pad";
                 case "raw cod" -> "enchanted cooked cod";
+                case "magmafish" -> "silver magmafish";
+                case "lotus" -> "silver lotus";
                 default -> "";
             };
         } else {
@@ -183,11 +186,13 @@ public class SacksTrackingManager {
                 case "ink sac" -> "enchanted ink sac";
                 case "raw cod" -> "enchanted raw cod";
                 case "tropical fish" -> "enchanted tropical fish";
+                case "magmafish" -> "gold magmafish";
+                case "lotus" -> "gold lotus";
                 default -> "";
             };
         }
     }
 
-    private static final List<String> enchantedSpecialItemNames = Arrays.asList("cocoa beans", "nether wart", "melon slice", "raw rabbit", "raw mutton", "raw porkchop", "end stone", "nether quartz", "slimeball", "lily pad", "ink sac", "raw cod", "tropical fish");
-    private static final List<String> superEnchantedSpecialItemNames = Arrays.asList("red mushroom", "brown mushroom", "nether wart", "melon slice", "raw porkchop", "raw cod");
+    private static final List<String> enchantedSpecialItemNames = Arrays.asList("cocoa beans", "nether wart", "melon slice", "raw rabbit", "raw mutton", "raw porkchop", "end stone", "nether quartz", "slimeball", "lily pad", "ink sac", "raw cod", "tropical fish", "magmafish", "lotus");
+    private static final List<String> superEnchantedSpecialItemNames = Arrays.asList("red mushroom", "brown mushroom", "nether wart", "melon slice", "raw porkchop", "raw cod", "lily pad", "magmafish", "lotus");
 }
