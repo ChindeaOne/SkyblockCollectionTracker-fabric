@@ -16,52 +16,66 @@ public class CommandHelper {
     private record CommandPage(String category, String color, List<CommandEntry> entries) {}
 
     private static final List<CommandPage> PAGES = List.of(
-            new CommandPage("General Use", "§e", List.of(
+            new CommandPage("General", "§e", List.of(
                     new CommandEntry("/sct", "§eOpens the GUI."),
-                    new CommandEntry("/sct edit", "§eOpens the position editor."),
-                    new CommandEntry("/sct edit title", "§eOpens the title position editor."),
                     new CommandEntry("/sct commands", "§eShows this message."),
                     new CommandEntry("/sct commands <page>", "§eJumps to a specific commands page."),
-                    new CommandEntry("/sct commissions reset", "§eResets the commissions tracker."),
-                    new CommandEntry("/sct changelog", "§eShows all recent changes to the mod."),
-                    new CommandEntry("/sct setCustomGoalPosition <name> <position>", "§eSets a custom leaderboard position goal for a collection or skill."),
-                    new CommandEntry("/sct setCustomGoalAmount <name> <amount>", "§eSets a custom amount goal (e.g. 10m, 1b) for a collection or skill.")
+                    new CommandEntry("/sct changelog", "§eShows all recent changes to the mod.")
             )),
+
+            new CommandPage("Editing", "§d", List.of(
+                    new CommandEntry("/sct edit", "§eOpens the position editor."),
+                    new CommandEntry("/sct edit title", "§eOpens the title position editor.")
+            )),
+
             new CommandPage("Collection Tracking", "§3", List.of(
                     new CommandEntry("/sct collections", "§eShows all available collections (page 1)."),
                     new CommandEntry("/sct collections <page | category>", "§eJumps to a specific collections page or category."),
                     new CommandEntry("/sct track <collection 1> <collection 2> ...", "§eTracks one or more collections at once."),
-                    new CommandEntry("/sct stop", "§eStops collection tracking."),
                     new CommandEntry("/sct pause", "§ePauses collection tracking."),
                     new CommandEntry("/sct resume", "§eResumes collection tracking."),
-                    new CommandEntry("/sct restart", "§eRestarts collection tracking.")
+                    new CommandEntry("/sct restart", "§eRestarts collection tracking."),
+                    new CommandEntry("/sct stop", "§eStops collection tracking.")
             )),
+
             new CommandPage("Skill Tracking", "§6", List.of(
                     new CommandEntry("/sct skill track <skill>", "§eTracks your skill progress."),
-                    new CommandEntry("/sct skill stop", "§eStops skill tracking."),
                     new CommandEntry("/sct skill pause", "§ePauses skill tracking."),
                     new CommandEntry("/sct skill resume", "§eResumes skill tracking."),
-                    new CommandEntry("/sct skill restart", "§eRestarts skill tracking.")
+                    new CommandEntry("/sct skill restart", "§eRestarts skill tracking."),
+                    new CommandEntry("/sct skill stop", "§eStops skill tracking.")
             )),
+
+            new CommandPage("Miscellaneous", "§9", List.of(
+                    new CommandEntry("/sct setCustomGoalPosition <name> <position>", "§eSets a custom leaderboard position goal for a collection or skill."),
+                    new CommandEntry("/sct setCustomGoalAmount <name> <amount>", "§eSets a custom amount goal (e.g. 10m, 1b) for a collection or skill."),
+                    new CommandEntry("/sct commissions reset", "§eResets the commissions tracker.")
+            )),
+
             new CommandPage("Coleweight", "§b", List.of(
                     new CommandEntry("/sct cw", "§eShows your Coleweight."),
                     new CommandEntry("/sct cw find [player]", "§eShows a player's Coleweight."),
                     new CommandEntry("/sct cw detailed [player]", "§eShows detailed Coleweight information."),
                     new CommandEntry("/sct cw lb <length>", "§eShows the Coleweight leaderboard."),
-                    new CommandEntry("/sct cw color set <player name> <hex color>", "§eSets a custom Coleweight rank color for a player (client side only)."),
-                    new CommandEntry("/sct cw color remove <player name>", "§eRemoves a player's custom Coleweight rank color (client side only)."),
-                    new CommandEntry("/sct cw color set global <hex color>", "§eSets your own global Coleweight rank color (available only for the top 10 players in Coleweight)."),
+
                     new CommandEntry("/sct cw track", "§eStarts Coleweight tracking."),
-                    new CommandEntry("/sct cw stop", "§eStops Coleweight tracking."),
                     new CommandEntry("/sct cw pause", "§ePauses Coleweight tracking."),
                     new CommandEntry("/sct cw resume", "§eResumes Coleweight tracking."),
                     new CommandEntry("/sct cw restart", "§eRestarts Coleweight tracking."),
-                    new CommandEntry("/sct timer <set | pause | resume | stop>", "§eManages the timer.")
+                    new CommandEntry("/sct cw stop", "§eStops Coleweight tracking."),
+
+                    new CommandEntry("/sct cw color set <player name> <hex color>", "§eSets a custom Coleweight rank color for a player (client side only)."),
+                    new CommandEntry("/sct cw color remove <player name>", "§eRemoves a player's custom Coleweight rank color (client side only)."),
+                    new CommandEntry("/sct cw color set global <hex color>", "§eSets your own global Coleweight rank color (available only for the top 10 players in Coleweight)."),
+
+                    new CommandEntry("/sct timer <set | pause | resume | stop>", "§eManages the general timer.")
             )),
+
             new CommandPage("Farming Weight", "§a", List.of(
                     new CommandEntry("/sct fw", "§eShows your Farming Weight."),
                     new CommandEntry("/sct fw find [player]", "§eShows a player's Farming Weight."),
                     new CommandEntry("/sct fw lb <length>", "§eShows the Farming Weight leaderboard."),
+
                     new CommandEntry("/sct fw color set <player name> <hex color>", "§eSets a custom Farming Weight rank color for a player (client side only)."),
                     new CommandEntry("/sct fw color remove <player name>", "§eRemoves a player's custom Farming Weight rank color (client side only)."),
                     new CommandEntry("/sct fw color set global <hex color>", "§eSets your own global Farming Weight rank color (available only for the top 10 players in Farming Weight).")
