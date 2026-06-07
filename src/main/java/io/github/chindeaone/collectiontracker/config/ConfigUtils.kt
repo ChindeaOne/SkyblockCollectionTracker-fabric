@@ -44,11 +44,11 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config!!
 
 // Position Config Accessor
-val trackingPosition: Position get() = modConfig.trackingOverlay.collectionConfig.overlayPosition
+val trackingPosition: Position get() = modConfig.tracking.collectionConfig.overlayPosition
 val miningStatsPosition: Position get() = modConfig.mining.miningStatsConfig.miningStatsOverlayPosition
 val foragingStatsPosition: Position get() = modConfig.foraging.foragingStatsConfig.foragingStatsOverlayPosition
 val commissionsPosition: Position get() = modConfig.mining.commissionsConfig.commissionsOverlayPosition
-val skillPosition: Position get() = modConfig.trackingOverlay.skillConfig.skillOverlayPosition
+val skillPosition: Position get() = modConfig.tracking.skillConfig.skillOverlayPosition
 val skyMallPosition: Position get() = modConfig.mining.hotmConfig.skyMallConfig.skyMallPosition
 val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryConfig.lotteryPosition
 val pickaxeAbilityPosition: Position get() = modConfig.mining.hotmConfig.pickaxeAbilityConfig.pickaxeAbilityPosition
@@ -56,7 +56,7 @@ val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilit
 val deployablePosition: Position get() = modConfig.mining.lanternDeployableConfig.deployablePosition
 val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tempBuffPosition
 val titlePosition: Position get() = modConfig.misc.titlePosition
-val multiOverlayPosition: Position get() = modConfig.trackingOverlay.multiCollectionConfig.multiOverlayPosition
+val multiOverlayPosition: Position get() = modConfig.tracking.multiCollectionConfig.multiOverlayPosition
 val coleweightTimerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTimerPosition
 val coleweightTrackerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTrackerPosition
 
@@ -164,7 +164,7 @@ val customFWColor: ChromaColour get() = farmingweightColorConfig.customColor
 val enableCustomFWColor: Boolean get() = farmingweightColorConfig.enableCustomColor
 
 // Collection Tracking Config Accessors
-val trackingConfig: Tracking get() = modConfig.trackingOverlay
+val trackingConfig: Tracking get() = modConfig.tracking
 val collectionConfig: CollectionConfig get() = trackingConfig.collectionConfig
 val statsText: List<CollectionConfig.OverlayText> get() = collectionConfig.statsText
 val extraStatsText: List<CollectionConfig.OverlayExtraText> get() = collectionConfig.extraStatsText

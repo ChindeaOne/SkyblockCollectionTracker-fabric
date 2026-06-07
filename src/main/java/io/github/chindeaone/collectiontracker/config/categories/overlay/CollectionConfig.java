@@ -98,7 +98,7 @@ public class CollectionConfig {
     )
     @SerializedName("showTrackingRatesAtEndOfSession")
     @ConfigEditorBoolean
-    public boolean showTrackingRatesAtEndOfSession = true;
+    public boolean showTrackingRatesAtEndOfSession = false;
 
     @Expose
     @ConfigLink(owner = CollectionConfig.class, field = "statsText")
