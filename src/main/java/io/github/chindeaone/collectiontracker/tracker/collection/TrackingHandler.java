@@ -10,7 +10,6 @@ import io.github.chindeaone.collectiontracker.gui.OverlayManager;
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.Hypixel;
-import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
 import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.LogManager;
@@ -43,7 +42,7 @@ public class TrackingHandler {
     private static long firstRestartTime;
 
     public static void startTracking() {
-        logger.info("[SCT]: Tracking started for player: {}", PlayerData.INSTANCE.getPlayerName());
+        logger.info("[SCT]: Tracking started for collection: {}", collection);
 
         OverlayManager.setTrackingOverlayRendering(true);
         DataFetcher.fetchData(true);

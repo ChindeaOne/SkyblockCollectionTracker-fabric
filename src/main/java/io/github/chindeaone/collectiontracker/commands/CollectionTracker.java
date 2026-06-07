@@ -69,6 +69,12 @@ public class CollectionTracker {
                     return;
                 } else {
                     ChatUtils.sendMessage("§aTracking " + collection + " collection.", true);
+                    if (collection.equals("timite") || collection.equals("youngite") || collection.equals("obsolite")) {
+                        ChatUtils.sendMessage(
+                                " §8Note: Tracking " + collection + " only tracks that item. " +
+                                        "For the full Timite collection use `/sct track youngite, timite, obsolite`, or track the variant(s) you mine.", false
+                        );
+                    }
                 }
 
                 // Fetch bazaar data and leaderboard data asynchronously
