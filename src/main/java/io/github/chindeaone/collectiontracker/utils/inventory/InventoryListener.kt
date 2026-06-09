@@ -32,12 +32,17 @@ object InventoryListener {
         val isTracking = TrackingHandler.isTracking
         val isMultiTracking = MultiTrackingHandler.isMultiTracking
 
+        val isTrackingPaused = TrackingHandler.isPaused
+        val isMultiTrackingPaused = MultiTrackingHandler.isMultiPaused
+
         if (!isTracking && !isMultiTracking) {
             lastInventoryState.clear()
             slotMatchHits.clear()
             slotSkipMap.clear()
             return
         }
+
+        if (isTracking && isTrackingPaused || isMultiTracking && isMultiTrackingPaused) return
 
         tickCount++
         if (tickCount % 4 != 0) return

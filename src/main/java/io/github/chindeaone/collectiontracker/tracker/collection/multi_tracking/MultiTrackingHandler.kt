@@ -207,6 +207,46 @@ object MultiTrackingHandler  {
         logger.info("[SCT]: Resuming multi-tracking.")
     }
 
+    fun resumeMultiRiftTracking() {
+        if (!isMultiTracking) {
+            logger.warn("[SCT]: Attempted to resume Rift multi tracking, but no tracking is active.")
+            return
+        }
+
+        if (!CollectionsManager.hasAnyRiftCollection()) {
+            logger.warn("[SCT]: Attempted to resume Rift multi tracking, but none of the tracked collections are Rift collections.")
+            return
+        }
+
+        if (!isMultiPaused) return
+
+        multiStartTime = System.currentTimeMillis()
+        isMultiPaused = false
+
+        sendMessage("§7Resuming multi tracking after rejoining The Rift.", true)
+        logger.info("[SCT]: Resuming multi tracking after rejoining The Rift.")
+    }
+
+    fun pauseMultiRiftTracking() {
+        if (!isMultiTracking) {
+            logger.warn("[SCT]: Attempted to pause Rift multi tracking, but no tracking is active.")
+            return
+        }
+
+        if (!CollectionsManager.hasAnyRiftCollection()) {
+            logger.warn("[SCT]: Attempted to pause Rift multi tracking, but none of the tracked collections are Rift collections.")
+            return
+        }
+
+        if (isMultiPaused) return
+
+        multiLastTime += (System.currentTimeMillis() - multiStartTime) / 1000
+        isMultiPaused = true
+
+        sendMessage("§7Pausing multi tracking before leaving The Rift.", true)
+        logger.info("[SCT]: Pausing multi tracking before leaving The Rift.")
+    }
+
     fun getMultiUptimeInSeconds(): Long {
         if (multiStartTime == 0L) {
             return 0
@@ -260,11 +300,17 @@ object MultiTrackingHandler  {
         if (!ConfigAccess.isMultiTrackingSummaryEnabled()) return
 
         val lines = mutableListOf<Component>()
+
         val useBazaar = ConfigAccess.isUsingBazaar()
+        val allRiftCollections = CollectionsManager.hasAllRiftCollections()
+        val useMotes = !useBazaar && allRiftCollections
+
         val variant = ConfigAccess.getGemstoneVariant().toString()
         val suffix = if (ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
         val bazaarSuffix = if (useBazaar) if (suffix.contains("BUY")) "Instant Buy" else "Instant Sell" else ""
         val bazaarType = if (ConfigAccess.getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) "Enchanted version" else "Super Enchanted version"
+
+        val pricingLabel = if (useBazaar) bazaarSuffix else if (useMotes) "NPC / Motes" else "NPC"
 
         var totalMoneyMade = 0L
         var totalMoneyRate = 0L
@@ -281,8 +327,9 @@ object MultiTrackingHandler  {
 
             val collName = formatCollectionName(coll)
             val formattedName = ColorUtils.collToColor(collName)
-            var currentMoney: Long
-            var currentRate: Long
+
+            val currentMoney: Long
+            val currentRate: Long
 
             if (!useBazaar) {
                 currentMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(coll, 0L)
@@ -294,6 +341,7 @@ object MultiTrackingHandler  {
                     "enchanted" -> "${coll}_${bazaarType}$suffix"
                     else -> ""
                 }
+
                 currentMoney = MultiTrackingRates.moneyMadeBazaar.getOrDefault(key, 0L)
                 currentRate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault(key, 0L)
             }
@@ -301,27 +349,53 @@ object MultiTrackingHandler  {
             totalMoneyMade += currentMoney
             totalMoneyRate += currentRate
 
+            val collectionMade = MultiTrackingRates.collectionMade[coll] ?: 0L
+            val collectionRate = MultiTrackingRates.collectionPerHour[coll] ?: 0L
+
             val line = Component.literal("   ").append(formattedName).append("§r: ")
 
             when (ConfigAccess.getSummaryStats().name) {
-                "COLLECTION" -> line.append("§f${formatNumber(MultiTrackingRates.collectionMade[coll] ?: 0L)} §7(${formatNumber(MultiTrackingRates.collectionPerHour[coll] ?: 0L)}/h)")
-                "MONEY" -> line.append("§a$${formatNumber(currentMoney)} §7($${formatNumber(currentRate)}/h)")
-                "BOTH" -> line.append("§f${formatNumber(MultiTrackingRates.collectionMade[coll] ?: 0L)} §7(${formatNumber(MultiTrackingRates.collectionPerHour[coll] ?: 0L)}/h)   §a$${formatNumber(currentMoney)} §7($${formatNumber(currentRate)}/h)")
+                "COLLECTION" -> {
+                    line.append("§f${formatNumber(collectionMade)} §7(${formatNumber(collectionRate)}/h)")
+                }
+
+                "MONEY" -> {
+                    if (useMotes) {
+                        line.append("§d${formatNumber(currentMoney)} Motes §7(${formatNumber(currentRate)} Motes/h)")
+                    } else {
+                        line.append("§a$${formatNumber(currentMoney)} §7($${formatNumber(currentRate)}/h)")
+                    }
+                }
+
+                "BOTH" -> {
+                    line.append("§f${formatNumber(collectionMade)} §7(${formatNumber(collectionRate)}/h)   ")
+
+                    if (useMotes) {
+                        line.append("§d${formatNumber(currentMoney)} Motes §7(${formatNumber(currentRate)} Motes/h)")
+                    } else {
+                        line.append("§a$${formatNumber(currentMoney)} §7($${formatNumber(currentRate)}/h)")
+                    }
+                }
+
                 else -> continue
             }
+
             collectionLines.add(line)
         }
 
-        // gemstones
+        // Gemstones
         val gemstoneLines = mutableListOf<Component>()
+
         if (trackedCollections.contains("gemstone")) {
             for (gemstone in MultiTrackingRates.seenGemstones) {
                 val name = formatCollectionName(gemstone)
                 val formattedName = ColorUtils.collToColor(name)
-                var gemMoney: Long
-                var gemRate: Long
+
+                val gemMoney: Long
+                val gemRate: Long
 
                 val keyPrefix = (gemstone + "_" + variant).uppercase()
+
                 if (!useBazaar) {
                     gemMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(keyPrefix, 0L)
                     gemRate = MultiTrackingRates.moneyPerHourNPC.getOrDefault(keyPrefix, 0L)
@@ -334,21 +408,28 @@ object MultiTrackingHandler  {
                 totalGemstoneMoneyMade += gemMoney
                 totalGemstoneMoneyRate += gemRate
 
+                val amount = MultiTrackingRates.collectionMade[gemstone] ?: 0L
+                val rate = MultiTrackingRates.collectionPerHour[gemstone] ?: 0L
+
                 val line = Component.literal("    - ").append(formattedName).append(": ")
 
                 when (ConfigAccess.getSummaryStats().name) {
                     "COLLECTION" -> {
-                        val amount = MultiTrackingRates.collectionMade[gemstone] ?: 0L
-                        val rate = MultiTrackingRates.collectionPerHour[gemstone] ?: 0L
                         line.append("§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)")
                     }
-                    "MONEY" -> line.append("§a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
+
+                    "MONEY" -> {
+                        line.append("§a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
+                    }
+
                     "BOTH" -> {
-                        val amount = MultiTrackingRates.collectionMade[gemstone] ?: 0L
-                        val rate = MultiTrackingRates.collectionPerHour[gemstone] ?: 0L
-                        line.append("§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)   §a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
+                        line.append(
+                            "§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)   " +
+                                    "§a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)"
+                        )
                     }
                 }
+
                 gemstoneLines.add(line)
             }
 
@@ -358,45 +439,59 @@ object MultiTrackingHandler  {
 
         if (ConfigAccess.getSummaryStats().name == "MONEY" || ConfigAccess.getSummaryStats().name == "BOTH") {
             if (totalMoneyMade > 0) {
-                lines.add(
-                    Component.literal("   §eTotal Profit: §f$${formatNumber(totalMoneyMade)}   §eRate: §f$${formatNumber(totalMoneyRate)}/h   §ePricing:§f" + if (useBazaar) " $bazaarSuffix" else " NPC")
-                )
+                val totalLine = Component.literal("   ")
+
+                if (useMotes) {
+                    totalLine.append(
+                        "§eTotal Motes: §f${formatNumber(totalMoneyMade)}   " +
+                                "§eRate: §f${formatNumber(totalMoneyRate)} Motes/h   " +
+                                "§ePricing: §f$pricingLabel"
+                    )
+                } else {
+                    totalLine.append(
+                        "§eTotal Profit: §f$${formatNumber(totalMoneyMade)}   " +
+                                "§eRate: §f$${formatNumber(totalMoneyRate)}/h   " +
+                                "§ePricing: §f$pricingLabel"
+                    )
+                }
+
+                lines.add(totalLine)
                 lines.add(Component.empty())
             }
         }
+
         lines.addAll(collectionLines)
 
         if (trackedCollections.contains("gemstone")) {
             val summaryLine = Component.literal("   §dGemstones (${variant.lowercase()}): ")
+
             when (ConfigAccess.getSummaryStats().name) {
                 "COLLECTION" -> {
                     val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
                     val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
+
                     summaryLine.append("§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)")
                 }
 
-                "MONEY" -> summaryLine.append(
-                    "§a$${formatNumber(totalGemstoneMoneyMade)} §7($${
-                        formatNumber(
-                            totalGemstoneMoneyRate
-                        )
-                    }/h)"
-                )
+                "MONEY" -> {
+                    summaryLine.append(
+                        "§a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)"
+                    )
+                }
 
                 "BOTH" -> {
                     val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
                     val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
+
                     summaryLine.append(
-                        "§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)   §a$${
-                            formatNumber(
-                                totalGemstoneMoneyMade
-                            )
-                        } §7($${formatNumber(totalGemstoneMoneyRate)}/h)"
+                        "§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)   " +
+                                "§a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)"
                     )
                 }
             }
 
             lines.add(summaryLine)
+
             if (ConfigAccess.isMultiDetailedSummaryEnabled()) {
                 lines.addAll(gemstoneLines)
             }
@@ -406,5 +501,4 @@ object MultiTrackingHandler  {
         lines.add(Component.literal("   §7Elapsed time: §f${getMultiUptimeInWords()}"))
 
         ChatUtils.sendSummary("§e§lMulti-Tracking Summary", lines)
-    }
-}
+    }}

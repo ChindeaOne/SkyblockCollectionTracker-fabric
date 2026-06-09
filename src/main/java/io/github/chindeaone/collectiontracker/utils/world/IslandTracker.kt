@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.tab.TabWidget
 
 object IslandTracker {
@@ -17,6 +19,9 @@ object IslandTracker {
     var isInGalatea: Boolean = false
         private set
 
+    var isInRift: Boolean = false
+        private set
+
     fun update() {
         val areaWidget = TabWidget.AREA
         if (!areaWidget.isPresent) {
@@ -28,6 +33,7 @@ object IslandTracker {
         updateMiningIsland(lines)
         updateForagingIsland(lines)
         updateFarmingIsland(lines)
+        updateRiftIsland(lines)
     }
 
     private fun updateMiningIsland(lines: List<String>) {
@@ -57,9 +63,22 @@ object IslandTracker {
         }
     }
 
+    private fun updateRiftIsland(lines: List<String>) {
+        val currentlyInRift = lines.any { it.contains("The Rift", ignoreCase = true) }
+
+        if (currentlyInRift == isInRift) return
+        isInRift = currentlyInRift
+
+        if (!isInRift) return
+
+        TrackingHandler.resumeRiftTracking()
+        MultiTrackingHandler.resumeMultiRiftTracking()
+    }
+
     fun reset() {
         currentMiningIsland = null
         currentForagingIsland = null
         isInGalatea = false
+        isInRift = false
     }
 }

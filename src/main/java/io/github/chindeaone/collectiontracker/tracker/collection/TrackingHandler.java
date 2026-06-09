@@ -220,6 +220,46 @@ public class TrackingHandler {
         }
     }
 
+    public static void resumeRiftTracking() {
+        if (!isTracking) {
+            logger.warn("[SCT]: Attempted to resume Rift tracking, but no tracking is active.");
+            return;
+        }
+
+        if (!CollectionsManager.isRiftCollection(collection)) {
+            logger.warn("[SCT]: Attempted to resume Rift tracking, but current collection is not a Rift collection.");
+            return;
+        }
+
+        if (!isPaused) return;
+
+        startTime = System.currentTimeMillis();
+        isPaused = false;
+
+        ChatUtils.sendMessage("§7Resuming tracking after rejoining The Rift.", true);
+        logger.info("[SCT]: Resuming tracking after rejoining The Rift.");
+    }
+
+    public static void pauseRiftTracking() {
+        if (!isTracking) {
+            logger.warn("[SCT]: Attempted to pause Rift tracking, but no tracking is active.");
+            return;
+        }
+
+        if (!CollectionsManager.isRiftCollection(collection)) {
+            logger.warn("[SCT]: Attempted to pause Rift tracking, but current collection is not a Rift collection.");
+            return;
+        }
+
+        if (isPaused) return;
+
+        lastTime += (System.currentTimeMillis() - startTime) / 1000;
+        isPaused = true;
+
+        ChatUtils.sendMessage("§7Pausing tracking before leaving The Rift.", true);
+        logger.info("[SCT]: Pausing tracking before leaving The Rift.");
+    }
+
     private static void sendRates() {
         assert collection != null;
         String collectionDisplay = TextUtils.formatCollectionName(collection);

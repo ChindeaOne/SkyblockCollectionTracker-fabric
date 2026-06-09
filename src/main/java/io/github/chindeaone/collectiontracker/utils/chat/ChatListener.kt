@@ -78,6 +78,11 @@ object ChatListener {
         consumableListener(cleanText)
         treeResetListener(cleanText)
         sacksListener(message, actionBar = false)
+
+        if (text.startsWith("  THE RIFT IS COLLAPSING")) {
+            TrackingHandler.pauseRiftTracking()
+            MultiTrackingHandler.pauseMultiRiftTracking()
+        }
     }
 
     private fun profileIdListener(cleanText: String) {
