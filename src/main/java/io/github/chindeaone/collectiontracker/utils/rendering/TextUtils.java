@@ -433,7 +433,8 @@ public class TextUtils {
                     long total = MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().entrySet().stream()
                             .filter(entry -> !entry.getKey().contains("_") || entry.getKey().endsWith("_" + variant))
                             .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
-                    list.add("§eOverall $/h (NPC): " + formatNumber(total));
+                    if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes/h: " + formatNumber(total));
+                    else list.add("§eOverall $/h (NPC): " + formatNumber(total));
                 } else {
                     long total = MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().entrySet().stream()
                             .filter(entry -> entry.getKey().endsWith(suffix))
@@ -447,7 +448,8 @@ public class TextUtils {
                     long total = MultiTrackingRates.INSTANCE.getMoneyMadeNPC().entrySet().stream()
                             .filter(entry -> !entry.getKey().contains("_") || entry.getKey().endsWith("_" + variant))
                             .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
-                    list.add("§eOverall $ made (NPC): " + formatNumber(total));
+                    if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes made: " + formatNumber(total));
+                    else list.add("§eOverall $ made (NPC): " + formatNumber(total));
                 } else {
                     long total = MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().entrySet().stream()
                             .filter(entry -> entry.getKey().endsWith(suffix))
