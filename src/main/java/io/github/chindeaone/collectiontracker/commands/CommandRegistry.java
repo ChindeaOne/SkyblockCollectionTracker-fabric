@@ -2,7 +2,9 @@ package io.github.chindeaone.collectiontracker.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
@@ -25,11 +27,10 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CommandRegistry {
 
@@ -528,19 +529,39 @@ public class CommandRegistry {
                             ChatUtils.sendMessage("§cUsage: /sct setCustomGoalPosition <collection/skill name> <position>", true);
                             return 1;
                         })
-                        .then(ClientCommandManager.argument("name", StringArgumentType.word())
-                                .suggests(COLLECTION_AND_SKILL_SUGGESTIONS)
-                                .then(ClientCommandManager.argument("position", IntegerArgumentType.integer(1))
-                                        .executes(context -> {
-                                            String name = StringArgumentType.getString(context, "name").trim();
-                                            int position = IntegerArgumentType.getInteger(context, "position");
-                                            
-                                            ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.POSITION);
-                                            ConfigHelper.setCustomGoal(name, position, null);
-                                            ChatUtils.sendMessage("§aCustom goal set for " + name + " at position " + position, true);
-                                            return 1;
-                                        })
-                                )
+                        .then(ClientCommandManager.argument("goal", StringArgumentType.greedyString())
+                                .suggests(CUSTOM_GOAL_POSITION_SUGGESTIONS)
+                                .executes(context -> {
+                                    String input = StringArgumentType.getString(context, "goal").trim();
+
+                                    int lastSpace = input.lastIndexOf(' ');
+                                    if (lastSpace == -1) {
+                                        ChatUtils.sendMessage("§cUsage: /sct setCustomGoalPosition <collection/skill name> <position>", true);
+                                        return 1;
+                                    }
+
+                                    String name = input.substring(0, lastSpace).trim();
+                                    String positionStr = input.substring(lastSpace + 1).trim();
+
+                                    int position;
+                                    try {
+                                        position = Integer.parseInt(positionStr);
+                                    } catch (NumberFormatException e) {
+                                        ChatUtils.sendMessage("§cInvalid position!", true);
+                                        return 1;
+                                    }
+
+                                    if (position < 1) {
+                                        ChatUtils.sendMessage("§cPosition must be at least 1!", true);
+                                        return 1;
+                                    }
+
+                                    ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.POSITION);
+                                    ConfigHelper.setCustomGoal(name, position, null);
+
+                                    ChatUtils.sendMessage("§aCustom goal set for " + name + " at position " + position, true);
+                                    return 1;
+                                })
                         )
                 )
                 // sct setCustomGoalAmount -> set custom amount goal
@@ -549,25 +570,33 @@ public class CommandRegistry {
                             ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true);
                             return 1;
                         })
-                        .then(ClientCommandManager.argument("name", StringArgumentType.word())
-                                .suggests(COLLECTION_AND_SKILL_SUGGESTIONS)
-                                .then(ClientCommandManager.argument("amount", StringArgumentType.greedyString())
-                                        .executes(context -> {
-                                            String name = StringArgumentType.getString(context, "name").trim();
-                                            String amountStr = StringArgumentType.getString(context, "amount").trim();
-                                            long amount = parseAmount(amountStr);
+                        .then(ClientCommandManager.argument("goal", StringArgumentType.greedyString())
+                                .suggests(CUSTOM_GOAL_AMOUNT_SUGGESTIONS)
+                                .executes(context -> {
+                                    String input = StringArgumentType.getString(context, "goal").trim();
 
-                                            if (amount < 0) {
-                                                ChatUtils.sendMessage("§cInvalid value!", true);
-                                                return 1;
-                                            }
-                                            
-                                            ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.AMOUNT);
-                                            ConfigHelper.setCustomGoal(name, null, amount);
-                                            ChatUtils.sendMessage("§aCustom goal set for " + name + " at amount " + amountStr, true);
-                                            return 1;
-                                        })
-                                )
+                                    int lastSpace = input.lastIndexOf(' ');
+                                    if (lastSpace == -1) {
+                                        ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true);
+                                        return 1;
+                                    }
+
+                                    String name = input.substring(0, lastSpace).trim();
+                                    String amountStr = input.substring(lastSpace + 1).trim();
+
+                                    long amount = parseAmount(amountStr);
+
+                                    if (amount < 0) {
+                                        ChatUtils.sendMessage("§cInvalid value!", true);
+                                        return 1;
+                                    }
+
+                                    ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.AMOUNT);
+                                    ConfigHelper.setCustomGoal(name, null, amount);
+
+                                    ChatUtils.sendMessage("§aCustom goal set for " + name + " at amount " + amountStr, true);
+                                    return 1;
+                                })
                         )
                 )
                 // sct commissions reset -> resets commissions tracker
@@ -638,20 +667,39 @@ public class CommandRegistry {
     };
 
     private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_AND_SKILL_SUGGESTIONS = (context, builder) -> {
-        String arg = builder.getRemaining().toLowerCase();
-        // Suggest collections
-        for (String collection : CollectionsManager.getAllCollections()) {
-            if (collection.toLowerCase().startsWith(arg)) {
-                builder.suggest(collection);
-            }
+        Suggestions collectionSuggestions = COLLECTION_SUGGESTIONS.getSuggestions(context, builder.createOffset(builder.getStart())).join();
+        Suggestions skillSuggestions = SKILL_LIST.getSuggestions(context, builder.createOffset(builder.getStart())).join();
+
+        for (Suggestion suggestion : collectionSuggestions.getList()) {
+            builder.suggest(suggestion.getText());
         }
-        // Suggest skills
-        for (String skill : SkillUtils.getDisplayNames()) {
-            if (skill.toLowerCase().startsWith(arg)) {
-                builder.suggest(skill);
-            }
+        for (Suggestion suggestion : skillSuggestions.getList()) {
+            builder.suggest(suggestion.getText());
         }
+
         return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<FabricClientCommandSource> CUSTOM_GOAL_POSITION_SUGGESTIONS = (context, builder) -> {
+        String remaining = builder.getRemaining();
+        String completedName = getCompletedGoalName(remaining);
+
+        if (completedName != null) {
+            return builder.buildFuture();
+        }
+
+        return COLLECTION_AND_SKILL_SUGGESTIONS.getSuggestions(context, builder);
+    };
+
+    private static final SuggestionProvider<FabricClientCommandSource> CUSTOM_GOAL_AMOUNT_SUGGESTIONS = (context, builder) -> {
+        String remaining = builder.getRemaining();
+        String completedName = getCompletedGoalName(remaining);
+
+        if (completedName != null) {
+            return builder.buildFuture();
+        }
+
+        return COLLECTION_AND_SKILL_SUGGESTIONS.getSuggestions(context, builder);
     };
 
     private static final SuggestionProvider<FabricClientCommandSource> PLAYER_SUGGESTIONS = (context, builder) -> {
@@ -663,6 +711,26 @@ public class CommandRegistry {
         }
         return builder.buildFuture();
     };
+
+    private static List<String> getAllCollectionAndSkillNames() {
+        List<String> names = new ArrayList<>();
+
+        names.addAll(CollectionsManager.getAllCollections());
+        names.addAll(SkillUtils.getDisplayNames());
+
+        return names.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    private static String getCompletedGoalName(String input) {
+        String lowerInput = input.toLowerCase(Locale.ROOT);
+
+        return getAllCollectionAndSkillNames().stream()
+                .filter(name -> lowerInput.equals(name.toLowerCase(Locale.ROOT) + " ") || lowerInput.startsWith(name.toLowerCase(Locale.ROOT) + " "))
+                .max(Comparator.comparingInt(String::length))
+                .orElse(null);
+    }
 
     private static int parseToSeconds(String input) {
         Pattern pattern = Pattern.compile("(\\d+)([hms])");
