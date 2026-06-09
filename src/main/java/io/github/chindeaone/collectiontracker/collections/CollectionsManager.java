@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.collections;
 
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
+
 import java.util.*;
 
 public class CollectionsManager {
@@ -42,6 +44,18 @@ public class CollectionsManager {
         return collections
                 .getOrDefault("Rift", Collections.emptySet())
                 .contains(collectionName);
+    }
+
+    public static boolean hasAnyRiftCollection() {
+        Set<String> riftCollections = collections.getOrDefault("Rift", Collections.emptySet());
+
+        return CollectionTracker.collectionList.stream().anyMatch(riftCollections::contains);
+    }
+
+    public static boolean hasAllRiftCollections() {
+        Set<String> riftCollections = collections.getOrDefault("Rift", Collections.emptySet());
+
+        return riftCollections.containsAll(CollectionTracker.collectionList);
     }
 
     public static void resetCollections() {

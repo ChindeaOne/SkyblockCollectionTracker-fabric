@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.ServerUtils;
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,6 +59,18 @@ public class CollectionTracker {
                     ChatUtils.sendMessage("§4" + collection + " collection is not supported! Use `/sct collections` to see all supported collections.", true);
                     return;
                 }
+
+                // Check for rift collections
+                if (CollectionsManager.isRiftCollection(collection) && !IslandTracker.INSTANCE.isInRift()) {
+                    ChatUtils.sendMessage("§cYou must be in The Rift to track rift collections!", true);
+                    return;
+                }
+
+                if (!CollectionsManager.isRiftCollection(collection) && IslandTracker.INSTANCE.isInRift()) {
+                    ChatUtils.sendMessage("§cYou cannot track non-rift collections while in The Rift!", true);
+                    return;
+                }
+
                 // Set collection source
                 if (CollectionsManager.isCollection(collection)) {
                     CollectionsManager.collectionSource = "collection";
@@ -136,6 +149,17 @@ public class CollectionTracker {
                 if (collectionList.contains("gemstone")) {
                     collectionList.remove("gemstone");
                     collectionList.add("gemstone");
+                }
+
+                // Check for rift collections
+                if (CollectionsManager.hasAnyRiftCollection() && !IslandTracker.INSTANCE.isInRift()) {
+                    ChatUtils.sendMessage("§cYou must be in The Rift to track rift collections!", true);
+                    return;
+                }
+
+                if (!CollectionsManager.hasAllRiftCollections() && IslandTracker.INSTANCE.isInRift()) {
+                    ChatUtils.sendMessage("§cYou cannot track non-rift collections while in The Rift!", true);
+                    return;
                 }
 
                 if (System.currentTimeMillis() - MultiTrackingHandler.getMultiLastTrackTime() < MultiTrackingHandler.getCOOLDOWN_MILLIS()) {
