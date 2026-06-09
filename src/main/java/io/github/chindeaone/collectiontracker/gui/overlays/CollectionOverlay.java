@@ -56,12 +56,17 @@ public class CollectionOverlay extends AbstractOverlay{
     @Override
     public void updateDimensions() {
         if (!isEnabled()) return;
-        List<String> lines = getCollectionLines();
+
+        List<String> lines = getLines();
         if (lines.isEmpty()) return;
 
         Font fr = Minecraft.getInstance().font;
+
         int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
+        for (String line : lines) {
+            maxW = Math.max(maxW, fr.width(line));
+        }
+
         int h = fr.lineHeight * lines.size();
 
         position.setDimensions(maxW, h);
@@ -97,6 +102,32 @@ public class CollectionOverlay extends AbstractOverlay{
         if (line.contains("Instant")) {
             changeBazaarPriceType();
         }
+    }
+
+    @Override
+    public boolean isHovered(double mouseX, double mouseY) {
+        if (!isEnabled()) return false;
+
+        updateDimensions();
+
+        Position position = this.position();
+        if (position == null) return false;
+
+        int padding = 8;
+
+        int x = position.getX();
+        int y = position.getY();
+        float scale = position.getScale();
+
+        int width = Math.round((position.getWidth() + padding * 2) * scale);
+        int height = Math.round((position.getHeight() + padding * 2) * scale);
+
+        double x1 = x - padding * scale;
+        double y1 = y - padding * scale;
+        double x2 = x1 + width;
+        double y2 = y1 + height;
+
+        return mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
     }
 
     private @NotNull List<String> getCollectionLines() {

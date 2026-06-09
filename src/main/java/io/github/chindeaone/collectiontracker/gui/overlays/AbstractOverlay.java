@@ -74,15 +74,14 @@ public abstract class AbstractOverlay {
         Position pos = this.position();
         if (pos == null) return false;
 
-        int yPadding = 4;
         int x = pos.getX();
         int y = pos.getY();
         float s = pos.getScale();
         int w = Math.round(pos.getWidth() * s);
 
         double x2 = x + w;
-        double y1 = y - (yPadding * s);
-        double y2 = y + (pos.getHeight() + yPadding) * s;
+        double y1 = y - s;
+        double y2 = y + pos.getHeight() * s;
 
         return mouseX >= x && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
     }
@@ -94,7 +93,6 @@ public abstract class AbstractOverlay {
         var option = editor.getOptionFromField(pos.link);
         if (option == null) return;
 
-        System.out.println("Jumping to config for " + overlayLabel() + " at " + pos.link);
         editor.search("");
         if (!editor.goToOption(option)) return;
         GuiManager.openEditor(editor);
