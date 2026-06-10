@@ -46,10 +46,10 @@ object Hypixel {
         skyblock = false
         playerLoaded = false
         serverStatus = false
-        TrackingHandler.stopTracking()
-        MultiTrackingHandler.stopMultiTracking()
-        SkillTrackingHandler.stopTracking()
-        ColeweightTrackingHandler.stopTracking()
+        TrackingHandler.pauseTracking()
+        MultiTrackingHandler.pauseMultiTracking()
+        SkillTrackingHandler.pauseTracking()
+        ColeweightTrackingHandler.pauseTracking()
     }
 
     private fun checkServer() {
