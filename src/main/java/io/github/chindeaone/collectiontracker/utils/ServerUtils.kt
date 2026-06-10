@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
@@ -52,9 +52,9 @@ object ServerUtils {
                     currentCheckInterval = COOLDOWN_CHECK_INTERVAL
                 }
 
-                // Stop all tracking if server is down
-                TrackingHandler.stopTracking()
+                // Stop all api-related tracking
                 SkillTrackingHandler.stopTracking()
+                ColeweightTrackingHandler.stopTracking()
             }
         }
     }
