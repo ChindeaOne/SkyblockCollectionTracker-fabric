@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -42,7 +43,7 @@ object InventoryListener {
             return
         }
 
-        if (isTracking && isTrackingPaused || isMultiTracking && isMultiTrackingPaused) return
+        if (isTracking && isTrackingPaused || isMultiTracking && isMultiTrackingPaused || !IslandTracker.isInRift) return
 
         tickCount++
         if (tickCount % 4 != 0) return

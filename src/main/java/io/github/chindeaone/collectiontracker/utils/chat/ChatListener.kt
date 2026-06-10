@@ -79,7 +79,7 @@ object ChatListener {
         treeResetListener(cleanText)
         sacksListener(message, actionBar = false)
 
-        if (text.startsWith("  THE RIFT IS COLLAPSING")) {
+        if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
             TrackingHandler.pauseRiftTracking()
             MultiTrackingHandler.pauseMultiRiftTracking()
         }
