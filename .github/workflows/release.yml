@@ -44,11 +44,6 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Build 1.21.10
-        run: |
-          ./gradlew stonecutterSwitchTo1.21.10 --no-daemon --stacktrace
-          ./gradlew :1.21.10:clean :1.21.10:build --no-daemon --stacktrace --no-build-cache
-
       - name: Build 1.21.11
         run: |
           ./gradlew stonecutterSwitchTo1.21.11 --no-daemon --stacktrace
@@ -57,7 +52,6 @@ jobs:
       - name: Create Draft Release
         run: |
           gh release create "${{ github.ref_name }}" \
-            build/libs/1.21.10/*.jar \
             build/libs/1.21.11/*.jar \
             --draft \
             --title "SkyblockCollectionTracker ${{ github.ref_name }}"

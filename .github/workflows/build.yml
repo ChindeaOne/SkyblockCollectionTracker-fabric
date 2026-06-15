@@ -66,12 +66,6 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Build for 1.21.10
-      - name: "Stonecutter: set active to 1.21.10"
-        run: ./gradlew stonecutterSwitchTo1.21.10 --no-daemon --stacktrace
-      - name: Build 1.21.10
-        run: ./gradlew :1.21.10:clean :1.21.10:build --no-daemon --stacktrace --no-build-cache
-
       # Build for 1.21.11
       - name: "Stonecutter: set active to 1.21.11"
         run: ./gradlew stonecutterSwitchTo1.21.11 --no-daemon --stacktrace
@@ -84,6 +78,5 @@ jobs:
         with:
           name: "Multi-version Development Build"
           path: |
-            build/libs/1.21.10/*.jar
             build/libs/1.21.11/*.jar
           if-no-files-found: error
