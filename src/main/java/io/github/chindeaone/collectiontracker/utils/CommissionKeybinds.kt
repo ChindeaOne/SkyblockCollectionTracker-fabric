@@ -115,12 +115,12 @@ object CommissionKeybinds {
     }
 
     fun initKeyGuards() {
-        // Cancels vanilla hotbar swap while in the commissions container
+        // Cancels vanilla hotbar swap while in the commission container
         keybindCancelEvent()
     }
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock || !ConfigAccess.isCommissionsKeybindsEnabled()) {
+        if (!HypixelUtils.isOnSkyblock) {
             detachListener()
             return
         }
@@ -169,6 +169,12 @@ object CommissionKeybinds {
 
         if (clickedTooltipLines.any { it.contains("COMPLETED", ignoreCase = true) }) {
             CommissionsTracker.onCommissionClaimed()
+        }
+
+        // Don't allow keybind input here
+        if (!ConfigAccess.isCommissionsKeybindsEnabled()) {
+            lastClick = now
+            return
         }
 
         gm.handleInventoryMouseClick(
