@@ -222,7 +222,6 @@ public class TrackingHandler {
 
     public static void resumeRiftTracking() {
         if (!isTracking) {
-            logger.warn("[SCT]: Attempted to resume Rift tracking, but no tracking is active.");
             return;
         }
 
@@ -242,7 +241,6 @@ public class TrackingHandler {
 
     public static void pauseRiftTracking() {
         if (!isTracking) {
-            logger.warn("[SCT]: Attempted to pause Rift tracking, but no tracking is active.");
             return;
         }
 

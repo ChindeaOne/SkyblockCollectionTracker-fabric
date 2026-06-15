@@ -3,7 +3,6 @@ package io.github.chindeaone.collectiontracker.tracker.skills;
 import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher;
 import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.ServerUtils;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
@@ -51,7 +50,7 @@ public class SkillFetcher {
         try {
             if (!ServerUtils.INSTANCE.getServerStatus()) {
                 logger.warn("[SCT]: API server not online. Stopping the skill tracker.");
-                TrackingHandler.stopTracking();
+                SkillTrackingHandler.stopTracking();
                 return;
             }
 

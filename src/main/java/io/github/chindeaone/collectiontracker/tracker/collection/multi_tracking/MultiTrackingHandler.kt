@@ -209,7 +209,6 @@ object MultiTrackingHandler  {
 
     fun resumeMultiRiftTracking() {
         if (!isMultiTracking) {
-            logger.warn("[SCT]: Attempted to resume Rift multi tracking, but no tracking is active.")
             return
         }
 
@@ -229,7 +228,6 @@ object MultiTrackingHandler  {
 
     fun pauseMultiRiftTracking() {
         if (!isMultiTracking) {
-            logger.warn("[SCT]: Attempted to pause Rift multi tracking, but no tracking is active.")
             return
         }
 
