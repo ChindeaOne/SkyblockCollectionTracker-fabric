@@ -50,6 +50,7 @@
 - Ported Dwarven Heatmap, with adjustable opacity.
 - Ported Precision Mining highlight.
 - Ported `/sct timer <set|pause|resume|stop>` command.
+- Ported `/sct stopwatch <start|pause|resume|stop>` command.
 - Tracking Coleweight via `/sct cw track` command.
 
 </details>
@@ -65,7 +66,7 @@
 <details>
 <summary><strong>Mining/Foraging Stats Overlay</strong></summary>
 
-- Shows all mining/foraging‑related stats from tab.
+- Shows all mining/foraging‑related stats from the tab.
 - Updates dynamically based on the targeted block.
 - Compacts Fortune into a single context‑aware stat.
 
@@ -75,6 +76,7 @@
 <summary><strong>Commissions Overlay and Claim Buttons</strong></summary>
 
 - Displays active commissions and progress from tab data.
+- Toggleable commission tracking.
 - Keybinds for quick commission claiming.
 
 </details>
@@ -92,9 +94,8 @@
 <summary><strong>Better Sky Mall/Lottery</strong></summary>
 
 - Shows current Sky Mall/Lottery buffs and their remaining time.
-- Compacts their chat messages.
+- Compacts chat messages.
 - Option to show overlays only in Mining/Foraging Islands.
-- Option to not render the buffs in chat.
 
 </details>
 
@@ -102,7 +103,7 @@
 <summary><strong>Mining Deployable Tracker</strong></summary>
 
 - Display the lantern type and current time remaining while being in range.
-- Configurable title alert when the deployable has expired.
+- Configurable title alert when the deployable has expired and out of range.
 
 </details>
 
@@ -111,7 +112,7 @@
 
 - Displays ordered waypoints in mineshafts, only for jasper and crystal mineshafts.
 - Displays ordered waypoints for mineshaft spawning routes.
-- Displays ordered waypoints for dwarven metals and pure ores routes.
+- Displays ordered waypoints for dwarven metal and pure ore routes.
 - All routes used are from Mining Cult.
 
 </details>
