@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,6 @@ public class TimerOverlay extends AbstractOverlay{
     private long remainingTime = 0;
     private boolean isPaused = false;
     private boolean hasEnded = true;
-    private boolean renderingAllowed = true;
 
     @Override
     public String overlayLabel() {
@@ -35,16 +35,6 @@ public class TimerOverlay extends AbstractOverlay{
     @Override
     public boolean isEnabled() {
         return !hasEnded && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override
@@ -124,6 +114,10 @@ public class TimerOverlay extends AbstractOverlay{
             }
             timerLines.add("§bTimer: §e" + timeFormat + pauseTarget);
         } else {
+            if (ConfigAccess.isShowTimerTitle()) {
+                String title = "§6[§3§kd§6] §b§lTimer Finished! §6[§3§kd§6]";
+                RenderUtils.showTitle(Component.literal(title), ConfigAccess.getTitleDisplayTimer());
+            }
             ChatUtils.sendMessage("§cTimer finished!", true);
             hasEnded = true;
         }

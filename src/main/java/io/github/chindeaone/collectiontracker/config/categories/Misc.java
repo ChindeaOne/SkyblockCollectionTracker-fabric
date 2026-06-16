@@ -74,5 +74,13 @@ public class Misc {
     public boolean serverLagProtection = false;
 
     @Expose
+    @ConfigOption(
+            name = "Timer Title",
+            desc = "Shows a title when the timer ends."
+    )
+    @ConfigEditorBoolean
+    public boolean showTimerTitle = false;
+
+    @Expose
     public Position titlePosition = new Position(0, 0);
 }

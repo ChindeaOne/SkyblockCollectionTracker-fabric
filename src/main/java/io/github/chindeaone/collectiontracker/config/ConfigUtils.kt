@@ -58,6 +58,7 @@ val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tem
 val titlePosition: Position get() = modConfig.misc.titlePosition
 val multiOverlayPosition: Position get() = modConfig.tracking.multiCollectionConfig.multiOverlayPosition
 val coleweightTimerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTimerPosition
+val coleweightStopwatchPosition: Position get() = modConfig.mining.coleweightConfig.coleweightStopwatchPosition
 val coleweightTrackerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTrackerPosition
 
 // About Config Accessor
@@ -195,6 +196,7 @@ val precision: Property<Int> get() = miscConfig.abilityPrecision
 val titleDisplayTimer: Property<Int> get() = miscConfig.titleDisplayTimer
 val titleScale: Misc.TitleScale get() = miscConfig.titleScale
 val abilityCooldownOnly: Boolean get() = miscConfig.abilityCooldownOnly
+val showTimerTitle: Boolean get() = miscConfig.showTimerTitle
 
 /**
  * Accessors for configuration sections.
@@ -242,6 +244,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getColeweightTimerPosition(): Position = coleweightTimerPosition
+
+    @JvmStatic
+    fun getColeweightStopwatchPosition(): Position = coleweightStopwatchPosition
 
     @JvmStatic
     fun getColeweightTrackerPosition(): Position = coleweightTrackerPosition
@@ -424,6 +429,9 @@ object ConfigAccess {
     fun isServerLagProtectionEnabled(): Boolean = miscConfig.serverLagProtection
 
     @JvmStatic
+    fun isShowTimerTitle(): Boolean = showTimerTitle
+
+    @JvmStatic
     fun isDeployableEnabled(): Boolean = enableDeployable
 
     @JvmStatic
@@ -500,7 +508,6 @@ object ConfigAccess {
 
     @JvmStatic
     fun isSkillLeaderboardEnabled(): Boolean = skillLeaderboard
-
 
     @JvmStatic
     fun isCustomGoalEnabled(): Boolean = customGoal
