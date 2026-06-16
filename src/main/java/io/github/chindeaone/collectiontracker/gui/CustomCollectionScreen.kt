@@ -5,7 +5,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.Screen
@@ -38,7 +38,8 @@ class CustomCollectionScreen(
                 20,
                 Component.literal(displayName)
                 )
-            box.setFilter { text -> text.all { it.isDigit() || it == '.' || it.lowercaseChar() in listOf('k', 'm', 'b') }}
+
+//            box.insertText { text -> text.all { it.isDigit() || it == '.' || it.lowercaseChar() in listOf('k', 'm', 'b') }}
 
             map[s] = box
             addRenderableWidget(box)
@@ -66,10 +67,10 @@ class CustomCollectionScreen(
         )
     }
 
-    override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
-        renderMenuBackground(context)
+    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
+        extractMenuBackground(context)
 
-        context.drawCenteredString(
+        context.centeredText(
             font,
             title,
             width / 2,
@@ -79,7 +80,7 @@ class CustomCollectionScreen(
 
         map.forEach { (name, box) ->
             val displayName = TextUtils.formatCollectionName(name)
-            context.drawString(
+            context.text(
                 font,
                 displayName,
                 box.x - font.width(name) - 10,
@@ -88,7 +89,7 @@ class CustomCollectionScreen(
             )
         }
 
-        super.render(context, mouseX, mouseY, delta)
+        super.extractRenderState(context, mouseX, mouseY, delta)
     }
 
     override fun shouldCloseOnEsc(): Boolean = true

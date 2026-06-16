@@ -38,21 +38,21 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'microsoft'
 
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Build 1.21.11
+      - name: Build 26.1
         run: |
-          ./gradlew stonecutterSwitchTo1.21.11 --no-daemon --stacktrace
-          ./gradlew :1.21.11:clean :1.21.11:build --no-daemon --stacktrace --no-build-cache
+          ./gradlew stonecutterSwitchTo26.1 --no-daemon --stacktrace
+          ./gradlew :26.1:clean :26.1:build --no-daemon --stacktrace --no-build-cache
 
       - name: Create Draft Release
         run: |
           gh release create "${{ github.ref_name }}" \
-            build/libs/1.21.11/*.jar \
+            build/libs/26.1/*.jar \
             --draft \
             --title "SkyblockCollectionTracker ${{ github.ref_name }}"
         env:

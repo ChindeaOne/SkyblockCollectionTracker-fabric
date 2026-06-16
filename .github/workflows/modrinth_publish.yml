@@ -10,7 +10,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        game-version: ["1.21.11"]
+        game-version: ["26.1"]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

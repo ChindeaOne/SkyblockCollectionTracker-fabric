@@ -10,7 +10,7 @@ import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class PickaxeAbilityOverlay extends AbstractOverlay{
     }
 
     @Override
-    public void render(GuiGraphics context) {
+    public void render(GuiGraphicsExtractor context) {
         if (!isEnabled()) return;
         List<String> lines = getPickaxeAbilityLines();
 

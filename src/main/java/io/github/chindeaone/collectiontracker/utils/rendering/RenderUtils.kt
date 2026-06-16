@@ -11,7 +11,7 @@ import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import kotlin.math.sqrt
 
@@ -24,7 +24,7 @@ object RenderUtils {
     private val titleQueue = ArrayDeque<QueuedTitle>()
 
     @JvmStatic
-    fun drawOverlayFrame(context: GuiGraphics, pos: Position, drawContext: Runnable) {
+    fun drawOverlayFrame(context: GuiGraphicsExtractor, pos: Position, drawContext: Runnable) {
         context.pose().pushMatrix()
         context.pose().translate(pos.x.toFloat(), pos.y.toFloat())
         context.pose().scale(pos.scale, pos.scale)
@@ -34,7 +34,7 @@ object RenderUtils {
         context.pose().popMatrix()
     }
 
-    fun drawDummyFrame(context: GuiGraphics, pos: Position, label: String) {
+    fun drawDummyFrame(context: GuiGraphicsExtractor, pos: Position, label: String) {
         val yPadding = 4
         val totalBoxHeight = pos.height + yPadding * 2
         val radius = (totalBoxHeight / 4).coerceAtMost(6)
@@ -53,13 +53,13 @@ object RenderUtils {
 
             context.pose().pushMatrix()
             context.pose().scale(textScale, textScale)
-            context.drawCenteredString(fr, overlayText, xPos.toInt(), yPos.toInt(), ColorUtils.WHITE)
+            context.centeredText(fr, overlayText, xPos.toInt(), yPos.toInt(), ColorUtils.WHITE)
             context.pose().popMatrix()
         }
     }
 
     @JvmStatic
-    fun renderTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
+    fun renderTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
         var y = 0
 
         val allLines = mutableListOf<String>()
@@ -127,7 +127,7 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun renderMultiTrackingStringsWithColor(context: GuiGraphics, lines: List<String>, withColor: Boolean) {
+    fun renderMultiTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, withColor: Boolean) {
         var y = 0
 
         for (line in lines) {
@@ -171,7 +171,7 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun renderSkillStringsWithTaming(context: GuiGraphics, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
+    fun renderSkillStringsWithTaming(context: GuiGraphicsExtractor, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
         var y = 0
 
         val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: ColorUtils.GREEN
@@ -191,7 +191,7 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun renderColeweightStrings(context: GuiGraphics, lines: List<String>) {
+    fun renderColeweightStrings(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
         val color = ColorUtils.SILVER_BLUE
 
@@ -202,16 +202,16 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun renderStrings(context: GuiGraphics, lines: List<String>) {
+    fun renderStrings(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
 
         for (line in lines) {
-            context.drawString(fr, line, 0, y, ColorUtils.WHITE, true)
+            context.text(fr, line, 0, y, ColorUtils.WHITE, true)
             y += fr.lineHeight
         }
     }
 
-    fun drawEditorHudText(context: GuiGraphics, activePosition: Position?) {
+    fun drawEditorHudText(context: GuiGraphicsExtractor, activePosition: Position?) {
         if (activePosition != null) {
             val x = ScaleUtils.mouseX + 12
             val y = ScaleUtils.mouseY - 12
@@ -233,7 +233,7 @@ object RenderUtils {
         }
     }
 
-    fun drawEditorHudTitle(context: GuiGraphics, pos: Position?) {
+    fun drawEditorHudTitle(context: GuiGraphicsExtractor, pos: Position?) {
         val textScale = 0.75f
         val resizeText = Component.literal("").withStyle(ChatFormatting.GREEN)
 
@@ -243,7 +243,7 @@ object RenderUtils {
 
         context.pose().pushMatrix()
         context.pose().scale(textScale, textScale)
-        context.drawString(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), ColorUtils.WHITE, true)
+        context.text(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), ColorUtils.WHITE, true)
         context.pose().popMatrix()
 
         if (pos != null) {
@@ -259,7 +259,7 @@ object RenderUtils {
         }
     }
 
-    private fun drawTooltipsHelper(context: GuiGraphics, positionText: Component, x: Int, y: Int) {
+    private fun drawTooltipsHelper(context: GuiGraphicsExtractor, positionText: Component, x: Int, y: Int) {
         val textScale = 0.85f
         val padding = 2
         val space = 2
@@ -280,23 +280,23 @@ object RenderUtils {
         context.pose().scale(textScale, textScale)
         lines.forEachIndexed { index, line ->
             val yOffset = index * (fr.lineHeight + space)
-            context.drawString(fr, line, 0, yOffset, ColorUtils.YELLOW, true)
+            context.text(fr, line, 0, yOffset, ColorUtils.YELLOW, true)
         }
         context.pose().popMatrix()
     }
 
-    private fun drawHelper(line: String, context: GuiGraphics, y: Int, prefixColor: Int) {
+    private fun drawHelper(line: String, context: GuiGraphicsExtractor, y: Int, prefixColor: Int) {
         val splitIndex = line.lastIndexOf(": ")
         if (splitIndex != -1) {
             val prefix = line.substring(0, splitIndex)
             val numberPart = line.substring(splitIndex)
 
-            context.drawString(fr, prefix, 0, y, prefixColor, true)
+            context.text(fr, prefix, 0, y, prefixColor, true)
 
             val prefixWidth = fr.width(prefix)
-            context.drawString(fr, numberPart,  prefixWidth, y, ColorUtils.CUSTOM_WHITE, true)
+            context.text(fr, numberPart,  prefixWidth, y, ColorUtils.CUSTOM_WHITE, true)
         } else {
-            context.drawString(fr, line, 0, y, prefixColor, true)
+            context.text(fr, line, 0, y, prefixColor, true)
         }
     }
 
@@ -310,14 +310,14 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun drawActiveTitle(context: GuiGraphics) {
+    fun drawActiveTitle(context: GuiGraphicsExtractor) {
         val title = titleQueue.firstOrNull() ?: return
         if (System.currentTimeMillis() < title.duration) {
             renderTitle(context, title.title)
         } else titleQueue.removeFirst()
     }
 
-    private fun renderTitle(context: GuiGraphics, title: Component) {
+    private fun renderTitle(context: GuiGraphicsExtractor, title: Component) {
         val screenWidth = context.guiWidth().toFloat()
         val screenHeight = context.guiHeight().toFloat()
         val pos = ConfigAccess.getTitlePosition()
@@ -329,12 +329,12 @@ object RenderUtils {
         context.pose().pushMatrix()
         context.pose().translate(screenWidth / 2f, y)
         context.pose().scale(scale, scale)
-        context.drawCenteredString(fr, title, 0, yOffset.toInt(), ColorUtils.WHITE)
+        context.centeredText(fr, title, 0, yOffset.toInt(), ColorUtils.WHITE)
         context.pose().popMatrix()
     }
 
     @JvmStatic
-    fun renderChangelog(context: GuiGraphics, scrollOffset: Int) {
+    fun renderChangelog(context: GuiGraphicsExtractor, scrollOffset: Int) {
         val rawNotes = RepoUtils.latestNotes
         if (rawNotes.isEmpty()) return
         val footerIndex = rawNotes.indexOf("**Full Changelog**")
@@ -352,7 +352,7 @@ object RenderUtils {
 
         // Render current version first
         SkyblockCollectionTracker.VERSION.let { version ->
-            context.drawCenteredString(fr, "Version: $version", screenWidth / 2, startY - 20, ColorUtils.GREEN)
+            context.centeredText(fr, "Version: $version", screenWidth / 2, startY - 20, ColorUtils.GREEN)
         }
 
         context.enableScissor(startX, startY, startX + overlayWidth, startY + overlayHeight)
@@ -360,7 +360,7 @@ object RenderUtils {
         context.disableScissor()
     }
 
-    private fun renderChangelogLines(context: GuiGraphics, text: String, startX: Int, startY: Int, overlayWidth: Int, limitStartY: Int, limitHeight: Int) {
+    private fun renderChangelogLines(context: GuiGraphicsExtractor, text: String, startX: Int, startY: Int, overlayWidth: Int, limitStartY: Int, limitHeight: Int) {
         val lines = text.split(Regex("\r?\n"))
         var currentY = startY
         val referenceRegex = Regex("""\(#\d+\)""")
@@ -388,7 +388,7 @@ object RenderUtils {
             val wrappedLines = fr.split(Component.literal(cleanLine), overlayWidth)
             for (wrapped in wrappedLines) {
                 if (currentY + fr.lineHeight >= limitStartY && currentY <= limitStartY + limitHeight)
-                    context.drawString(fr, wrapped, startX, currentY, color, true)
+                    context.text(fr, wrapped, startX, currentY, color, true)
                 currentY += fr.lineHeight
             }
         }
@@ -422,7 +422,7 @@ object RenderUtils {
         return totalHeight
     }
 
-    private fun drawTooltipBox(context: GuiGraphics, x: Float, y: Float, width: Float, height: Float, padding: Float = 4f, borderColor: Int = ColorUtils.GRAY) {
+    private fun drawTooltipBox(context: GuiGraphicsExtractor, x: Float, y: Float, width: Float, height: Float, padding: Float = 4f, borderColor: Int = ColorUtils.GRAY) {
         val x1 = (x - padding).toInt()
         val y1 = (y - padding).toInt()
         val x2 = (x + width + padding).toInt()
@@ -436,7 +436,7 @@ object RenderUtils {
         context.fill(x2 - 1, y1, x2, y2, borderColor) // Right
     }
 
-    private fun drawRoundedRect(context: GuiGraphics, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
+    private fun drawRoundedRect(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
         if (radius <= 0) {
             context.fill(x, y, x + width, y + height, color)
             return
@@ -476,7 +476,7 @@ object RenderUtils {
         }
     }
 
-    private fun drawOverlayOutline(context: GuiGraphics, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
+    private fun drawOverlayOutline(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
         val r = radius.coerceAtMost(width / 2).coerceAtMost(height / 2)
 
         context.fill(x + r, y, x + width - r, y + 1, color)

@@ -5,7 +5,8 @@ import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public abstract class AbstractOverlay {
         return isEnabled() && isRenderingAllowed();
     }
 
-    public abstract void render(GuiGraphics context);
+    public abstract void render(GuiGraphicsExtractor context);
 
     public abstract void updateDimensions();
 

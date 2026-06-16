@@ -1,12 +1,11 @@
-import net.fabricmc.loom.task.RemapJarTask
 import sct.GitVersion
 
 plugins {
-    id("com.gradleup.shadow") version "9.4.1"
-    id("net.fabricmc.fabric-loom-remap")
-    kotlin("jvm") version "2.3.20"
-    id("com.google.devtools.ksp") version "2.3.6"
-    kotlin("plugin.power-assert") version "2.3.20"
+    id("com.gradleup.shadow") version "9.4.2"
+    id("net.fabricmc.fabric-loom")
+    kotlin("jvm") version "2.4.0"
+    id("com.google.devtools.ksp") version "2.3.9"
+    kotlin("plugin.power-assert") version "2.4.0"
 }
 
 val gitVersion = objects.newInstance(GitVersion::class)
@@ -85,16 +84,10 @@ repositories {
     }
 }
 
-loom {
-    @Suppress("UnstableApiUsage")
-    mixin {
-        useLegacyMixinAp.set(true)
-        defaultRefmapName.set("mixins.sct.refmap.json")
-    }
-}
+loom {}
 
 val shadowModImpl: Configuration by configurations.creating {
-    configurations.modImplementation.get().extendsFrom(this)
+    configurations.implementation.get().extendsFrom(this)
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -109,18 +102,15 @@ fabricApi {
 
 dependencies {
     minecraft("com.mojang:minecraft:${sc.current.version}")
-    @Suppress("UnstableApiUsage")
-    mappings(loom.layered {
-        officialMojangMappings()
-    })
-    modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
+
+    implementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
 
     // Fabric API
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
-    modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_kotlin_version")}")
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
+    implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+    implementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_kotlin_version")}")
+    runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
 
-    modImplementation("com.terraformersmc:modmenu:${project.property("mod_menu_version")}")
+    implementation("com.terraformersmc:modmenu:${project.property("mod_menu_version")}")
 
     shadowModImpl("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
     shadowImpl("com.github.ChindeaOne:modrinthautoupdater:${project.property("modrinthautoupdater_version")}") {
@@ -132,7 +122,7 @@ dependencies {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.3"
+            languageVersion = "2.4"
         }
     }
 }
@@ -169,7 +159,7 @@ tasks.processResources {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(21)
+    options.release.set(25)
 }
 
 tasks.withType(JavaCompile::class) {
@@ -177,8 +167,8 @@ tasks.withType(JavaCompile::class) {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 tasks.jar {
@@ -188,16 +178,6 @@ tasks.jar {
     from("LICENSE") {
         rename { "${it}_${archivesNameValue}" }
     }
-}
-
-val remapJar by tasks.named<RemapJarTask>("remapJar") {
-    archiveClassifier.set("")
-
-    archiveFileName.set("${project.property("archives_base_name")}-${project.version}+mc${sc.current.version}.jar")
-
-    dependsOn(tasks.shadowJar)
-    inputFile.set(tasks.shadowJar.get().archiveFile)
-    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs/${sc.current.version}"))
 }
 
 tasks.shadowJar {

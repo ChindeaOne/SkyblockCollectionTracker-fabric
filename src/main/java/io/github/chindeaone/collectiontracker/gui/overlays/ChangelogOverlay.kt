@@ -1,14 +1,12 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
-import io.github.chindeaone.collectiontracker.mixins.AbstractContainerScreenAccessor
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
-import org.jetbrains.annotations.NotNull
 
 class ChangelogOverlay(
     private val oldScreen: AbstractContainerScreen<*>?
@@ -21,11 +19,10 @@ class ChangelogOverlay(
         Minecraft.getInstance().setScreen(oldScreen)
     }
 
-    override fun render(@NotNull context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        renderMenuBackground(context)
+    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
+        extractMenuBackground(context)
 
-        if (oldScreen != null) (oldScreen as AbstractContainerScreenAccessor)
-            .invokeDrawGuiContainerBackgroundLayer_sct(context, partialTicks, -1, -1)
+        oldScreen?.extractRenderState(context, mouseX, mouseY, partialTicks)
 
         RenderUtils.renderChangelog(context, scrollAmount.toInt())
     }

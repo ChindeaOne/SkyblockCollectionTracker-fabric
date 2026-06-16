@@ -5,13 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.state.CameraRenderState
+import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.core.BlockPos
+import net.minecraft.util.LightCoordsUtil
 import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
 import org.joml.Quaternionf
@@ -20,7 +20,7 @@ import java.awt.Color
 
 object BlockOutline {
 
-    fun renderWaypoint(context: WorldRenderContext) {
+    fun renderWaypoint(context: LevelRenderContext) {
         if (!RenderSystem.isOnRenderThread()) return
         if (!HypixelUtils.isOnSkyblock) return
         if (!FetchWaypoints.hasWaypoints) return
@@ -31,8 +31,8 @@ object BlockOutline {
         if (currentIsland == "Dwarven Mines" && !ConfigAccess.isMineshaftSpawnRoutesEnabled() && !ConfigAccess.isDwarvenMetalRoutesEnabled() && !ConfigAccess.isPureOresRoutesEnabled()) return
         if (currentIsland == "Mineshaft" && !ConfigAccess.isMineshaftRoutesEnabled()) return
 
-        val camera = context.worldState().cameraRenderState
-        val buffers = context.consumers()
+        val camera = context.levelState().cameraRenderState
+        val buffers = context.bufferSource()
 
         WaypointsUtils.updateCurrentIndex()
         val category = WaypointsUtils.currentCategory ?: return
@@ -100,11 +100,11 @@ object BlockOutline {
             vc.addVertex(matrix, v1[0], v1[1], v1[2])
                 .setColor(r, g, 0f, 1f)
                 .setNormal(edgeNormal.x(), edgeNormal.y(), edgeNormal.z())
-                /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
+                .setLineWidth(2f)
             vc.addVertex(matrix, v2[0], v2[1], v2[2])
                 .setColor(r, g, 0f, 1f)
                 .setNormal(edgeNormal.x(), edgeNormal.y(), edgeNormal.z())
-                /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
+                .setLineWidth(2f)
         }
     }
 
@@ -123,13 +123,14 @@ object BlockOutline {
 
         val fr: Font = Minecraft.getInstance().font
         val offset = -fr.width(text) / 2f
-        val glyphs: Font.PreparedText = fr.prepareText(text, offset, 0f, color, false,LightTexture.FULL_BRIGHT)
+        // set a background color
+        val glyphs: Font.PreparedText = fr.prepareText(text, offset, 0f, color, false, 0)
         glyphs.visit(
             Font.GlyphVisitor.forMultiBufferSource(
                 buffers,
                 matrix,
                 Font.DisplayMode.SEE_THROUGH,
-                LightTexture.FULL_BRIGHT
+                LightCoordsUtil.FULL_BRIGHT
             )
         )
     }
@@ -160,12 +161,12 @@ object BlockOutline {
         vc.addVertex(matrix, sx, sy, sz)
             .setColor(0f, 1f, 0f, 1f)
             .setNormal(normal.x(), normal.y(), normal.z())
-        /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
+            .setLineWidth(2f)
 
         vc.addVertex(matrix, ex, ey, ez)
             .setColor(0f, 1f, 0f, 1f)
             .setNormal(normal.x(), normal.y(), normal.z())
-        /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
+            .setLineWidth(2f)
     }
 
     fun renderBlockHighlight(
@@ -293,11 +294,11 @@ object BlockOutline {
         vc.addVertex(matrix, sx, sy, sz)
             .setColor(0f, 1f, 0f, 1f)
             .setNormal(normal.x(), normal.y(), normal.z())
-        /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
+            .setLineWidth(2f)
 
         vc.addVertex(matrix, ex, ey, ez)
             .setColor(0f, 1f, 0f, 1f)
             .setNormal(normal.x(), normal.y(), normal.z())
-        /*? if = 1.21.11 {*/.setLineWidth(2f) /*?}*/
+            .setLineWidth(2f)
     }
 }

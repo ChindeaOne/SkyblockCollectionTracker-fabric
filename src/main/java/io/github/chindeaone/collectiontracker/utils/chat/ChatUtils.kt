@@ -22,7 +22,8 @@ object ChatUtils {
         } else {
             messageComponent
         }
-        Minecraft.getInstance().player?.displayClientMessage(text, false)
+        Minecraft.getInstance().gui.chat.addClientSystemMessage(text)
+//        Minecraft.getInstance().player?.displayClientMessage(text, false)
     }
 
     fun sendEmptyMessage() {
@@ -35,7 +36,8 @@ object ChatUtils {
         } else {
             component
         }
-        Minecraft.getInstance().player?.displayClientMessage(finalComponent, false)
+        Minecraft.getInstance().gui.chat.addClientSystemMessage(finalComponent)
+//        Minecraft.getInstance().player?.displayClientMessage(finalComponent, false)
     }
 
     fun sendCommandComponent(
@@ -77,13 +79,7 @@ object ChatUtils {
         return component
     }
 
-    private fun getWidth(): Int {
-        //? if = 1.21.11 {
-        return ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get())
-        //? } else {
-         /*return Minecraft.getInstance().gui.chat.width
-        *///? }
-    }
+    private fun getWidth(): Int = ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get())
 
     fun sendCommandPage(
         category: String,

@@ -9,7 +9,7 @@ import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
 import io.github.chindeaone.collectiontracker.utils.tab.ForagingStatsWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class LotteryOverlay extends AbstractOverlay {
     }
 
     @Override
-    public void render(GuiGraphics context) {
+    public void render(GuiGraphicsExtractor context) {
         if (!isEnabled()) return;
         List<String> lines = getLotteryLines();
 

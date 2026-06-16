@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class TitleOverlay extends AbstractOverlay{
 
@@ -35,7 +35,7 @@ public class TitleOverlay extends AbstractOverlay{
     }
 
     @Override
-    public void render(GuiGraphics context) {
+    public void render(GuiGraphicsExtractor context) {
         if (!isEnabled()) return;
         RenderUtils.drawActiveTitle(context);
     }

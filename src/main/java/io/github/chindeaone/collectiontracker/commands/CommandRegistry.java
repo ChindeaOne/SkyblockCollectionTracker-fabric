@@ -23,8 +23,8 @@ import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.SkillUtils;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 
@@ -36,35 +36,35 @@ import java.util.stream.Collectors;
 public class CommandRegistry {
 
     public static void init() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-                dispatcher.register(ClientCommandManager.literal(SkyblockCollectionTracker.NAMESPACE)
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) ->
+                dispatcher.register(ClientCommands.literal(SkyblockCollectionTracker.NAMESPACE)
                 // sct -> opens the config GUI
-                .executes(context -> {
+                .executes(_ -> {
                     GuiManager.INSTANCE.openConfigGui(null);
                     return 1;
                 })
                 // sct edit -> opens the position editor
-                .then(ClientCommandManager.literal("edit")
-                        .executes(context -> {
+                .then(ClientCommands.literal("edit")
+                        .executes(_ -> {
                             Minecraft.getInstance().execute(GuiManager::openGuiPositionEditor);
                             return 1;
                         })
-                        .then(ClientCommandManager.literal("title")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("title")
+                                .executes(_ -> {
                                     Minecraft.getInstance().execute(GuiManager::openGuiTitlePositionEditor);
                                     return 1;
                                 })
                         )
                 )
                 // sct commands -> shows the list of commands
-                .then(ClientCommandManager.literal("commands")
+                .then(ClientCommands.literal("commands")
                         // sct commands -> shows first page of commands
-                        .executes(context -> {
+                        .executes(_ -> {
                             CommandHelper.showCommands(1);
                             return 1;
                         })
                         // sct commands <page>
-                        .then(ClientCommandManager.argument("page", IntegerArgumentType.integer(1))
+                        .then(ClientCommands.argument("page", IntegerArgumentType.integer(1))
                                 .executes(context -> {
                                     int page = IntegerArgumentType.getInteger(context, "page");
                                     CommandHelper.showCommands(page);
@@ -73,15 +73,15 @@ public class CommandRegistry {
                         )
                 )
                 // sct collections -> shows the list of collections
-                .then(ClientCommandManager.literal("collections")
+                .then(ClientCommands.literal("collections")
                         // sct collections -> opens first category (page 1)
-                        .executes(context -> {
+                        .executes(_ -> {
                             CollectionList.sendCollectionList(1);
                             return 1;
                         })
 
                         // sct collections <page> or <category>
-                        .then(ClientCommandManager.argument("arg", StringArgumentType.word())
+                        .then(ClientCommands.argument("arg", StringArgumentType.word())
                                 .suggests(CATEGORY_SUGGESTIONS)
                                 .executes(context -> {
                                     String arg = StringArgumentType.getString(context, "arg");
@@ -108,12 +108,12 @@ public class CommandRegistry {
                         )
                 )
                 // sct track <collection>
-                .then(ClientCommandManager.literal("track")
-                        .executes(context -> {
+                .then(ClientCommands.literal("track")
+                        .executes(_ -> {
                             ChatUtils.sendMessage("Usage: /sct track <collection>",true);
                             return 1;
                         })
-                        .then(ClientCommandManager.argument("collection", StringArgumentType.greedyString())
+                        .then(ClientCommands.argument("collection", StringArgumentType.greedyString())
                                 .suggests(COLLECTION_SUGGESTIONS)
                                 .executes(context -> {
                                     String input = StringArgumentType.getString(context, "collection").trim();
@@ -156,8 +156,8 @@ public class CommandRegistry {
                         )
                 )
                 // sct stop
-                .then(ClientCommandManager.literal("stop")
-                        .executes(context -> {
+                .then(ClientCommands.literal("stop")
+                        .executes(_ -> {
                             if (MultiTrackingHandler.isMultiTracking()) {
                                 MultiTrackingHandler.stopMultiTrackingManual();
                             } else {
@@ -167,8 +167,8 @@ public class CommandRegistry {
                         })
                 )
                 // sct pause
-                .then(ClientCommandManager.literal("pause")
-                        .executes(context -> {
+                .then(ClientCommands.literal("pause")
+                        .executes(_ -> {
                             if (MultiTrackingHandler.isMultiTracking()) {
                                 MultiTrackingHandler.pauseMultiTracking();
                             } else {
@@ -178,8 +178,8 @@ public class CommandRegistry {
                         })
                 )
                 // sct resume
-                .then(ClientCommandManager.literal("resume")
-                        .executes(context -> {
+                .then(ClientCommands.literal("resume")
+                        .executes(_ -> {
                             if (MultiTrackingHandler.isMultiPaused()) {
                                 MultiTrackingHandler.resumeMultiTracking();
                             } else {
@@ -189,8 +189,8 @@ public class CommandRegistry {
                         })
                 )
                 // sct restart
-                .then(ClientCommandManager.literal("restart")
-                        .executes(context -> {
+                .then(ClientCommands.literal("restart")
+                        .executes(_ -> {
                             if (MultiTrackingHandler.isMultiTracking() || MultiTrackingHandler.isMultiPaused()) {
                                 MultiTrackingHandler.restartMultiTracking();
                             } else {
@@ -200,14 +200,14 @@ public class CommandRegistry {
                         })
                 )
                 // sct skill -> skill tracking commands
-                .then(ClientCommandManager.literal("skill")
+                .then(ClientCommands.literal("skill")
                         // sct skill track <skillName>
-                        .then(ClientCommandManager.literal("track")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("track")
+                                .executes(_ -> {
                                     ChatUtils.sendMessage("Usage: /sct skill track <skill>",true);
                                     return 1;
                                 })
-                                .then(ClientCommandManager.argument("skillName", StringArgumentType.greedyString())
+                                .then(ClientCommands.argument("skillName", StringArgumentType.greedyString())
                                         .suggests(SKILL_LIST)
                                         .executes(context -> {
                                             SkillTracker.startTracking(StringArgumentType.getString(context, "skillName").trim());
@@ -216,48 +216,48 @@ public class CommandRegistry {
                                 )
                         )
                         // sct skill stop
-                        .then(ClientCommandManager.literal("stop")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("stop")
+                                .executes(_ -> {
                                     SkillTrackingHandler.stopTrackingManual();
                                     return 1;
                                 })
                         )
                         // sct skill pause
-                        .then(ClientCommandManager.literal("pause")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("pause")
+                                .executes(_ -> {
                                     SkillTrackingHandler.pauseTracking();
                                     return 1;
                                 })
                         )
                         // sct skill resume
-                        .then(ClientCommandManager.literal("resume")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("resume")
+                                .executes(_ -> {
                                     SkillTrackingHandler.resumeTracking();
                                     return 1;
                                 })
                         )
                         // sct skill restart
-                        .then(ClientCommandManager.literal("restart")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("restart")
+                                .executes(_ -> {
                                     SkillTrackingHandler.restartTracking();
                                     return 1;
                                 })
                         )
                 )
                 // sct cw -> shows player's coleweight
-                .then(ClientCommandManager.literal("cw")
+                .then(ClientCommands.literal("cw")
                         // sct cw -> shows player's coleweight
-                        .executes(context -> {
+                        .executes(_ -> {
                             ColeweightUtils.getColeweight(PlayerData.INSTANCE.getPlayerName(), false);
                             return 1;
                         })
                         // sct cw find <player> -> shows specified player(or local player)'s coleweight
-                        .then(ClientCommandManager.literal("find")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("find")
+                                .executes(_ -> {
                                     ColeweightUtils.getColeweight(PlayerData.INSTANCE.getPlayerName(), false);
                                     return 1;
                                 })
-                                .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                .then(ClientCommands.argument("player", StringArgumentType.string())
                                         .suggests(PLAYER_SUGGESTIONS)
                                         .executes(context -> {
                                             String playerName = StringArgumentType.getString(context, "player").trim();
@@ -266,13 +266,13 @@ public class CommandRegistry {
                                         })
                                 )
                         )
-                        .then(ClientCommandManager.literal("detailed")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("detailed")
+                                .executes(_ -> {
                                     String playerName = PlayerData.INSTANCE.getPlayerName();
                                     ColeweightUtils.getColeweightDetailed(playerName);
                                     return 1;
                                 })
-                                .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                .then(ClientCommands.argument("player", StringArgumentType.string())
                                         .suggests(PLAYER_SUGGESTIONS)
                                         .executes(context -> {
                                             String playerName = StringArgumentType.getString(context, "player").trim();
@@ -282,12 +282,12 @@ public class CommandRegistry {
                                 )
                         )
                         // sct cw lb <length>
-                        .then(ClientCommandManager.literal("lb")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("lb")
+                                .executes(_ -> {
                                     ChatUtils.sendMessage("Usage: /sct cw lb <length>.",true);
                                     return 1;
                                 })
-                                .then(ClientCommandManager.argument("position", IntegerArgumentType.integer())
+                                .then(ClientCommands.argument("position", IntegerArgumentType.integer())
                                         .executes(context -> {
                                             int position = IntegerArgumentType.getInteger(context, "position");
                                             ColeweightUtils.getColeweightLeaderboard(position);
@@ -296,13 +296,13 @@ public class CommandRegistry {
                                 )
                         )
                         // sct cw color set <ign> <color>
-                        .then(ClientCommandManager.literal("color")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("color")
+                                .executes(_ -> {
                                     ChatUtils.sendMessage("Usage: /sct cw color set <player name> <hex color>.",true);
                                     return 1;
                                 })
-                                .then(ClientCommandManager.literal("set")
-                                        .then(ClientCommandManager.argument("target", StringArgumentType.string())
+                                .then(ClientCommands.literal("set")
+                                        .then(ClientCommands.argument("target", StringArgumentType.string())
                                                 .suggests(((context, builder) -> {
                                                     String remaining = builder.getRemaining().toLowerCase();
                                                     if ("global".startsWith(remaining)) builder.suggest("global");
@@ -311,7 +311,7 @@ public class CommandRegistry {
                                                     }
                                                     return builder.buildFuture();
                                                 }))
-                                                .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
+                                                .then(ClientCommands.argument("hex color", StringArgumentType.greedyString())
                                                         .executes(context -> {
                                                             String target = StringArgumentType.getString(context, "target").trim();
                                                             String color = StringArgumentType.getString(context, "hex color").trim();
@@ -334,12 +334,12 @@ public class CommandRegistry {
                                                 )
                                         )
                                 )
-                                .then(ClientCommandManager.literal("remove")
-                                        .executes(context -> {
+                                .then(ClientCommands.literal("remove")
+                                        .executes(_ -> {
                                             ChatUtils.sendMessage("Usage: /sct cw color remove <player name>.",true);
                                             return 1;
                                         })
-                                        .then(ClientCommandManager.argument("player name", StringArgumentType.string())
+                                        .then(ClientCommands.argument("player name", StringArgumentType.string())
                                                 .suggests(PLAYER_SUGGESTIONS)
                                                 .executes(context -> {
                                                     String name = StringArgumentType.getString(context, "player name").trim();
@@ -349,47 +349,47 @@ public class CommandRegistry {
                                         )
                                 )
                         )
-                        .then(ClientCommandManager.literal("track")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("track")
+                                .executes(_ -> {
                                     ColeweightTrackingHandler.startTracking();
                                     return 1;
                                 })
                         )
-                        .then(ClientCommandManager.literal("stop")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("stop")
+                                .executes(_ -> {
                                     ColeweightTrackingHandler.stopTrackingManual();
                                     return 1;
                                 })
                         )
-                        .then(ClientCommandManager.literal("pause")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("pause")
+                                .executes(_ -> {
                                     ColeweightTrackingHandler.pauseTracking();
                                     return 1;
                                 })
-                        ).then(ClientCommandManager.literal("resume")
-                                .executes(context -> {
+                        ).then(ClientCommands.literal("resume")
+                                .executes(_ -> {
                                     ColeweightTrackingHandler.resumeTracking();
                                     return 1;
                                 })
                         )
-                        .then(ClientCommandManager.literal("restart")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("restart")
+                                .executes(_ -> {
                                     ColeweightTrackingHandler.restartTracking();
                                     return 1;
                                 })
                         )
                 )
-                .then(ClientCommandManager.literal("fw")
-                        .executes(context -> {
+                .then(ClientCommands.literal("fw")
+                        .executes(_ -> {
                             FarmingweightUtils.getFarmingweight(PlayerData.INSTANCE.getPlayerName());
                             return 1;
                         })
-                        .then(ClientCommandManager.literal("find")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("find")
+                                .executes(_ -> {
                                     FarmingweightUtils.getFarmingweight(PlayerData.INSTANCE.getPlayerName());
                                     return 1;
                                 })
-                                .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                                .then(ClientCommands.argument("player", StringArgumentType.string())
                                         .suggests(PLAYER_SUGGESTIONS)
                                         .executes(context -> {
                                             String playerName = StringArgumentType.getString(context, "player").trim();
@@ -398,12 +398,12 @@ public class CommandRegistry {
                                         })
                                 )
                         )
-                        .then(ClientCommandManager.literal("lb")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("lb")
+                                .executes(_ -> {
                                     ChatUtils.sendMessage("Usage: /sct fw lb <length>.", true);
                                     return 1;
                                 })
-                                .then(ClientCommandManager.argument("position", IntegerArgumentType.integer())
+                                .then(ClientCommands.argument("position", IntegerArgumentType.integer())
                                         .executes(context -> {
                                             int position = IntegerArgumentType.getInteger(context, "position");
                                             FarmingweightUtils.getFarmingweightLeaderboard(position);
@@ -412,13 +412,13 @@ public class CommandRegistry {
                                 )
                         )
                         // sct fw color set <ign> <color>
-                        .then(ClientCommandManager.literal("color")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("color")
+                                .executes(_ -> {
                                     ChatUtils.sendMessage("Usage: /sct fw color set <player name> <hex color>.", true);
                                     return 1;
                                 })
-                                .then(ClientCommandManager.literal("set")
-                                        .then(ClientCommandManager.argument("target", StringArgumentType.string())
+                                .then(ClientCommands.literal("set")
+                                        .then(ClientCommands.argument("target", StringArgumentType.string())
                                                 .suggests(((context, builder) -> {
                                                     String remaining = builder.getRemaining().toLowerCase();
                                                     if ("global".startsWith(remaining)) {
@@ -431,7 +431,7 @@ public class CommandRegistry {
                                                     }
                                                     return builder.buildFuture();
                                                 }))
-                                                .then(ClientCommandManager.argument("hex color", StringArgumentType.greedyString())
+                                                .then(ClientCommands.argument("hex color", StringArgumentType.greedyString())
                                                         .executes(context -> {
                                                             String target = StringArgumentType.getString(context, "target").trim();
                                                             String color = StringArgumentType.getString(context, "hex color").trim();
@@ -455,12 +455,12 @@ public class CommandRegistry {
                                                 )
                                         )
                                 )
-                                .then(ClientCommandManager.literal("remove")
-                                        .executes(context -> {
+                                .then(ClientCommands.literal("remove")
+                                        .executes(_ -> {
                                             ChatUtils.sendMessage("Usage: /sct fw color remove <player name>.", true);
                                             return 1;
                                         })
-                                        .then(ClientCommandManager.argument("player name", StringArgumentType.string())
+                                        .then(ClientCommands.argument("player name", StringArgumentType.string())
                                                 .suggests(PLAYER_SUGGESTIONS)
                                                 .executes(context -> {
                                                     String name = StringArgumentType.getString(context, "player name").trim();
@@ -472,16 +472,16 @@ public class CommandRegistry {
                         )
                 )
                 // sct changelog -> opens the changelog GUI
-                .then(ClientCommandManager.literal("changelog")
-                        .executes(context -> {
+                .then(ClientCommands.literal("changelog")
+                        .executes(_ -> {
                             Minecraft.getInstance().execute(GuiManager::openChangelog);
                             return 1;
                         })
                 )
                 // sct timer -> timer commands
-                .then(ClientCommandManager.literal("timer")
-                        .then(ClientCommandManager.literal("set")
-                                .then(ClientCommandManager.argument("time", StringArgumentType.greedyString())
+                .then(ClientCommands.literal("timer")
+                        .then(ClientCommands.literal("set")
+                                .then(ClientCommands.argument("time", StringArgumentType.greedyString())
                                         .executes(context -> {
                                             String time =StringArgumentType.getString(context, "time");
                                             int seconds = parseToSeconds(time);
@@ -499,24 +499,24 @@ public class CommandRegistry {
                                         })
                                 )
                         )
-                        .then(ClientCommandManager.literal("pause")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("pause")
+                                .executes(_ -> {
                                     TimerOverlay timer = OverlayManager.getTimerOverlay();
                                     assert timer != null;
                                     timer.pauseTimer();
                                     return 1;
                                 })
                         )
-                        .then(ClientCommandManager.literal("resume")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("resume")
+                                .executes(_ -> {
                                     TimerOverlay timer = OverlayManager.getTimerOverlay();
                                     assert timer != null;
                                     timer.pauseTimer();
                                     return 1;
                                 })
                         )
-                        .then(ClientCommandManager.literal("stop")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("stop")
+                                .executes(_ -> {
                                     TimerOverlay timer = OverlayManager.getTimerOverlay();
                                     assert timer != null;
                                     timer.setTimer(0);
@@ -525,33 +525,33 @@ public class CommandRegistry {
                         )
                 )
                 // sct stopwatch -> stopwatch commands
-                .then(ClientCommandManager.literal("stopwatch")
-                        .then(ClientCommandManager.literal("start")
-                                .executes(context -> {
+                .then(ClientCommands.literal("stopwatch")
+                        .then(ClientCommands.literal("start")
+                                .executes(_ -> {
                                     StopwatchOverlay stopwatch = OverlayManager.getStopwatchOverlay();
                                     assert stopwatch != null;
                                     stopwatch.startStopwatch();
                                     return 1;
                                 })
                         )
-                        .then(ClientCommandManager.literal("pause")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("pause")
+                                .executes(_ -> {
                                     StopwatchOverlay stopwatch = OverlayManager.getStopwatchOverlay();
                                     assert stopwatch != null;
                                     stopwatch.pauseStopwatch();
                                     return 1;
                                 })
                         )
-                        .then(ClientCommandManager.literal("resume")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("resume")
+                                .executes(_ -> {
                                     StopwatchOverlay stopwatch = OverlayManager.getStopwatchOverlay();
                                     assert stopwatch != null;
                                     stopwatch.pauseStopwatch();
                                     return 1;
                                 })
                         )
-                        .then(ClientCommandManager.literal("stop")
-                                .executes(context -> {
+                        .then(ClientCommands.literal("stop")
+                                .executes(_ -> {
                                     StopwatchOverlay stopwatch = OverlayManager.getStopwatchOverlay();
                                     assert stopwatch != null;
                                     stopwatch.stopStopwatch();
@@ -561,12 +561,12 @@ public class CommandRegistry {
                 )
 
                 // sct setCustomGoalPosition -> set custom position goal
-                .then(ClientCommandManager.literal("setCustomGoalPosition")
-                        .executes(context -> {
+                .then(ClientCommands.literal("setCustomGoalPosition")
+                        .executes(_ -> {
                             ChatUtils.sendMessage("§cUsage: /sct setCustomGoalPosition <collection/skill name> <position>", true);
                             return 1;
                         })
-                        .then(ClientCommandManager.argument("goal", StringArgumentType.greedyString())
+                        .then(ClientCommands.argument("goal", StringArgumentType.greedyString())
                                 .suggests(CUSTOM_GOAL_POSITION_SUGGESTIONS)
                                 .executes(context -> {
                                     String input = StringArgumentType.getString(context, "goal").trim();
@@ -602,12 +602,12 @@ public class CommandRegistry {
                         )
                 )
                 // sct setCustomGoalAmount -> set custom amount goal
-                .then(ClientCommandManager.literal("setCustomGoalAmount")
-                        .executes(context -> {
+                .then(ClientCommands.literal("setCustomGoalAmount")
+                        .executes(_ -> {
                             ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true);
                             return 1;
                         })
-                        .then(ClientCommandManager.argument("goal", StringArgumentType.greedyString())
+                        .then(ClientCommands.argument("goal", StringArgumentType.greedyString())
                                 .suggests(CUSTOM_GOAL_AMOUNT_SUGGESTIONS)
                                 .executes(context -> {
                                     String input = StringArgumentType.getString(context, "goal").trim();
@@ -637,9 +637,9 @@ public class CommandRegistry {
                         )
                 )
                 // sct commissions reset -> resets commissions tracker
-                .then(ClientCommandManager.literal("commissions")
-                        .then(ClientCommandManager.literal("reset")
-                                .executes(context -> {
+                .then(ClientCommands.literal("commissions")
+                        .then(ClientCommands.literal("reset")
+                                .executes(_ -> {
                                     CommissionsTracker.INSTANCE.reset();
                                     ChatUtils.sendMessage("§aCommissions tracker has been reset.", true);
                                     return 1;
@@ -649,7 +649,7 @@ public class CommandRegistry {
         ));
     }
 
-    private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_SUGGESTIONS = (context, builder) -> {
+    private static final SuggestionProvider<FabricClientCommandSource> COLLECTION_SUGGESTIONS = (_, builder) -> {
         String arg = builder.getRemaining().toLowerCase();
         String prefix;
         String lastWord;
@@ -683,7 +683,7 @@ public class CommandRegistry {
         return builder.buildFuture();
     };
 
-    private static final SuggestionProvider<FabricClientCommandSource> CATEGORY_SUGGESTIONS = (context, builder) -> {
+    private static final SuggestionProvider<FabricClientCommandSource> CATEGORY_SUGGESTIONS = (_, builder) -> {
         String arg = builder.getRemaining().toLowerCase();
         for (String category : CollectionsManager.collections.keySet()) {
             if (category.toLowerCase().startsWith(arg)) {
@@ -693,7 +693,7 @@ public class CommandRegistry {
         return builder.buildFuture();
     };
 
-    private static final SuggestionProvider<FabricClientCommandSource> SKILL_LIST = (context, builder) -> {
+    private static final SuggestionProvider<FabricClientCommandSource> SKILL_LIST = (_, builder) -> {
         String arg = builder.getRemaining().toLowerCase();
         for (String skill : SkillUtils.getDisplayNames()) {
             if (skill.toLowerCase().startsWith(arg)) {

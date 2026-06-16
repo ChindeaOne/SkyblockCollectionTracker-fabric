@@ -79,7 +79,7 @@ public class SkillFetcher {
         if (skillName == null || skillName.isEmpty()) return;
         if (!ConfigAccess.isSkillLeaderboardEnabled()) return;
 
-        AtomicBoolean inProgress = skillLeaderboardFetchInProgress.computeIfAbsent(skillName.toLowerCase(), k -> new AtomicBoolean(false));
+        AtomicBoolean inProgress = skillLeaderboardFetchInProgress.computeIfAbsent(skillName.toLowerCase(), _ -> new AtomicBoolean(false));
         if (!inProgress.compareAndSet(false, true)) return;
 
         try {

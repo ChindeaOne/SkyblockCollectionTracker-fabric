@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.world
 import com.mojang.blaze3d.systems.RenderSystem
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.BlockPos
@@ -31,13 +31,13 @@ object DwarvenHeatmap {
         "minecraft:brown_terracotta" to 2 // umber
     )
 
-    fun render (context: WorldRenderContext) {
+    fun render (context: LevelRenderContext) {
         if (!RenderSystem.isOnRenderThread()) return
         if (!HypixelUtils.isOnSkyblock) return
         if (!ConfigAccess.isHeatmapEnabled() || IslandTracker.currentMiningIsland != "Dwarven Mines") return
 
-        val camera = context.worldState().cameraRenderState
-        val buffers = context.consumers()
+        val camera = context.levelState().cameraRenderState
+        val buffers = context.bufferSource()
 
         val world = Minecraft.getInstance().level ?: return
         val player = Minecraft.getInstance().player ?: return

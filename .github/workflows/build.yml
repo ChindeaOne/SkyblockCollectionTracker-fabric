@@ -61,16 +61,16 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'microsoft'
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Build for 1.21.11
-      - name: "Stonecutter: set active to 1.21.11"
-        run: ./gradlew stonecutterSwitchTo1.21.11 --no-daemon --stacktrace
-      - name: Build 1.21.11
-        run: ./gradlew :1.21.11:clean :1.21.11:build --no-daemon --stacktrace --no-build-cache
+      # Build for 26.1
+      - name: "Stonecutter: set active to 26.1"
+        run: ./gradlew stonecutterSwitchTo26.1 --no-daemon --stacktrace
+      - name: Build 26.1
+        run: ./gradlew :26.1:clean :26.1:build --no-daemon --stacktrace --no-build-cache
 
       # Multi version download
       - name: Upload Development Build
@@ -78,5 +78,5 @@ jobs:
         with:
           name: "Multi-version Development Build"
           path: |
-            build/libs/1.21.11/*.jar
+            build/libs/26.1/*.jar
           if-no-files-found: error

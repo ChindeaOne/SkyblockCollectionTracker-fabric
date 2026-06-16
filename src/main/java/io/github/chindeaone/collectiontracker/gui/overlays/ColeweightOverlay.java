@@ -9,7 +9,7 @@ import io.github.chindeaone.collectiontracker.utils.NumbersUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class ColeweightOverlay extends AbstractOverlay{
     }
 
     @Override
-    public void render(GuiGraphics context) {
+    public void render(GuiGraphicsExtractor context) {
         if (!isEnabled() || !trackingDirty) return;
 
         List<String> lines = getLines();

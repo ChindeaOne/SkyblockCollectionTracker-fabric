@@ -32,7 +32,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.ContainerListener
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
@@ -166,11 +166,11 @@ object CommissionKeybinds {
 
         val wasCompleted = isCompletedCommission(clickedItem)
 
-        gm.handleInventoryMouseClick(
+        gm.handleContainerInput(
             screen.menu.containerId,
             slotIndex,
             0,
-            ClickType.PICKUP,
+            ContainerInput.PICKUP,
             player
         )
 

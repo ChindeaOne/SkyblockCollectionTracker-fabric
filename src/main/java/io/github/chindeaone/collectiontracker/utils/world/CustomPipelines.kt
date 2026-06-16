@@ -1,14 +1,10 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import com.mojang.blaze3d.pipeline.RenderPipeline
-import com.mojang.blaze3d.platform.DepthTestFunction
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import net.minecraft.client.renderer.RenderPipelines
-//? if = 1.21.11 {
 import net.minecraft.resources.Identifier
-//? } else {
-/*import net.minecraft.resources.ResourceLocation
-*///? }
+import java.util.Optional
 
 object CustomPipelines {
     lateinit var LINE_THROUGH_WALLS: RenderPipeline
@@ -17,22 +13,14 @@ object CustomPipelines {
     fun register() {
         LINE_THROUGH_WALLS = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
-            //? if = 1.21.11 {
-                 .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/line_through_walls"))
-            //? } else {
-                /*.withLocation(ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/line_through_walls"))
-                *///?}
-                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/line_through_walls"))
+                .withDepthStencilState(Optional.empty())
                 .build()
         )
         HIGHLIGHT = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
-            //? if = 1.21.11 {
                 .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/highlight"))
-            //? } else {
-                /*.withLocation(ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/highlight"))
-                *///?}
-                .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+                .withDepthStencilState(Optional.empty())
                 .build()
         )
     }

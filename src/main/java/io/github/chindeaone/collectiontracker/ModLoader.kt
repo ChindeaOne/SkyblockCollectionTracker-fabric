@@ -24,17 +24,13 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.ChatScreen
-//? if = 1.21.11 {
 import net.minecraft.resources.Identifier
-//? } else {
-/*import net.minecraft.resources.ResourceLocation
-*///? }
 
 class ModLoader: ModInitializer {
 
@@ -60,16 +56,12 @@ class ModLoader: ModInitializer {
         ClientReceiveMessageEvents.GAME_CANCELED.register { message, actionBar -> ChatListener.sacksListener(message, actionBar) }
 
         UseItemCallback.EVENT.register { player, _, hand -> InventoryListener.checkHandItem(player, hand) }
-        WorldRenderEvents.END_MAIN.register { context ->
+        LevelRenderEvents.END_MAIN.register { context ->
             BlockOutline.renderWaypoint(context)
             DwarvenHeatmap.render(context)
             PrecisionMining.render(context)
         }
-        //? if = 1.21.11 {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
-        //? } else {
-         /*val overlayId = ResourceLocation.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay") 
-        *///? }
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, _ ->
             // Avoid rendering in editor mode
             if(OverlayManager.isInEditorMode()) return@attachElementBefore

@@ -376,7 +376,7 @@ public class TextUtils {
                 if (mainExpanded) {
                     list.add(prefix + "§dGemstones:§r");
 
-                    GemstonePrices.multiGemstoneRecipes.forEach((type, variants) -> {
+                    GemstonePrices.multiGemstoneRecipes.forEach((type, _) -> {
                         if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(type)) {
                             String line = null;
                             switch (ConfigAccess.getTrackingOptions()) {
