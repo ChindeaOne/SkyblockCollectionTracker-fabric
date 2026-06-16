@@ -68,7 +68,8 @@ public class CommandHelper {
                     new CommandEntry("/sct cw color remove <player name>", "§eRemoves a player's custom Coleweight rank color (client side only)."),
                     new CommandEntry("/sct cw color set global <hex color>", "§eSets your own global Coleweight rank color (available only for the top 10 players in Coleweight)."),
 
-                    new CommandEntry("/sct timer <set | pause | resume | stop>", "§eManages the general timer.")
+                    new CommandEntry("/sct timer <set | pause | resume | stop>", "§eManages the general timer."),
+                    new CommandEntry("/sct stopwatch <start | pause | resume | stop>", "§eManages the stopwatch.")
             )),
 
             new CommandPage("Farming Weight", "§a", List.of(

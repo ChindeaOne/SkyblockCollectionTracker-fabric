@@ -51,5 +51,8 @@ public class ColeweightConfig {
     public Position coleweightTimerPosition = new Position(300, 200);
 
     @Expose
+    public Position coleweightStopwatchPosition = new Position(300, 250);
+
+    @Expose
     public Position coleweightTrackerPosition = new Position(400, 200);
 }

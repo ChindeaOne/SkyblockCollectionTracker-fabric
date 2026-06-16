@@ -13,6 +13,7 @@ import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.chindeaone.collectiontracker.gui.OverlayManager;
+import io.github.chindeaone.collectiontracker.gui.overlays.StopwatchOverlay;
 import io.github.chindeaone.collectiontracker.gui.overlays.TimerOverlay;
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker;
@@ -523,6 +524,42 @@ public class CommandRegistry {
                                 })
                         )
                 )
+                // sct stopwatch -> stopwatch commands
+                .then(ClientCommandManager.literal("stopwatch")
+                        .then(ClientCommandManager.literal("start")
+                                .executes(context -> {
+                                    StopwatchOverlay stopwatch = OverlayManager.getStopwatchOverlay();
+                                    assert stopwatch != null;
+                                    stopwatch.startStopwatch();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("pause")
+                                .executes(context -> {
+                                    StopwatchOverlay stopwatch = OverlayManager.getStopwatchOverlay();
+                                    assert stopwatch != null;
+                                    stopwatch.pauseStopwatch();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("resume")
+                                .executes(context -> {
+                                    StopwatchOverlay stopwatch = OverlayManager.getStopwatchOverlay();
+                                    assert stopwatch != null;
+                                    stopwatch.pauseStopwatch();
+                                    return 1;
+                                })
+                        )
+                        .then(ClientCommandManager.literal("stop")
+                                .executes(context -> {
+                                    StopwatchOverlay stopwatch = OverlayManager.getStopwatchOverlay();
+                                    assert stopwatch != null;
+                                    stopwatch.stopStopwatch();
+                                    return 1;
+                                })
+                        )
+                )
+
                 // sct setCustomGoalPosition -> set custom position goal
                 .then(ClientCommandManager.literal("setCustomGoalPosition")
                         .executes(context -> {
