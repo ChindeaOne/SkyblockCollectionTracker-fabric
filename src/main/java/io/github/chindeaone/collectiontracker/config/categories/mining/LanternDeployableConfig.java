@@ -25,6 +25,14 @@ public class LanternDeployableConfig {
     public boolean showDeployableTitle = false;
 
     @Expose
+    @ConfigOption(
+            name = "Out of Range Warning",
+            desc = "Shows a title warning when you move out of range of a deployable."
+    )
+    @ConfigEditorBoolean
+    public boolean deployableOutOfRangeWarning  = false;
+
+    @Expose
     @ConfigLink(owner = LanternDeployableConfig.class, field = "enableDeployable")
     public Position deployablePosition = new Position(300, 100);
 }

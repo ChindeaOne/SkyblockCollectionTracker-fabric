@@ -26,6 +26,7 @@ object DeployableParser {
     var deployablePos: BlockPos? = null
     @JvmStatic
     var isNear: Boolean = false
+    private var wasNear: Boolean = false
 
     private val MINING_DEPLOYABLE = listOf("Dwarven Lantern", "Mithril Lantern", "Titanium Lantern", "Glacite Lantern", "Will-o'-wisp")
     private val TIME_REGEX = Regex("""(\d+)s""")
@@ -76,7 +77,18 @@ object DeployableParser {
             remainingTime = timeMatch?.value ?: ""
 
             val isMineshaftType = buff.equals("Glacite Lantern", ignoreCase = true) || buff.equals("Will-o'-wisp", ignoreCase = true)
-            isNear = if (isMineshaftType && inMineshaft == true) true else player.distanceToSqr(entity) <= 900.0
+            val newIsNear = if (isMineshaftType && inMineshaft == true) {
+                true
+            } else {
+                player.distanceToSqr(entity) <= 900.0
+            }
+
+            if (wasNear && !newIsNear && buff.isNotEmpty()) {
+                notifyOutOfRange()
+            }
+
+            isNear = newIsNear
+            wasNear = newIsNear
 
             if ((remainingTime == "0s" || !entity.isAlive) && buff.isNotEmpty()) {
                 if (remainingTime == "0s") notifyExpiration()
@@ -123,6 +135,13 @@ object DeployableParser {
         }
     }
 
+    private fun notifyOutOfRange() {
+        if (!ConfigAccess.isDeployableOutOfRangeWarningEnabled()) return
+
+        val message = Component.literal("$buffColor$buff §cOut of range!")
+        RenderUtils.showTitle(message)
+    }
+
     @JvmStatic
     fun reset() {
         buff = ""
@@ -132,6 +151,7 @@ object DeployableParser {
         internalTimerTicks = 0
         deployablePos = null
         isNear = false
+        wasNear = false
         trackedEntity = null
     }
 }

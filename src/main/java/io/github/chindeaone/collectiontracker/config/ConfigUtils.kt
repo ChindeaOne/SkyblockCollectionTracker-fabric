@@ -135,6 +135,7 @@ val professionalMS: Property<Int> get() = hotmConfig.professionalMS
 val strongArmMS: Property<Int> get() = hotmConfig.strongArmMS
 val enableDeployable: Boolean get() = lanternDeployableConfig.enableDeployable
 val showDeployableTitle: Boolean get() = lanternDeployableConfig.showDeployableTitle
+val deployableOutOfRangeWarning : Boolean get() = lanternDeployableConfig.deployableOutOfRangeWarning
 
 // Foraging Config Accessors
 val foragingConfig: Foraging get() = modConfig.foraging
@@ -427,6 +428,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun isShowDeployableTitle(): Boolean = showDeployableTitle
+
+    @JvmStatic
+    fun isDeployableOutOfRangeWarningEnabled(): Boolean = deployableOutOfRangeWarning
 
     @JvmStatic
     fun isMineshaftRoutesEnabled(): Boolean = enableMineshaftRoutes
