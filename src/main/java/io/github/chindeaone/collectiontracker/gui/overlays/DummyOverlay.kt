@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
-import io.github.chindeaone.collectiontracker.mixins.AccessorGuiContainer
+import io.github.chindeaone.collectiontracker.mixins.AbstractContainerScreenAccessor
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
@@ -31,7 +31,7 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
         renderMenuBackground(context)
 
         if (oldScreen != null) {
-            (oldScreen as AccessorGuiContainer)
+            (oldScreen as AbstractContainerScreenAccessor)
                 .invokeDrawGuiContainerBackgroundLayer_sct(context, partialTicks, -1, -1)
         }
 

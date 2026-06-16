@@ -20,22 +20,23 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.mixins.AbstractContainerScreenAccessor
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionFormat
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.ContainerListener
+import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Logger
 import org.lwjgl.glfw.GLFW
 import java.util.*
 
@@ -50,7 +51,6 @@ object CommissionKeybinds {
         ConfigAccess.getKeybindConfig().commission3,
         ConfigAccess.getKeybindConfig().commission4
     )
-    private val logger: Logger = LogManager.getLogger(CommissionKeybinds::class.java)
 
     private var attachedMenu: AbstractContainerMenu? = null
     private val wasDown = HashMap<Int, Boolean>()
@@ -59,8 +59,7 @@ object CommissionKeybinds {
     private val COMMISSION_SLOTS = mapOf(11 to 0, 12 to 1, 14 to 2, 15 to 3)
 
     private var keyGuardActive = false
-    private val guardedScreens: MutableSet<Screen> =
-        Collections.newSetFromMap(WeakHashMap())
+    private val guardedScreens: MutableSet<Screen> = Collections.newSetFromMap(WeakHashMap())
 
     private val menuListener = object : ContainerListener {
         override fun slotChanged(menu: AbstractContainerMenu, slotId: Int, stack: ItemStack) {
@@ -138,6 +137,11 @@ object CommissionKeybinds {
 
         attachListener(screen.menu)
 
+        if (!ConfigAccess.isCommissionsKeybindsEnabled()) {
+            wasDown.clear()
+            return
+        }
+
         val now = System.currentTimeMillis()
         if (now - openedAt < CLICK_DEBOUNCE_MS) return
         if (now - lastClick < CLICK_DEBOUNCE_MS) return
@@ -160,30 +164,19 @@ object CommissionKeybinds {
         val player = client.player ?: return
         val gm = client.gameMode ?: return
 
-        // Check if claimed commission is completed
-        val clickedTooltipLines = clickedItem.getTooltipLines(
-            Item.TooltipContext.of(client.level!!.registryAccess()),
-            player,
-            AbilityItemParser.tooltipFlag()
-        ).map { it.string }
-
-        if (clickedTooltipLines.any { it.contains("COMPLETED", ignoreCase = true) }) {
-            CommissionsTracker.onCommissionClaimed()
-        }
-
-        // Don't allow keybind input here
-        if (!ConfigAccess.isCommissionsKeybindsEnabled()) {
-            lastClick = now
-            return
-        }
+        val wasCompleted = isCompletedCommission(clickedItem)
 
         gm.handleInventoryMouseClick(
             screen.menu.containerId,
-            slot.index,
+            slotIndex,
             0,
             ClickType.PICKUP,
             player
         )
+
+        if (wasCompleted) {
+            CommissionsTracker.onCommissionClaimed()
+        }
 
         lastClick = now
     }
@@ -247,13 +240,28 @@ object CommissionKeybinds {
     }
 
     private fun registerKeyGuards(screen: Screen) {
-
+        // these 2 handle custom keybinds
         ScreenKeyboardEvents.allowKeyPress(screen).register(ScreenKeyboardEvents.AllowKeyPress { s, event ->
             val container = s as? AbstractContainerScreen<*> ?: return@AllowKeyPress true
-            if (!shouldBlockNumberKeys(container)) return@AllowKeyPress true
 
             val keyCode = event.key
-            keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
+            val isNumberKey = keyCode in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
+
+            if (!isNumberKey) return@AllowKeyPress true
+            if (!shouldHandleCommissionTracking(container)) return@AllowKeyPress true
+            if (ConfigAccess.isCommissionsKeybindsEnabled()) return@AllowKeyPress false // block vanilla swapping
+
+            val slot = getHoveredSlot(container) ?: return@AllowKeyPress true
+
+            val slotId = container.menu.slots.indexOf(slot)
+            if (slotId !in COMMISSION_SLOTS.keys) return@AllowKeyPress true
+            if (!slot.hasItem()) return@AllowKeyPress true
+
+            if (isCompletedCommission(slot.item.copy())) {
+                CommissionsTracker.onCommissionClaimed()
+            }
+
+            true
         })
 
         ScreenKeyboardEvents.allowKeyRelease(screen).register(ScreenKeyboardEvents.AllowKeyRelease { s, event ->
@@ -263,11 +271,69 @@ object CommissionKeybinds {
             val keyCode = event.key
             keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
         })
+
+        // this handles mouse click
+        ScreenMouseEvents.beforeMouseClick(screen).register(ScreenMouseEvents.BeforeMouseClick { s, event ->
+            val container = s as? AbstractContainerScreen<*> ?: return@BeforeMouseClick
+
+            if (!shouldHandleCommissionTracking(container)) return@BeforeMouseClick
+            if (event.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT) return@BeforeMouseClick
+
+            val slot = getHoveredSlot(
+                container,
+                event.x(),
+                event.y()
+            ) ?: return@BeforeMouseClick
+
+            val slotId = container.menu.slots.indexOf(slot)
+            if (slotId !in COMMISSION_SLOTS.keys) return@BeforeMouseClick
+            if (!slot.hasItem()) return@BeforeMouseClick
+
+            if (isCompletedCommission(slot.item.copy())) {
+                CommissionsTracker.onCommissionClaimed()
+            }
+        })
     }
 
-    private fun shouldBlockNumberKeys(screen: AbstractContainerScreen<*>): Boolean {
+    private fun getHoveredSlot(screen: AbstractContainerScreen<*>, mouseX: Double, mouseY: Double): Slot? {
+        return (screen as AbstractContainerScreenAccessor)
+            .invokeGetHoveredSlot(mouseX, mouseY)
+    }
+
+    private fun getHoveredSlot(screen: AbstractContainerScreen<*>): Slot? {
+        return (screen as AbstractContainerScreenAccessor).getHoveredSlotField()
+    }
+
+    private fun isCommissionScreen(screen: AbstractContainerScreen<*>): Boolean {
         if (!HypixelUtils.isOnSkyblock) return false
         if (!ConfigAccess.isCommissionsEnabled()) return false
         return screen.title.string.contains("Commissions", ignoreCase = true)
+    }
+
+    private fun shouldBlockNumberKeys(screen: AbstractContainerScreen<*>): Boolean {
+        if (!isCommissionScreen(screen)) return false
+        return ConfigAccess.isCommissionsKeybindsEnabled()
+    }
+
+    private fun shouldHandleCommissionTracking(screen: AbstractContainerScreen<*>): Boolean {
+        return isCommissionScreen(screen)
+    }
+
+    private fun isCompletedCommission(stack: ItemStack): Boolean {
+        if (stack.isEmpty) return false
+
+        val client = Minecraft.getInstance()
+        val player = client.player ?: return false
+        val level = client.level ?: return false
+
+        val tooltipLines = stack.getTooltipLines(
+            Item.TooltipContext.of(level.registryAccess()),
+            player,
+            AbilityItemParser.tooltipFlag()
+        ).map { it.string }
+
+        return tooltipLines.any {
+            it.contains("COMPLETED", ignoreCase = true)
+        }
     }
 }

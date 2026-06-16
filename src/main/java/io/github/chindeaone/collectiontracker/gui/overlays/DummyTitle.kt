@@ -4,7 +4,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
-import io.github.chindeaone.collectiontracker.mixins.AccessorGuiContainer
+import io.github.chindeaone.collectiontracker.mixins.AbstractContainerScreenAccessor
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils
 import net.minecraft.client.Minecraft
@@ -31,7 +31,7 @@ class DummyTitle(
     override fun render(@NotNull context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
         renderMenuBackground(context)
 
-        if (oldScreen != null) (oldScreen as AccessorGuiContainer)
+        if (oldScreen != null) (oldScreen as AbstractContainerScreenAccessor)
             .invokeDrawGuiContainerBackgroundLayer_sct(context, partialTicks, -1, -1)
 
         val pos = ConfigAccess.getTitlePosition()
