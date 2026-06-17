@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = ChatScreen.class)
 public class ChatScreenMixin {
 
-    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     private void onRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
         for (AbstractOverlay overlay: OverlayManager.all()) {
             if (overlay.shouldRender() && OverlayManager.isCollectionOverlay(overlay)) {
