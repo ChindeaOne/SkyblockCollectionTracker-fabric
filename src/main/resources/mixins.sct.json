@@ -6,7 +6,8 @@
     "ChatScreenMixin",
     "ChatWeightMixin",
     "ClientPacketListenerMixin",
-    "ParticleMixin"
+    "ParticleMixin",
+    "GameRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
