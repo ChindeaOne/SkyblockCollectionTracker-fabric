@@ -72,6 +72,12 @@ jobs:
       - name: Build 26.1
         run: ./gradlew :26.1:clean :26.1:build --no-daemon --stacktrace --no-build-cache
 
+      # Build for 26.2
+      - name: "Stonecutter: set active to 26.2"
+        run: ./gradlew stonecutterSwitchTo26.2 --no-daemon --stacktrace
+      - name: Build 26.2
+        run: ./gradlew :26.2:clean :26.2:build --no-daemon --stacktrace --no-build-cache
+
       # Multi version download
       - name: Upload Development Build
         uses: actions/upload-artifact@v4
@@ -79,5 +85,5 @@ jobs:
           name: "Multi-version Development Build"
           path: |
             versions/26.1/build/libs/*.jar
-            !versions/26.1/build/libs/*-dev.jar
+            versions/26.2/build/libs/*.jar
           if-no-files-found: error
