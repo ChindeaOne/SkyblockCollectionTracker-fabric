@@ -28,7 +28,7 @@ object InventoryListener {
 
     fun onTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
-        if (/*? if 26.2 {*//* client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) return
+        if (/*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) return
 
         val isTracking = TrackingHandler.isTracking
         val isMultiTracking = MultiTrackingHandler.isMultiTracking

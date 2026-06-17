@@ -124,7 +124,7 @@ object CommissionKeybinds {
             return
         }
 
-        val screen = /*? if 26.2 {*//* client.gui.screen() *//*?} else {*/ client.screen /*?}*/ as? AbstractContainerScreen<*> ?: run {
+        val screen = /*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ as? AbstractContainerScreen<*> ?: run {
             detachListener()
             return
         }

@@ -22,7 +22,7 @@ object ChatUtils {
         } else {
             messageComponent
         }
-        Minecraft.getInstance().gui/*? if 26.2 {*//* .hud *//*?}*/.chat.addClientSystemMessage(text)
+        Minecraft.getInstance().gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat.addClientSystemMessage(text)
     }
 
     fun sendEmptyMessage() {
@@ -35,7 +35,7 @@ object ChatUtils {
         } else {
             component
         }
-        Minecraft.getInstance().gui/*? if 26.2 {*//* .hud *//*?}*/.chat.addClientSystemMessage(finalComponent)
+        Minecraft.getInstance().gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat.addClientSystemMessage(finalComponent)
     }
 
     fun sendCommandComponent(

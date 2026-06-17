@@ -16,7 +16,7 @@ class ChangelogOverlay(
 
     override fun onClose(){
         OverlayManager.setGlobalRendering(true)
-        Minecraft.getInstance()./*? if 26.2 {*//* gui.setScreen *//*?} else {*/ setScreen /*?}*/(oldScreen)
+        Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(oldScreen)
     }
 
     override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {

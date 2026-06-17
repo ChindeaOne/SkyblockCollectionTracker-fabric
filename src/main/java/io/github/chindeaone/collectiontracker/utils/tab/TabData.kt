@@ -62,7 +62,7 @@ object TabData {
         val player = mc.player ?: return null
         val connection = player.connection
 
-        val tabOverlay = mc.gui /*? if 26.2 {*//* .hud *//*?}*/.tabList
+        val tabOverlay = mc.gui /*? if 26.2 {*/ /*.hud *//*?}*/.tabList
 
         val result = connection.onlinePlayers
             .sortedWith(compareBy({ it.team?.name ?: "" }, { it.profile.name }))

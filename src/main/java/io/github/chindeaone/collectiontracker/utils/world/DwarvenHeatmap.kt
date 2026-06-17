@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
-import com.mojang.blaze3d.systems.RenderSystem
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
@@ -32,12 +31,10 @@ object DwarvenHeatmap {
     )
 
     fun render (context: LevelRenderContext) {
-        if (!RenderSystem.isOnRenderThread()) return
         if (!HypixelUtils.isOnSkyblock) return
         if (!ConfigAccess.isHeatmapEnabled() || IslandTracker.currentMiningIsland != "Dwarven Mines") return
 
         val camera = context.levelState().cameraRenderState
-        val buffers = context./*? if 26.2 {*//* poseStack() *//*?} else {*/ bufferSource() /*?}*/
 
         val world = Minecraft.getInstance().level ?: return
         val player = Minecraft.getInstance().player ?: return
@@ -58,7 +55,7 @@ object DwarvenHeatmap {
                         val blockName = key.toString()
 
                         val (r, g, b) = priorityColor(blockName)
-                        BlockOutline.renderBlockHighlight(buffers, checkPos, camera, r, g, b)
+                        BlockOutline.renderBlockHighlight(checkPos, camera, r, g, b)
                     }
                 }
             }
@@ -101,7 +98,7 @@ object DwarvenHeatmap {
 
         fun isNotSolid(pos: BlockPos): Boolean {
             val state = world.getBlockState(pos)
-            return state.isAir || state.block == Blocks.SNOW || state.block == Blocks./*? if 26.2 {*//* CARPET.lightGray *//*?} else {*/ LIGHT_GRAY_CARPET /*?}*/
+            return state.isAir || state.block == Blocks.SNOW || state.block == Blocks./*? if 26.2 {*/ /*CARPET.lightGray *//*?} else {*/ LIGHT_GRAY_CARPET /*?}*/
         }
 
         if (isNotSolid(pos.above())) return true

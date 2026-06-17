@@ -24,7 +24,7 @@ object SkyblockCollectionTracker {
         screenTicks++
         if (screenTicks != 5) return
         shouldCloseScreen = true
-        client./*? if 26.2 {*//* gui.setScreen *//*?} else {*/ setScreen /*?}*/(screenToOpen)
+        client./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(screenToOpen)
         screenTicks = 0
         this.screenToOpen = null
     }
