@@ -39,6 +39,7 @@ public class RepoUtils {
                 .timeout(Duration.ofSeconds(5))
                 .header("User-Agent", URLManager.AGENT)
                 .header("Accept", "application/json")
+                .header("MC_VERSION", SkyblockCollectionTracker.MC_VERSION)
                 .GET()
                 .build();
 
