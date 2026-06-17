@@ -52,7 +52,7 @@ jobs:
       - name: Create Draft Release
         run: |
           gh release create "${{ github.ref_name }}" \
-            build/libs/26.1/*.jar \
+            versions/26.1/build/libs/*.jar \
             --draft \
             --title "SkyblockCollectionTracker ${{ github.ref_name }}"
         env:

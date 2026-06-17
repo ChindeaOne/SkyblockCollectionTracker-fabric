@@ -19,8 +19,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p build/libs
-          gh release download ${{ github.event.release.tag_name }} --pattern "*${{ matrix.game-version }}*.jar" --dir build/libs
+          mkdir -p release-assets
+          gh release download ${{ github.event.release.tag_name }} --pattern "*${{ matrix.game-version }}*.jar" --dir release-assets
 
       - name: Prepare Description
         id: prepare_desc
@@ -48,10 +48,10 @@ jobs:
           changelog: "${{ steps.prepare_desc.outputs.description }}"
 
           files: |
-            build/libs/**/*${{ matrix.game-version }}*.jar
-            !build/libs/**/*-dev.jar
-            !build/libs/**/*-sources.jar
-            !build/libs/**/*-javadoc.jar
+            release-assets/**/*${{ matrix.game-version }}*.jar
+            !release-assets/**/*-dev.jar
+            !release-assets/**/*-sources.jar
+            !release-assets/**/*-javadoc.jar
 
           loaders: fabric
           game-versions: ${{ matrix.game-version }}

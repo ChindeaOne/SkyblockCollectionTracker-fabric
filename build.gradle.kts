@@ -172,17 +172,21 @@ java {
 }
 
 tasks.jar {
+    destinationDirectory.set(layout.buildDirectory.dir("intermediates"))
+    archiveClassifier.set("dev")
+}
+
+tasks.shadowJar {
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+    archiveClassifier.set("")
+
     val archivesNameValue = base.archivesName.get()
     inputs.property("archivesName", archivesNameValue)
 
     from("LICENSE") {
         rename { "${it}_${archivesNameValue}" }
     }
-}
 
-tasks.shadowJar {
-    destinationDirectory.set(layout.buildDirectory.dir("intermediates"))
-    archiveClassifier.set("non-obfuscated-with-deps")
     configurations = listOf(shadowImpl, shadowModImpl)
 
     doLast {
@@ -194,4 +198,8 @@ tasks.shadowJar {
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "io.github.chindeaone.collectiontracker.deps.moulconfig")
     relocate("io.github.chindeaone.modrinthautoupdater", "io.github.chindeaone.collectiontracker.deps.modrinthautoupdater")
+}
+
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }

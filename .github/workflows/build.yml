@@ -78,5 +78,6 @@ jobs:
         with:
           name: "Multi-version Development Build"
           path: |
-            build/libs/26.1/*.jar
+            versions/26.1/build/libs/*.jar
+            !versions/26.1/build/libs/*-dev.jar
           if-no-files-found: error
