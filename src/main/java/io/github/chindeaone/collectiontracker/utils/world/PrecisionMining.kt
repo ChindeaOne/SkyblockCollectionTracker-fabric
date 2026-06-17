@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
-import com.mojang.blaze3d.systems.RenderSystem
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
@@ -20,7 +19,6 @@ object PrecisionMining {
     private var activeParticlePos: Vec3? = null
 
     fun render(context: LevelRenderContext) {
-        if (!RenderSystem.isOnRenderThread()) return
         if (!HypixelUtils.isOnSkyblock) return
         if (!ConfigAccess.isPrecisionMiningHighlightEnabled()) return
         if (BlockWatcher.precisionMiningBlockType.isEmpty()) {
@@ -37,8 +35,6 @@ object PrecisionMining {
         }
 
         val camera = context.levelState().cameraRenderState
-        val buffers = context./*? if 26.2 {*//* poseStack() *//*?} else {*/ bufferSource() /*?}*/
-
         val pos = activeParticlePos ?: return
 
         val box = AABB(
@@ -47,7 +43,7 @@ object PrecisionMining {
         )
 
         val color = if (isLooking) Color.GREEN else Color.RED
-        BlockOutline.renderBox(buffers, box, camera, color)
+        BlockOutline.renderBox(box, camera, color)
     }
 
     @JvmStatic

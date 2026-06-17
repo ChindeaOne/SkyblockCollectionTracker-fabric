@@ -3,6 +3,7 @@
 */
 package io.github.chindeaone.collectiontracker
 
+import com.mojang.blaze3d.systems.RenderSystem
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.CommissionKeybinds
@@ -15,9 +16,10 @@ import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.tab.TabData
 import io.github.chindeaone.collectiontracker.utils.world.BlockOutline
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
+import io.github.chindeaone.collectiontracker.utils.world.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.world.DwarvenHeatmap
-import io.github.chindeaone.collectiontracker.utils.world.OutlineTypes
 import io.github.chindeaone.collectiontracker.utils.world.PrecisionMining
+import io.github.chindeaone.collectiontracker.utils.world.Renderer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -43,7 +45,7 @@ class ModLoader: ModInitializer {
         CommandRegistry.init()
 
         CommissionKeybinds.initKeyGuards()
-        OutlineTypes.init()
+        CustomPipelines.register()
     }
 
     private fun eventRegistration() {
@@ -57,9 +59,16 @@ class ModLoader: ModInitializer {
 
         UseItemCallback.EVENT.register { player, _, hand -> InventoryListener.checkHandItem(player, hand) }
         LevelRenderEvents.END_MAIN.register { context ->
-            BlockOutline.renderWaypoint(context)
-            DwarvenHeatmap.render(context)
-            PrecisionMining.render(context)
+            if (!RenderSystem.isOnRenderThread()) return@register
+
+            try {
+                /*? if 26.2 {*/ /*Renderer.prepare() *//*?}*/
+                BlockOutline.renderWaypoint(context)
+                DwarvenHeatmap.render(context)
+                PrecisionMining.render(context)
+            } finally {
+                Renderer.executeDraws()
+            }
         }
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, _ ->
