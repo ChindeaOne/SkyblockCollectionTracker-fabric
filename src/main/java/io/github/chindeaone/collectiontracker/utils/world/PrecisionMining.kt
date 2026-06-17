@@ -37,7 +37,7 @@ object PrecisionMining {
         }
 
         val camera = context.levelState().cameraRenderState
-        val buffers = context.bufferSource()
+        val buffers = context./*? if 26.2 {*//* poseStack() *//*?} else {*/ bufferSource() /*?}*/
 
         val pos = activeParticlePos ?: return
 

@@ -14,5 +14,4 @@ public interface AbstractContainerScreenAccessor {
 
     @Accessor("hoveredSlot")
     Slot getHoveredSlotField();
-
 }

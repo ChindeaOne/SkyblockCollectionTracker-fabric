@@ -42,7 +42,7 @@ object GuiManager {
     fun openGuiPositionEditor() {
         OverlayManager.setGlobalRendering(false)
 
-        val current = Minecraft.getInstance().screen
+        val current = Minecraft.getInstance()./*? if 26.2 {*//* gui.screen() *//*?} else {*/ screen /*?}*/
         val old = current as? AbstractContainerScreen<*>
 
         screenToOpen = DummyOverlay(old)
@@ -52,7 +52,7 @@ object GuiManager {
     fun openChangelog() {
         OverlayManager.setGlobalRendering(false)
 
-        val current = Minecraft.getInstance().screen
+        val current = Minecraft.getInstance()./*? if 26.2 {*//* gui.screen() *//*?} else {*/ screen /*?}*/
         val old = current as? AbstractContainerScreen<*>
 
         screenToOpen = ChangelogOverlay(old)
@@ -62,7 +62,7 @@ object GuiManager {
     fun openGuiTitlePositionEditor() {
         OverlayManager.setGlobalRendering(false)
 
-        val current = Minecraft.getInstance().screen
+        val current = Minecraft.getInstance()./*? if 26.2 {*//* gui.screen() *//*?} else {*/ screen /*?}*/
         val old = current as? AbstractContainerScreen<*>
 
         screenToOpen = DummyTitle(old)

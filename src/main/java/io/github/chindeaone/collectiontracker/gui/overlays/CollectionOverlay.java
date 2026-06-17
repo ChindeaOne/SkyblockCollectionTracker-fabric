@@ -136,7 +136,7 @@ public class CollectionOverlay extends AbstractOverlay{
         List<String> lines = new ArrayList<>(overlayLines);
         lines.add("Uptime: " + TrackingHandler.getUptime());
         if (!ConfigAccess.isShowExtraStats()) {
-            if (Minecraft.getInstance().screen instanceof ChatScreen) {
+            if (Minecraft.getInstance()./*? if 26.2 {*//* gui.screen() *//*?} else {*/ screen /*?}*/ instanceof ChatScreen) {
                 TextUtils.addToggleableSettingsLines(lines);
             }
         }
@@ -146,7 +146,7 @@ public class CollectionOverlay extends AbstractOverlay{
     private @NotNull List<String> getCollectionExtraLines() {
         if (!ConfigAccess.isShowExtraStats()) return Collections.emptyList();
         TextUtils.updateTrackingExtraLines(extraOverlayLines);
-        if (Minecraft.getInstance().screen instanceof ChatScreen) {
+        if (Minecraft.getInstance()./*? if 26.2 {*//* gui.screen() *//*?} else {*/ screen /*?}*/ instanceof ChatScreen) {
             TextUtils.addToggleableSettingsLines(extraOverlayLines);
         }
         return extraOverlayLines;

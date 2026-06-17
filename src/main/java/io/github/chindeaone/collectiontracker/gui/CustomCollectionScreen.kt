@@ -38,7 +38,7 @@ class CustomCollectionScreen(
                 20,
                 Component.literal(displayName)
                 )
-
+            // TODO: fix this later
 //            box.insertText { text -> text.all { it.isDigit() || it == '.' || it.lowercaseChar() in listOf('k', 'm', 'b') }}
 
             map[s] = box

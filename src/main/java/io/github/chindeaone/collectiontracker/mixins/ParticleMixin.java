@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ParticleMixin {
 
     @Inject(method = "createParticle", at = @At("HEAD"), cancellable = true)
-    private void onCreateParticle(ParticleOptions options, double x, double y, double z, double dx, double dy, double dz, CallbackInfoReturnable<Particle> ci) {
+    private void onCreateParticle(ParticleOptions options, double x, double y, double z, double xa, double ya, double za, CallbackInfoReturnable<Particle> ci) {
         PrecisionMining.handleParticles(options, x, y, z);
 
         // prevent particles from rendering client-side

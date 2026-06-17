@@ -37,7 +37,7 @@ object DwarvenHeatmap {
         if (!ConfigAccess.isHeatmapEnabled() || IslandTracker.currentMiningIsland != "Dwarven Mines") return
 
         val camera = context.levelState().cameraRenderState
-        val buffers = context.bufferSource()
+        val buffers = context./*? if 26.2 {*//* poseStack() *//*?} else {*/ bufferSource() /*?}*/
 
         val world = Minecraft.getInstance().level ?: return
         val player = Minecraft.getInstance().player ?: return
@@ -101,7 +101,7 @@ object DwarvenHeatmap {
 
         fun isNotSolid(pos: BlockPos): Boolean {
             val state = world.getBlockState(pos)
-            return state.isAir || state.block == Blocks.SNOW || state.block == Blocks.LIGHT_GRAY_CARPET
+            return state.isAir || state.block == Blocks.SNOW || state.block == Blocks./*? if 26.2 {*//* CARPET.lightGray *//*?} else {*/ LIGHT_GRAY_CARPET /*?}*/
         }
 
         if (isNotSolid(pos.above())) return true

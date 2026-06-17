@@ -243,9 +243,9 @@ public class TrackingRates {
     private static void updateBazaarExtremes(String key, long value) {
         if (key == null || value <= 0L) return;
 
-        lowestRatesPerHourBazaar.compute(key, (k, old) -> (old == null) ? value : Math.min(old, value));
+        lowestRatesPerHourBazaar.compute(key, (_, old) -> (old == null) ? value : Math.min(old, value));
 
-        highestRatesPerHourBazaar.compute(key, (k, old) -> (old == null) ? value : Math.max(old, value));
+        highestRatesPerHourBazaar.compute(key, (_, old) -> (old == null) ? value : Math.max(old, value));
     }
 
     private static boolean isTrackingDataReady() {

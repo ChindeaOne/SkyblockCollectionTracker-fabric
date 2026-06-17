@@ -1,6 +1,10 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import com.mojang.blaze3d.systems.RenderSystem
+//? if 26.2 {
+/*import com.mojang.blaze3d.textures.FilterMode
+import com.mojang.blaze3d.vertex.PoseStack
+*///?}
 import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -8,7 +12,13 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.MultiBufferSource
+//? if 26.2 {
+/*import net.minecraft.client.gui.font.TextRenderable
+import net.minecraft.client.gui.render.TextureSetup
+import net.minecraft.client.renderer.RenderPipelines
+*///?} else {
+ import net.minecraft.client.renderer.MultiBufferSource
+//?}
 import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.core.BlockPos
 import net.minecraft.util.LightCoordsUtil
@@ -32,7 +42,7 @@ object BlockOutline {
         if (currentIsland == "Mineshaft" && !ConfigAccess.isMineshaftRoutesEnabled()) return
 
         val camera = context.levelState().cameraRenderState
-        val buffers = context.bufferSource()
+        val buffers = context./*? if 26.2 {*//* poseStack() *//*?} else {*/ bufferSource() /*?}*/
 
         WaypointsUtils.updateCurrentIndex()
         val category = WaypointsUtils.currentCategory ?: return
@@ -66,13 +76,14 @@ object BlockOutline {
     }
 
     private fun renderBlockOutline(
-        buffers: MultiBufferSource,
+        buffers: /*? if 26.2 {*//* PoseStack *//*?} else {*/ MultiBufferSource /*?}*/,
         pos: BlockPos,
         camera: CameraRenderState,
         r: Float,
         g: Float,
     ) {
-        val vc: VertexConsumer = buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS)
+        val vc: VertexConsumer = /*? if 26.2 {*//* Renderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS) *//*?} else {*/
+             buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS) /*?}*/
 
         val matrix = Matrix4f().apply {
                 translate((pos.x - camera.pos.x).toFloat(), (pos.y - camera.pos.y).toFloat(), (pos.z - camera.pos.z).toFloat())
@@ -109,7 +120,7 @@ object BlockOutline {
     }
 
     private fun renderText(
-        buffers: MultiBufferSource,
+        buffers: /*? if 26.2 {*//* PoseStack *//*?} else {*/ MultiBufferSource /*?}*/,
         pos: BlockPos,
         text: String,
         camera: CameraRenderState,
@@ -126,17 +137,38 @@ object BlockOutline {
         // set a background color
         val glyphs: Font.PreparedText = fr.prepareText(text, offset, 0f, color, false, 0)
         glyphs.visit(
-            Font.GlyphVisitor.forMultiBufferSource(
+            //? if 26.2 {
+            /*object: Font.GlyphVisitor {
+                override fun acceptGlyph(glyph: TextRenderable.Styled) {
+                    draw(glyph)
+                }
+                override fun acceptEffect(bakedGlyph: TextRenderable) {
+                    draw(bakedGlyph)
+                }
+
+                private fun draw(glyph: TextRenderable) {
+                    val textureSetup = TextureSetup.singleTextureWithLightmap(
+                        glyph.textureView(),
+                        RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)
+                    )
+                    val vc: VertexConsumer = Renderer.getBuffer(RenderPipelines.TEXT_GRAYSCALE_SEE_THROUGH, textureSetup)
+
+                    glyph.render(matrix, vc, LightCoordsUtil.FULL_BRIGHT, false)
+                }
+            }
+            *///?} else {
+             Font.GlyphVisitor.forMultiBufferSource(
                 buffers,
                 matrix,
                 Font.DisplayMode.SEE_THROUGH,
                 LightCoordsUtil.FULL_BRIGHT
             )
+            //?}
         )
     }
 
     private fun drawLinetoBlock(
-        buffers: MultiBufferSource,
+        buffers: /*? if 26.2 {*//* PoseStack *//*?} else {*/ MultiBufferSource /*?}*/,
         blockPos: BlockPos,
         camera: CameraRenderState,
     ) {
@@ -151,7 +183,8 @@ object BlockOutline {
         val ey = (blockPos.y + 1.0 - camera.pos.y).toFloat()
         val ez = (blockPos.z + 0.5 - camera.pos.z).toFloat()
 
-        val vc = buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS)
+        val vc: VertexConsumer = /*? if 26.2 {*//* Renderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS) *//*?} else {*/
+             buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS) /*?}*/
 
         val matrix = Matrix4f().apply {
             translate(sx, sy, sz)
@@ -170,7 +203,7 @@ object BlockOutline {
     }
 
     fun renderBlockHighlight(
-        buffers: MultiBufferSource,
+        buffers: /*? if 26.2 {*//* PoseStack *//*?} else {*/ MultiBufferSource /*?}*/,
         pos: BlockPos,
         camera: CameraRenderState,
         red: Float,
@@ -178,7 +211,8 @@ object BlockOutline {
         blue: Float,
         alpha: Float = ConfigAccess.getHeatmapOpacity(),
     ) {
-        val vc: VertexConsumer = buffers.getBuffer(OutlineTypes.HIGHLIGHT)
+        val vc: VertexConsumer = /*? if 26.2 {*//* Renderer.getBuffer(CustomPipelines.HIGHLIGHT) *//*?} else {*/
+             buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS) /*?}*/
 
         val minX = pos.x.toFloat() - 0.001f
         val minY = pos.y.toFloat() - 0.001f
@@ -195,14 +229,14 @@ object BlockOutline {
     }
 
     fun renderBox(
-        buffers: MultiBufferSource,
+        buffers: /*? if 26.2 {*//* PoseStack *//*?} else {*/ MultiBufferSource /*?}*/,
         box: AABB,
         camera: CameraRenderState,
         color: Color,
         alpha: Float = 1f,
     ) {
-
-        val vc: VertexConsumer = buffers.getBuffer(OutlineTypes.HIGHLIGHT)
+        val vc: VertexConsumer = /*? if 26.2 {*//* Renderer.getBuffer(CustomPipelines.HIGHLIGHT) *//*?} else {*/
+             buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS) /*?}*/
 
         val posMatrix = Matrix4f().apply {
             translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
@@ -268,7 +302,7 @@ object BlockOutline {
     }
 
     private fun drawLineToBox(
-        buffers: MultiBufferSource,
+        buffers: /*? if 26.2 {*//* PoseStack *//*?} else {*/ MultiBufferSource /*?}*/,
         box: AABB,
         camera: CameraRenderState,
     ) {
@@ -284,7 +318,8 @@ object BlockOutline {
         val ey = ((box.minY + box.maxY) / 2 - camera.pos.y).toFloat()
         val ez = ((box.minZ + box.maxZ) / 2 - camera.pos.z).toFloat()
 
-        val vc = buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS)
+        val vc: VertexConsumer = /*? if 26.2 {*//* Renderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS) *//*?} else {*/
+             buffers.getBuffer(OutlineTypes.LINE_THROUGH_WALLS) /*?}*/
 
         val matrix = Matrix4f().apply {
             translate(sx, sy, sz)

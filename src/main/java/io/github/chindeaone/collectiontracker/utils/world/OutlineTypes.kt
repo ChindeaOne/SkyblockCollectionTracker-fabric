@@ -11,12 +11,12 @@ object OutlineTypes {
         CustomPipelines.register()
 
         val setup = RenderSetup.builder(CustomPipelines.LINE_THROUGH_WALLS)
-            .bufferSize(1536)
+            /*? if < 26.2 */ .bufferSize(1536) 
             .createRenderSetup()
         LINE_THROUGH_WALLS = RenderType.create("line_through_walls", setup)
 
         val highlightSetup = RenderSetup.builder(CustomPipelines.HIGHLIGHT)
-            .bufferSize(1536)
+            /*? if < 26.2 */ .bufferSize(1536) 
             .createRenderSetup()
         HIGHLIGHT = RenderType.create("highlight", highlightSetup)
     }

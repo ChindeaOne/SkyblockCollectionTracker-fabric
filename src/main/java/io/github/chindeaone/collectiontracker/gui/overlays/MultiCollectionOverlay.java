@@ -146,7 +146,7 @@ public class MultiCollectionOverlay extends AbstractOverlay{
     }
 
     private @NotNull List<String> getMultiCollectionLines() {
-        boolean isChatOpened = Minecraft.getInstance().screen instanceof ChatScreen;
+        boolean isChatOpened = Minecraft.getInstance()./*? if 26.2 {*//* gui.screen() *//*?} else {*/ screen /*?}*/ instanceof ChatScreen;
         TextUtils.updateMultiTrackingLines(multiOverlayLines, expandedCollections, isChatOpened);
         List<String> lines = new ArrayList<>(multiOverlayLines);
         lines.add("Uptime: " + MultiTrackingHandler.getMultiUptime());

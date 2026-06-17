@@ -38,7 +38,7 @@ object MultiDataFetcher {
                 if (data == null) {
                     logger.error("[SCT]: Failed to fetch multi collection data from the Hypixel API.")
                     Minecraft.getInstance().execute {
-                        Minecraft.getInstance().setScreen(CustomCollectionScreen(CollectionTracker.collectionList))
+                        Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(CustomCollectionScreen(CollectionTracker.collectionList))
                     }
                     return
                 }

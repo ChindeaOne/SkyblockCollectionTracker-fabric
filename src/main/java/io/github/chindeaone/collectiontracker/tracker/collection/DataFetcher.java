@@ -53,7 +53,7 @@ public class DataFetcher {
                 String jsonData = fetchDataFromApi(playerUUID, collection);
                 if (jsonData == null) {
                     logger.error("[SCT]: Failed to fetch data from the Hypixel API");
-                    Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new CustomCollectionScreen(List.of(collection))));
+                    Minecraft.getInstance().execute(() -> Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(new CustomCollectionScreen(List.of(collection))));
                     return;
                 }
                 collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().getValue().getAsLong();
