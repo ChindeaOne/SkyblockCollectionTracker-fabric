@@ -56,10 +56,10 @@ public class RepoUtils {
             JsonObject jsonResponse = JsonParser.parseReader(reader).getAsJsonObject();
             logger.info("[SCT]: Successfully fetched GitHub releases");
 
-            latestReleaseTag = jsonResponse.getAsJsonPrimitive("latest_tag").getAsString();
-            latestBetaTag = jsonResponse.getAsJsonPrimitive("latest_beta_tag").getAsString();
-            latestReleaseNotes = jsonResponse.getAsJsonPrimitive("latest_release_notes").getAsString();
-            latestBetaNotes = jsonResponse.getAsJsonPrimitive("latest_beta_notes").getAsString();
+            latestReleaseTag = getNullableString(jsonResponse, "latest_tag");
+            latestBetaTag = getNullableString(jsonResponse, "latest_beta_tag");
+            latestReleaseNotes = getNullableString(jsonResponse, "latest_release_notes");
+            latestBetaNotes = getNullableString(jsonResponse, "latest_beta_notes");
         }
     }
 
@@ -74,6 +74,12 @@ public class RepoUtils {
         String chosenNotes = (ConfigAccess.getUpdateType() == About.UpdateType.BETA)
                 ? latestBetaNotes
                 : latestReleaseNotes;
+
+        if (chosenTag == null) {
+            latestVersion = null;
+            latestNotes = null;
+            return;
+        }
 
         // If already on that same version -> no update
         if (currentVersion.equals(chosenTag)) {
@@ -122,5 +128,13 @@ public class RepoUtils {
             if (n1 != n2) return Integer.compare(n1, n2);
         }
         return 0; // same major.minor.beta
+    }
+
+    private static String getNullableString(JsonObject object, String key) {
+        if (!object.has(key) || object.get(key).isJsonNull()) {
+            return null;
+        }
+
+        return object.get(key).getAsString();
     }
 }
