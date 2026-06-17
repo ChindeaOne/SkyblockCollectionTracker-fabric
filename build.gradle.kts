@@ -84,10 +84,10 @@ repositories {
     }
 }
 
-loom {}
-
-val shadowModImpl: Configuration by configurations.creating {
-    configurations.implementation.get().extendsFrom(this)
+loom {
+    accessWidenerPath.set(
+        rootProject.file("src/main/resources/skyblockcollectiontracker.accesswidener")
+    )
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -112,7 +112,9 @@ dependencies {
 
     implementation("com.terraformersmc:modmenu:${project.property("mod_menu_version")}")
 
-    shadowModImpl("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
+    shadowImpl("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}") {
+        exclude(group = "org.jetbrains.kotlin")
+    }
     shadowImpl("com.github.ChindeaOne:modrinthautoupdater:${project.property("modrinthautoupdater_version")}") {
         exclude(group = "gson")
     }
@@ -187,10 +189,10 @@ tasks.shadowJar {
         rename { "${it}_${archivesNameValue}" }
     }
 
-    configurations = listOf(shadowImpl, shadowModImpl)
+    configurations = listOf(shadowImpl)
 
     doLast {
-        listOf(shadowImpl, shadowModImpl).forEach {
+        listOf(shadowImpl,).forEach {
             println("Copying dependencies into mod: ${it.files}")
         }
     }
