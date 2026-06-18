@@ -182,6 +182,8 @@ tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("libs"))
     archiveClassifier.set("")
 
+    archiveFileName.set("${project.property("archives_base_name")}-${project.version}+mc${sc.current.version}.jar")
+
     val archivesNameValue = base.archivesName.get()
     inputs.property("archivesName", archivesNameValue)
 
