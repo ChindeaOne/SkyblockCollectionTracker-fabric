@@ -35,8 +35,10 @@ public class MiningStatsParser {
                 continue;
             }
 
-            if (line.contains("Mining Spread") || line.contains("Gemstone Spread")) {
-                ctx.spread.parse(line);
+            if (line.contains("Mining Spread")) {
+                ctx.miningSpread.parse(line);
+            } else if (line.contains("Gemstone Spread")) {
+                ctx.gemstoneSpread.parse(line);
             } else if (line.contains("Pristine")) {
                 ctx.pristine.parse(line);
             } else if (line.contains("Mining Wisdom")) {
@@ -54,10 +56,10 @@ public class MiningStatsParser {
         formatted.add(ctx.formatTotalFortune());
 
         if (ctx.isGemstone) {
-            if (!"0".equals(ctx.spread.value)) formatted.add(ctx.spread.format());
+            if (!"0".equals(ctx.gemstoneSpread.value)) formatted.add(ctx.gemstoneSpread.format());
             if (!"0".equals(ctx.pristine.value)) formatted.add(ctx.pristine.format());
         } else {
-            if (!"0".equals(ctx.spread.value)) formatted.add(ctx.spread.format());
+            if (!"0".equals(ctx.miningSpread.value)) formatted.add(ctx.miningSpread.format());
         }
 
         if (!"0".equals(ctx.wisdom.value)) formatted.add(ctx.wisdom.format());
@@ -140,7 +142,8 @@ public class MiningStatsParser {
         String specificFortuneName = "";
 
         Stat speed = new Stat("Mining Speed", "⸕", "§6");
-        Stat spread = new Stat("Mining Spread", "▚", "§e");
+        Stat miningSpread = new Stat("Mining Spread", "▚", "§e");
+        Stat gemstoneSpread = new Stat("Gemstone Spread", "▚", "§e");
         Stat pristine = new Stat("Pristine", "✧", "§5");
         Stat wisdom = new Stat("Mining Wisdom", "☯", "§3");
         Stat cold = new Stat("Cold Resistance", "❄", "§b");
@@ -151,10 +154,6 @@ public class MiningStatsParser {
             this.blockType = blockType;
             this.island = IslandTracker.getCurrentMiningIsland();
             this.isGemstone = "gemstones".equals(blockType);
-
-            if (isGemstone) {
-                this.spread = new Stat("Gemstone Spread", "▚", "§e");
-            }
 
             Set<String> allowed = MiningMapping.getMiningBlocksPerArea().get(blockType);
             this.allowSpecificFortune = allowed != null && island != null && allowed.contains(island);
