@@ -24,10 +24,10 @@ public class EliteApiFetcher {
     public static boolean hasFarmingweightLb = false;
     public static boolean hasFarmingweightTopColors = false;
 
-    public static void fetchFarmingweightDataAsync(String playerName, String uuid, String profileId, Runnable onComplete) {
+    public static void fetchFarmingweightDataAsync(String playerName, String uuid, Runnable onComplete) {
         try {
             URI uri = URI.create(URLManager.FARMINGWEIGHT_URL);
-            HttpRequest request = buildPlayerRequest(uri, playerName, uuid, profileId);
+            HttpRequest request = buildPlayerRequest(uri, playerName, uuid);
 
             HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                     .thenAccept(response -> {
@@ -37,7 +37,7 @@ public class EliteApiFetcher {
                             logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
                             try {
                                 TokenManager.fetchAndStoreToken();
-                                HttpRequest retryRequest = buildPlayerRequest(uri, playerName, uuid, profileId);
+                                HttpRequest retryRequest = buildPlayerRequest(uri, playerName, uuid);
                                 HttpResponse<String> retryResponse = HTTP_CLIENT.send(retryRequest, HttpResponse.BodyHandlers.ofString());
                                 status = retryResponse.statusCode();
 
@@ -266,7 +266,6 @@ public class EliteApiFetcher {
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(15))
                     .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-NAME", PlayerData.INSTANCE.getPlayerName())
                     .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
@@ -285,7 +284,6 @@ public class EliteApiFetcher {
                 request = HttpRequest.newBuilder(uri)
                         .timeout(Duration.ofSeconds(15))
                         .header("Authorization", "Bearer " + token)
-                        .header("X-NAME", PlayerData.INSTANCE.getPlayerName())
                         .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
                         .header("User-Agent", URLManager.AGENT)
                         .header("Accept", "application/json")
@@ -312,7 +310,7 @@ public class EliteApiFetcher {
         return null;
     }
 
-    private static HttpRequest buildPlayerRequest(URI uri, String playerName, String uuid, String profileId) {
+    private static HttpRequest buildPlayerRequest(URI uri, String playerName, String uuid) {
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
                 .timeout(Duration.ofSeconds(15))
                 .header("Authorization", "Bearer " + TokenManager.getToken())
@@ -320,10 +318,6 @@ public class EliteApiFetcher {
                 .header("X-UUID", uuid)
                 .header("User-Agent", URLManager.AGENT)
                 .header("Accept", "application/json");
-
-        if (profileId != null) {
-            builder.header("X-PROFILEID", profileId);
-        }
 
         return builder.GET().build();
     }

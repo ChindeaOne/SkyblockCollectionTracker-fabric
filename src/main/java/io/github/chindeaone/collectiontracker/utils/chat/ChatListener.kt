@@ -70,7 +70,6 @@ object ChatListener {
         val text = message.string
         val cleanText = text.removeColor()
 
-        profileIdListener(cleanText)
         petSummoned(text)
         abilityListener(cleanText)
         onCooldownListener(cleanText)
@@ -82,15 +81,6 @@ object ChatListener {
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
             TrackingHandler.pauseRiftTracking()
             MultiTrackingHandler.pauseMultiRiftTracking()
-        }
-    }
-
-    private fun profileIdListener(cleanText: String) {
-        if (!cleanText.startsWith("Profile ID:")) return
-        val id = cleanText.substringAfter("Profile ID:").trim()
-        val isUuid = Regex("^[0-9a-fA-F-]{36}$").matches(id)
-        if (isUuid) {
-            PlayerData.updateProfileId(id)
         }
     }
 
