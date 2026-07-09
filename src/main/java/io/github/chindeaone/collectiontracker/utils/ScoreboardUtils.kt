@@ -151,9 +151,7 @@ object ScoreboardUtils {
             match?.groupValues[1]?.toIntOrNull()
         }
 
-        coldValue = if (cold != null && coldValue != cold) {
-            cold
-        } else 0
+        coldValue = cold ?: 0
     }
 
     @JvmStatic
