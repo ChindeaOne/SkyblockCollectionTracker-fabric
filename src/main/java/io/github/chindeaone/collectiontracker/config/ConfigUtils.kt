@@ -633,8 +633,18 @@ object ConfigHelper {
     }
 
     @JvmStatic
+    fun disableSkyMall() {
+        skyMallConfig.enableSkyMall = false
+    }
+
+    @JvmStatic
     fun setLastLotteryPerk(perk: String) {
         lotteryConfig.lastLotteryPerk = perk
+    }
+
+    @JvmStatic
+    fun disableLottery() {
+        lotteryConfig.enableLottery = false
     }
 
     @JvmStatic

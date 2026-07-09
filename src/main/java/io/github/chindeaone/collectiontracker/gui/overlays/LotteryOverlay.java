@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
+import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
@@ -74,6 +75,10 @@ public class LotteryOverlay extends AbstractOverlay {
 
     private List<String> getLotteryLines() {
         lotteryOverlayLines.clear();
+        if (ChatListener.getCurrentLotteryBuff().isEmpty()) {
+            if (ConfigAccess.isLotteryEnabled()) ConfigHelper.disableLottery();
+            return Collections.emptyList();
+        }
         if (ConfigAccess.isLotteryInForagingIslandsOnly() && ForagingStatsWidget.getCurrentForagingIsland() == null) return Collections.emptyList();
 
         lotteryOverlayLines.add("§2Lottery: " + ChatListener.getCurrentLotteryBuff());
