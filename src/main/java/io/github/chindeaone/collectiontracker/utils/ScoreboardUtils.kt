@@ -10,12 +10,14 @@ import kotlin.math.roundToInt
 
 object ScoreboardUtils {
 
-    private val locationSymbols: Regex = Regex("^[⏣ф]\\s*") // ф is for Rift
+    private val locationSymbols: Regex = Regex("[\uE067\uE020]\\s*") // ф is for Rift
     private val timeRegex = Regex("(\\d{1,2}):(\\d{2})(am|pm)")
 
     var location: String = ""
     var lastLocation: String = ""
     var mineshaftType: String = ""
+    @JvmStatic
+    var coldValue: Int = 0
 
     private var checkTime: Boolean = true
     var timeLeft: Int = 0
@@ -48,6 +50,7 @@ object ScoreboardUtils {
         checkSkyblockTime(rawLines)
         checkLocation(rawLines)
         checkIfMineshaft(rawLines)
+        getColdValue(rawLines)
     }
 
     private fun checkLocation(rawLines: List<String>) {
@@ -108,13 +111,14 @@ object ScoreboardUtils {
         return displayName
     }
 
-    fun checkIfMineshaft(rawLines: List<String>) {
+    private fun checkIfMineshaft(rawLines: List<String>) {
         if (!IslandTracker.currentMiningIsland.equals("Mineshaft")) {
             if (mineshaftType.isNotEmpty()) {
                 mineshaftType = ""
             }
             return
         }
+
         val foundType = rawLines.firstNotNullOfOrNull { line ->
             WaypointsUtils.MineshaftTypes.entries.find {type ->
                 line.contains(type.name)
@@ -137,6 +141,19 @@ object ScoreboardUtils {
                 WaypointsUtils.currentCategory = null
             }
         }
+    }
+
+    private fun getColdValue(rawLines: List<String>) {
+        if (!isColdStatRelevant()) return
+
+        val cold = rawLines.firstNotNullOfOrNull { line ->
+            val match = Regex("""Cold:\s*(-?\d+)""").find(line)
+            match?.groupValues[1]?.toIntOrNull()
+        }
+
+        coldValue = if (cold != null && coldValue != cold) {
+            cold
+        } else 0
     }
 
     @JvmStatic

@@ -63,7 +63,7 @@ public class MiningStatsParser {
         }
 
         if (!"0".equals(ctx.wisdom.value)) formatted.add(ctx.wisdom.format());
-        if (!"0".equals(ctx.cold.value) && ScoreboardUtils.isColdStatRelevant() ) formatted.add(ctx.cold.format());
+        if (!"0".equals(ctx.cold.value) && ScoreboardUtils.isColdStatRelevant()) formatted.add(ctx.cold.format());
         if (!"0".equals(ctx.heat.value) && ScoreboardUtils.isHeatStatRelevant()) formatted.add(ctx.heat.format());
         if (!"0".equals(ctx.breakingPower.value)) formatted.add(ctx.breakingPower.format());
 
@@ -141,12 +141,12 @@ public class MiningStatsParser {
         int specificFortune = 0;
         String specificFortuneName = "";
 
-        Stat speed = new Stat("Mining Speed", "⸕", "§6");
-        Stat miningSpread = new Stat("Mining Spread", "▚", "§e");
-        Stat gemstoneSpread = new Stat("Gemstone Spread", "▚", "§e");
-        Stat pristine = new Stat("Pristine", "✧", "§5");
+        Stat speed = new Stat("Mining Speed", "\uE015", "§6");
+        Stat miningSpread = new Stat("Mining Spread", "\uE016", "§e");
+        Stat gemstoneSpread = new Stat("Gemstone Spread", "\uE00F", "§e");
+        Stat pristine = new Stat("Pristine", "\uE01C", "§5");
         Stat wisdom = new Stat("Mining Wisdom", "☯", "§3");
-        Stat cold = new Stat("Cold Resistance", "❄", "§b");
+        Stat cold = new Stat("Cold Resistance", "\uE006", "§b");
         Stat heat = new Stat("Heat Resistance", "♨", "§c");
         Stat breakingPower = new Stat("Breaking Power", "Ⓟ", "§2");
 
@@ -184,7 +184,7 @@ public class MiningStatsParser {
         }
 
         String formatTotalFortune() {
-            String symbol = "☘";
+            String symbol = "\uE053";
             String color = getFortuneColor();
             int total = globalFortune + specificFortune;
             boolean showDetailed = ConfigAccess.isShowDetailedMiningFortune();
@@ -237,6 +237,12 @@ public class MiningStatsParser {
             }
 
             String format() {
+                // for cold
+                if (label.equals("Cold Resistance")) {
+                    int coldValue = ScoreboardUtils.getColdValue();
+                    if (coldValue != 0) return "§a" + label + ": " + valueColor + symbol + value + "/" + valueColor + coldValue;
+                }
+
                 return "§a" + label + ": " + valueColor + symbol + value;
             }
         }
