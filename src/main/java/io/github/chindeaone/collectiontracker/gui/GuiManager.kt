@@ -24,6 +24,7 @@ object GuiManager {
     @JvmStatic
     fun getEditorInstance() = editor ?: MoulConfigEditor(configManager.processor).also { editor = it }
 
+    @JvmStatic
     fun openConfigGui(search: String? = null) {
         val editor = getEditorInstance()
 

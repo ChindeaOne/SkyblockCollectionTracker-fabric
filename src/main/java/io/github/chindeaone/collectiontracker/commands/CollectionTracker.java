@@ -33,7 +33,7 @@ public class CollectionTracker {
                 return;
             }
             try {
-                if (!ServerUtils.INSTANCE.getServerStatus()) {
+                if (!ServerUtils.getServerStatus()) {
                     ChatUtils.sendMessage("§cYou can't use any tracking commands at the moment.", true);
                     return;
                 }
@@ -61,12 +61,12 @@ public class CollectionTracker {
                 }
 
                 // Check for rift collections
-                if (CollectionsManager.isRiftCollection(collection) && !IslandTracker.INSTANCE.isInRift()) {
+                if (CollectionsManager.isRiftCollection(collection) && !IslandTracker.isInRift()) {
                     ChatUtils.sendMessage("§cYou must be in The Rift to track rift collections!", true);
                     return;
                 }
 
-                if (!CollectionsManager.isRiftCollection(collection) && IslandTracker.INSTANCE.isInRift()) {
+                if (!CollectionsManager.isRiftCollection(collection) && IslandTracker.isInRift()) {
                     ChatUtils.sendMessage("§cYou cannot track non-rift collections while in The Rift!", true);
                     return;
                 }
@@ -91,7 +91,7 @@ public class CollectionTracker {
                 }
 
                 // Fetch bazaar data and leaderboard data asynchronously
-                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection))
+                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.getPlayerUUID(), TokenManager.getToken(), collection))
                         .thenRunAsync(() -> DataFetcher.fetchLeaderboardData(collection))
                         .thenRun(TrackingHandler::startTracking);
             } catch (Exception e) {
@@ -110,7 +110,7 @@ public class CollectionTracker {
                 return;
             }
             try {
-                if (!ServerUtils.INSTANCE.getServerStatus()) {
+                if (!ServerUtils.getServerStatus()) {
                     ChatUtils.sendMessage("§cYou can't use any tracking commands at the moment.", true);
                     return;
                 }
@@ -152,12 +152,12 @@ public class CollectionTracker {
                 }
 
                 // Check for rift collections
-                if (CollectionsManager.hasAnyRiftCollection() && !IslandTracker.INSTANCE.isInRift()) {
+                if (CollectionsManager.hasAnyRiftCollection() && !IslandTracker.isInRift()) {
                     ChatUtils.sendMessage("§cYou must be in The Rift to track rift collections!", true);
                     return;
                 }
 
-                if (!CollectionsManager.hasAllRiftCollections() && IslandTracker.INSTANCE.isInRift()) {
+                if (!CollectionsManager.hasAllRiftCollections() && IslandTracker.isInRift()) {
                     ChatUtils.sendMessage("§cYou cannot track non-rift collections while in The Rift!", true);
                     return;
                 }
@@ -170,7 +170,7 @@ public class CollectionTracker {
                 }
 
                 // Fetch bazaar data asynchronously
-                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collectionList))
+                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.getPlayerUUID(), TokenManager.getToken(), collectionList))
                         .thenRunAsync(() -> {
                             if (collectionList.size() == 1 && collectionList.contains("gemstone")) {
                                 String collection = "gemstone";

@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ChatWeightMixin {
     @Inject(method = "addClientSystemMessage", at = @At("HEAD"))
     private void modifyVisualMessage(Component message, CallbackInfo ci) {
-        if (!StringUtils.INSTANCE.removeColor(message.getString(), false).startsWith("[SCT]"))
+        if (!StringUtils.removeColor(message.getString(), false).startsWith("[SCT]"))
             ChatListener.farmingweightHandle(ChatListener.coleweightHandle(message));
     }
 }

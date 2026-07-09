@@ -171,6 +171,7 @@ object ColorUtils {
         }
     }
 
+    @JvmStatic
     fun coloredText(color: String): Component {
         return Component.literal(color).withStyle{
             it.withColor(TextColor.fromRgb(Color.decode(color).rgb))

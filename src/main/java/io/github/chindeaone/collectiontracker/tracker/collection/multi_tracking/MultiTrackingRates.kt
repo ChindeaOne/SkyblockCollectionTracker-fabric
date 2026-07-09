@@ -16,8 +16,11 @@ import java.util.concurrent.ConcurrentHashMap
 object MultiTrackingRates {
 
     // Collection tracking data
+    @JvmStatic
     val collectionAmounts = ConcurrentHashMap<String, Long>()
+    @JvmStatic
     val collectionPerHour = ConcurrentHashMap<String, Long>()
+    @JvmStatic
     val collectionMade = ConcurrentHashMap<String, Long>()
     val collectionSinceLast = ConcurrentHashMap<String, Long>()
     val sessionStartCollections = ConcurrentHashMap<String, Long>()
@@ -25,15 +28,20 @@ object MultiTrackingRates {
     val lastApiCollections = ConcurrentHashMap<String, Long>()
 
     // Track seen gemstones to only render them if they've been received from chat
+    @JvmStatic
     val seenGemstones: MutableSet<String>  = ConcurrentHashMap.newKeySet()
 
     // Money tracking data
     // NPC
+    @JvmStatic
     val moneyPerHourNPC = ConcurrentHashMap<String, Long>()
+    @JvmStatic
     val moneyMadeNPC = ConcurrentHashMap<String, Long>()
 
     // Bazaar
+    @JvmStatic
     val moneyMadeBazaar = ConcurrentHashMap<String, Long>()
+    @JvmStatic
     val moneyPerHourBazaar = ConcurrentHashMap<String, Long>()
 
     // Leaderboard tracking data

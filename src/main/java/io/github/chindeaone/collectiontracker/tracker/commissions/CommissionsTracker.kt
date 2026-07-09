@@ -46,18 +46,22 @@ object CommissionsTracker {
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
 
+    @JvmStatic
     fun getCompletedCount(): Int = completedCount
 
+    @JvmStatic
     fun getCommissionsPerHour(): Double {
         update()
         return cachedPerHour
     }
 
+    @JvmStatic
     fun getUptime(): String {
         update()
         return cachedUptime
     }
 
+    @JvmStatic
     fun reset() {
         completedCount = 0
         startTime = 0L

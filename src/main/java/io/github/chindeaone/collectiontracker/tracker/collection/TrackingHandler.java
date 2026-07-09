@@ -76,7 +76,7 @@ public class TrackingHandler {
     public static void stopTracking() {
         if (isTracking) {
 
-            if (!Hypixel.INSTANCE.getServer()) {
+            if (!Hypixel.getServer()) {
                 logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
             } else {
                 ChatUtils.sendMessage("§cAPI server is down. Stopping the tracker.", true);
@@ -302,7 +302,7 @@ public class TrackingHandler {
 
         // If no collection update, skip best/worst rates
         if (collectionMade == 0) {
-            ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
+            ChatUtils.sendSummary("§e§lTracking Summary", lines);
             return;
         }
 
@@ -362,7 +362,7 @@ public class TrackingHandler {
                 }
             }
         }
-        ChatUtils.INSTANCE.sendSummary("§e§lTracking Summary", lines);
+        ChatUtils.sendSummary("§e§lTracking Summary", lines);
     }
 
     public static long getUptimeInSeconds() {

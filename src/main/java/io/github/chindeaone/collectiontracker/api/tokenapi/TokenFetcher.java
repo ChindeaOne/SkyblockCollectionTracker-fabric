@@ -27,7 +27,7 @@ public class TokenFetcher {
 
         HttpRequest request = HttpRequest.newBuilder(uri)
                 .timeout(Duration.ofSeconds(5))
-                .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                .header("X-UUID", PlayerData.getPlayerUUID())
                 .header("User-Agent", URLManager.AGENT)
                 .header("Accept", "application/json")
                 .GET()

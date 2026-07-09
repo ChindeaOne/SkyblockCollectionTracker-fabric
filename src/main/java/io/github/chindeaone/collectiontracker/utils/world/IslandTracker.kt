@@ -19,6 +19,7 @@ object IslandTracker {
     var isInGalatea: Boolean = false
         private set
 
+    @JvmStatic
     var isInRift: Boolean = false
         private set
     private var riftCheckTicks = 0

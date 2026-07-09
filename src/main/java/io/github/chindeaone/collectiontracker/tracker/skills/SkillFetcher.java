@@ -48,7 +48,7 @@ public class SkillFetcher {
 
     private static void fetchSkillData(String skillName, boolean isSkillMaxed) {
         try {
-            if (!ServerUtils.INSTANCE.getServerStatus()) {
+            if (!ServerUtils.getServerStatus()) {
                 logger.warn("[SCT]: API server not online. Stopping the skill tracker.");
                 SkillTrackingHandler.stopTracking();
                 return;
@@ -58,7 +58,7 @@ public class SkillFetcher {
             if (isPaused) return;
 
 
-            getData(PlayerData.INSTANCE.getPlayerUUID(), skillName); // fetch data for the tracked skill
+            getData(PlayerData.getPlayerUUID(), skillName); // fetch data for the tracked skill
 
             // Skill leaderboard fetching
             fetchSkillLeaderboardData(skillName);
@@ -102,7 +102,7 @@ public class SkillFetcher {
             for (int i = 0; i < entriesArray.size(); i++) {
                 JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
                 String username = entryObject.get("username").getAsString();
-                if (username.equalsIgnoreCase(PlayerData.INSTANCE.getPlayerName())) continue;
+                if (username.equalsIgnoreCase(PlayerData.getPlayerName())) continue;
 
                 entries.add(new LeaderboardEntry(
                         username,

@@ -168,7 +168,7 @@ public class ForagingStatsParser {
             String stackDisplay = beaconStacks.isEmpty() ? "" : " §3(" + beaconStacks + ")";
 
             // If player isn't on Galatea, use global fortune only
-            if (!ForagingStatsWidget.INSTANCE.isInGalatea()) {
+            if (!ForagingStatsWidget.isInGalatea()) {
                 return "§aForaging Fortune: §6" + symbol + globalFortune;
             }
 

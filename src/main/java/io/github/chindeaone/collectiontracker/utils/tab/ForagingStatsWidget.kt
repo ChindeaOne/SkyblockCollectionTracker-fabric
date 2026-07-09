@@ -20,6 +20,7 @@ object ForagingStatsWidget {
     @JvmStatic
     var currentForagingIsland: String? = null
         private set
+    @JvmStatic
     var isInGalatea: Boolean = false
 
     private var nextAllowedTime: Long = 0L

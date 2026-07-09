@@ -115,7 +115,7 @@ public class SkillTrackingHandler {
     public static void stopTracking() {
         if (!isTracking) return;
 
-        if (!Hypixel.INSTANCE.getServer()) {
+        if (!Hypixel.getServer()) {
             logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
         } else if (afk) {
             ChatUtils.sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true);

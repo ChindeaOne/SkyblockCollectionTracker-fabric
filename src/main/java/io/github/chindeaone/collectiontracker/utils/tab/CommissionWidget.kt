@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 
 object CommissionWidget {
     private var lastCommissionSet: List<String>? = null
+    @JvmStatic
     var rawCommissions: MutableList<String> = mutableListOf()
 
     private var nextAllowedTime: Long = 0L

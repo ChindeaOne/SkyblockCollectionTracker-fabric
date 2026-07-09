@@ -19,6 +19,7 @@ object MiningMapping {
     )
 
     // Mining specific islands
+    @JvmStatic
     val miningIslands = listOf(
         "Dwarven Mines",
         "Crystal Hollows",

@@ -39,14 +39,14 @@ public class DataFetcher {
         logger.info("[SCT]: Fetching collection data");
 
         try {
-            if (!ServerUtils.INSTANCE.getServerStatus()) {
+            if (!ServerUtils.getServerStatus()) {
                 logger.warn("[SCT]: API server not online. Stopping the tracker.");
                 TrackingHandler.stopTracking();
                 return;
             }
             if (!isInitialFetch && (!isTracking || isPaused)) return;
 
-            String playerUUID = PlayerData.INSTANCE.getPlayerUUID();
+            String playerUUID = PlayerData.getPlayerUUID();
             Long collectionData = getCachedData(collection);
 
             if (collectionData == null) {
@@ -132,7 +132,7 @@ public class DataFetcher {
 
             for (int i = 0; i < entriesArray.size(); i++) {
                 JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
-                if (entryObject.get("username").getAsString().equalsIgnoreCase(PlayerData.INSTANCE.getPlayerName())) continue;
+                if (entryObject.get("username").getAsString().equalsIgnoreCase(PlayerData.getPlayerName())) continue;
                 entries.add(new LeaderboardEntry(
                         entryObject.get("username").getAsString(),
                         entryObject.get("rank").getAsInt(),

@@ -40,7 +40,7 @@ public class CommandRegistry {
                 dispatcher.register(ClientCommands.literal(SkyblockCollectionTracker.NAMESPACE)
                 // sct -> opens the config GUI
                 .executes(_ -> {
-                    GuiManager.INSTANCE.openConfigGui(null);
+                    GuiManager.openConfigGui(null);
                     return 1;
                 })
                 // sct edit -> opens the position editor
@@ -248,13 +248,13 @@ public class CommandRegistry {
                 .then(ClientCommands.literal("cw")
                         // sct cw -> shows player's coleweight
                         .executes(_ -> {
-                            ColeweightUtils.getColeweight(PlayerData.INSTANCE.getPlayerName(), false);
+                            ColeweightUtils.getColeweight(PlayerData.getPlayerName(), false);
                             return 1;
                         })
                         // sct cw find <player> -> shows specified player(or local player)'s coleweight
                         .then(ClientCommands.literal("find")
                                 .executes(_ -> {
-                                    ColeweightUtils.getColeweight(PlayerData.INSTANCE.getPlayerName(), false);
+                                    ColeweightUtils.getColeweight(PlayerData.getPlayerName(), false);
                                     return 1;
                                 })
                                 .then(ClientCommands.argument("player", StringArgumentType.string())
@@ -268,7 +268,7 @@ public class CommandRegistry {
                         )
                         .then(ClientCommands.literal("detailed")
                                 .executes(_ -> {
-                                    String playerName = PlayerData.INSTANCE.getPlayerName();
+                                    String playerName = PlayerData.getPlayerName();
                                     ColeweightUtils.getColeweightDetailed(playerName);
                                     return 1;
                                 })
@@ -381,12 +381,12 @@ public class CommandRegistry {
                 )
                 .then(ClientCommands.literal("fw")
                         .executes(_ -> {
-                            FarmingweightUtils.getFarmingweight(PlayerData.INSTANCE.getPlayerName());
+                            FarmingweightUtils.getFarmingweight(PlayerData.getPlayerName());
                             return 1;
                         })
                         .then(ClientCommands.literal("find")
                                 .executes(_ -> {
-                                    FarmingweightUtils.getFarmingweight(PlayerData.INSTANCE.getPlayerName());
+                                    FarmingweightUtils.getFarmingweight(PlayerData.getPlayerName());
                                     return 1;
                                 })
                                 .then(ClientCommands.argument("player", StringArgumentType.string())
@@ -640,7 +640,7 @@ public class CommandRegistry {
                 .then(ClientCommands.literal("commissions")
                         .then(ClientCommands.literal("reset")
                                 .executes(_ -> {
-                                    CommissionsTracker.INSTANCE.reset();
+                                    CommissionsTracker.reset();
                                     ChatUtils.sendMessage("§aCommissions tracker has been reset.", true);
                                     return 1;
                                 })

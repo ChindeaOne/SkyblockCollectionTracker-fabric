@@ -279,9 +279,9 @@ public class ColeweightFetcher {
             if (status == 200) {
                 logger.info("[SCT]: Successfully set global Coleweight color for player: {}", playerName);
                 Minecraft.getInstance().execute(() ->
-                        ChatUtils.INSTANCE.sendComponent(Component.empty()
+                        ChatUtils.sendComponent(Component.empty()
                                 .append("§aGlobal color set to ")
-                                .append(ColorUtils.INSTANCE.coloredText(color))
+                                .append(ColorUtils.coloredText(color))
                                 .append("."), true));
             } else {
                 logger.warn("[SCT]: Failed to set global Coleweight color for player: {}. HTTP status: {}", playerName, status);

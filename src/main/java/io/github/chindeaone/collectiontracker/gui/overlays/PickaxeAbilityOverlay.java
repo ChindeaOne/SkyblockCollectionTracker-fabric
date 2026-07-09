@@ -69,7 +69,7 @@ public class PickaxeAbilityOverlay extends AbstractOverlay{
         pickaxeAbilityOverlayLines.clear();
 
         if (!ConfigAccess.isPickaxeAbilityDisplayed()) return Collections.emptyList();
-        if (ConfigAccess.isPickaxeAbilityInMiningIslandsOnly() && !MiningMapping.INSTANCE.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
+        if (ConfigAccess.isPickaxeAbilityInMiningIslandsOnly() && !MiningMapping.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
 
         String abilityName = ConfigAccess.getPickaxeAbilityName();
         String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;

@@ -11,6 +11,7 @@ import java.util.concurrent.Executors
 
 object ServerUtils {
 
+    @JvmStatic
     var serverStatus = false
 
     private const val NORMAL_CHECK_INTERVAL = 6000  // 5 minutes

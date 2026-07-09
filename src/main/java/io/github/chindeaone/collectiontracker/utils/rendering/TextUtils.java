@@ -377,7 +377,7 @@ public class TextUtils {
                     list.add(prefix + "§dGemstones:§r");
 
                     GemstonePrices.multiGemstoneRecipes.forEach((type, _) -> {
-                        if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(type)) {
+                        if (MultiTrackingRates.getSeenGemstones().contains(type)) {
                             String line = null;
                             switch (ConfigAccess.getTrackingOptions()) {
                                 case COLLECTION_RATE -> line = handleCollectionPerHourMulti(type);
@@ -430,13 +430,13 @@ public class TextUtils {
         switch (ConfigAccess.getTrackingOptions()) {
             case MONEY_RATE -> {
                 if (!ConfigAccess.isUsingBazaar()) {
-                    long total = MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().entrySet().stream()
+                    long total = MultiTrackingRates.getMoneyPerHourNPC().entrySet().stream()
                             .filter(entry -> !entry.getKey().contains("_") || entry.getKey().endsWith("_" + variant))
                             .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
                     if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes/h: " + formatNumber(total));
                     else list.add("§eOverall $/h (NPC): " + formatNumber(total));
                 } else {
-                    long total = MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().entrySet().stream()
+                    long total = MultiTrackingRates.getMoneyPerHourBazaar().entrySet().stream()
                             .filter(entry -> entry.getKey().endsWith(suffix))
                             .filter(entry -> entry.getKey().contains("_normal") || entry.getKey().contains("_" + type) || entry.getKey().contains("_" + variant))
                             .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
@@ -445,13 +445,13 @@ public class TextUtils {
             }
             case MONEY_MADE -> {
                 if (!ConfigAccess.isUsingBazaar()) {
-                    long total = MultiTrackingRates.INSTANCE.getMoneyMadeNPC().entrySet().stream()
+                    long total = MultiTrackingRates.getMoneyMadeNPC().entrySet().stream()
                             .filter(entry -> !entry.getKey().contains("_") || entry.getKey().endsWith("_" + variant))
                             .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
                     if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes made: " + formatNumber(total));
                     else list.add("§eOverall $ made (NPC): " + formatNumber(total));
                 } else {
-                    long total = MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().entrySet().stream()
+                    long total = MultiTrackingRates.getMoneyMadeBazaar().entrySet().stream()
                             .filter(entry -> entry.getKey().endsWith(suffix))
                             .filter(entry -> entry.getKey().contains("_normal") || entry.getKey().contains("_" + type) || entry.getKey().contains("_" + variant))
                             .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
@@ -466,20 +466,20 @@ public class TextUtils {
         if ("gemstone".equals(coll) && ConfigAccess.isCollectionLeaderboardEnabled() && MultiTrackingRates.getPlayerCurrentRank() != -1) {
             rankSuffix = " [#" + MultiTrackingRates.getPlayerCurrentRank() + "]";
         }
-        return MultiTrackingRates.INSTANCE.getCollectionAmounts().getOrDefault(coll, -1L) >= 0
-                ? formatCollectionName(coll) + " collection: " + formatNumber(MultiTrackingRates.INSTANCE.getCollectionAmounts().getOrDefault(coll, 0L)) + rankSuffix
+        return MultiTrackingRates.getCollectionAmounts().getOrDefault(coll, -1L) >= 0
+                ? formatCollectionName(coll) + " collection: " + formatNumber(MultiTrackingRates.getCollectionAmounts().getOrDefault(coll, 0L)) + rankSuffix
                 : formatCollectionName(coll) + " collection: Calculating...";
     }
 
     private static String handleCollectionSessionMulti(String coll) {
-        return MultiTrackingRates.INSTANCE.getCollectionMade().getOrDefault(coll, -1L) > 0
-                ? formatCollectionName(coll) + " collection (session): " + formatNumber(MultiTrackingRates.INSTANCE.getCollectionMade().getOrDefault(coll, 0L))
+        return MultiTrackingRates.getCollectionMade().getOrDefault(coll, -1L) > 0
+                ? formatCollectionName(coll) + " collection (session): " + formatNumber(MultiTrackingRates.getCollectionMade().getOrDefault(coll, 0L))
                 : formatCollectionName(coll) + " collection (session): Calculating...";
     }
 
     private static String handleCollectionPerHourMulti(String coll) {
-        return MultiTrackingRates.INSTANCE.getCollectionPerHour().getOrDefault(coll, -1L) > 0
-                ? formatCollectionName(coll) + " Coll/h: " + formatNumber(MultiTrackingRates.INSTANCE.getCollectionPerHour().getOrDefault(coll, 0L))
+        return MultiTrackingRates.getCollectionPerHour().getOrDefault(coll, -1L) > 0
+                ? formatCollectionName(coll) + " Coll/h: " + formatNumber(MultiTrackingRates.getCollectionPerHour().getOrDefault(coll, 0L))
                 : formatCollectionName(coll) + " Coll/h: Calculating...";
     }
 
@@ -496,11 +496,11 @@ public class TextUtils {
             String variant = ConfigAccess.getGemstoneVariant().toString();
             String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
 
-            for (String gem : MultiTrackingRates.INSTANCE.getSeenGemstones()) {
+            for (String gem : MultiTrackingRates.getSeenGemstones()) {
                 if (useBazaar) {
-                    totalRate += MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().getOrDefault((gem + "_" + variant).toUpperCase() + suffix, 0L);
+                    totalRate += MultiTrackingRates.getMoneyPerHourBazaar().getOrDefault((gem + "_" + variant).toUpperCase() + suffix, 0L);
                 } else {
-                    totalRate += MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().getOrDefault((gem + "_" + variant).toUpperCase(), 0L);
+                    totalRate += MultiTrackingRates.getMoneyPerHourNPC().getOrDefault((gem + "_" + variant).toUpperCase(), 0L);
                 }
             }
             return "Gemstone $/h (" + (useBazaar ? "Bazaar" : "NPC") + "): " + formatNumberOrPlaceholder(totalRate);
@@ -508,12 +508,12 @@ public class TextUtils {
 
         if (!useBazaar) {
             String key = coll;
-            if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
+            if (MultiTrackingRates.getSeenGemstones().contains(coll)) {
                 String variant = ConfigAccess.getGemstoneVariant().toString();
                 key = (coll + "_" + variant).toUpperCase();
             }
 
-            long npcRate = MultiTrackingRates.INSTANCE.getMoneyPerHourNPC().getOrDefault(key, -1L);
+            long npcRate = MultiTrackingRates.getMoneyPerHourNPC().getOrDefault(key, -1L);
             if (CollectionsManager.isRiftCollection(coll)) {
                 return formatCollectionName(coll) + " Motes/h: " + formatNumberOrPlaceholder(npcRate);
             }
@@ -522,7 +522,7 @@ public class TextUtils {
             String actualColl = coll;
             String gemstoneVariant = null;
 
-            if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
+            if (MultiTrackingRates.getSeenGemstones().contains(coll)) {
                 actualColl = "gemstone";
                 String variant = ConfigAccess.getGemstoneVariant().toString();
                 gemstoneVariant = (coll + "_" + variant).toUpperCase();
@@ -530,7 +530,7 @@ public class TextUtils {
             String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
 
             if (gemstoneVariant != null) {
-                long rate = MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().getOrDefault(gemstoneVariant + suffix, 0L);
+                long rate = MultiTrackingRates.getMoneyPerHourBazaar().getOrDefault(gemstoneVariant + suffix, 0L);
                 return formatCollectionName(coll) + " $/h (Bazaar): " + formatNumberOrPlaceholder(rate);
             }
 
@@ -539,10 +539,10 @@ public class TextUtils {
             if (type != null) {
                 long rate = 0;
                 switch (type) {
-                    case "normal" -> rate = MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().getOrDefault(actualColl + "_normal" + suffix, 0L);
+                    case "normal" -> rate = MultiTrackingRates.getMoneyPerHourBazaar().getOrDefault(actualColl + "_normal" + suffix, 0L);
                     case "enchanted" -> {
                         String key = ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION) ? "Enchanted version" : "Super Enchanted version";
-                        rate = MultiTrackingRates.INSTANCE.getMoneyPerHourBazaar().getOrDefault(actualColl + "_" + key + suffix, 0L);
+                        rate = MultiTrackingRates.getMoneyPerHourBazaar().getOrDefault(actualColl + "_" + key + suffix, 0L);
                     }
                 }
 
@@ -566,11 +566,11 @@ public class TextUtils {
             String variant = ConfigAccess.getGemstoneVariant().toString();
             String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
 
-            for (String gem : MultiTrackingRates.INSTANCE.getSeenGemstones()) {
+            for (String gem : MultiTrackingRates.getSeenGemstones()) {
                 if (useBazaar) {
-                    totalMoney += MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().getOrDefault((gem + "_" + variant).toUpperCase() + suffix, 0L);
+                    totalMoney += MultiTrackingRates.getMoneyMadeBazaar().getOrDefault((gem + "_" + variant).toUpperCase() + suffix, 0L);
                 } else {
-                    totalMoney += MultiTrackingRates.INSTANCE.getMoneyMadeNPC().getOrDefault((gem + "_" + variant).toUpperCase(), 0L);
+                    totalMoney += MultiTrackingRates.getMoneyMadeNPC().getOrDefault((gem + "_" + variant).toUpperCase(), 0L);
                 }
             }
             return "Gemstone $ made (" + (useBazaar ? "Bazaar" : "NPC") + "): " + formatNumberOrPlaceholder(totalMoney);
@@ -578,12 +578,12 @@ public class TextUtils {
 
         if (!useBazaar) {
             String key = coll;
-            if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
+            if (MultiTrackingRates.getSeenGemstones().contains(coll)) {
                 String variant = ConfigAccess.getGemstoneVariant().toString();
                 key = (coll + "_" + variant).toUpperCase();
             }
 
-            long npcMoney = MultiTrackingRates.INSTANCE.getMoneyMadeNPC().getOrDefault(key, -1L);
+            long npcMoney = MultiTrackingRates.getMoneyMadeNPC().getOrDefault(key, -1L);
             if (CollectionsManager.isRiftCollection(coll)) {
                 return formatCollectionName(coll) + " Motes made: " + formatNumberOrPlaceholder(npcMoney);
             }
@@ -592,7 +592,7 @@ public class TextUtils {
             String actualColl = coll;
             String gemstoneVariant = null;
 
-            if (MultiTrackingRates.INSTANCE.getSeenGemstones().contains(coll)) {
+            if (MultiTrackingRates.getSeenGemstones().contains(coll)) {
                 actualColl = "gemstone";
                 String variant = ConfigAccess.getGemstoneVariant().toString();
                 gemstoneVariant = (coll + "_" + variant).toUpperCase();
@@ -601,7 +601,7 @@ public class TextUtils {
             String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
 
             if (gemstoneVariant != null) {
-                long money = MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().getOrDefault(gemstoneVariant + suffix, 0L);
+                long money = MultiTrackingRates.getMoneyMadeBazaar().getOrDefault(gemstoneVariant + suffix, 0L);
                 return formatCollectionName(coll) + " $ made (Bazaar): " + formatNumberOrPlaceholder(money);
             }
 
@@ -610,10 +610,10 @@ public class TextUtils {
             if (type != null) {
                 long money = 0;
                 switch (type) {
-                    case "normal" -> money = MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().getOrDefault(actualColl + "_normal" + suffix, 0L);
+                    case "normal" -> money = MultiTrackingRates.getMoneyMadeBazaar().getOrDefault(actualColl + "_normal" + suffix, 0L);
                     case "enchanted" -> {
                         String key = ConfigAccess.getBazaarType().equals(BazaarType.ENCHANTED_VERSION) ? "Enchanted version" : "Super Enchanted version";
-                        money = MultiTrackingRates.INSTANCE.getMoneyMadeBazaar().getOrDefault(actualColl + "_" + key + suffix, 0L);
+                        money = MultiTrackingRates.getMoneyMadeBazaar().getOrDefault(actualColl + "_" + key + suffix, 0L);
                     }
                 }
 

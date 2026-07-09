@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 object MiningStatsWidget {
 
     private var lastStats: List<String>? = null
+    @JvmStatic
     var rawStats: List<String> = emptyList()
 
     private var nextAllowedTime: Long = 0L

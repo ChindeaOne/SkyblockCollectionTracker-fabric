@@ -34,6 +34,7 @@ object Hypixel {
 
     private val scoreboardTitlePattern = Regex("SK[YI]BLOCK(?: CO-OP| GUEST)?(?: [♲☀Ⓑ])?")
 
+    @JvmStatic
     var server = false
     var skyblock = false
     private var playerLoaded = false

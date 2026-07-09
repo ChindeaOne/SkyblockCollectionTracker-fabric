@@ -41,6 +41,7 @@ object CommissionFormat {
         return formatted
     }
 
+    @JvmStatic
     val COMMISSIONS = listOf(
         // Dwarven Mines
         CommissionType("Mithril Miner", Area.DWARVEN_MINES) { formatLine(it) },

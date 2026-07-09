@@ -60,7 +60,7 @@ public class HypixelApiFetcher {
         try {
             String collection = String.join(",", CollectionTracker.collectionList);
             String collectionSource = String.join(",", CollectionsManager.multiCollectionSource);
-            HttpRequest request = buildCollectionRequest(PlayerData.INSTANCE.getPlayerUUID(), TokenManager.getToken(), collection, collectionSource);
+            HttpRequest request = buildCollectionRequest(PlayerData.getPlayerUUID(), TokenManager.getToken(), collection, collectionSource);
             HttpResponse<String> response =
                     HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
@@ -71,7 +71,7 @@ public class HypixelApiFetcher {
                 TokenManager.fetchAndStoreToken();
                 String token = TokenManager.getToken(); // get the new token
 
-                request = buildCollectionRequest(PlayerData.INSTANCE.getPlayerUUID(), token, collection, collectionSource);
+                request = buildCollectionRequest(PlayerData.getPlayerUUID(), token, collection, collectionSource);
                 response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
                 status = response.statusCode();
             }

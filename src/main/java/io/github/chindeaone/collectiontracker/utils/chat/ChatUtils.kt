@@ -29,6 +29,7 @@ object ChatUtils {
         sendMessage("", prefix = false)
     }
 
+    @JvmStatic
     fun sendComponent(component: Component, prefix: Boolean = true) {
         val finalComponent = if (prefix) {
             Component.empty().append(PREFIX).append(component)
@@ -79,6 +80,7 @@ object ChatUtils {
 
     private fun getWidth(): Int = ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get())
 
+    @JvmStatic
     fun sendCommandPage(
         category: String,
         color: String,
@@ -135,6 +137,7 @@ object ChatUtils {
         return title
     }
 
+    @JvmStatic
     fun sendSummary(
         title: String,
         lines: List<Component>
@@ -154,6 +157,7 @@ object ChatUtils {
         sendEmptyMessage()
     }
 
+    @JvmStatic
     fun sendCategoryPage(
         category: String,
         color: String,

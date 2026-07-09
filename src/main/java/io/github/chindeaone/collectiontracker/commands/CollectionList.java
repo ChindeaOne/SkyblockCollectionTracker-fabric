@@ -50,7 +50,7 @@ public class CollectionList {
 
         Page current = pages.get(page - 1);
 
-        ChatUtils.INSTANCE.sendCategoryPage(current.category, current.color, current.collections, page, totalPages);
+        ChatUtils.sendCategoryPage(current.category, current.color, current.collections, page, totalPages);
     }
 
     public static Integer getPageForCategory(String categoryInput) {

@@ -73,7 +73,7 @@ public class CommissionsOverlay extends AbstractOverlay{
     }
 
     private List<String> getCommissionsLines() {
-        List<String> raw = CommissionWidget.INSTANCE.getRawCommissions();
+        List<String> raw = CommissionWidget.getRawCommissions();
         if (raw.isEmpty()) return Collections.emptyList();
 
         formattedCommissions.clear();
@@ -82,7 +82,7 @@ public class CommissionsOverlay extends AbstractOverlay{
         for (String line : raw) {
             String formatted = line;
             String lowerLine = line.toLowerCase();
-            for (CommissionFormat.CommissionType type : CommissionFormat.INSTANCE.getCOMMISSIONS()) {
+            for (CommissionFormat.CommissionType type : CommissionFormat.getCOMMISSIONS()) {
                 String typeNameLower = type.getName().toLowerCase();
                 if (lowerLine.contains(typeNameLower)) {
                     formatted = type.getFormat().invoke(line);
@@ -102,13 +102,13 @@ public class CommissionsOverlay extends AbstractOverlay{
         }
 
         // Commissions tracker
-        if (ConfigAccess.isCommissionsTrackingEnabled() && CommissionsTracker.INSTANCE.getCompletedCount() > 0) {
+        if (ConfigAccess.isCommissionsTrackingEnabled() && CommissionsTracker.getCompletedCount() > 0) {
             if (!formattedCommissions.isEmpty()) {
                 formattedCommissions.add("");
             }
-            formattedCommissions.add("§6Commissions Completed: §e" + CommissionsTracker.INSTANCE.getCompletedCount());
-            formattedCommissions.add("§6Commissions/h: §e" + String.format("%.2f", CommissionsTracker.INSTANCE.getCommissionsPerHour()));
-            formattedCommissions.add("§6Uptime: §e" + CommissionsTracker.INSTANCE.getUptime());
+            formattedCommissions.add("§6Commissions Completed: §e" + CommissionsTracker.getCompletedCount());
+            formattedCommissions.add("§6Commissions/h: §e" + String.format("%.2f", CommissionsTracker.getCommissionsPerHour()));
+            formattedCommissions.add("§6Uptime: §e" + CommissionsTracker.getUptime());
         }
 
         return formattedCommissions;

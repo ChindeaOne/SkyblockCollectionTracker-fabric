@@ -34,7 +34,7 @@ public class SkillApiFetcher {
 
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(5))
-                    .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                    .header("X-UUID", PlayerData.getPlayerUUID())
                     .header("Authorization", "Bearer " + TokenManager.getToken())
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
@@ -52,7 +52,7 @@ public class SkillApiFetcher {
 
                 request = HttpRequest.newBuilder(uri)
                         .timeout(Duration.ofSeconds(5))
-                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                        .header("X-UUID", PlayerData.getPlayerUUID())
                         .header("Authorization", "Bearer " + TokenManager.getToken())
                         .header("User-Agent", URLManager.AGENT)
                         .header("Accept", "application/json")

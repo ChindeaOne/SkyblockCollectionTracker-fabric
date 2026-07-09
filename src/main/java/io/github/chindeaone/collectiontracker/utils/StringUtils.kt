@@ -48,6 +48,7 @@ object StringUtils {
     }
 
     // Method taken from Skyhanni
+    @JvmStatic
     fun CharSequence.removeColor(keepFormatting: Boolean = false): String {
         // Glossary:
         // Formatting indicator: The '§' character indicating the beginning of a formatting sequence

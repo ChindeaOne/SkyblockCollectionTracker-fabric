@@ -10,8 +10,10 @@ object BlockWatcher {
 
     var blockId : String = ""
         private set
+    @JvmStatic
     var miningBlockType: String = ""
         private set
+    @JvmStatic
     var foragingBlockType: String = ""
         private set
     @Volatile

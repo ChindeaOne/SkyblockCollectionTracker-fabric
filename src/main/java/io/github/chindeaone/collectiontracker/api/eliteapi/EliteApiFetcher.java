@@ -213,9 +213,9 @@ public class EliteApiFetcher {
             if (status == 200) {
                 logger.info("[SCT]: Successfully set global Farming Weight color for player: {}", playerName);
                 Minecraft.getInstance().execute(() ->
-                        ChatUtils.INSTANCE.sendComponent(Component.empty()
+                        ChatUtils.sendComponent(Component.empty()
                                 .append("§aGlobal color set to ")
-                                .append(ColorUtils.INSTANCE.coloredText(color))
+                                .append(ColorUtils.coloredText(color))
                                 .append("."), true));
             } else {
                 logger.warn("[SCT]: Failed to set global Farming Weight color for player: {}. HTTP status: {}", playerName, status);
@@ -266,7 +266,7 @@ public class EliteApiFetcher {
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(15))
                     .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                    .header("X-UUID", PlayerData.getPlayerUUID())
                     .header("User-Agent", URLManager.AGENT)
                     .header("Accept", "application/json")
                     .GET()
@@ -284,7 +284,7 @@ public class EliteApiFetcher {
                 request = HttpRequest.newBuilder(uri)
                         .timeout(Duration.ofSeconds(15))
                         .header("Authorization", "Bearer " + token)
-                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                        .header("X-UUID", PlayerData.getPlayerUUID())
                         .header("User-Agent", URLManager.AGENT)
                         .header("Accept", "application/json")
                         .GET()

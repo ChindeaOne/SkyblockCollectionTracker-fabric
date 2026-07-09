@@ -55,8 +55,8 @@ public class Position {
     }
 
     public void setPosition(int x, int y) {
-        int screenWidth = ScaleUtils.INSTANCE.getScaledWidth();
-        int screenHeight = ScaleUtils.INSTANCE.getScaledHeight();
+        int screenWidth = ScaleUtils.getScaledWidth();
+        int screenHeight = ScaleUtils.getScaledHeight();
 
         int yPadding = 4;
         int scaledYPadding = Math.round(yPadding * this.scale);

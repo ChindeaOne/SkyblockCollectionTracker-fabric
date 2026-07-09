@@ -92,7 +92,7 @@ public class CommandHelper {
         page = Mth.clamp(page, 1, totalPages);
         CommandPage current = PAGES.get(page - 1);
         List<MutableComponent> components = buildComponentsForPage(current);
-        ChatUtils.INSTANCE.sendCommandPage(current.category(), current.color(), components, page, totalPages);
+        ChatUtils.sendCommandPage(current.category(), current.color(), components, page, totalPages);
     }
 
     private static List<MutableComponent> buildComponentsForPage(CommandPage commandPage) {
