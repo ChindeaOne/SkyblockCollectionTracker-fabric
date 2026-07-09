@@ -28,7 +28,12 @@ object InventoryListener {
 
     fun onTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
-        if (/*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) return
+        if (/*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) {
+            lastInventoryState.clear()
+            slotMatchHits.clear()
+            slotSkipMap.clear()
+            return
+        }
 
         val isTracking = TrackingHandler.isTracking
         val isMultiTracking = MultiTrackingHandler.isMultiTracking
@@ -85,7 +90,9 @@ object InventoryListener {
 
             if (isSoloRift && matches(itemName, currentSoloColl)) {
                 matchedAny = true
-                if (gainCount > 0) {
+                val maxGain = maxGainForCollection(currentSoloColl)
+
+                if (gainCount in 1..maxGain) {
                     soloGainToProcess += gainCount.toLong()
                 }
             }
@@ -93,7 +100,9 @@ object InventoryListener {
             for (coll in multiRiftCollections) {
                 if (matches(itemName, coll)) {
                     matchedAny = true
-                    if (gainCount > 0) {
+                    val maxGain = maxGainForCollection(coll)
+
+                    if (gainCount in 1..maxGain) {
                         multiGains[coll] = (multiGains[coll] ?: 0L) + gainCount
                     }
                 }
@@ -151,4 +160,10 @@ object InventoryListener {
     private fun matches(itemName: String, collection: String): Boolean {
         return itemName.startsWith(collection)
     }
+
+    private fun maxGainForCollection(collection: String): Int =
+        when (collection) {
+            "half-eaten carrot" -> 5 // suppose max threshold
+            else -> 1
+        }
 }
