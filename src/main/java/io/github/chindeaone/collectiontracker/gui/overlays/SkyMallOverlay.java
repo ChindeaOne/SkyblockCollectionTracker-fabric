@@ -24,7 +24,7 @@ public class SkyMallOverlay extends AbstractOverlay {
 
     @Override
     public String overlayLabel() {
-        return "SkyMall";
+        return "Sky Mall";
     }
 
     @Override
@@ -75,7 +75,7 @@ public class SkyMallOverlay extends AbstractOverlay {
 
     private List<String> getSkyMallLines() {
         skyMallOverlayLines.clear();
-        if (ConfigAccess.isSkyMallInMiningIslandsOnly() && !MiningMapping.INSTANCE.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
+        if (ConfigAccess.isSkyMallInMiningIslandsOnly() && !MiningMapping.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
 
         skyMallOverlayLines.add("§bSky Mall: " + ChatListener.getCurrentSkyMallBuff());
         skyMallOverlayLines.add(TextUtils.updateTimer());

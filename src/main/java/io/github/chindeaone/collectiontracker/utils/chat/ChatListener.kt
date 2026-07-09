@@ -33,9 +33,7 @@ object ChatListener {
         CONSUME("""^You consumed an? (.+?) and gained""", RegexOption.IGNORE_CASE),
         ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
         // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §aVIEW RULE"
-        AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)!""", RegexOption.IGNORE_CASE),
-        HOTM_RESET("""^Reset your Heart of the Mountain! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE),
-        HOTF_RESET("""^You have reset your Heart of the Forest! Your Perks and Abilities have been reset\.""", RegexOption.IGNORE_CASE);
+        AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)!""", RegexOption.IGNORE_CASE);
         val regex: Regex = Regex(pattern, options.toSet())
 
         fun find(input: CharSequence): MatchResult? = regex.find(input)
@@ -186,8 +184,8 @@ object ChatListener {
 
     private fun treeResetListener(text: String) {
         when {
-            Patterns.HOTM_RESET.find(text) != null -> FetchSkillTree.resetHotm()
-            Patterns.HOTF_RESET.find(text) != null -> FetchSkillTree.resetHotf()
+            text.startsWith("You have reset your Heart of the Mountain", ignoreCase = true) -> FetchSkillTree.resetHotm()
+            text.startsWith("You have reset your Heart of the Forest", ignoreCase = true) -> FetchSkillTree.resetHotf()
         }
     }
 
@@ -340,11 +338,11 @@ object ChatListener {
             // Sky Mall buffs
             "Mining Speed" in text -> {
                 val num = numberRegex.find(text)?.value
-                "§6$num ⸕ Mining Speed"
+                "§6$num \uE015 Mining Speed"
             }
             "Mining Fortune" in text -> {
                 val num = numberRegex.find(text)?.value
-                "§6$num ☘ Mining Fortune"
+                "§6$num \uE053 Mining Fortune"
             }
             "Titanium" in text -> {
                 val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
@@ -361,22 +359,22 @@ object ChatListener {
             }
             "Goblins" in text -> {
                 val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
-                "§a$x §9Golden and Diamond Goblins"
+                "§a$x §6Golden §7and §bDiamond §7Goblins"
             }
 
             // Lottery buffs
             "Fig" in text -> {
                 val num = numberRegex.find(text)?.value
-                "§6$num ☘ Fig Fortune"
+                "§6$num \uE054 Fig Fortune"
             }
             "Mangrove" in text -> {
                 val num = numberRegex.find(text)?.value
-                "§6$num ☘ Mangrove Fortune"
+                "§6$num \uE054 Mangrove Fortune"
             }
             "Sweep" in text -> {
                 val rawPct = percentRegex.find(text)?.value
                 val pct = "${rawPct?.trimEnd('%')}%"
-                "§a$pct §2∮ Sweep"
+                "§a$pct §2\uE023 Sweep"
             }
             else -> message // fallback to original text
         }

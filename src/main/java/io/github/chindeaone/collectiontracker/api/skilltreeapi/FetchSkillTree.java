@@ -7,6 +7,7 @@ import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,7 +47,7 @@ public class FetchSkillTree {
             HttpRequest request = HttpRequest.newBuilder(uri)
                     .timeout(Duration.ofSeconds(5))
                     .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                    .header("X-UUID", PlayerData.getPlayerUUID())
                     .header("X-MINING", String.valueOf(mining))
                     .header("X-FORAGING", String.valueOf(foraging))
                     .header("User-Agent", URLManager.AGENT)
@@ -66,7 +67,7 @@ public class FetchSkillTree {
                 request = HttpRequest.newBuilder(uri)
                         .timeout(Duration.ofSeconds(5))
                         .header("Authorization", "Bearer " + TokenManager.getToken())
-                        .header("X-UUID", PlayerData.INSTANCE.getPlayerUUID())
+                        .header("X-UUID", PlayerData.getPlayerUUID())
                         .header("X-MINING", String.valueOf(mining))
                         .header("X-FORAGING", String.valueOf(foraging))
                         .header("User-Agent", URLManager.AGENT)
@@ -112,6 +113,9 @@ public class FetchSkillTree {
     }
 
     public static void resetHotm() {
+        ConfigHelper.setStrongArmMS(0);
+        ConfigHelper.setProfessionalMS(0);
+        ChatListener.setCurrentSkyMallBuff("§cUnknown");
         if (pendingHotmReset == null || pendingHotmReset.isDone()) {
             pendingHotmReset = scheduler.schedule(() -> fetchSkillTree(true, false), 10, TimeUnit.MINUTES);
             logger.info("[SCT]: Scheduled a mining skill tree fetch in 10 minutes.");
@@ -119,6 +123,7 @@ public class FetchSkillTree {
     }
 
     public static void resetHotf() {
+        ChatListener.setCurrentLotteryBuff("§cUnknown");
         if (pendingHotfReset == null || pendingHotfReset.isDone()) {
             pendingHotfReset = scheduler.schedule(() -> fetchSkillTree(false, true), 10, TimeUnit.MINUTES);
             logger.info("[SCT]: Scheduled a foraging skill tree fetch in 10 minutes.");
