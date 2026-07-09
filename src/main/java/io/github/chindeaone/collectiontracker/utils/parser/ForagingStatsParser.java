@@ -204,7 +204,7 @@ public class ForagingStatsParser {
                 return base;
             }
 
-            return "§aForaging Fortune: §6" + symbol + globalFortune;
+            return "§aForaging Fortune: §6" + symbol + totalGlobal;
         }
 
         private static class Stat {
