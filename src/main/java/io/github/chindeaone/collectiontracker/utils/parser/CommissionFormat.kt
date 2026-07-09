@@ -15,7 +15,7 @@ object CommissionFormat {
 
     // NEU Style
     private fun formatLine(line: String): String {
-        var formatted = "§3$line§r"
+        var formatted = "§9$line§r"
 
         // Format completion: DONE-> §a (Green), 66%-> §e (Yellow), 33%-> §6 (Orange), else §c (Red)
         val completionRegex = Regex("(?i)DONE|\\d+(?:\\.\\d+)?%", RegexOption.IGNORE_CASE)

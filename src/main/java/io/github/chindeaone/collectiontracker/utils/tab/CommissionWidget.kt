@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.tab
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.utils.CommissionKeybinds
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 
@@ -29,6 +30,10 @@ object CommissionWidget {
         if (!ConfigAccess.isCommissionsEnabled()) {
             rawCommissions = mutableListOf()
             lastCommissionSet = null
+            return
+        }
+
+        if (CommissionKeybinds.isMenuOpen) {
             return
         }
 

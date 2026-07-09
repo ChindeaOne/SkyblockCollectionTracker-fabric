@@ -56,6 +56,9 @@ object CommissionKeybinds {
     private val wasDown = HashMap<Int, Boolean>()
     private const val CLICK_DEBOUNCE_MS = 300L
 
+    var isMenuOpen = false
+        private set
+
     private val COMMISSION_SLOTS = mapOf(11 to 0, 12 to 1, 14 to 2, 15 to 3)
 
     private var keyGuardActive = false
@@ -129,8 +132,10 @@ object CommissionKeybinds {
             return
         }
 
-        val title = screen.title.string
-        if (!title.contains("Commissions", ignoreCase = true)) {
+        val isCommissionsScreen = screen.title.string.contains("Commissions", ignoreCase = true)
+        isMenuOpen = isCommissionsScreen
+
+        if (!isCommissionsScreen) {
             detachListener()
             return
         }
