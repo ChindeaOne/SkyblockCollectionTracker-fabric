@@ -334,7 +334,7 @@ enum class TabWidget(headerRegex: String) {
     ),
     STARBORN_TEMPLE(
         // language=RegExp
-        "§9§lStarborn Temple:",
+        "(?:§.)*Starborn Temple:",
     ),
     PITY(
         // language=RegExp

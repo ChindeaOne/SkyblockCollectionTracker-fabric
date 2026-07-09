@@ -73,8 +73,6 @@ object TabData {
     }
 
     fun parseWidgetData(lines: List<String>): List<String>? {
-        if (lines.size < 2) return null
-
         val body = lines.drop(1)
             .map { it.stripMinecraftFormatting().trim() }
             .filter { it.isNotEmpty() }

@@ -72,12 +72,13 @@ public class ForagingStatsOverlay extends AbstractOverlay{
     }
 
     private List<String> getForagingLines() {
-        List<String> raw = ForagingStatsWidget.INSTANCE.getRawStats();
-        List<String> rawBeacon = ForagingStatsWidget.INSTANCE.getRawBeaconStats();
+        List<String> raw = ForagingStatsWidget.getRawStats();
+        List<String> rawBeacon = ForagingStatsWidget.getRawBeaconStats();
+        String rawStarbornTemple = ForagingStatsWidget.getRawStarbornTempleStats();
         if (raw.isEmpty()) return Collections.emptyList();
 
         formattedForagingStats.clear();
-        formattedForagingStats.addAll(ForagingStatsParser.parse(raw, rawBeacon, BlockWatcher.INSTANCE.getForagingBlockType()));
+        formattedForagingStats.addAll(ForagingStatsParser.parse(raw, rawBeacon, rawStarbornTemple, BlockWatcher.getForagingBlockType()));
         return formattedForagingStats;
     }
 }

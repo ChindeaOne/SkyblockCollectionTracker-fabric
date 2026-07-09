@@ -18,7 +18,7 @@ public class ForagingStatsParser {
 
     private ForagingStatsParser() {}
 
-    public static List<String> parse(List<String> raw, List<String> rawBeacon, String blockType) {
+    public static List<String> parse(List<String> raw, List<String> rawBeacon, String rawStarbornTemple, String blockType) {
         List<String> formatted = new ArrayList<>();
         if (raw == null || raw.isEmpty()) return formatted;
 
@@ -31,6 +31,10 @@ public class ForagingStatsParser {
 
                 processFortuneLine(trimmed, ctx, true);
             }
+        }
+
+        if (rawStarbornTemple != null && !rawStarbornTemple.isBlank()) {
+            processFortuneLine("Starborn " + rawStarbornTemple, ctx, false);
         }
 
         for (String line : raw) {
@@ -73,7 +77,12 @@ public class ForagingStatsParser {
             return;
         }
 
-        if (line.contains("Foraging Fortune") && !line.contains("Fig") && !line.contains("Mangrove")) {
+        if (line.contains("Starborn")) {
+            ctx.starbornTempleFortune = value;
+            return;
+        }
+
+        if (line.contains("Foraging Fortune") && !line.contains("Fig") && !line.contains("Mangrove") && !line.contains("Starborn")) {
             ctx.globalFortune = value;
             return;
         }
@@ -103,6 +112,11 @@ public class ForagingStatsParser {
 
     private static int extractFortune(String line) {
         try {
+            int comma = line.indexOf('.');
+            if (comma != -1) {
+                line = line.substring(0, comma);
+            }
+
             String digits = line.replaceAll("[^0-9]", "");
             return digits.isEmpty() ? 0 : Integer.parseInt(digits);
         } catch (NumberFormatException e) {
@@ -118,9 +132,10 @@ public class ForagingStatsParser {
         int mangroveFortune = 0;
         int beaconFigFortune = 0;
         int beaconMangroveFortune = 0;
+        int starbornTempleFortune = 0;
         String beaconStacks = "";
 
-        Stat sweep = new Stat("Sweep", "∮", "§2");
+        Stat sweep = new Stat("Sweep", "\uE023", "§2");
         Stat wisdom = new Stat("Foraging Wisdom", "☯", "§3");
 
         ForagingContext(String blockType) {
@@ -128,7 +143,7 @@ public class ForagingStatsParser {
         }
 
         String formatTotalFortune() {
-            String symbol = "☘";
+            String symbol = "\uE054";
             int baseSpecific = 0;
             int beaconSpecific = 0;
             String specificFortuneName = "";
@@ -146,7 +161,10 @@ public class ForagingStatsParser {
                 specificColor = "§c";
             }
 
-            int total = globalFortune + (specificFortuneName.isEmpty() ? (lastDisplayedSpecificFortuneValue + lastDisplayedBeaconFortuneValue) : (baseSpecific + beaconSpecific));
+            int totalGlobal = globalFortune + starbornTempleFortune;
+            int total = totalGlobal + (specificFortuneName.isEmpty()
+                    ? (lastDisplayedSpecificFortuneValue + lastDisplayedBeaconFortuneValue)
+                    : (baseSpecific + beaconSpecific));
             String stackDisplay = beaconStacks.isEmpty() ? "" : " §3(" + beaconStacks + ")";
 
             // If player isn't on Galatea, use global fortune only
@@ -161,6 +179,11 @@ public class ForagingStatsParser {
                 if (showDetailed) {
                     base += " §7(§6" + globalFortune + " §7+ " + specificColor + baseSpecific;
                     if (beaconSpecific > 0) base += " §7+ §3" + beaconSpecific;
+
+                    if (starbornTempleFortune > 0) {
+                        base += " §7+ §9" + starbornTempleFortune;
+                    }
+
                     base += "§7)";
                 }
                 return base;
@@ -171,6 +194,11 @@ public class ForagingStatsParser {
                 if (showDetailed) {
                     base += " §7(§6" + globalFortune + " §7+ " + lastDisplayedFortuneColor + lastDisplayedSpecificFortuneValue;
                     if (lastDisplayedBeaconFortuneValue > 0) base += " §7+ §3" + lastDisplayedBeaconFortuneValue;
+
+                    if (starbornTempleFortune > 0) {
+                        base += " §7+ §9" + starbornTempleFortune;
+                    }
+
                     base += "§7)";
                 }
                 return base;
