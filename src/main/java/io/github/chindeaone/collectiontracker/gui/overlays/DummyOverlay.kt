@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import net.minecraft.client.Minecraft
@@ -39,7 +38,7 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
 
             RenderUtils.drawDummyFrame(context, overlay.position(), overlay.overlayLabel())
 
-            if (isMouseOver(mouseX, mouseY, overlay.position())) {
+            if (overlay.isHovered(mouseX.toDouble(), mouseY.toDouble())) {
                 hovered = overlay
             }
         }
@@ -57,14 +56,11 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
 
         if (verticalAmount == 0.0) return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
 
-        val mx = mouseX.toInt()
-        val my = mouseY.toInt()
-
         for (overlay in OverlayManager.all()) {
             if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
 
             val pos = overlay.position()
-            if (isMouseOver(mx, my, pos)) {
+            if (overlay.isHovered(mouseX, mouseY)) {
                 val scaleChange = 0.05f
                 val next = pos.scale + (if (verticalAmount > 0) scaleChange else -scaleChange)
                 pos.setScaling(clamp(next))
@@ -76,30 +72,34 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
     }
 
     override fun mouseClicked(event: MouseButtonEvent, doubled: Boolean): Boolean {
-        val mx = event.x.toInt()
-        val my = event.y.toInt()
+        val mx = event.x
+        val my = event.y
 
         for (overlay in OverlayManager.all()) {
             when (event.button()) {
                 0 -> {
                     if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
 
-                    if (isMouseOver(mx, my, overlay.position())) {
+                    if (overlay.isHovered(mx, my)) {
                         dragging = overlay
-                        dragOffsetX = mx - overlay.position().x
-                        dragOffsetY = my - overlay.position().y
+                        dragOffsetX = (mx - overlay.position().x).toInt()
+                        dragOffsetY = (my - overlay.position().y).toInt()
                         return true
                     }
                 }
-                1 -> if (overlay.overlayLabel() != "Global Title" && isMouseOver(mx, my, overlay.position())) {
-                    OverlayManager.setGlobalRendering(true)
-                    overlay.jumpToConfig()
-                    return true
+                1 -> {
+                    if (!overlay.isEnabled || overlay.overlayLabel() == "Global Title") continue
+
+                    if (overlay.isHovered(mx, my)) {
+                        OverlayManager.setGlobalRendering(true)
+                        overlay.jumpToConfig()
+                        return true
+                    }
                 }
                 2 -> {
                     if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
 
-                    if (isMouseOver(mx, my, overlay.position())) {
+                    if (overlay.isHovered(mx, my)) {
                         overlay.position().setScaling(1.0f)
                         return true
                     }
@@ -113,21 +113,6 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
     override fun mouseReleased(event: MouseButtonEvent): Boolean {
         dragging = null
         return super.mouseReleased(event)
-    }
-
-    private fun isMouseOver(mouseX: Int, mouseY: Int, pos: Position): Boolean {
-        val yPadding = 4
-        val x = pos.x
-        val y = pos.y
-        val w = pos.width
-        val h = pos.height
-        val s = pos.scale
-
-        val x2 = x + (w * s).toInt()
-        val y1 = (y - yPadding * s).toInt()
-        val y2 = (y + (h + yPadding) * s).toInt()
-
-        return mouseX in x..x2 && mouseY in y1..y2
     }
 
     private fun clamp(v: Float): Float {

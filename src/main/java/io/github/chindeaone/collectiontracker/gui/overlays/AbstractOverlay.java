@@ -72,19 +72,24 @@ public abstract class AbstractOverlay {
     }
 
     public boolean isHovered(double mouseX, double mouseY) {
-        Position pos = this.position();
+        Position pos = position();
         if (pos == null) return false;
+
+        int padding = 4;
 
         int x = pos.getX();
         int y = pos.getY();
-        float s = pos.getScale();
-        int w = Math.round(pos.getWidth() * s);
+        float scale = pos.getScale();
 
-        double x2 = x + w;
-        double y1 = y - s;
-        double y2 = y + pos.getHeight() * s;
+        int width = Math.round(pos.getWidth() * scale);
+        int height = Math.round(pos.getHeight() * scale);
 
-        return mouseX >= x && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
+        double x2 = x + width;
+        double y1 = y - padding * scale;
+        double y2 = y + height + padding * scale;
+
+        return mouseX >= (double) x && mouseX <= x2 &&
+                mouseY >= y1 && mouseY <= y2;
     }
 
     public void jumpToConfig() {
