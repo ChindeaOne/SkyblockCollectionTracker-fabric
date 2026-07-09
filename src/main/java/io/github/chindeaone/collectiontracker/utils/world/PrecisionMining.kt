@@ -49,12 +49,14 @@ object PrecisionMining {
     @JvmStatic
     fun handleParticles(options: ParticleOptions, x: Double, y: Double, z: Double) {
         if (!HypixelUtils.isOnSkyblock) return
-        if (options.type == lookingParticle) {
-            activeParticlePos = Vec3(x, y, z)
-            isLooking = true
-        } else if (options.type == notLookingParticle) {
-            activeParticlePos = Vec3(x, y, z)
-            isLooking = false
-        }
+        if (options.type != lookingParticle && options.type != notLookingParticle) return
+        if (BlockWatcher.precisionMiningBlockType.isEmpty()) return
+
+        val blockBox = BlockWatcher.blockBox ?: return
+
+        if (!blockBox.inflate(0.2).contains(x, y, z)) return
+
+        activeParticlePos = Vec3(x, y, z)
+        isLooking = options.type == lookingParticle
     }
 }

@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.world
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 
@@ -10,6 +11,7 @@ object BlockWatcher {
 
     var blockId : String = ""
         private set
+    var blockBox: AABB? = null
     @JvmStatic
     var miningBlockType: String = ""
         private set
@@ -33,6 +35,8 @@ object BlockWatcher {
                 val state = client.level?.getBlockState(pos) ?: return
                 val block = state.block
 
+                blockBox = AABB(pos)
+
                 blockId = BuiltInRegistries.BLOCK.getKey(block).toString()
 
                 updateMiningBlockType(blockId)
@@ -40,6 +44,7 @@ object BlockWatcher {
                 precisionMiningBlockType(blockId)
             } else if (hitResult.type == HitResult.Type.MISS) {
                 precisionMiningBlockType = ""
+                blockBox = null
             }
         }
     }
