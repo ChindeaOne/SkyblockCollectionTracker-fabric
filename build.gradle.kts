@@ -90,7 +90,7 @@ loom {
     )
 }
 
-val shadowImpl: Configuration by configurations.creating {
+val shadowImpl: Configuration = configurations.create("shadowImpl") {
     configurations.implementation.get().extendsFrom(this)
 }
 
@@ -118,7 +118,7 @@ dependencies {
     shadowImpl("com.github.ChindeaOne:modrinthautoupdater:${project.property("modrinthautoupdater_version")}") {
         exclude(group = "gson")
     }
-    include("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
+//    include("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
 }
 
 kotlin {
@@ -193,11 +193,6 @@ tasks.shadowJar {
 
     configurations = listOf(shadowImpl)
 
-    doLast {
-        listOf(shadowImpl,).forEach {
-            println("Copying dependencies into mod: ${it.files}")
-        }
-    }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "io.github.chindeaone.collectiontracker.deps.moulconfig")
