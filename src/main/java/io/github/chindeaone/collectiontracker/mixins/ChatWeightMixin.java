@@ -6,14 +6,17 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(value = ChatComponent.class, priority = 1001) // Lower priority for Skyhanni
 public class ChatWeightMixin {
-    @Inject(method = "addClientSystemMessage", at = @At("HEAD"))
-    private void modifyVisualMessage(Component message, CallbackInfo ci) {
-        if (!StringUtils.removeColor(message.getString(), false).startsWith("[SCT]"))
-            ChatListener.farmingweightHandle(ChatListener.coleweightHandle(message));
+    @ModifyVariable(
+            method = "addMessage",
+            at = @At("HEAD"),
+            argsOnly = true,
+            name = "contents")
+    private Component modifyVisualMessage(Component contents) {
+        if (StringUtils.removeColor(contents.getString(), false).startsWith("[SCT]")) return contents;
+        return ChatListener.farmingweightHandle(ChatListener.coleweightHandle(contents));
     }
 }
