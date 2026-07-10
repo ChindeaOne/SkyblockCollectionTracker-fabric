@@ -16,7 +16,6 @@ public class DeployableOverlay extends AbstractOverlay {
 
     private final Position position = ConfigAccess.getDeployablePosition();
     private final List<String> deployableLines = new ArrayList<>();
-    private boolean renderingAllowed = true;
 
     @Override
     public String overlayLabel() {
@@ -31,16 +30,6 @@ public class DeployableOverlay extends AbstractOverlay {
     @Override
     public boolean isEnabled() {
         return ConfigAccess.isDeployableEnabled() && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override

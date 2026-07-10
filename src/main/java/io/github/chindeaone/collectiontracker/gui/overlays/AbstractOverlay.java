@@ -31,7 +31,12 @@ public abstract class AbstractOverlay {
     }
 
     public boolean shouldRender() {
-        return isEnabled() && isRenderingAllowed();
+        Minecraft mc = Minecraft.getInstance();
+
+        return !mc.options.hideGui
+                && !mc.getDebugOverlay().showDebugScreen()
+                && isEnabled()
+                && isRenderingAllowed();
     }
 
     public abstract void render(GuiGraphicsExtractor context);
