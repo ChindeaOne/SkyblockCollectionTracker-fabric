@@ -18,7 +18,11 @@ object ForagingMapping {
     )
 
     val foragingBlockPerType = mapOf(
-        "fig" to "minecraft:stripped_spruce_wood",
-        "mangrove" to "minecraft:mangrove_wood",
+        "fig" to setOf("minecraft:stripped_spruce_wood"),
+        "mangrove" to setOf("minecraft:mangrove_wood"),
+        "helix" to setOf(
+            "minecraft:stripped_mangrove_wood",
+            "minecraft:stripped_birch_wood"
+        )
     )
 }
