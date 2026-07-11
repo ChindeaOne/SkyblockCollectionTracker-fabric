@@ -33,6 +33,7 @@ object ServerUtils {
     }
 
     private fun checkServerStatusPeriodically(client: Minecraft) {
+        if (!HypixelUtils.isOnSkyblock) return
         logger.info("[SCT]: Checking server status...")
         ServerStatus.checkServerAsync(client::execute) { up ->
             serverStatus = up
