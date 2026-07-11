@@ -19,6 +19,9 @@ object IslandTracker {
     var isInGalatea: Boolean = false
         private set
 
+    var currentIsland: String? = null
+        private set
+
     @JvmStatic
     var isInRift: Boolean = false
         private set
@@ -32,49 +35,44 @@ object IslandTracker {
         }
 
         val lines = areaWidget.lines
-        updateMiningIsland(lines)
-        updateForagingIsland(lines)
-        updateFarmingIsland(lines)
-        updateRiftIsland(lines)
+        if (lines.isEmpty()) return
+
+        val detectedIsland = lines.toString()
+            .trim('[', ']')
+            .substringAfter("Area:")
+            .trim()
+
+        if (detectedIsland.isEmpty() || detectedIsland == currentIsland) return
+        currentIsland = detectedIsland
+
+        updateIslands(detectedIsland)
     }
 
-    private fun updateMiningIsland(lines: List<String>) {
-        currentMiningIsland = lines.firstNotNullOfOrNull { line ->
-            MiningMapping.miningAreas.firstOrNull { name ->
-                line.contains(name, ignoreCase = true)
-            }
+    private fun updateIslands(island: String) {
+        currentMiningIsland = MiningMapping.miningAreas.firstOrNull { name ->
+            island.equals(name, ignoreCase = true)
         }
-    }
 
-    private fun updateForagingIsland(lines: List<String>) {
-        val foragingLines = lines.find { it.contains("The Park") || it.contains("Galatea") }
-        if (foragingLines != null) {
-            isInGalatea = foragingLines.contains("Galatea")
-            currentForagingIsland = if (isInGalatea) "Galatea" else "The Park"
-        } else {
-            currentForagingIsland = null
-            isInGalatea = false
+        currentForagingIsland = ForagingMapping.foragingIslands.firstOrNull { name ->
+            island.equals(name, ignoreCase = true)
         }
-    }
+        isInGalatea = currentForagingIsland == "Galatea"
 
-    private fun updateFarmingIsland(lines: List<String>) {
-        currentFarmingIsland = lines.firstNotNullOfOrNull { line ->
-            FarmingMapping.farmingAreas.firstOrNull { name ->
-                line.contains(name, ignoreCase = true)
-            }
+        currentFarmingIsland = FarmingMapping.farmingAreas.firstOrNull { name ->
+            island.equals(name, ignoreCase = true)
         }
+
+        updateRiftIsland(island)
     }
 
-    private fun updateRiftIsland(lines: List<String>) {
+    private fun updateRiftIsland(island: String) {
         if (riftCheckTicks > 0) {
             riftCheckTicks--
             return
         }
         riftCheckTicks = 20
 
-        val currentlyInRift = lines.any {
-            it.contains("The Rift", ignoreCase = true)
-        }
+        val currentlyInRift = island.equals("The Rift", ignoreCase = true)
 
         if (currentlyInRift == isInRift) return
         isInRift = currentlyInRift
@@ -86,6 +84,7 @@ object IslandTracker {
     }
 
     fun reset() {
+        currentIsland = null
         currentMiningIsland = null
         currentForagingIsland = null
         isInGalatea = false

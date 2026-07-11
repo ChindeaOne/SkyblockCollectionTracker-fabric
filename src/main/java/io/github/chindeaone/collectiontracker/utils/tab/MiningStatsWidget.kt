@@ -126,8 +126,5 @@ object MiningStatsWidget {
 
         rawStats = currentRaw
         lastStats = currentRaw
-        nextAllowedTime = now + 3_000L // same as Hypixel
-
-        rawStats.joinToString(" | ") { it }
     }
 }

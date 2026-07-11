@@ -78,8 +78,5 @@ object CommissionWidget {
 
         rawCommissions = currentRaw.toMutableList()
         lastCommissionSet = currentRaw
-        nextAllowedTime = now + 3_000L // same as Hypixel
-
-        rawCommissions.joinToString(" | ") { it }
     }
 }
