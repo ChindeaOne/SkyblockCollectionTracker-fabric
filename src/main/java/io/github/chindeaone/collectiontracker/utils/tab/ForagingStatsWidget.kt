@@ -23,22 +23,23 @@ object ForagingStatsWidget {
     @JvmStatic
     var isInGalatea: Boolean = false
 
-    private var nextAllowedTime: Long = 0L
     private var firstInfoSeenTime: Long = 0L
 
     fun onTabWidgetsUpdate() {
         val now = System.currentTimeMillis()
-        if (now < nextAllowedTime) return
 
         currentForagingIsland = IslandTracker.currentForagingIsland
         isInGalatea = IslandTracker.isInGalatea
         if (currentForagingIsland == null) {
             rawStats = emptyList()
             rawBeaconStats = emptyList()
-            rawStarbornTempleStats = ""
             lastStats = null
             lastBeaconStats = null
-            lastStarbornTempleStats = null
+
+            if (!isInGalatea) {
+                rawStarbornTempleStats = ""
+                lastStarbornTempleStats = null
+            }
             return
         }
 
@@ -53,7 +54,7 @@ object ForagingStatsWidget {
         }
 
         val widget = TabWidget.STATS
-        val beaconWidget = TabWidget.MOONGLADE_BEACON
+        val beaconWidget = if (isInGalatea) TabWidget.MOONGLADE_BEACON else TabWidget.TORRHUS_BEACON
         val starbornTempleWidget = TabWidget.STARBORN_TEMPLE
 
         if (!widget.isPresent) {
@@ -99,9 +100,5 @@ object ForagingStatsWidget {
             rawStarbornTempleStats = starbornTempleDataRaw.toString()
             lastStarbornTempleStats = starbornTempleDataRaw
         }
-
-        nextAllowedTime = now + 3_000L // same as Hypixel
-        rawStats.joinToString(" | ") { it }
-        rawBeaconStats.joinToString(" | ") { it }
     }
 }

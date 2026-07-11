@@ -82,7 +82,7 @@ public class ForagingStatsParser {
             return;
         }
 
-        if (line.contains("Foraging Fortune") && !line.contains("Fig") && !line.contains("Mangrove") && !line.contains("Starborn")) {
+        if (line.contains("Foraging Fortune") && !line.contains("Fig") && !line.contains("Mangrove") && !line.contains("Helix") && !line.contains("Starborn")) {
             ctx.globalFortune = value;
             return;
         }
@@ -106,6 +106,16 @@ public class ForagingStatsParser {
                 lastDisplayedSpecificFortuneValue = ctx.mangroveFortune;
                 lastDisplayedBeaconFortuneValue = ctx.beaconMangroveFortune;
                 lastDisplayedFortuneColor = "§c";
+            }
+        } else if (line.contains("Helix Fortune")) {
+            if (isBeacon) ctx.beaconHelixFortune += value;
+            else ctx.helixFortune += value;
+
+            if ("helix".equals(ctx.blockType)) {
+                lastDisplayedSpecificFortune = "Helix Fortune";
+                lastDisplayedSpecificFortuneValue = ctx.helixFortune;
+                lastDisplayedBeaconFortuneValue = ctx.beaconHelixFortune;
+                lastDisplayedFortuneColor = "§b";
             }
         }
     }
@@ -132,6 +142,8 @@ public class ForagingStatsParser {
         int mangroveFortune = 0;
         int beaconFigFortune = 0;
         int beaconMangroveFortune = 0;
+        int helixFortune = 0;
+        int beaconHelixFortune = 0;
         int starbornTempleFortune = 0;
         String beaconStacks = "";
 
@@ -159,6 +171,11 @@ public class ForagingStatsParser {
                 beaconSpecific = beaconMangroveFortune;
                 specificFortuneName = "Mangrove Fortune";
                 specificColor = "§c";
+            } else if ("helix".equals(blockType)) {
+                baseSpecific = helixFortune;
+                beaconSpecific = beaconHelixFortune;
+                specificFortuneName = "Helix Fortune";
+                specificColor = "§b";
             }
 
             int totalGlobal = globalFortune + starbornTempleFortune;

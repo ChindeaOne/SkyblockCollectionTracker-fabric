@@ -320,6 +320,10 @@ enum class TabWidget(headerRegex: String) {
         // language=RegExp
         "(?:§.)*Moonglade Beacon: (?:§.)*(?<stacks>\\d+) Stacks?"
     ),
+    TORRHUS_BEACON(
+        // language=RegExp
+      "(?:§.)*Torrhus Beacon: (?:§.)*(?<stacks>\\d+) Stacks?"
+    ),
     SALTS(
         // language=RegExp
         "(?:§.)*Salts:",
