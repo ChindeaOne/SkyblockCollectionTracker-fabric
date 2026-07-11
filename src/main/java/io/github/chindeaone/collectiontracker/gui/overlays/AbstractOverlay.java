@@ -33,7 +33,7 @@ public abstract class AbstractOverlay {
     public boolean shouldRender() {
         Minecraft mc = Minecraft.getInstance();
 
-        return !mc.options.hideGui
+        return /*? if 26.2 {*/ /*!mc.gui.hud.isHidden() *//*?} else {*/ !mc.options.hideGui /*?}*/
                 && !mc.getDebugOverlay().showDebugScreen()
                 && isEnabled()
                 && isRenderingAllowed();
