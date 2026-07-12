@@ -23,7 +23,6 @@ public class MultiCollectionOverlay extends AbstractOverlay{
     public static volatile boolean trackingDirty = false;
     private final Position position = ConfigAccess.getMultiOverlayPosition();
     public final List<String> multiOverlayLines = new ArrayList<>();
-    private boolean renderingAllowed  = true;
     private final List<String> expandedCollections = new ArrayList<>();
 
     @Override
@@ -38,16 +37,6 @@ public class MultiCollectionOverlay extends AbstractOverlay{
     @Override
     public boolean isEnabled() {
         return MultiTrackingHandler.isMultiTracking() && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override

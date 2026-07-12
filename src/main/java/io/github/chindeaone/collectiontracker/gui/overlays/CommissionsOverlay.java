@@ -19,7 +19,6 @@ public class CommissionsOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getCommissionsPosition();
     private final List<String> formattedCommissions = new ArrayList<>();
-    private boolean renderingAllowed  = true;
 
     @Override
     public String overlayLabel() {
@@ -34,16 +33,6 @@ public class CommissionsOverlay extends AbstractOverlay{
     @Override
     public boolean isEnabled() {
         return ConfigAccess.isCommissionsEnabled() && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override

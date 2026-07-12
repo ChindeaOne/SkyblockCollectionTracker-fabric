@@ -21,7 +21,6 @@ public class SkyMallOverlay extends AbstractOverlay {
 
     private final Position position = ConfigAccess.getSkyMallPosition();
     private final List<String> skyMallOverlayLines = new ArrayList<>();
-    private boolean renderingAllowed  = true;
 
     @Override
     public String overlayLabel() {
@@ -36,16 +35,6 @@ public class SkyMallOverlay extends AbstractOverlay {
     @Override
     public boolean isEnabled() {
         return ConfigAccess.isSkyMallEnabled() && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override

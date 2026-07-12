@@ -19,7 +19,6 @@ public class ForagingStatsOverlay extends AbstractOverlay{
 
     private final Position position = ConfigAccess.getForagingStatsPosition();
     private final List<String> formattedForagingStats = new ArrayList<>();
-    private boolean renderingAllowed  = true;
 
     @Override
     public String overlayLabel() {
@@ -33,16 +32,6 @@ public class ForagingStatsOverlay extends AbstractOverlay{
     @Override
     public boolean isEnabled() {
         return ConfigAccess.isForagingStatsOverlayEnabled() && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override

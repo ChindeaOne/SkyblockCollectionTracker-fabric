@@ -20,7 +20,6 @@ public class LotteryOverlay extends AbstractOverlay {
 
     private final Position position = ConfigAccess.getLotteryPosition();
     private final List<String> lotteryOverlayLines = new ArrayList<>();
-    private boolean renderingAllowed  = true;
 
     @Override
     public String overlayLabel() {
@@ -35,16 +34,6 @@ public class LotteryOverlay extends AbstractOverlay {
     @Override
     public boolean isEnabled() {
         return ConfigAccess.isLotteryEnabled() && HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override

@@ -7,8 +7,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class TitleOverlay extends AbstractOverlay{
 
-    private boolean renderingAllowed  = true;
-
     @Override
     public String overlayLabel() {
         return "Global Title";
@@ -22,16 +20,6 @@ public class TitleOverlay extends AbstractOverlay{
     @Override
     public boolean isEnabled() {
         return HypixelUtils.isOnSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
     }
 
     @Override
