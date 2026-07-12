@@ -8,17 +8,21 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 object RenderUtils {
 
     private val fr: Font get() = Minecraft.getInstance().font
-    private const val DUMMY_BG = -0x7fbfbfc0
 
     private data class QueuedTitle(val title: Component, val duration: Long)
     private val titleQueue = ArrayDeque<QueuedTitle>()
@@ -40,7 +44,7 @@ object RenderUtils {
         val radius = (totalBoxHeight / 4).coerceAtMost(6)
 
         drawOverlayFrame(context, pos) {
-            drawRoundedRect(context, 0, -yPadding, pos.width, totalBoxHeight, radius, DUMMY_BG)
+            drawRoundedRect(context, 0, -yPadding, pos.width, totalBoxHeight, radius, ColorUtils.DUMMY_BG)
 
             val overlayText = Component.literal(label).withStyle(ChatFormatting.GREEN)
             val textScale = 0.8f
@@ -208,6 +212,75 @@ object RenderUtils {
         for (line in lines) {
             context.text(fr, line, 0, y, ColorUtils.WHITE, true)
             y += fr.lineHeight
+        }
+    }
+
+    @JvmStatic
+    fun renderCooldownCircle(context: GuiGraphicsExtractor) {
+        val centerX = ScaleUtils.scaledWidth / 2f - 1f
+        val centerY = ScaleUtils.scaledHeight / 2f - 1f
+
+        val cooldown = ChatListener.finalCooldown
+        val duration = ChatListener.finalDuration
+
+        val maxCooldown = ChatListener.maxCooldown
+        val maxDuration = ChatListener.maxDuration
+
+        when {
+            cooldown <= 0.0 -> {
+                drawArc(context, centerX, centerY, -90f, 360f, ColorUtils.GREEN)
+            }
+
+            duration > 0.0 -> {
+                val progress = (duration / maxDuration).coerceIn(0.0, 1.0)
+                val sweep = (360 * progress).toFloat()
+                val start = -90f + (360f - sweep)
+
+                drawArc(context, centerX, centerY, start, sweep, ColorUtils.GREEN)
+            }
+
+            else -> {
+                val progress = (1.0 - cooldown / maxCooldown).coerceIn(0.0, 1.0)
+
+                drawArc(context, centerX, centerY, -90f, (-360 * progress).toFloat(), ColorUtils.RED)
+            }
+        }
+    }
+
+    private fun drawArc(context: GuiGraphicsExtractor, centerX: Float, centerY: Float, direction: Float, sweepAngle: Float, color: Int) {
+        if (sweepAngle == 0f) return
+
+        val cx = centerX.roundToInt()
+        val cy = centerY.roundToInt()
+        val count = arcPixels.size
+        val startIdx = (normalizeAngle(direction + 90f) / 360f * count).toInt()
+        val steps = (abs(sweepAngle) / 360f * count).toInt().coerceAtLeast(1)
+        val dir = if (sweepAngle >= 0f) 1 else -1
+
+        var idx = startIdx
+        repeat(steps + 1) {
+            val (ox, oy) = arcPixels[idx]
+            context.fill(cx + ox, cy + oy, cx + ox + 1, cy + oy + 1, color)
+
+            idx += dir
+            if (idx < 0) idx = count - 1
+            else if (idx >= count) idx = 0
+        }
+    }
+
+    private fun normalizeAngle(angle: Float): Float = ((angle % 360f) + 360f) % 360f
+
+    private val arcPixels: List<Pair<Int, Int>> = buildList {
+        var last: Pair<Int, Int>? = null
+
+        for (deg in 0..360) {
+            val angle = Math.toRadians((deg - 90).toDouble())
+            val point = (6f * cos(angle).toFloat()).roundToInt() to (6f * sin(angle).toFloat()).roundToInt()
+
+            if (point != last) {
+                add(point)
+                last = point
+            }
         }
     }
 

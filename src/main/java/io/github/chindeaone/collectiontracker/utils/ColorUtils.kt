@@ -14,11 +14,13 @@ fun Int.toFWRankComponent(isMe: Boolean, playerName: String): Component = ColorU
 
 object ColorUtils {
     const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
+    const val DUMMY_BG: Int = 0x80404040.toInt()
     const val WHITE: Int = 0xFFFFFFFF.toInt()
     const val GREEN: Int = 0xFF55FF55.toInt()
     const val YELLOW: Int = 0xFFFFFF55.toInt()
     const val AQUA: Int = 0xFF55FFFF.toInt()
     const val GRAY: Int = 0xFFAAAAAA.toInt()
+    const val RED: Int = 0xFFFF0000.toInt()
     const val DARK_GRAY: Int = 0xFFAAAAAA.toInt()
     const val SILVER_BLUE: Int = 0xFF7FB4DB.toInt()
 

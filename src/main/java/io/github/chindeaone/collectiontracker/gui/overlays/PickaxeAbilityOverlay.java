@@ -49,6 +49,8 @@ public class PickaxeAbilityOverlay extends AbstractOverlay{
         RenderUtils.drawOverlayFrame(context, position, () ->
                 RenderUtils.renderStrings(context, lines)
         );
+
+        RenderUtils.renderCooldownCircle(context);
     }
 
     @Override
