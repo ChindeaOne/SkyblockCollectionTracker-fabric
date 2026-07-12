@@ -17,7 +17,7 @@ public class SkyMallConfig {
     public boolean enableSkyMall = false;
 
     @Expose
-    public String lastSkyMallPerk = "";
+    public String lastSkyMallBuff = "";
 
     @Expose
     @ConfigOption(

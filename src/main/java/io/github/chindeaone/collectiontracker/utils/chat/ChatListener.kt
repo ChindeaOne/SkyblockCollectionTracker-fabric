@@ -44,6 +44,7 @@ object ChatListener {
     @JvmStatic var currentSkyMallBuff = "§cUnknown"
     var isPickaxeAbility = false
     @JvmStatic var currentLotteryBuff = "§cUnknown"
+    @JvmStatic var currentBeekeeperBuff = "§cUnknown"
 
     @JvmStatic var nextBuffTime: Long = 0
         private set
@@ -51,6 +52,7 @@ object ChatListener {
 
     private var expectingSkyMallBuff = false
     private var expectingLotteryBuff = false
+    private var expectingBeekeeper = false
 
     private val pickaxeDuration = TimerState()
     private val pickaxeCooldown = TimerState()
@@ -61,6 +63,15 @@ object ChatListener {
     @JvmStatic val finalDuration: Double get() = pickaxeDuration.remainingSeconds
     @JvmStatic val finalAxeCooldown: Double get() = axeCooldown.remainingSeconds
     @JvmStatic val finalAxeDuration: Double get() = axeDuration.remainingSeconds
+
+    @JvmStatic var maxCooldown = 0.0
+        private set
+    @JvmStatic var maxDuration = 0.0
+        private set
+    @JvmStatic var maxAxeCooldown = 0.0
+        private set
+    @JvmStatic var maxAxeDuration = 0.0
+        private set
 
     fun onChatMessage(message: Component) {
         if (!HypixelUtils.isOnSkyblock) return
@@ -232,6 +243,9 @@ object ChatListener {
 
         val durationMs = (AbilityUtils.getBaseDuration(ability, abilityLevel, hasBlueCheese) * 1000).toLong()
 
+        maxCooldown = finalCooldownSec
+        maxDuration = durationMs / 1000.0
+
         pickaxeDuration.start(durationMs)
         pickaxeCooldown.start((finalCooldownSec * 1000).toLong())
 
@@ -248,10 +262,12 @@ object ChatListener {
         )
 
         val durationMs = (AbilityUtils.getBaseAxeDuration(ability, abilityLevel) * 1000).toLong()
-        val cooldownMs = (finalCooldownSec * 1000).toLong()
+
+        maxAxeCooldown = finalCooldownSec
+        maxAxeDuration = durationMs / 1000.0
 
         axeDuration.start(durationMs)
-        axeCooldown.start(cooldownMs)
+        axeCooldown.start((finalCooldownSec * 1000).toLong())
 
         ConfigHelper.setAxeAbilityName(ability)
     }
@@ -285,6 +301,10 @@ object ChatListener {
                 expectingLotteryBuff = true
                 return ConfigAccess.isLotteryEnabled()
             }
+            text.contains("Your Beekeeper buff changed") -> {
+                expectingBeekeeper = true
+                return ConfigAccess.isBeekeeperEnabled()
+            }
             text.startsWith("New buff: ") -> {
                 val buffText = text.substringAfter("New buff: ").trim()
                 // Set default 20 mins only when a new buff is sent in chat
@@ -292,11 +312,13 @@ object ChatListener {
                     nextBuffTime = now + 1_200_000
                 }
 
+                println(buffText)
+
                 val compact = compactBuffs(buffText)
                 if (expectingSkyMallBuff) {
                     isPickaxeAbility = "Pickaxe Ability" in text
                     currentSkyMallBuff = compact
-                    ConfigHelper.setLastSkyMallPerk(compact)
+                    ConfigHelper.setLastSkyMallBuff(compact)
                     expectingSkyMallBuff = false
                     if (ConfigAccess.isDisableSkyMallChatMessages()) return true // Don't render Sky Mall buff in chat, but update the buffs in overlay
 
@@ -309,13 +331,25 @@ object ChatListener {
                 }
                 if (expectingLotteryBuff) {
                     currentLotteryBuff = compact
-                    ConfigHelper.setLastLotteryPerk(compact)
+                    ConfigHelper.setLastLotteryBuff(compact)
                     expectingLotteryBuff = false
                     if (ConfigAccess.isDisableLotteryChatMessages()) return true // Don't render Lottery buff in chat, but update the buffs in overlay
 
                     // Compact messages if overlay is enabled
                     if (ConfigAccess.isLotteryEnabled()) {
                         ChatUtils.sendMessage("§eNew §2Lottery §eBuff§r: $compact", prefix = true)
+                        return true
+                    }
+                    return false
+                }
+                if (expectingBeekeeper) {
+                    currentBeekeeperBuff = compact
+                    ConfigHelper.setLastBeekeeperBuff(compact)
+                    expectingBeekeeper = false
+                    if (ConfigAccess.isDisableBeekeeperChatMessages()) return true
+
+                    if (ConfigAccess.isBeekeeperEnabled()) {
+                        ChatUtils.sendMessage("§eNew §6Beekeeper §eBuff§r: $compact", prefix = true)
                         return true
                     }
                     return false
@@ -371,10 +405,32 @@ object ChatListener {
                 val num = numberRegex.find(text)?.value
                 "§6$num \uE054 Mangrove Fortune"
             }
+            "Helix" in text -> {
+                val num = numberRegex.find(text)?.value
+                "§6$num \uE054 Helix Fortune"
+            }
             "Sweep" in text -> {
                 val rawPct = percentRegex.find(text)?.value
                 val pct = "${rawPct?.trimEnd('%')}%"
                 "§a$pct §2\uE023 Sweep"
+            }
+
+            // Beekeeper buffs
+            "Honeyhives refill" in text -> {
+                val rawPct = percentRegex.find(text)?.value
+                "§a$rawPct §6Honeyhives Refill"
+            }
+            "Trees lathered" in text && "attract" in text -> {
+                val rawPct = percentRegex.find(text)?.value
+                "§a$rawPct §a\uE05BCritter Speed"
+            }
+            "Gain" in text && "Honeycomb" in text -> {
+                val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
+                "§a$x §6Honeycomb"
+            }
+            "second Critter" in text -> {
+                val rawPct = percentRegex.find(text)?.value
+                " §a$rawPct §a\uE05BExtra Critter"
             }
             else -> message // fallback to original text
         }

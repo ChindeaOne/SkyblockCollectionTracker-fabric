@@ -25,4 +25,9 @@ public class HotfConfig {
     @ConfigOption(name = "Lottery Config", desc = "")
     @Accordion
     public LotteryConfig lotteryConfig = new LotteryConfig();
+
+    @Expose
+    @ConfigOption(name = "Beekeeper Config", desc = "")
+    @Accordion
+    public BeekeeperConfig beekeeperConfig = new BeekeeperConfig();
 }

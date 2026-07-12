@@ -15,6 +15,7 @@ import io.github.chindeaone.collectiontracker.config.categories.coleweight.Heatm
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.PrecisionMiningConfig
 import io.github.chindeaone.collectiontracker.config.categories.farmingweight.FarmingweightColorConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
+import io.github.chindeaone.collectiontracker.config.categories.foraging.BeekeeperConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
@@ -51,6 +52,7 @@ val commissionsPosition: Position get() = modConfig.mining.commissionsConfig.com
 val skillPosition: Position get() = modConfig.tracking.skillConfig.skillOverlayPosition
 val skyMallPosition: Position get() = modConfig.mining.hotmConfig.skyMallConfig.skyMallPosition
 val lotteryPosition: Position get() = modConfig.foraging.hotfConfig.lotteryConfig.lotteryPosition
+val beekeeperPosition: Position get() = modConfig.foraging.hotfConfig.beekeeperConfig.beekeeperPosition
 val pickaxeAbilityPosition: Position get() = modConfig.mining.hotmConfig.pickaxeAbilityConfig.pickaxeAbilityPosition
 val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilityConfig.axeAbilityPosition
 val deployablePosition: Position get() = modConfig.mining.lanternDeployableConfig.deployablePosition
@@ -89,7 +91,7 @@ val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displ
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
 val lastPet: String get() = pickaxeAbilityConfig.lastPet
 val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
-val lastSkyMallPerk: String get() = skyMallConfig.lastSkyMallPerk
+val lastSkyMallBuff: String get() = skyMallConfig.lastSkyMallBuff
 val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIslandsOnly
 val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChatMessages
 val showPickaxeReadyAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeReadyAbilityTitle
@@ -150,8 +152,14 @@ val abilityNameAxe: String get() = axeAbilityConfig.abilityNameAxe
 val displayAxeAbility: Boolean get() = axeAbilityConfig.displayAxeAbility
 val lotteryConfig: LotteryConfig get() = hotfConfig.lotteryConfig
 val enableLottery: Boolean get() = lotteryConfig.enableLottery
+val lastLotteryBuff: String get() = lotteryConfig.lastLotteryBuff
 val lotteryInForagingIslandsOnly: Boolean get() = lotteryConfig.lotteryInForagingIslandsOnly
 val disableLotteryChatMessages: Boolean get() = lotteryConfig.disableLotteryChatMessages
+val beekeeperConfig: BeekeeperConfig get() = hotfConfig.beekeeperConfig
+val enableBeekeeper: Boolean get() = beekeeperConfig.enableBeekeeper
+val lastBeekeeperBuff: String get() = beekeeperConfig.lastBeekeeperBuff
+val beekeeperInForagingIslandsOnly: Boolean get() = beekeeperConfig.beekeeperInForagingIslandsOnly
+val disableBeekeeperChatMessages: Boolean get() = beekeeperConfig.disableBeekeeperChatMessages
 val showAxeReadyAbilityTitle: Boolean get() = axeAbilityConfig.showAxeReadyAbilityTitle
 val showAxeExpiredAbilityTitle: Boolean get() = axeAbilityConfig.showAxeExpiredAbilityTitle
 val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbilityInForagingIslandsOnly
@@ -220,6 +228,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun getLotteryPosition(): Position = lotteryPosition
+
+    @JvmStatic
+    fun getBeekeeperPosition(): Position = beekeeperPosition
 
     @JvmStatic
     fun getSkillPosition(): Position = skillPosition
@@ -360,13 +371,22 @@ object ConfigAccess {
     fun isLotteryEnabled(): Boolean = enableLottery
 
     @JvmStatic
+    fun isBeekeeperEnabled(): Boolean = enableBeekeeper
+
+    @JvmStatic
     fun isDisableLotteryChatMessages(): Boolean = disableLotteryChatMessages
+
+    @JvmStatic
+    fun isDisableBeekeeperChatMessages(): Boolean = disableBeekeeperChatMessages
 
     @JvmStatic
     fun isSkyMallInMiningIslandsOnly(): Boolean = skyMallInMiningIslandsOnly
 
     @JvmStatic
     fun isLotteryInForagingIslandsOnly(): Boolean = lotteryInForagingIslandsOnly
+
+    @JvmStatic
+    fun isBeekeeperInForagingIslandsOnly(): Boolean = beekeeperInForagingIslandsOnly
 
     @JvmStatic
     fun isPickaxeAbilityDisplayed(): Boolean = displayPickaxeAbility
@@ -378,10 +398,13 @@ object ConfigAccess {
     fun getLastPet(): String = lastPet
 
     @JvmStatic
-    fun getLastSkyMallPerk(): String = lastSkyMallPerk
+    fun getLastSkyMallBuff(): String = lastSkyMallBuff
 
     @JvmStatic
-    fun getLastLotteryPerk(): String = lotteryConfig.lastLotteryPerk
+    fun getLastLotteryBuff(): String = lastLotteryBuff
+
+    @JvmStatic
+    fun getLastBeekeeperBuff(): String = lastBeekeeperBuff
 
     @JvmStatic
     fun isAxeAbilityDisplayed(): Boolean = displayAxeAbility
@@ -628,8 +651,8 @@ object ConfigHelper {
     }
 
     @JvmStatic
-    fun setLastSkyMallPerk(perk: String) {
-        skyMallConfig.lastSkyMallPerk = perk
+    fun setLastSkyMallBuff(buff: String) {
+        skyMallConfig.lastSkyMallBuff = buff
     }
 
     @JvmStatic
@@ -638,13 +661,23 @@ object ConfigHelper {
     }
 
     @JvmStatic
-    fun setLastLotteryPerk(perk: String) {
-        lotteryConfig.lastLotteryPerk = perk
+    fun setLastLotteryBuff(buff: String) {
+        lotteryConfig.lastLotteryBuff = buff
     }
 
     @JvmStatic
     fun disableLottery() {
         lotteryConfig.enableLottery = false
+    }
+
+    @JvmStatic
+    fun setLastBeekeeperBuff(buff: String) {
+        beekeeperConfig.lastBeekeeperBuff = buff
+    }
+
+    @JvmStatic
+    fun disableBeekeeper() {
+        beekeeperConfig.enableBeekeeper = false
     }
 
     @JvmStatic

@@ -17,7 +17,7 @@ public class LotteryConfig {
     public boolean enableLottery = false;
 
     @Expose
-    public String lastLotteryPerk = "";
+    public String lastLotteryBuff = "";
 
     @Expose
     @ConfigOption(

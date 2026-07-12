@@ -45,6 +45,7 @@ object OverlayManager {
                 ForagingStatsOverlay(),
                 SkyMallOverlay(),
                 LotteryOverlay(),
+                BeekeeperOverlay(),
                 PickaxeAbilityOverlay(),
                 AxeAbilityOverlay(),
                 DeployableOverlay(),

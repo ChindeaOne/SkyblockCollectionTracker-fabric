@@ -24,15 +24,19 @@ object ConfigUtils {
                 logger.warn("[SCT]: Failed to load last pet from config: ${e.message}")
             }
         }
-        val lastSkyMallPerk = ConfigAccess.getLastSkyMallPerk()
-        val lastLotteryPerk = ConfigAccess.getLastLotteryPerk()
+        val lastSkyMallBuff = ConfigAccess.getLastSkyMallBuff()
+        val lastLotteryBuff = ConfigAccess.getLastLotteryBuff()
+        val lastBeekeeperBuff = ConfigAccess.getLastBeekeeperBuff()
 
-        if (lastSkyMallPerk.isNotBlank()) {
-            ChatListener.currentSkyMallBuff = lastSkyMallPerk
-            if (lastSkyMallPerk.contains("Cooldown")) ChatListener.isPickaxeAbility = true
+        if (lastSkyMallBuff.isNotBlank()) {
+            ChatListener.currentSkyMallBuff = lastSkyMallBuff
+            if (lastSkyMallBuff.contains("Cooldown")) ChatListener.isPickaxeAbility = true
         }
-        if (lastLotteryPerk.isNotBlank()) {
-            ChatListener.currentLotteryBuff = lastLotteryPerk
+        if (lastLotteryBuff.isNotBlank()) {
+            ChatListener.currentLotteryBuff = lastLotteryBuff
+        }
+        if (lastBeekeeperBuff.isNotBlank()) {
+            ChatListener.currentBeekeeperBuff = lastBeekeeperBuff
         }
 
         TemporaryBuffsParser.loadDurations()

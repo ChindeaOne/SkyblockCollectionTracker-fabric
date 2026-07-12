@@ -116,7 +116,7 @@ public class FetchSkillTree {
         ConfigHelper.setStrongArmMS(0);
         ConfigHelper.setProfessionalMS(0);
         ChatListener.setCurrentSkyMallBuff("");
-        ConfigHelper.setLastSkyMallPerk("");
+        ConfigHelper.setLastSkyMallBuff("");
         if (pendingHotmReset == null || pendingHotmReset.isDone()) {
             pendingHotmReset = scheduler.schedule(() -> fetchSkillTree(true, false), 10, TimeUnit.MINUTES);
             logger.info("[SCT]: Scheduled a mining skill tree fetch in 10 minutes.");
@@ -125,7 +125,9 @@ public class FetchSkillTree {
 
     public static void resetHotf() {
         ChatListener.setCurrentLotteryBuff("");
-        ConfigHelper.setLastLotteryPerk("");
+        ConfigHelper.setLastLotteryBuff("");
+        ChatListener.setCurrentBeekeeperBuff("");
+        ConfigHelper.setLastBeekeeperBuff("");
         if (pendingHotfReset == null || pendingHotfReset.isDone()) {
             pendingHotfReset = scheduler.schedule(() -> fetchSkillTree(false, true), 10, TimeUnit.MINUTES);
             logger.info("[SCT]: Scheduled a foraging skill tree fetch in 10 minutes.");
