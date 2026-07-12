@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils.parser;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.utils.tab.ForagingStatsWidget;
 import io.github.chindeaone.collectiontracker.utils.world.ForagingMapping;
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,7 +185,7 @@ public class ForagingStatsParser {
             String stackDisplay = beaconStacks.isEmpty() ? "" : " §3(" + beaconStacks + ")";
 
             // If player isn't on Galatea, use global fortune only
-            if (!ForagingStatsWidget.isInGalatea()) {
+            if (IslandTracker.isInPark()) {
                 return "§aForaging Fortune: §6" + symbol + globalFortune;
             }
 

@@ -20,8 +20,6 @@ object ForagingStatsWidget {
     @JvmStatic
     var currentForagingIsland: String? = null
         private set
-    @JvmStatic
-    var isInGalatea: Boolean = false
 
     private var firstInfoSeenTime: Long = 0L
 
@@ -29,14 +27,13 @@ object ForagingStatsWidget {
         val now = System.currentTimeMillis()
 
         currentForagingIsland = IslandTracker.currentForagingIsland
-        isInGalatea = IslandTracker.isInGalatea
         if (currentForagingIsland == null) {
             rawStats = emptyList()
             rawBeaconStats = emptyList()
             lastStats = null
             lastBeaconStats = null
 
-            if (!isInGalatea) {
+            if (!IslandTracker.isInGalatea) {
                 rawStarbornTempleStats = ""
                 lastStarbornTempleStats = null
             }
@@ -54,8 +51,8 @@ object ForagingStatsWidget {
         }
 
         val widget = TabWidget.STATS
-        val beaconWidget = if (isInGalatea) TabWidget.MOONGLADE_BEACON else TabWidget.TORRHUS_BEACON
-        val starbornTempleWidget = TabWidget.STARBORN_TEMPLE
+        val beaconWidget = if (IslandTracker.isInGalatea) TabWidget.MOONGLADE_BEACON else TabWidget.TORRHUS_BEACON
+        val starbornTempleWidget = if (IslandTracker.isInGalatea) TabWidget.STARBORN_TEMPLE else null
 
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible
@@ -82,7 +79,7 @@ object ForagingStatsWidget {
 
         val currentRaw = TabData.parseWidgetData(widget.lines)
         val beaconDataRaw = TabData.parseWidgetData(beaconWidget.lines)
-        val starbornTempleDataRaw = TabData.parseWidgetData(starbornTempleWidget.lines)
+        val starbornTempleDataRaw = if (starbornTempleWidget != null) TabData.parseWidgetData(starbornTempleWidget.lines) else null
 
         if (currentRaw == lastStats && beaconDataRaw == lastBeaconStats && starbornTempleDataRaw == lastStarbornTempleStats) return
 

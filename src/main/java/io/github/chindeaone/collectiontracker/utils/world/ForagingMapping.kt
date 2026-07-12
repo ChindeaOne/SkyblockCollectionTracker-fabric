@@ -12,6 +12,7 @@ object ForagingMapping {
     val foragingStats = listOf(
         "Foraging Fortune",
         "Fig Fortune",
+        "Helix Fortune",
         "Mangrove Fortune",
         "Sweep",
         "Foraging Wisdom"

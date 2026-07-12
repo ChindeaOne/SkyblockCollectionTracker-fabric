@@ -6,8 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.tab.TabWidget
 
 object IslandTracker {
 
-    @JvmStatic
-    var currentMiningIsland: String? = null
+    @JvmStatic var currentMiningIsland: String? = null
         private set
 
     var currentForagingIsland: String? = null
@@ -15,15 +14,17 @@ object IslandTracker {
 
     var currentFarmingIsland: String? = null
         private set
-    
-    var isInGalatea: Boolean = false
+
+    @JvmStatic var isInPark: Boolean = false
+        private set
+
+    @JvmStatic var isInGalatea: Boolean = false
         private set
 
     var currentIsland: String? = null
         private set
 
-    @JvmStatic
-    var isInRift: Boolean = false
+    @JvmStatic var isInRift: Boolean = false
         private set
     private var riftCheckTicks = 0
 
@@ -56,6 +57,7 @@ object IslandTracker {
         currentForagingIsland = ForagingMapping.foragingIslands.firstOrNull { name ->
             island.equals(name, ignoreCase = true)
         }
+        isInPark = currentForagingIsland == "The Park"
         isInGalatea = currentForagingIsland == "Galatea"
 
         currentFarmingIsland = FarmingMapping.farmingAreas.firstOrNull { name ->
