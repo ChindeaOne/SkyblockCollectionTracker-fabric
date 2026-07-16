@@ -312,8 +312,6 @@ object ChatListener {
                     nextBuffTime = now + 1_200_000
                 }
 
-                println(buffText)
-
                 val compact = compactBuffs(buffText)
                 if (expectingSkyMallBuff) {
                     isPickaxeAbility = "Pickaxe Ability" in text

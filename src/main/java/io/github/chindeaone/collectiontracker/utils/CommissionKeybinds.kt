@@ -54,7 +54,7 @@ object CommissionKeybinds {
 
     private var attachedMenu: AbstractContainerMenu? = null
     private val wasDown = HashMap<Int, Boolean>()
-    private const val CLICK_DEBOUNCE_MS = 300L
+    private const val CLICK_DEBOUNCE_MS = 100L
 
     var isMenuOpen = false
         private set
@@ -227,6 +227,7 @@ object CommissionKeybinds {
         m.removeSlotListener(menuListener)
         attachedMenu = null
         wasDown.clear()
+        isMenuOpen = false
     }
 
     private fun keybindCancelEvent() {
