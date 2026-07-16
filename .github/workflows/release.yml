@@ -10,23 +10,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     environment: ci
-    env:
-      TOKEN_URL: ${{ secrets.TOKEN_URL }}
-      TRACKED_COLLECTION_URL: ${{ secrets.TRACKED_COLLECTION_URL }}
-      AVAILABLE_COLLECTIONS_URL: ${{ secrets.AVAILABLE_COLLECTIONS_URL }}
-      AVAILABLE_GEMSTONES_URL: ${{ secrets.AVAILABLE_GEMSTONES_URL }}
-      NPC_PRICES_URL: ${{ secrets.NPC_PRICES_URL }}
-      BAZAAR_URL: ${{ secrets.BAZAAR_URL }}
-      STATUS_URL: ${{ secrets.STATUS_URL }}
-      GITHUB_URL: ${{ secrets.GHUB_URL }}
-      COLORS_URL: ${{ secrets.COLORS_URL }}
-      SKILLS_URL: ${{ secrets.SKILLS_URL }}
-      COLEWEIGHT_URL: ${{ secrets.COLEWEIGHT_URL }}
-      WAYPOINTS_URL: ${{ secrets.WAYPOINTS_URL }}
-      FARMINGWEIGHT_URL: ${{ secrets.FARMINGWEIGHT_URL }}
-      COLLECTION_LEADERBOARD_URL: ${{ secrets.COLLECTION_LEADERBOARD_URL }}
-      SKILLTREE_URL: ${{ secrets.SKILLTREE_URL }}
-      AGENT: ${{ secrets.AGENT }}
     steps:
       - name: checkout repository
         uses: actions/checkout@v4

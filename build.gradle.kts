@@ -118,7 +118,6 @@ dependencies {
     shadowImpl("com.github.ChindeaOne:modrinthautoupdater:${project.property("modrinthautoupdater_version")}") {
         exclude(group = "gson")
     }
-//    include("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}")
 }
 
 kotlin {
@@ -133,29 +132,13 @@ tasks.processResources {
     val expandProps = buildMap {
         put("version", project.version)
         put("minecraft_version", sc.current.version)
-        put("TOKEN_URL", System.getenv("TOKEN_URL") ?: "")
-        put("TRACKED_COLLECTION_URL", System.getenv("TRACKED_COLLECTION_URL") ?: "")
-        put("AVAILABLE_COLLECTIONS_URL", System.getenv("AVAILABLE_COLLECTIONS_URL") ?: "")
-        put("AVAILABLE_GEMSTONES_URL", System.getenv("AVAILABLE_GEMSTONES_URL") ?: "")
-        put("NPC_PRICES_URL", System.getenv("NPC_PRICES_URL") ?: "")
-        put("BAZAAR_URL", System.getenv("BAZAAR_URL") ?: "")
-        put("STATUS_URL", System.getenv("STATUS_URL") ?: "")
-        put("GITHUB_URL", System.getenv("GITHUB_URL") ?: "")
-        put("COLORS_URL", System.getenv("COLORS_URL") ?: "")
-        put("SKILLS_URL", System.getenv("SKILLS_URL") ?: "")
-        put("COLEWEIGHT_URL", System.getenv("COLEWEIGHT_URL") ?: "")
-        put("FARMINGWEIGHT_URL", System.getenv("FARMINGWEIGHT_URL") ?: "")
-        put("COLLECTION_LEADERBOARD_URL", System.getenv("COLLECTION_LEADERBOARD_URL") ?: "")
-        put("WAYPOINTS_URL", System.getenv("WAYPOINTS_URL") ?: "")
-        put("SKILLTREE_URL", System.getenv("SKILLTREE_URL") ?: "")
-        put("AGENT", System.getenv("AGENT") ?: "")
     }
 
     expandProps.forEach { (key, value) ->
         inputs.property(key, value)
     }
 
-    filesMatching(listOf("fabric.mod.json", "assets/skyblockcollectiontracker/url.properties")) {
+    filesMatching(listOf("fabric.mod.json")) {
         expand(expandProps)
     }
 }
