@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher;
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher;
-import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
@@ -53,7 +52,12 @@ public class DataFetcher {
                 String jsonData = fetchDataFromApi(playerUUID, collection);
                 if (jsonData == null) {
                     logger.error("[SCT]: Failed to fetch data from the Hypixel API");
-                    Minecraft.getInstance().execute(() -> Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(new CustomCollectionScreen(List.of(collection))));
+                    Minecraft.getInstance().execute(() -> Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
+                            new CustomCollectionScreen(
+                                    List.of(collection),
+                                    () -> {}
+                            )
+                    ));
                     return;
                 }
                 collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().getValue().getAsLong();
@@ -90,7 +94,7 @@ public class DataFetcher {
             logger.info("[SCT]: No cache present for player {} collection {}. Fetching data.", playerUUID, collection);
         }
 
-        return HypixelApiFetcher.fetchJsonData(playerUUID, TokenManager.getToken(), collection);
+        return HypixelApiFetcher.fetchJsonData(collection);
     }
 
     public static void clearCollectionCache() {

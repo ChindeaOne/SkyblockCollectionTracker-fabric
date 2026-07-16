@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.commands;
 
 import io.github.chindeaone.collectiontracker.api.bazaarapi.FetchBazaarPrice;
-import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher;
@@ -9,7 +8,6 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.PlayerData;
 import io.github.chindeaone.collectiontracker.utils.ServerUtils;
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 import org.apache.logging.log4j.LogManager;
@@ -91,7 +89,7 @@ public class CollectionTracker {
                 }
 
                 // Fetch bazaar data and leaderboard data asynchronously
-                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.getPlayerUUID(), TokenManager.getToken(), collection))
+                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(collection))
                         .thenRunAsync(() -> DataFetcher.fetchLeaderboardData(collection))
                         .thenRun(TrackingHandler::startTracking);
             } catch (Exception e) {
@@ -170,7 +168,7 @@ public class CollectionTracker {
                 }
 
                 // Fetch bazaar data asynchronously
-                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(PlayerData.getPlayerUUID(), TokenManager.getToken(), collectionList))
+                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(collectionList))
                         .thenRunAsync(() -> {
                             if (collectionList.size() == 1 && collectionList.contains("gemstone")) {
                                 String collection = "gemstone";
@@ -182,7 +180,6 @@ public class CollectionTracker {
                 ChatUtils.sendMessage("§cAn error occurred while processing the command.", true);
                 logger.error("[SCT]: Error processing command: ", e);
             }
-
         } catch (Exception e) {
             logger.error("[SCT]: Unexpected error when starting multi-tracking: ", e);
         }

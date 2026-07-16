@@ -12,10 +12,12 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 
 class CustomCollectionScreen(
-    private val collectionList: List<String>
+    private val collectionList: List<String>,
+    private val onCancel: Runnable? = null
 ) : Screen(Component.literal("Enter custom collection value")) {
 
     private val map = mutableMapOf<String, EditBox>()
+    private var confirmed = false
 
     override fun init() {
         if (collectionList.isEmpty()) {
@@ -62,9 +64,17 @@ class CustomCollectionScreen(
                     val formattedValue = NumbersUtils.formatNumber(value)
                     ChatUtils.sendMessage(" §7- §f$displayName: §a$formattedValue", false)
                 }
+                confirmed = true
                 onClose()
             }.bounds(width / 2 - 100, buttonY, 200, 20).build()
         )
+    }
+
+    override fun onClose() {
+        if (!confirmed) {
+            onCancel?.run()
+        }
+        super.onClose()
     }
 
     override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {

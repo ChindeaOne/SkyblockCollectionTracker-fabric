@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking
 
 import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher
@@ -38,7 +39,11 @@ object MultiDataFetcher {
                 if (data == null) {
                     logger.error("[SCT]: Failed to fetch multi collection data from the Hypixel API.")
                     Minecraft.getInstance().execute {
-                        Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(CustomCollectionScreen(CollectionTracker.collectionList))
+                        Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
+                            CustomCollectionScreen(CollectionTracker.collectionList) {
+                                CollectionsManager.multiCollectionSource.clear()
+                            }
+                        )
                     }
                     return
                 }
