@@ -1,140 +1,154 @@
-package io.github.chindeaone.collectiontracker.api.serverapi;
+package io.github.chindeaone.collectiontracker.api.serverapi
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
-import io.github.chindeaone.collectiontracker.api.URLManager;
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.categories.About;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.api.ApiManager
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.categories.About
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
+object RepoUtils {
 
-import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
+    private val logger: Logger = LogManager.getLogger(RepoUtils::class.java)
 
-public class RepoUtils {
-    private static final Logger logger = LogManager.getLogger(RepoUtils.class);
+    @JvmStatic
+    var latestVersion: String? = null
+        private set
 
-    public static volatile String latestVersion;
-    public static String latestReleaseTag;
-    public static String latestBetaTag;
-    public static String latestNotes;
-    private static String latestReleaseNotes;
-    private static String latestBetaNotes;
+    @JvmStatic
+    var latestReleaseTag: String? = null
+        private set
 
-    private static final String currentVersion = SkyblockCollectionTracker.VERSION;
+    @JvmStatic
+    var latestBetaTag: String? = null
+        private set
 
-    public static void checkGithubReleases() throws Exception {
-        URI uri = URI.create(URLManager.GITHUB_URL);
+    @JvmStatic
+    var latestNotes: String? = null
+        private set
 
-        HttpRequest request = HttpRequest.newBuilder(uri)
-                .timeout(Duration.ofSeconds(5))
-                .header("User-Agent", URLManager.AGENT)
-                .header("Accept", "application/json")
-                .header("MC_VERSION", SkyblockCollectionTracker.MC_VERSION)
-                .GET()
-                .build();
+    private var latestReleaseNotes: String? = null
+    private var latestBetaNotes: String? = null
 
-        HttpResponse<InputStream> response =
-                HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
+    private val currentVersion = SkyblockCollectionTracker.VERSION
 
-        int status = response.statusCode();
-        if (status != 200) {
-            logger.error("[SCT]: Failed to fetch GitHub releases, response code: {}", status);
-            return;
-        }
+    @JvmStatic
+    fun checkGithubReleases(): Boolean {
+        return try {
+            val headers = listOf(
+                "MC_VERSION" to SkyblockCollectionTracker.MC_VERSION
+            )
 
-        try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
-            JsonObject jsonResponse = JsonParser.parseReader(reader).getAsJsonObject();
-            logger.info("[SCT]: Successfully fetched GitHub releases");
+            val response = ApiManager.request("github", headers)
 
-            latestReleaseTag = getNullableString(jsonResponse, "latest_tag");
-            latestBetaTag = getNullableString(jsonResponse, "latest_beta_tag");
-            latestReleaseNotes = getNullableString(jsonResponse, "latest_release_notes");
-            latestBetaNotes = getNullableString(jsonResponse, "latest_beta_notes");
+            val status = response.statusCode()
+            if (status != 200) {
+                logger.error("[SCT]: Failed to fetch GitHub releases, response code: {}", status)
+                return false
+            }
+
+            val jsonResponse = JsonParser.parseString(response.body()).asJsonObject
+            logger.info("[SCT]: Successfully fetched GitHub releases")
+
+            latestReleaseTag = getNullableString(jsonResponse, "latest_tag")
+            latestBetaTag = getNullableString(jsonResponse, "latest_beta_tag")
+            latestReleaseNotes = getNullableString(jsonResponse, "latest_release_notes")
+            latestBetaNotes = getNullableString(jsonResponse, "latest_beta_notes")
+
+            true
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error fetching GitHub releases: ", e)
+            false
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public static void checkLatestVersion() {
-        latestReleaseTag = normalizeTags(latestReleaseTag);
-        latestBetaTag = normalizeTags(latestBetaTag);
+    @JvmStatic
+    fun checkLatestVersion() {
+        latestReleaseTag = normalizeTags(latestReleaseTag)
+        latestBetaTag = normalizeTags(latestBetaTag)
 
-        String chosenTag = (ConfigAccess.getUpdateType() == About.UpdateType.BETA)
-                ? latestBetaTag
-                : latestReleaseTag;
-        String chosenNotes = (ConfigAccess.getUpdateType() == About.UpdateType.BETA)
-                ? latestBetaNotes
-                : latestReleaseNotes;
+        val chosenTag = if (ConfigAccess.getUpdateType() == About.UpdateType.BETA) {
+            latestBetaTag
+        } else {
+            latestReleaseTag
+        }
+
+        val chosenNotes = if (ConfigAccess.getUpdateType() == About.UpdateType.BETA) {
+            latestBetaNotes
+        } else {
+            latestReleaseNotes
+        }
 
         if (chosenTag == null) {
-            latestVersion = null;
-            latestNotes = null;
-            return;
+            latestVersion = null
+            latestNotes = null
+            return
         }
 
         // If already on that same version -> no update
-        if (currentVersion.equals(chosenTag)) {
-            latestVersion = null;
-            latestNotes = chosenNotes;
-            return;
+        if (currentVersion == chosenTag) {
+            latestVersion = null
+            latestNotes = chosenNotes
+            return
         }
 
         // Prevent downgrades
-        int baseCompare = compareBaseVersion(chosenTag);
+        val baseCompare = compareBaseVersion(chosenTag)
 
         if (baseCompare > 0) {
             // Target has higher major/minor/beta -> update
-            latestVersion = chosenTag;
-            latestNotes = chosenNotes;
+            latestVersion = chosenTag
+            latestNotes = chosenNotes
         } else if (baseCompare == 0) {
-            if (!currentVersion.equals(chosenTag)) {
-                latestVersion = chosenTag;
-                latestNotes = chosenNotes;
-            }
+            latestVersion = chosenTag
+            latestNotes = chosenNotes
         } else {
             // Target is older -> don't update
-            latestVersion = null;
-            latestNotes = null;
+            latestVersion = null
+            latestNotes = null
         }
     }
 
-    private static String normalizeTags(String tag) {
-        tag = tag.startsWith("v") ? tag.substring(1) : tag;
+    private fun normalizeTags(tag: String?): String? {
+        tag ?: return null
 
-        // remove metadata if preset
-        int plusIndex = tag.indexOf('+');
+        var normalizedTag = tag
+
+        // Remove 'v' prefix if present
+        if (tag.startsWith("v")) {
+            normalizedTag = tag.substring(1)
+        }
+
+        // Remove metadata if present
+        val plusIndex = normalizedTag.indexOf('+')
         if (plusIndex != -1) {
-            tag = tag.substring(0, plusIndex);
+            normalizedTag = normalizedTag.substring(0, plusIndex)
         }
-        return tag;
+
+        return normalizedTag
     }
 
-    private static int compareBaseVersion(String v1) {
-        String[] a = v1.split("-", 2)[0].split("\\.");
-        String[] b = RepoUtils.currentVersion.split("-", 2)[0].split("\\.");
+    private fun compareBaseVersion(v1: String?): Int {
+        v1 ?: return 0
 
-        for (int i = 0; i < 3; i++) {
-            int n1 = Integer.parseInt(a[i]);
-            int n2 = Integer.parseInt(b[i]);
-            if (n1 != n2) return Integer.compare(n1, n2);
+        val a = v1.substringBefore('-').split('.')
+        val b = currentVersion.substringBefore('-').split('.')
+
+        for (i in 0 until 3) {
+            val n1 = a.getOrNull(i)?.toIntOrNull() ?: 0
+            val n2 = b.getOrNull(i)?.toIntOrNull() ?: 0
+            if (n1 != n2) return n1.compareTo(n2)
         }
-        return 0; // same major.minor.beta
+        return 0 // same major.minor.beta
     }
 
-    private static String getNullableString(JsonObject object, String key) {
-        if (!object.has(key) || object.get(key).isJsonNull()) {
-            return null;
+    private fun getNullableString(objectJson: JsonObject, key: String): String? {
+        return if (objectJson.has(key) && !objectJson.get(key).isJsonNull) {
+            objectJson.get(key).asString
+        } else {
+            null
         }
-
-        return object.get(key).getAsString();
     }
 }

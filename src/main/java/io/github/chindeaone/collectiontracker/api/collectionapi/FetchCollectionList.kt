@@ -1,71 +1,41 @@
-package io.github.chindeaone.collectiontracker.api.collectionapi;
+package io.github.chindeaone.collectiontracker.api.collectionapi
 
-import com.google.gson.*;
-import io.github.chindeaone.collectiontracker.api.URLManager;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.google.gson.JsonParser
+import io.github.chindeaone.collectiontracker.api.ApiManager
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import java.util.LinkedHashSet
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+object FetchCollectionList {
 
-import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
-import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collections;
+    private val logger: Logger = LogManager.getLogger(FetchCollectionList::class.java)
+    @Volatile
+    var hasCollectionList: Boolean = false
 
-public class FetchCollectionList {
-
-    private static final Logger logger = LogManager.getLogger(FetchCollectionList.class);
-    public static volatile boolean hasCollectionList = false;
-
-    public static void fetchCollectionList() {
+    fun fetchCollectionList() {
         try {
-            URI uri = URI.create(URLManager.AVAILABLE_COLLECTIONS_URL);
+            val response = ApiManager.request("get-collections", listOf())
 
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(5))
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
+            if (response.statusCode() == 200) {
+                val json = JsonParser.parseString(response.body()).asJsonObject
 
-            HttpResponse<InputStream> response = HTTP_CLIENT.send(
-                    request,
-                    HttpResponse.BodyHandlers.ofInputStream()
-            );
-
-            int status = response.statusCode();
-            if (status == 200) {
-                try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
-                    JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-
-                    for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
-                        String category = entry.getKey();
-                        JsonArray itemsArray = entry.getValue().getAsJsonArray();
-
-                        Set<String> items = new LinkedHashSet<>();
-                        for (JsonElement el : itemsArray) {
-                            items.add(el.getAsString());
-                        }
-                        collections.put(category, items);
+                for ((category, itemsArray) in json.entrySet()) {
+                    val items = LinkedHashSet<String>()
+                    for (item in itemsArray.asJsonArray) {
+                        items.add(item.asString)
                     }
+                    CollectionsManager.collections[category] = items
                 }
-                hasCollectionList = true;
-                logger.info("[SCT]: Successfully received the collection list.");
+
+                hasCollectionList = true
+                logger.info("[SCT]: Successfully received the collection list.")
             } else {
-                logger.error("[SCT]: Failed to fetch collection list. HTTP {}", status);
+                logger.error("[SCT]: Failed to fetch collection list. HTTP {}", response.statusCode())
             }
 
-        } catch (IOException | InterruptedException e) {
-            logger.error("[SCT]: Error while receiving the collection list", e);
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error while receiving the collection list", e)
         }
     }
 }

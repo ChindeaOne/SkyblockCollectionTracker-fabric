@@ -408,7 +408,7 @@ object RenderUtils {
 
     @JvmStatic
     fun renderChangelog(context: GuiGraphicsExtractor, scrollOffset: Int) {
-        val rawNotes = RepoUtils.latestNotes
+        val rawNotes = RepoUtils.latestNotes ?: return
         if (rawNotes.isEmpty()) return
         val footerIndex = rawNotes.indexOf("**Full Changelog**")
         val cleanNotes = if (footerIndex != -1) rawNotes.substring(0, footerIndex) else rawNotes

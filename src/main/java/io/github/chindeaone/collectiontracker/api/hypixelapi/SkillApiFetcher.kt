@@ -1,92 +1,77 @@
-package io.github.chindeaone.collectiontracker.api.hypixelapi;
+package io.github.chindeaone.collectiontracker.api.hypixelapi
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import io.github.chindeaone.collectiontracker.api.URLManager;
-import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
-import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
-import io.github.chindeaone.collectiontracker.utils.SkillUtils;
-import io.github.chindeaone.collectiontracker.utils.PlayerData;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import io.github.chindeaone.collectiontracker.api.ApiManager
+import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
+import io.github.chindeaone.collectiontracker.utils.PlayerData
+import io.github.chindeaone.collectiontracker.utils.SkillUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import java.net.http.HttpResponse
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Map;
+object SkillApiFetcher {
 
-import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
+    private val logger: Logger = LogManager.getLogger(SkillApiFetcher::class.java)
 
-public class SkillApiFetcher {
+    @JvmStatic
+    fun fetchSkillsData() {
+        try {            
+            val headers = listOf(
+                "Authorization" to "Bearer ${TokenManager.token}",
+                "X-UUID" to PlayerData.playerUUID,
+            )
 
-    private static final Logger logger = LogManager.getLogger(SkillApiFetcher.class);
+            val response = ApiManager.request("skills", headers)
 
-    public static void fetchSkillsData() {
-        try {
-            URI uri = URI.create(URLManager.SKILLS_URL);
+            when(val status = response.statusCode()) {
+                401 -> {
+                    logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
+                    TokenManager.fetchAndStoreToken()
 
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(5))
-                    .header("X-UUID", PlayerData.getPlayerUUID())
-                    .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
-
-            HttpResponse<InputStream> response =
-                    HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-            int status = response.statusCode();
-
-            if (status == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
-                TokenManager.fetchAndStoreToken();
-
-                request = HttpRequest.newBuilder(uri)
-                        .timeout(Duration.ofSeconds(5))
-                        .header("X-UUID", PlayerData.getPlayerUUID())
-                        .header("Authorization", "Bearer " + TokenManager.getToken())
-                        .header("User-Agent", URLManager.AGENT)
-                        .header("Accept", "application/json")
-                        .GET()
-                        .build();
-
-                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-                status = response.statusCode();
-            }
-
-            if (status == 200) {
-                try (InputStream body = response.body();
-                     Reader reader = new InputStreamReader(body, StandardCharsets.UTF_8)) {
-
-
-                    Gson gson = new Gson();
-                    Type mapType = new TypeToken<Map<String, Double>>() {}.getType();
-                    Map<String, Double> skills = gson.fromJson(reader, mapType);
-
-                    if (skills == null || skills.isEmpty()) {
-                        ChatUtils.sendMessage("§c[SCT] Skill API disabled. Please enable it in the settings.", true);
-                        logger.warn("[SCT]: Skill API disabled for player.");
-                        SkillTrackingHandler.stopTracking();
-                        return;
+                    val headersWithNewToken = listOf(
+                        "Authorization" to "Bearer ${TokenManager.token}",
+                        "X-UUID" to PlayerData.playerUUID,
+                    )
+                    val responseWithNewToken = ApiManager.request("skills", headersWithNewToken)
+                    val statusWithNewToken = responseWithNewToken.statusCode()
+                    
+                    if (statusWithNewToken == 200) {
+                        processSkillsResponse(responseWithNewToken)
+                    } else {
+                        logger.error("[SCT]: Failed to fetch skill data after token refresh. HTTP {}", statusWithNewToken)
                     }
-
-                    SkillUtils.updateFromApi(skills);
-                    logger.info("[SCT]: Successfully received the skill data.");
                 }
-            } else {
-                logger.error("[SCT]: Failed to fetch skill data. HTTP {}", status);
+
+                200 -> {
+                    processSkillsResponse(response)
+                }
+
+                else -> {
+                    logger.error("[SCT]: Failed to fetch skill data. HTTP {}", status)
+                }
             }
-        } catch (Exception e) {
-            logger.error("[SCT]: Error while receiving the skill data", e);
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error while receiving the skill data", e)
         }
+    }
+    
+    private fun processSkillsResponse(response: HttpResponse<String>) {
+        val skills = Gson().fromJson<Map<String, Double>>(
+            response.body(),
+            object : TypeToken<Map<String, Double>>() {}.type
+        )
+            
+        if (skills.isEmpty()) {
+            ChatUtils.sendMessage("§c[SCT] Skill API disabled. Please enable it in the settings.", true)
+            logger.warn("[SCT]: Skill API disabled for player.")
+            SkillTrackingHandler.stopTracking()
+            return
+        }
+
+        SkillUtils.updateFromApi(skills)
+        logger.info("[SCT]: Successfully received the skill data.")
     }
 }

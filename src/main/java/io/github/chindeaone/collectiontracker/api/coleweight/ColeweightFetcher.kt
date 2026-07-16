@@ -1,326 +1,270 @@
-package io.github.chindeaone.collectiontracker.api.coleweight;
+package io.github.chindeaone.collectiontracker.api.coleweight
 
-import io.github.chindeaone.collectiontracker.api.URLManager;
-import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager;
-import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager;
-import io.github.chindeaone.collectiontracker.utils.ColorUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.github.chindeaone.collectiontracker.api.ApiManager
+import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
+import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
+import org.apache.logging.log4j.LogManager
+import java.net.http.HttpResponse
 
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
+object ColeweightFetcher {
 
-import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
+    private val logger = LogManager.getLogger(ColeweightFetcher::class.java)
 
-public class ColeweightFetcher {
+    @Volatile
+    var hasColeweightLb = false
+        private set
 
-    private static final Logger logger = LogManager.getLogger(ColeweightFetcher.class);
-    public static boolean hasColeweightLb = false;
-    public static boolean hasColeweightTopColors = false;
+    @Volatile
+    var hasColeweightTopColors = false
+        private set
 
-    public static void fetchColeweightDataAsync(String playerName, String uuid, Runnable onComplete) {
-        try {
-            URI uri = URI.create(URLManager.COLEWEIGHT_URL);
+    fun fetchColeweightDataAsync(
+        playerName: String,
+        uuid: String,
+        onComplete: Runnable?
+    ) {
+        ApiManager.requestAsync("coleweight", authHeaders(uuid, playerName)).thenAccept { response ->
+            if (response.statusCode() == 401) {
+                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
+                TokenManager.fetchAndStoreToken()
 
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(15))
-                    .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-UUID", uuid)
-                    .header("X-NAME", playerName)
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
-
-            HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .thenAccept(response -> {
-                        int status = response.statusCode();
-
-                        if (status == 401) {
-                            logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
-                            try {
-                                TokenManager.fetchAndStoreToken();
-                                HttpRequest retryRequest = HttpRequest.newBuilder(uri)
-                                        .timeout(Duration.ofSeconds(15))
-                                        .header("Authorization", "Bearer " + TokenManager.getToken())
-                                        .header("X-UUID", uuid)
-                                        .header("X-NAME", playerName)
-                                        .header("User-Agent", URLManager.AGENT)
-                                        .header("Accept", "application/json")
-                                        .GET()
-                                        .build();
-                                HttpResponse<String> retryResponse = HTTP_CLIENT.send(retryRequest, HttpResponse.BodyHandlers.ofString());
-                                status = retryResponse.statusCode();
-
-                                if (status == 200) {
-                                    if (retryResponse.body() == null || retryResponse.body().isEmpty()) {
-                                        Minecraft.getInstance().execute(() ->
-                                                ChatUtils.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
-                                        );
-                                        logger.warn("[SCT]: Received empty response when fetching Coleweight data for player: {}", playerName);
-                                        return;
-                                    }
-                                    ColeweightManager.updateColeweight(retryResponse.body());
-                                    logger.info("[SCT]: Successfully fetched Coleweight data for player: {} (after token refresh)", playerName);
-                                    if (onComplete != null) onComplete.run();
-                                } else {
-                                    Minecraft.getInstance().execute(() ->
-                                            ChatUtils.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
-                                    );
-                                    logger.warn("[SCT]: Failed to fetch Coleweight data for player: {} after token refresh. HTTP status: {}", playerName, status);
-                                }
-                            } catch (Exception e) {
-                                logger.error("[SCT]: An error occurred while retrying Coleweight fetch after token refresh.", e);
-                            }
-                            return;
-                        }
-
-                        if (status == 429) {
-                            logger.warn("[SCT]: Rate limit exceeded for Coleweight API. Limit: 10 requests per 10 minutes.");
-                            Minecraft.getInstance().execute(() ->
-                                    ChatUtils.sendMessage("§cColeweight fetching limit reached! Try again later.", true)
-                            );
-                            return;
-                        }
-
-                        if (status == 200) {
-                            if (response.body() == null || response.body().isEmpty()) {
-                                Minecraft.getInstance().execute(() ->
-                                        ChatUtils.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
-                                );
-                                logger.warn("[SCT]: Received empty response when fetching Coleweight data for player: {}", playerName);
-                                return;
-                            }
-                            ColeweightManager.updateColeweight(response.body());
-                            logger.info("[SCT]: Successfully fetched Coleweight data for player: {}", playerName);
-                            if (onComplete != null) onComplete.run();
-                        } else {
-                            Minecraft.getInstance().execute(() ->
-                                    ChatUtils.sendMessage("§cCouldn't find " + playerName + "'s coleweight.", true)
-                            );
-                            logger.warn("[SCT]: Failed to fetch Coleweight data for player: {}. HTTP status: {}", playerName, status);
-                        }
-                    })
-                    .exceptionally(e -> {
-                        logger.error("[SCT]: An error occurred while fetching Coleweight data. ", e);
-                        return null;
-                    });
-        } catch (Exception e) {
-            logger.error("[SCT]: An error occurred while fetching Coleweight data. ", e);
-        }
-    }
-
-    public static void fetchColeweightLbAsync(Runnable onComplete) {
-        try {
-            URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/lb");
-
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(15))
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
-
-            HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .thenAccept(response -> {
-                        int status = response.statusCode();
-                        if (status == 200) {
-                            if (response.body() == null || response.body().isEmpty()) {
-                                Minecraft.getInstance().execute(() ->
-                                        ChatUtils.sendMessage("§cCouldn't fetch Coleweight leaderboard data.", true)
-                                );
-                                logger.warn("[SCT]: Received empty response when fetching Coleweight leaderboard data.");
-                                return;
-                            }
-                            ColeweightManager.updateColeweightLb(response.body(), false);
-                            logger.info("[SCT]: Successfully fetched Coleweight leaderboard data.");
-                            if (onComplete != null) {
-                                try {
-                                    onComplete.run();
-                                } catch (Exception e) {
-                                    logger.error("[SCT]: An error occurred while executing the onComplete callback. ", e);
-                                }
-                            }
-                        } else {
-                            logger.warn("[SCT]: Failed to fetch Coleweight leaderboard data. HTTP status: {}", status);
-                        }
-                    })
-                    .exceptionally(e -> {
-                        logger.error("[SCT]: An error occurred while fetching Coleweight leaderboard data.", e);
-                        return null;
-                    });
-        } catch (Exception e) {
-            logger.error("[SCT]: An error occurred while fetching Coleweight leaderboard data.", e);
-        }
-    }
-
-    public static void fetchColeweightLbTop1k() {
-        try {
-            URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/top1k");
-
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(15))
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-
-            int status = response.statusCode();
-            if (status == 200) {
-                if (response.body() == null || response.body().isEmpty()) {
-                    logger.warn("Received empty response when fetching Coleweight leaderboard for top 1k players.");
-                    return;
+                handleColeweightResponse(authenticatedGet(authHeaders(uuid, playerName)), playerName) { body ->
+                    ColeweightManager.updateColeweight(body)
+                    logger.info("[SCT]: Successfully fetched Coleweight for {}", playerName)
+                    runCallback(onComplete)
                 }
-                ColeweightManager.updateColeweightLb(response.body(), true);
-                hasColeweightLb = true;
-                logger.info("[SCT] Successfully fetched Coleweight leaderboard for top 1k players.");
-            } else {
-                logger.warn("[SCT]: Failed to fetch Coleweight leaderboard for top 1k players. HTTP status: {}", status);
+                return@thenAccept
             }
-        } catch (Exception e) {
-            logger.error("[SCT]: An error occurred while fetching Coleweight leaderboard data.", e);
+
+            handleColeweightResponse(response, playerName) { body ->
+                ColeweightManager.updateColeweight(body)
+                logger.info("[SCT]: Successfully fetched Coleweight for {}", playerName)
+                runCallback(onComplete)
+            }
+        }.exceptionally {
+            logger.error("[SCT]: Error fetching Coleweight.", it)
+            null
         }
     }
 
-    public static String fetchColeweightData(String playerName, String uuid) {
-        try {
-            URI uri = URI.create(URLManager.COLEWEIGHT_URL);
+    fun fetchColeweightLbAsync(onComplete: Runnable?) {
+        ApiManager.requestAsync("coleweight/lb")
+            .thenAccept { response ->
 
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(15))
-                    .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-UUID", uuid)
-                    .header("X-NAME", playerName)
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-
-            int status = response.statusCode();
-
-            if (status == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...");
-                TokenManager.fetchAndStoreToken();
-                request = HttpRequest.newBuilder(uri)
-                        .timeout(Duration.ofSeconds(15))
-                        .header("Authorization", "Bearer " + TokenManager.getToken())
-                        .header("X-UUID", uuid)
-                        .header("X-NAME", playerName)
-                        .header("User-Agent", URLManager.AGENT)
-                        .header("Accept", "application/json")
-                        .GET()
-                        .build();
-                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-                status = response.statusCode();
-            }
-
-            if (status == 200) {
-                logger.info("[SCT]: Successfully fetched Coleweight data for player: {}", playerName);
-                return response.body();
-            } else {
-                Minecraft.getInstance().execute(() ->
-                        ChatUtils.sendMessage("§cCouldn't find your coleweight.", true)
-                );
-                logger.warn("[SCT]: Failed to fetch Coleweight data for player: {}. HTTP status: {}", playerName, status);
-                return null;
-            }
-        } catch (Exception e) {
-            logger.error("[SCT]: An error occurred while fetching Coleweight data. ", e);
-        }
-        return null;
-    }
-
-    public static void setGlobalColor(String playerName, String uuid, String color) {
-        try {
-            URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/color");
-
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(15))
-                    .header("Authorization", "Bearer " + TokenManager.getToken())
-                    .header("X-UUID", uuid)
-                    .header("X-NAME", playerName)
-                    .header("X-COLOR", color)
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .POST(HttpRequest.BodyPublishers.noBody())
-                    .build();
-
-            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-
-            int status = response.statusCode();
-
-            if (status == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retry...");
-                TokenManager.fetchAndStoreToken();
-                request = HttpRequest.newBuilder(uri)
-                        .timeout(Duration.ofSeconds(15))
-                        .header("Authorization", "Bearer " + TokenManager.getToken())
-                        .header("X-UUID", uuid)
-                        .header("X-NAME", playerName)
-                        .header("X-COLOR", color)
-                        .header("User-Agent", URLManager.AGENT)
-                        .header("Accept", "application/json")
-                        .POST(HttpRequest.BodyPublishers.noBody())
-                        .build();
-
-                response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-                status = response.statusCode();
-            }
-
-            if (status == 200) {
-                logger.info("[SCT]: Successfully set global Coleweight color for player: {}", playerName);
-                Minecraft.getInstance().execute(() ->
-                        ChatUtils.sendComponent(Component.empty()
-                                .append("§aGlobal color set to ")
-                                .append(ColorUtils.coloredText(color))
-                                .append("."), true));
-            } else {
-                logger.warn("[SCT]: Failed to set global Coleweight color for player: {}. HTTP status: {}", playerName, status);
-                Minecraft.getInstance().execute(() ->
-                        ChatUtils.sendMessage("§cFailed to set global Coleweight color.", true)
-                );
-            }
-        } catch (Exception e) {
-            logger.error("[SCT]: An error occurred while setting global Coleweight color. ", e);
-        }
-    }
-
-    public static void fetchColeweightTopColors() {
-        try {
-            URI uri = URI.create(URLManager.COLEWEIGHT_URL + "/colors");
-
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(5))
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-
-            int status = response.statusCode();
-            if (status == 200) {
-                if (response.body() == null || response.body().isEmpty()) {
-                    logger.warn("Received empty response when fetching Coleweight top colors.");
-                    return;
+                handleStringResponse(
+                    response,
+                    "Received empty response when fetching Coleweight leaderboard."
+                ) { body ->
+                    ColeweightManager.updateColeweightLb(body, false)
+                    logger.info("[SCT]: Successfully fetched Coleweight leaderboard.")
+                    runCallback(onComplete)
                 }
-                ColeweightManager.updateColeweightTopColors(response.body());
-                hasColeweightTopColors = true;
-                logger.info("[SCT] Successfully fetched Coleweight top colors.");
-            } else {
-                logger.warn("[SCT]: Failed to fetch Coleweight top colors. HTTP status: {}", status);
+
             }
-        } catch (Exception e) {
-            logger.error("[SCT]: An error occurred while fetching Coleweight top colors.", e);
+            .exceptionally {
+                logger.error("[SCT]: Error fetching Coleweight leaderboard.", it)
+                null
+            }
+    }
+
+    fun fetchColeweightLbTop1k() {
+        try {
+            val response = ApiManager.request("coleweight/top1k")
+
+            handleStringResponse(response, "Received empty response when fetching Coleweight leaderboard.") { body ->
+                ColeweightManager.updateColeweightLb(body, true)
+                hasColeweightLb = true
+                logger.info("[SCT]: Successfully fetched Coleweight leaderboard.")
+            }
+
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error fetching Coleweight leaderboard.", e)
+        }
+    }
+
+    fun fetchColeweightData(playerName: String, uuid: String): String? {
+        return try {
+            val response = authenticatedGet(authHeaders(uuid, playerName))
+
+            when (response.statusCode()) {
+
+                200 -> {
+                    logger.info("[SCT]: Successfully fetched Coleweight for {}", playerName)
+                    response.body()
+                }
+
+                else -> {
+                    sendError("§cCouldn't find your coleweight.")
+                    logger.warn("[SCT]: Failed to fetch Coleweight for {}. HTTP {}", playerName, response.statusCode())
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error fetching Coleweight.", e)
+            null
+        }
+    }
+
+    fun setGlobalColor(playerName: String, uuid: String, color: String) {
+        try {
+            val headers = authHeaders(uuid, playerName).apply {
+                add("X-COLOR" to color)
+            }
+            val response = authenticatedPost(headers)
+
+            if (response.statusCode() == 200) {
+                logger.info("[SCT]: Successfully set global color for {}", playerName)
+
+                Minecraft.getInstance().execute {
+                    ChatUtils.sendComponent(
+                        Component.empty()
+                            .append("§aGlobal color set to ")
+                            .append(ColorUtils.coloredText(color))
+                            .append("."),
+                        true
+                    )
+                }
+            } else {
+                logger.warn(
+                    "[SCT]: Failed to set global color for {}. HTTP {}",
+                    playerName,
+                    response.statusCode()
+                )
+                sendError("§cFailed to set global Coleweight color.")
+            }
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error setting Coleweight color.", e)
+        }
+    }
+
+    fun fetchColeweightTopColors() {
+        try {
+            val response = ApiManager.request("coleweight/colors")
+
+            handleStringResponse(response, "Received empty response when fetching Coleweight top colors.") { body ->
+                ColeweightManager.updateColeweightTopColors(body)
+                hasColeweightTopColors = true
+                logger.info("[SCT]: Successfully fetched Coleweight top colors.")
+            }
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error fetching Coleweight top colors.", e)
+        }
+    }
+
+    private fun authHeaders(uuid: String, playerName: String) = mutableListOf(
+        "Authorization" to "Bearer ${TokenManager.token}",
+        "X-UUID" to uuid,
+        "X-NAME" to playerName
+    )
+
+    private fun sendError(message: String) {
+        Minecraft.getInstance().execute {
+            ChatUtils.sendMessage(message, true)
+        }
+    }
+
+    private fun runCallback(callback: Runnable?) {
+        try {
+            callback?.run()
+        } catch (e: Exception) {
+            logger.error("[SCT]: An error occurred while executing callback.", e)
+        }
+    }
+
+    private fun authenticatedGet(headers: List<Pair<String, String>>): HttpResponse<String> {
+        var response = ApiManager.request("coleweight", headers)
+
+        if (response.statusCode() == 401) {
+            logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
+            TokenManager.fetchAndStoreToken()
+
+            response = ApiManager.request(
+                "coleweight",
+                headers.map {
+                    if (it.first == "Authorization")
+                        "Authorization" to "Bearer ${TokenManager.token}"
+                    else it
+                }
+            )
+        }
+        return response
+    }
+
+    private fun authenticatedPost(headers: List<Pair<String, String>>): HttpResponse<String> {
+
+        var response = ApiManager.post("coleweight/color", headers)
+
+        if (response.statusCode() == 401) {
+            logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
+
+            TokenManager.fetchAndStoreToken()
+
+            response = ApiManager.post(
+                "coleweight/color",
+                headers.map {
+                    if (it.first == "Authorization")
+                        "Authorization" to "Bearer ${TokenManager.token}"
+                    else it
+                }
+            )
+        }
+        return response
+    }
+
+    private inline fun handleColeweightResponse(
+        response: HttpResponse<String>,
+        playerName: String,
+        onSuccess: (String) -> Unit
+    ) {
+        when (response.statusCode()) {
+
+            200 -> {
+                val body = response.body()
+
+                if (body.isNullOrBlank()) {
+                    sendError("§cCouldn't find $playerName's coleweight.")
+                    logger.warn("[SCT]: Empty response for {}", playerName)
+                    return
+                }
+                onSuccess(body)
+            }
+
+            429 -> {
+                logger.warn("[SCT]: Coleweight API rate limit exceeded.")
+                sendError("§cColeweight fetching limit reached! Try again later.")
+            }
+
+            else -> {
+                logger.warn("[SCT]: Failed to fetch Coleweight for {}. HTTP {}", playerName, response.statusCode())
+                sendError("§cCouldn't find $playerName's coleweight.")
+            }
+        }
+    }
+
+    private inline fun handleStringResponse(
+        response: HttpResponse<String>,
+        emptyMessage: String,
+        success: (String) -> Unit
+    ) {
+        when (response.statusCode()) {
+            200 -> {
+                val body = response.body()
+
+                if (body.isNullOrBlank()) {
+                    logger.warn(emptyMessage)
+                    return
+                }
+                success(body)
+            }
+
+            else -> logger.warn(
+                "[SCT]: Request failed. HTTP {}",
+                response.statusCode()
+            )
         }
     }
 }

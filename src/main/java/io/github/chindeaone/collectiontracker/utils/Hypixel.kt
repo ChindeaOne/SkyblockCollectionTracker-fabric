@@ -72,14 +72,14 @@ object Hypixel {
             if (HypixelUtils.isInHypixel && !playerLoaded) {
                 loadPlayerData(client)
                 if (playerLoaded) {
-                    ServerStatus.checkServerAsync(client::execute) { up ->
+                    ServerStatus.checkServerWithCallback(client::execute) { up ->
                         serverStatus = up
 
                         if (!serverStatus) {
                             ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
                             logger.warn("[SCT]: The API server is currently under maintenance.")
                         } else {
-                            if (TokenManager.getToken() == null) {
+                            if (TokenManager.token == null) {
                                 TokenManager.fetchAndStoreToken()
                             }
                             fetchData()
@@ -135,7 +135,10 @@ object Hypixel {
         if (!ColeweightFetcher.hasColeweightTopColors) CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightTopColors() }
         if (!EliteApiFetcher.hasFarmingweightLb) CompletableFuture.runAsync { EliteApiFetcher.fetchFarmingweightLbTop1k() }
         if (!EliteApiFetcher.hasFarmingweightTopColors) CompletableFuture.runAsync { EliteApiFetcher.fetchFarmingweightTopColors() }
-        if (!FetchSkillTree.hasSkillTree) CompletableFuture.runAsync { FetchSkillTree.fetchSkillTree(true, true) }
+        if (!FetchSkillTree.hasSkillTree) CompletableFuture.runAsync { FetchSkillTree.fetchSkillTree(
+            mining = true,
+            foraging = true
+        ) }
     }
 
     private fun loadPlayerData(client: Minecraft) {

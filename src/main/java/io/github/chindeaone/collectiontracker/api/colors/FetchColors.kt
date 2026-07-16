@@ -1,53 +1,31 @@
-package io.github.chindeaone.collectiontracker.api.colors;
+package io.github.chindeaone.collectiontracker.api.colors
 
-import com.google.gson.JsonParser;
-import io.github.chindeaone.collectiontracker.api.URLManager;
-import io.github.chindeaone.collectiontracker.utils.ColorUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.google.gson.JsonParser
+import io.github.chindeaone.collectiontracker.api.ApiManager
+import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
+object FetchColors {
 
-import static io.github.chindeaone.collectiontracker.api.URLManager.HTTP_CLIENT;
+    private val logger: Logger = LogManager.getLogger(FetchColors::class.java)
+    @Volatile
+    var hasColors: Boolean = false
 
-public class FetchColors {
-
-    public static final Logger logger = LogManager.getLogger(FetchColors.class);
-    public static volatile boolean hasColors = false;
-
-    public static void fetchColorsData() {
+    fun fetchColorsData() {
         try {
-            URI uri = URI.create(URLManager.COLORS_URL);
-
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .timeout(Duration.ofSeconds(5))
-                    .header("User-Agent", URLManager.AGENT)
-                    .header("Accept", "application/json")
-                    .GET()
-                    .build();
-
-            HttpResponse<InputStream> response =
-                    HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-            int status = response.statusCode();
-            if (status == 200) {
-                try (Reader reader = new InputStreamReader(response.body(), StandardCharsets.UTF_8)) {
-                    ColorUtils.setupColors(JsonParser.parseReader(reader).getAsJsonObject());
-                    hasColors = true;
-                    logger.info("[SCT]: Successfully fetched colors data.");
-                }
+            val response = ApiManager.request("color-codes", listOf())
+            
+            if (response.statusCode() != 200) {
+                logger.error("[SCT]: Failed to fetch colors data. Server responded with code: {}", response.statusCode())
             } else {
-                logger.error("[SCT]: Failed to fetch colors data. Server responded with code: {}", status);
+                val json = JsonParser.parseString(response.body()).asJsonObject
+                ColorUtils.setupColors(json)
+                hasColors = true
+                logger.info("[SCT]: Successfully fetched colors data.")
             }
-        } catch (Exception e) {
-            logger.error("[SCT]: An error occurred while fetching colors data: ", e);
+        } catch (e: Exception) {
+            logger.error("[SCT]: An error occurred while fetching colors data: ", e)
         }
     }
 }

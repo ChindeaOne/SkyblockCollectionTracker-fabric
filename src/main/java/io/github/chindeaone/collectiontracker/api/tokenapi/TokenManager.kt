@@ -1,15 +1,12 @@
-package io.github.chindeaone.collectiontracker.api.tokenapi;
+package io.github.chindeaone.collectiontracker.api.tokenapi
 
-public class TokenManager {
+object TokenManager {
 
-    private static volatile String token;
+    @Volatile
+    var token: String? = null
+        private set
 
-    public static void fetchAndStoreToken() throws Exception {
-        TokenFetcher tokenFetcher = new TokenFetcher();
-        token = tokenFetcher.fetchToken();
-    }
-
-    public static String getToken() {
-        return token;
+    fun fetchAndStoreToken() {
+        token = TokenFetcher.fetchToken()
     }
 }

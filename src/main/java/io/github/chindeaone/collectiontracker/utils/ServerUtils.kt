@@ -35,7 +35,7 @@ object ServerUtils {
     private fun checkServerStatusPeriodically(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
         logger.info("[SCT]: Checking server status...")
-        ServerStatus.checkServerAsync(client::execute) { up ->
+        ServerStatus.checkServerWithCallback(client::execute) { up ->
             serverStatus = up
 
             if (serverStatus) {
@@ -43,7 +43,7 @@ object ServerUtils {
                 consecutiveFailures = 0
                 currentCheckInterval = NORMAL_CHECK_INTERVAL
 
-                if (TokenManager.getToken() == null) {
+                if (TokenManager.token == null) {
                     TokenManager.fetchAndStoreToken()
                 }
                 checkIfDataWasFetched()
