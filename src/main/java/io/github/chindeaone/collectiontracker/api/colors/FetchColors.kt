@@ -14,7 +14,7 @@ object FetchColors {
 
     fun fetchColorsData() {
         try {
-            val response = ApiManager.request("color-codes", listOf())
+            val response = ApiManager.request("collection-colors", listOf())
             
             if (response.statusCode() != 200) {
                 logger.error("[SCT]: Failed to fetch colors data. Server responded with code: {}", response.statusCode())

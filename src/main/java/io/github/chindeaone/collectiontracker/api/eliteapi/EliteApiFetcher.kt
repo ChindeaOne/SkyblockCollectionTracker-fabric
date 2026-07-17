@@ -28,7 +28,7 @@ object EliteApiFetcher {
         uuid: String,
         onComplete: Runnable?
     ) {
-        ApiManager.requestAsync("farming", authHeaders(uuid, playerName)).thenAccept { response ->
+        ApiManager.requestAsync("farmingweight", authHeaders(uuid, playerName)).thenAccept { response ->
             if (response.statusCode() == 401) {
                 logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
                 TokenManager.fetchAndStoreToken()
@@ -54,7 +54,7 @@ object EliteApiFetcher {
     }
 
     fun fetchFarmingweightLbAsync(onComplete: Runnable?) {
-        ApiManager.requestAsync("farming/lb")
+        ApiManager.requestAsync("farmingweight/lb")
             .thenAccept { response ->
                 handleStringResponse(response, "Received empty response when fetching Farming Weight leaderboard.") { body ->
                     FarmingweightManager.updateFarmingweightLb(body, false)
@@ -70,7 +70,7 @@ object EliteApiFetcher {
 
     fun fetchFarmingweightLbTop1k() {
         try {
-            val response = ApiManager.request("farming/top1k")
+            val response = ApiManager.request("farmingweight/top1k")
 
             handleStringResponse(response, "Received empty response when fetching Farming Weight leaderboard.") { body ->
                 FarmingweightManager.updateFarmingweightLb(body, true)
@@ -113,7 +113,7 @@ object EliteApiFetcher {
 
     fun fetchFarmingweightTopColors() {
         try {
-            val response = ApiManager.request("farming/colors")
+            val response = ApiManager.request("farmingweight/colors")
 
             handleStringResponse(response, "Received empty response when fetching Farming Weight top colors.") { body ->
                 FarmingweightManager.updateFarmingweightTopColors(body)
@@ -194,7 +194,7 @@ object EliteApiFetcher {
     }
 
     private fun authenticatedPost(headers: List<Pair<String, String>>): HttpResponse<String> {
-        var response = ApiManager.post("farming/color", headers)
+        var response = ApiManager.post("farmingweight/color", headers)
 
         if (response.statusCode() == 401) {
             logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")

@@ -38,7 +38,7 @@ object RepoUtils {
     fun checkGithubReleases(): Boolean {
         return try {
             val headers = listOf(
-                "MC_VERSION" to SkyblockCollectionTracker.MC_VERSION
+                "X-MINECRAFT-VERSION" to SkyblockCollectionTracker.MC_VERSION
             )
 
             val response = ApiManager.request("github", headers)

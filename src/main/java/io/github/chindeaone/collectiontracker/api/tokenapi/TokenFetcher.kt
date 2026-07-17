@@ -12,10 +12,19 @@ object TokenFetcher {
 
     fun fetchToken(): String? {
         return try {
+            val serverId = ApiManager.serverId
+            if (serverId == null) {
+                logger.error("[SCT]: Mojang authentication was not completed.")
+                return null
+            }
+
             val headers = listOf(
-                "X-UUID" to PlayerData.playerUUID
+                "X-UUID" to PlayerData.profileId.toString(),
+                "X-NAME" to PlayerData.playerName,
+                "X-SERVER-ID" to serverId
             )
-            val response = ApiManager.request("get-token", headers)
+
+            val response = ApiManager.request("token", headers)
 
             if (response.statusCode() != 200) {
                 logger.error("[SCT]: Failed to fetch token, response code: {}", response.statusCode())

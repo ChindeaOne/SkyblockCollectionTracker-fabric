@@ -2,6 +2,8 @@ package io.github.chindeaone.collectiontracker.api
 
 import com.mojang.authlib.minecraft.MinecraftSessionService
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.utils.PlayerData
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -31,12 +33,15 @@ object ApiManager {
 
     fun authenticateMojang() {
         serverId = UUID.randomUUID().toString()
-        val profile = Minecraft.getInstance().user.profileId
-        val accessToken = Minecraft.getInstance().user.accessToken
+        val profile = PlayerData.profileId
+        val accessToken = PlayerData.accessToken
 
         try {
-            session.joinServer(profile, accessToken, serverId!!)
+            session.joinServer(profile, accessToken, serverId)
             logger.info("Registered session with Mojang")
+
+
+            TokenManager.fetchAndStoreToken()
         } catch (e: Exception) {
             logger.error("[SCT]: Failed to authenticate with Mojang servers: ${e.message}", e)
         }

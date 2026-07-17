@@ -14,7 +14,7 @@ object FetchGemstoneList {
 
     fun fetchGemstoneList() {
         try {
-            val response = ApiManager.request("get-gemstones", listOf())
+            val response = ApiManager.request("gemstones", listOf())
 
             if (response.statusCode() == 200) {
                 val json = JsonParser.parseString(response.body()).asJsonObject

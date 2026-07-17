@@ -15,7 +15,7 @@ object FetchNpcPrices {
 
     fun fetchPrices() {
         try {
-            val response = ApiManager.request("npc-prices", listOf())
+            val response = ApiManager.request("npc", listOf())
             
             if (response.statusCode() == 200) {
                 val prices = Gson().fromJson<Map<String, Int>>(

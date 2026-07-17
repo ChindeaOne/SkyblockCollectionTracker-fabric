@@ -15,7 +15,7 @@ object FetchCollectionList {
 
     fun fetchCollectionList() {
         try {
-            val response = ApiManager.request("get-collections", listOf())
+            val response = ApiManager.request("collections", listOf())
 
             if (response.statusCode() == 200) {
                 val json = JsonParser.parseString(response.body()).asJsonObject

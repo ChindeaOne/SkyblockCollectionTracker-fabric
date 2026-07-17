@@ -12,7 +12,6 @@ import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
-import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -79,9 +78,6 @@ object Hypixel {
                             ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
                             logger.warn("[SCT]: The API server is currently under maintenance.")
                         } else {
-                            if (TokenManager.token == null) {
-                                TokenManager.fetchAndStoreToken()
-                            }
                             fetchData()
                             logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
 
