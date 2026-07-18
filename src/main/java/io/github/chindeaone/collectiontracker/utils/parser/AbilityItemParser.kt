@@ -6,37 +6,56 @@ import net.minecraft.world.item.TooltipFlag
 
 object AbilityItemParser {
 
+    private val AXE_REGEX = Regex("\\baxe\\b")
+    private val DRILL_REGEX = Regex("\\bdrill\\b")
+    private val PICKAXE_REGEX = Regex("\\bpickaxe\\b")
+    private val GAUNTLET_REGEX = Regex("\\bgauntlet\\b")
+
     fun tooltipFlag(): TooltipFlag.Default =
         if (Minecraft.getInstance().options.advancedItemTooltips) TooltipFlag.Default.ADVANCED
         else TooltipFlag.Default.NORMAL
 
     fun parse(lines: List<String>): AbilityUtils.AbilitySnapshot? {
-        val hasBreakingPower = lines.any { it.contains("breaking power") }
-        if (!hasBreakingPower) return null
-        val toolTypeLine = lines.findLast { it.contains("\\bdrill\\b".toRegex()) || it.contains("\\bpickaxe\\b".toRegex()) || it.contains("\\bgauntlet\\b".toRegex()) }
-        val isDrill = toolTypeLine?.contains("drill") == true
-        val isPickaxeOrDrill = toolTypeLine != null
-        val isAxe = lines.findLast { it.contains("\\baxe\\b".toRegex()) }
+        val lastLine = lines.last()
 
-        // Logic for Axes
-        if (isAxe != null) {
+        val isAxe = AXE_REGEX.containsMatchIn(lastLine)
+        val hasBreakingPower = lines[1].startsWith("breaking power")
+
+        if (!isAxe && !hasBreakingPower) return null
+
+        val isDrill = DRILL_REGEX.containsMatchIn(lastLine)
+
+        val isMiningTool = isDrill ||
+                PICKAXE_REGEX.containsMatchIn(lastLine) ||
+                GAUNTLET_REGEX.containsMatchIn(lastLine)
+
+        if (isAxe) {
             return AbilityUtils.AxeAbilitySnapshot(
                 timestamp = System.currentTimeMillis(),
                 hasAbility = true
             )
         }
 
-        // Logic for Pickaxes/Drills
-        if (isPickaxeOrDrill) {
-            val fuelTank = when {
-                lines.any { it.contains("perfectly-cut fuel tank") } -> AbilityUtils.FuelTank.PERFECTLY_CUT
-                lines.any { it.contains("gemstone fuel tank") }      -> AbilityUtils.FuelTank.GEMSTONE
-                lines.any { it.contains("titanium-infused fuel tank") } -> AbilityUtils.FuelTank.TITANIUM
-                lines.any { it.contains("mithril-infused fuel tank") }  -> AbilityUtils.FuelTank.MITHRIL
-                else -> null
-            }
+        if (isMiningTool) {
+            var fuelTank: AbilityUtils.FuelTank? = null
+            var hasBlueCheese = false
 
-            val hasBlueCheese = lines.any { it.contains("blue cheese goblin omelette part") }
+            for (line in lines) {
+                if (fuelTank == null) {
+                    when {
+                        line.contains("perfectly-cut fuel tank") -> fuelTank = AbilityUtils.FuelTank.PERFECTLY_CUT
+                        line.contains("gemstone fuel tank") -> fuelTank = AbilityUtils.FuelTank.GEMSTONE
+                        line.contains("titanium-infused fuel tank") -> fuelTank = AbilityUtils.FuelTank.TITANIUM
+                        line.contains("mithril-infused fuel tank") -> fuelTank = AbilityUtils.FuelTank.MITHRIL
+                    }
+                }
+
+                if (!hasBlueCheese && line.contains("blue cheese goblin omelette part")) {
+                    hasBlueCheese = true
+                }
+
+                if (fuelTank != null && hasBlueCheese) break
+            }
 
             return AbilityUtils.PickaxeAbilitySnapshot(
                 timestamp = System.currentTimeMillis(),
