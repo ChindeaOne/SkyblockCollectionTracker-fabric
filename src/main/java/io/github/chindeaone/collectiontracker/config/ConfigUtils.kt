@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.config
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.config.categories.Abilities
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Farming
@@ -36,6 +37,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningSt
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 
@@ -197,6 +199,10 @@ val summaryStats: MultiCollectionConfig.SummaryStats get() = multiCollectionOver
 // Skills Tracking Config Accessors
 val skillConfig: SkillConfig get() = trackingConfig.skillConfig
 val enableTamingTracking: Boolean get() = skillConfig.enableTamingTracking
+
+// Abilities Config Accessors
+val abilitiesConfig: Abilities get() = modConfig.abilities
+val circle: Boolean get() = abilitiesConfig.circle
 
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
@@ -547,19 +553,8 @@ object ConfigAccess {
     }
 
     @JvmStatic
-    fun setMineshaftSpawnRoutesEnabled(enabled: Boolean) {
-        mineshaftRoutesConfig.enableMineshaftSpawnRoutes = enabled
-    }
+    fun isCircle(): Boolean = circle
 
-    @JvmStatic
-    fun setDwarvenMetalRoutesEnabled(enabled: Boolean) {
-        dwarvenMetalsRoutesConfig.enableDwarvenMetalRoutes = enabled
-    }
-
-    @JvmStatic
-    fun setPureOresRoutesEnabled(enabled: Boolean) {
-        pureOresRoutesConfig.enablePureOresRoutes = enabled
-    }
 }
 
 /**
@@ -767,4 +762,29 @@ object ConfigHelper {
     fun removeFarmingweightColor(player: String) {
         farmingweightColorConfig.customColors.remove(player)
     }
+
+    @JvmStatic
+    fun setMineshaftSpawnRoutesEnabled(enabled: Boolean) {
+        mineshaftRoutesConfig.enableMineshaftSpawnRoutes = enabled
+    }
+
+    @JvmStatic
+    fun setDwarvenMetalRoutesEnabled(enabled: Boolean) {
+        dwarvenMetalsRoutesConfig.enableDwarvenMetalRoutes = enabled
+    }
+
+    @JvmStatic
+    fun setPureOresRoutesEnabled(enabled: Boolean) {
+        pureOresRoutesConfig.enablePureOresRoutes = enabled
+    }
+}
+
+fun jumpToConfig(position: Position) {
+    val editor = GuiManager.getEditorInstance()
+    val option = editor.getOptionFromField(position.link) ?: return
+
+    editor.search("")
+    if (!editor.goToOption(option)) return
+
+    GuiManager.openEditor(editor)
 }

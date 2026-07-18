@@ -216,15 +216,11 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun renderCooldownCircle(context: GuiGraphicsExtractor) {
+    fun renderCooldownCircle(context: GuiGraphicsExtractor, ability: String) {
         val centerX = ScaleUtils.scaledWidth / 2f - 1f
         val centerY = ScaleUtils.scaledHeight / 2f - 1f
 
-        val cooldown = ChatListener.finalCooldown
-        val duration = ChatListener.finalDuration
-
-        val maxCooldown = ChatListener.maxCooldown
-        val maxDuration = ChatListener.maxDuration
+        val (cooldown, duration, maxCooldown, maxDuration) = getAbilityTimes(ability)
 
         when {
             cooldown <= 0.0 -> {
@@ -282,6 +278,32 @@ object RenderUtils {
                 last = point
             }
         }
+    }
+
+    data class AbilityTimes(
+        val cooldown: Double,
+        val duration: Double,
+        val maxCooldown: Double,
+        val maxDuration: Double
+    )
+
+
+    private fun getAbilityTimes(ability: String) = when (ability) {
+        "axe" -> AbilityTimes(
+            ChatListener.finalAxeCooldown,
+            ChatListener.finalAxeDuration,
+            ChatListener.maxAxeCooldown,
+            ChatListener.maxAxeDuration
+        )
+
+        "pickaxe" -> AbilityTimes(
+            ChatListener.finalCooldown,
+            ChatListener.finalDuration,
+            ChatListener.maxCooldown,
+            ChatListener.maxDuration
+        )
+
+        else -> AbilityTimes(0.0, 0.0, 0.0, 0.0)
     }
 
     fun drawEditorHudText(context: GuiGraphicsExtractor, activePosition: Position?) {

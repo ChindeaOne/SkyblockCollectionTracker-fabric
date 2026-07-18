@@ -44,9 +44,9 @@ object MiningStatsWidget {
 
         if (currentMiningIsland == "Dwarven Mines") {
             val routes = listOf(
-                Triple(ConfigAccess.isMineshaftSpawnRoutesEnabled(), lastMineshaftEnabled, ConfigAccess::setMineshaftSpawnRoutesEnabled),
-                Triple(ConfigAccess.isDwarvenMetalRoutesEnabled(), lastMetalEnabled, ConfigAccess::setDwarvenMetalRoutesEnabled),
-                Triple(ConfigAccess.isPureOresRoutesEnabled(), lastOresEnabled, ConfigAccess::setPureOresRoutesEnabled)
+                Triple(ConfigAccess.isMineshaftSpawnRoutesEnabled(), lastMineshaftEnabled, ConfigHelper::setMineshaftSpawnRoutesEnabled),
+                Triple(ConfigAccess.isDwarvenMetalRoutesEnabled(), lastMetalEnabled, ConfigHelper::setDwarvenMetalRoutesEnabled),
+                Triple(ConfigAccess.isPureOresRoutesEnabled(), lastOresEnabled, ConfigHelper::setPureOresRoutesEnabled)
             )
 
             val selectedIndex = routes.indexOfFirst { it.first && !it.second }

@@ -48,6 +48,8 @@ public class AxeAbilityOverlay extends AbstractOverlay{
         RenderUtils.drawOverlayFrame(context, position, () ->
                 RenderUtils.renderStrings(context, lines)
         );
+
+        if (ConfigAccess.isCircle()) RenderUtils.renderCooldownCircle(context, "axe");
     }
 
     @Override

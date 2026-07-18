@@ -50,7 +50,7 @@ public class PickaxeAbilityOverlay extends AbstractOverlay{
                 RenderUtils.renderStrings(context, lines)
         );
 
-        RenderUtils.renderCooldownCircle(context);
+        if (ConfigAccess.isCircle()) RenderUtils.renderCooldownCircle(context, "pickaxe");
     }
 
     @Override

@@ -42,6 +42,11 @@ class ModConfig : Config() {
     @Accordion
     val farming: Farming = Farming()
     @Expose
+    @Category(name = "Abilities", desc = "Abilities config")
+    @SerializedName("abilities")
+    @Accordion
+    val abilities: Abilities = Abilities()
+    @Expose
     @Category(name = "Misc", desc = "Misc config")
     @SerializedName("misc")
     @Accordion
