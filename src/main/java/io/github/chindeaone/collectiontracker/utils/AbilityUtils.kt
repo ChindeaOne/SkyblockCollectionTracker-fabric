@@ -163,8 +163,8 @@ object AbilityUtils {
             "Damage Boost" -> 10
             "Axe Toss" -> 10
             "Maniac Slicer" -> when (abilityLevel) {
-                2 -> 15
-                1 -> 20
+                2 -> 20
+                1 -> 15
                 else -> 0
             }
             else -> 0
