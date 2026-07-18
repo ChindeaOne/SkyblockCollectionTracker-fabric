@@ -6,13 +6,13 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
+import io.github.chindeaone.collectiontracker.utils.StringUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class MultiCollectionOverlay extends AbstractOverlay{
 
     @Override
     public void handleLineAction(String line) {
-        String cleanLine = StringUtil.stripColor(line);
+        String cleanLine = StringUtils.removeColor(line, false);
         if (cleanLine.startsWith("[+] ") || cleanLine.startsWith("[-] ")) {
             String content = cleanLine.substring(4);
             String collName;

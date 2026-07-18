@@ -78,7 +78,6 @@ public class CollectionOverlay extends AbstractOverlay{
 
         List<String> combinedLines = new ArrayList<>(getCollectionLines());
         if (ConfigAccess.isShowExtraStats()) {
-            // append extra lines to create a single list
             combinedLines.add(""); // add separator line
             combinedLines.addAll(getCollectionExtraLines());
         }

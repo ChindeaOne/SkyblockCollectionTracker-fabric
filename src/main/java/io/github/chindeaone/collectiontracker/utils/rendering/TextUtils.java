@@ -369,7 +369,7 @@ public class TextUtils {
         list.clear();
         for (String coll : CollectionTracker.collectionList) {
             if ("gemstone".equals(coll)) {
-                boolean mainExpanded = expanded.contains("gemstone");
+                boolean mainExpanded = expanded.contains("gemstone") && ConfigAccess.getTrackingOptions() != COLLECTION;
                 boolean showingCollection = ConfigAccess.getTrackingOptions() == COLLECTION;
                 String prefix = (showPrefixes && !showingCollection) ? (mainExpanded ? "§e[-]§r " : "§e[+]§r ") : "";
 
