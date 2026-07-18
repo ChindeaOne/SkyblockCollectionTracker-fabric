@@ -37,8 +37,11 @@ public class SacksTrackingManager {
             String itemName = entry.getKey();
             int amount = entry.getValue();
 
-            boolean isEnchanted = !normalizedEnchantedMap.isEmpty() && normalizedEnchantedMap.keySet().stream().anyMatch(itemName::contains);
-            boolean isSuperEnchanted = !normalizedSuperEnchantedMap.isEmpty() && normalizedSuperEnchantedMap.keySet().stream().anyMatch(itemName::contains);
+            Integer enchantedMultiplier = normalizedEnchantedMap.get(itemName);
+            Integer superEnchantedMultiplier = normalizedSuperEnchantedMap.get(itemName);
+
+            boolean isEnchanted = enchantedMultiplier != null;
+            boolean isSuperEnchanted = superEnchantedMultiplier != null;
 
             if (!itemName.equals(collectionName) && !isEnchanted && !isSuperEnchanted) continue;
 
@@ -46,9 +49,9 @@ public class SacksTrackingManager {
                 totalAmount += (long) amount * getGemstoneMultiplier(itemName);
             } else if (type.equals("enchanted")) {
                 if (isSuperEnchanted) {
-                    totalAmount += (long) amount * normalizedSuperEnchantedMap.values().iterator().next();
+                    totalAmount += (long) amount * superEnchantedMultiplier;
                 } else if (isEnchanted) {
-                    totalAmount += (long) amount * normalizedEnchantedMap.values().iterator().next();
+                    totalAmount += (long) amount * enchantedMultiplier;
                 } else {
                     totalAmount += amount;
                 }
@@ -80,17 +83,18 @@ public class SacksTrackingManager {
                     long gain = (long) amount * getGemstoneMultiplier(itemName);
                     totalAmount += gain;
                 } else if ("enchanted".equals(type)) {
-                    boolean isEnchanted = !normalizedEnchantedMap.isEmpty() && normalizedEnchantedMap.keySet().stream().anyMatch(itemName::contains);
-                    boolean isSuperEnchanted = !normalizedSuperEnchantedMap.isEmpty() && normalizedSuperEnchantedMap.keySet().stream().anyMatch(itemName::contains);
+                    Integer enchantedMultiplier = normalizedEnchantedMap.get(itemName);
+                    Integer superEnchantedMultiplier = normalizedSuperEnchantedMap.get(itemName);
+
+                    boolean isEnchanted = enchantedMultiplier != null;
+                    boolean isSuperEnchanted = superEnchantedMultiplier != null;
 
                     if (!itemName.equals(coll) && !isEnchanted && !isSuperEnchanted) continue;
 
                     if (isSuperEnchanted) {
-                        long gain = (long) amount * normalizedSuperEnchantedMap.values().iterator().next();
-                        totalAmount += gain;
+                        totalAmount += (long) amount * superEnchantedMultiplier;
                     } else if (isEnchanted) {
-                        long gain = (long) amount * normalizedEnchantedMap.values().iterator().next();
-                        totalAmount += gain;
+                        totalAmount += (long) amount * enchantedMultiplier;
                     } else {
                         totalAmount += amount;
                     }
