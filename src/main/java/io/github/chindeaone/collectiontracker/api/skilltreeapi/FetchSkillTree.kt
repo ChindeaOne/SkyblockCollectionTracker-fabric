@@ -83,10 +83,10 @@ object FetchSkillTree {
                     ConfigHelper.setCotmLevel(it.asInt)
                 }
                 miningTree.get("professional")?.let {
-                    ConfigHelper.setProfessionalMS(it.asInt)
+                    ConfigHelper.setProfessionalMS(50 + it.asInt * 5)
                 }
                 miningTree.get("strong_arm")?.let {
-                    ConfigHelper.setStrongArmMS(it.asInt)
+                    ConfigHelper.setStrongArmMS(it.asInt * 5)
                 }
             }
 
