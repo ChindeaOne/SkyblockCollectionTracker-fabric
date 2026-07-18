@@ -578,10 +578,8 @@ object ChatListener {
             }
         }
 
-        val finalGains = sacksDetails.filterValues { it > 0 }
-
-        if (hasGains && finalGains.isNotEmpty()) {
-            SacksTrackingManager.onSacksGain(finalGains)
+        if (hasGains) {
+            SacksTrackingManager.onSacksGain(sacksDetails)
         }
     }
 
