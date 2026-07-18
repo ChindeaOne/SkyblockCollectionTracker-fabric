@@ -71,6 +71,11 @@ public class SacksTrackingManager {
         for (String coll : CollectionTracker.collectionList) {
             String type = CollectionsManager.multiCollectionTypes.get(coll);
 
+            if (type == null) {
+                // gemstones
+                continue;
+            }
+
             long totalAmount = 0;
             Map<String, Integer> normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.multiEnchantedRecipes.getOrDefault(coll, new HashMap<>()), false, coll);
             Map<String, Integer> normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.multiSuperEnchantedRecipes.getOrDefault(coll, new HashMap<>()), true, coll);
