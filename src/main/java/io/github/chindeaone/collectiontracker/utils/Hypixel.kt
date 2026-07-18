@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
+import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -36,7 +37,6 @@ object Hypixel {
     @JvmStatic
     var server = false
     var skyblock = false
-    private var playerLoaded = false
 
     private var logger: Logger = LogManager.getLogger(Hypixel::class.java)
 
@@ -44,7 +44,6 @@ object Hypixel {
         logger.info("[SCT]: Player has disconnected from the server.")
         server = false
         skyblock = false
-        playerLoaded = false
         serverStatus = false
         TrackingHandler.pauseTracking()
         MultiTrackingHandler.pauseMultiTracking()
@@ -68,48 +67,48 @@ object Hypixel {
     fun onTick(client: Minecraft) {
         if (!HypixelUtils.isInHypixel) {
             checkServer()
-            if (HypixelUtils.isInHypixel && !playerLoaded) {
-                loadPlayerData(client)
-                if (playerLoaded) {
-                    ServerStatus.checkServerWithCallback(client::execute) { up ->
-                        serverStatus = up
+            if (HypixelUtils.isInHypixel) {
+                ServerStatus.checkServerWithCallback(client::execute) { up ->
+                    serverStatus = up
 
-                        if (!serverStatus) {
-                            ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
-                            logger.warn("[SCT]: The API server is currently under maintenance.")
-                        } else {
-                            fetchData()
-                            logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
+                    if (!serverStatus) {
+                        ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
+                        logger.warn("[SCT]: The API server is currently under maintenance.")
+                    } else {
+                        if (TokenManager.token == null) Minecraft.getInstance().execute {
+                            ChatUtils.sendMessage("§cCouldn't request an API token. Some tracking features might be unavailable. Use §e/sct token§c to retry manually.")
+                        }
+                        fetchData()
+                        logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
 
-                            if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
-                                CompletableFuture.runAsync {
-                                    RepoUtils.checkGithubReleases()
-                                    RepoUtils.checkLatestVersion()
-                                }.thenAcceptAsync  {
-                                    if (RepoUtils.latestVersion != null) {
-                                        Minecraft.getInstance().execute {
-                                            ChatUtils.sendMessage(
-                                                "§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game."
-                                            )
-                                        }
-                                        logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
-                                        UpdaterManager.update()
-                                        ConfigHelper.disableUpdateChecks()
-                                    } else {
-                                        if (!ConfigAccess.hasCheckedUpdate()) {
-                                            Minecraft.getInstance().execute {
-                                                ChatUtils.sendMessage("§aThe mod has been updated successfully.")
-                                                ChatUtils.sendCommandComponent("§eSee what changed here.", "/sct changelog")
-                                            }
-                                            ConfigHelper.enableUpdateChecks()
-                                            logger.info("[SCT]: The mod has been updated successfully.")
-                                        }
-                                        logger.info("[SCT]: No new version found.")
+                        if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
+                            CompletableFuture.runAsync {
+                                RepoUtils.checkGithubReleases()
+                                RepoUtils.checkLatestVersion()
+                            }.thenAcceptAsync  {
+                                if (RepoUtils.latestVersion != null) {
+                                    Minecraft.getInstance().execute {
+                                        ChatUtils.sendMessage(
+                                            "§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game."
+                                        )
                                     }
+                                    logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
+                                    UpdaterManager.update()
+                                    ConfigHelper.disableUpdateChecks()
+                                } else {
+                                    if (!ConfigAccess.hasCheckedUpdate()) {
+                                        Minecraft.getInstance().execute {
+                                            ChatUtils.sendMessage("§aThe mod has been updated successfully.")
+                                            ChatUtils.sendCommandComponent("§eSee what changed here.", "/sct changelog")
+                                        }
+                                        ConfigHelper.enableUpdateChecks()
+                                        logger.info("[SCT]: The mod has been updated successfully.")
+                                    }
+                                    logger.info("[SCT]: No new version found.")
                                 }
-                            } else{
-                                logger.info("[SCT]: Update stream is disabled.")
                             }
+                        } else{
+                            logger.info("[SCT]: Update stream is disabled.")
                         }
                     }
                 }
@@ -135,14 +134,6 @@ object Hypixel {
             mining = true,
             foraging = true
         ) }
-    }
-
-    private fun loadPlayerData(client: Minecraft) {
-        if (client.player != null) {
-            playerLoaded = true
-            PlayerData.playerUUID
-            PlayerData.playerName
-        }
     }
 
     private fun checkScoreboard(client: Minecraft): Boolean {
