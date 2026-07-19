@@ -20,6 +20,9 @@
 				"value": "io.github.chindeaone.collectiontracker.ModLoader",
 				"adapter": "kotlin"
 			}
+		],
+		"modmenu": [
+			"io.github.chindeaone.collectiontracker.utils.ModMenuIntegration"
 		]
 	},
 	"mixins": [
