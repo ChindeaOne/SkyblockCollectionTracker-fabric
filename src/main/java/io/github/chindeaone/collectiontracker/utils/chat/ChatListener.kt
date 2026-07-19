@@ -99,6 +99,7 @@ object ChatListener {
         val multiTracking = MultiTrackingHandler.isMultiTracking && !MultiTrackingHandler.isMultiPaused
 
         if (!normalTracking && !multiTracking) return
+        if (ConfigAccess.isApiTrackingEnabled()) return
 
         if (component.string.startsWith("[Sacks]")) {
             parseSacksMessage(component)

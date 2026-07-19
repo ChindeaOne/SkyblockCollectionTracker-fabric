@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.commands;
 import io.github.chindeaone.collectiontracker.api.bazaarapi.FetchBazaarPrice;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager;
+import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
@@ -16,11 +17,17 @@ import org.apache.logging.log4j.Logger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 public class CollectionTracker {
 
     public static String collection = "";
     public static List<String> collectionList = new LinkedList<>();
+
+    public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    public static ScheduledFuture<?> trackingTask;
 
     public static Logger logger = LogManager.getLogger(CollectionTracker.class);
 
@@ -183,5 +190,15 @@ public class CollectionTracker {
         } catch (Exception e) {
             logger.error("[SCT]: Unexpected error when starting multi-tracking: ", e);
         }
+    }
+
+    public static void cancelScheduledTask() {
+        if (trackingTask != null && !trackingTask.isCancelled()) {
+            trackingTask.cancel(true);
+            trackingTask = null;
+        }
+
+        ConfigHelper.setApiTracking(false);
+        ChatUtils.sendMessage("§eAPI data could not be fetched. Automatic API tracking has been disabled. Continuing with sack tracking.", true);
     }
 }

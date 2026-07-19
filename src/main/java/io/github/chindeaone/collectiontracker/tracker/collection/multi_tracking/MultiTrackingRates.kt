@@ -51,7 +51,6 @@ object MultiTrackingRates {
     @JvmStatic var etaToNextRank: String? = null
     @JvmStatic var collectionTillNextRank = -1L
 
-    @JvmStatic
     fun setCollections(values: Map<String, Long>) {
         val now = System.currentTimeMillis()
         MultiTrackingHandler.initMultiTracking()
@@ -76,6 +75,21 @@ object MultiTrackingRates {
             }
             collectionAmounts[coll] = value
             updateValues(coll, value, 0L)
+        }
+    }
+
+    fun updateCollections(values: Map<String, Long>) {
+        for ((coll, newTotal) in values) {
+            val previousTotal = lastApiCollections.getOrDefault(coll, newTotal)
+            val gained = (newTotal - previousTotal).coerceAtLeast(0L)
+
+            lastApiCollections[coll] = newTotal
+
+            if (sessionStartCollections.getOrDefault(coll, -1L) == -1L) {
+                sessionStartCollections[coll] = newTotal
+            }
+
+            updateValues(coll, newTotal, gained)
         }
     }
 

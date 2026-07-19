@@ -79,6 +79,13 @@ public class TrackingRates {
         updateValues(currentCollection, value);
     }
 
+    public static void updateCollection(long value) {
+        // 'value' here is the current collection amount fetched from the API
+        long gainedSinceLast = value - lastApiCollection;
+        lastApiCollection = value; // update last API collection
+        updateValues(value, gainedSinceLast);
+    }
+
     public static void updateLeaderboardStats() {
         LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry();
         if (playerEntry != null) {

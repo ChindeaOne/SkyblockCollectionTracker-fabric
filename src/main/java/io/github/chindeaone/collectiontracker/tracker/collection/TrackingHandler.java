@@ -17,17 +17,19 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
+import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler;
+import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask;
 
 public class TrackingHandler {
 
     private static final Logger logger = LogManager.getLogger(TrackingHandler.class);
-    public static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10 seconds cooldown
+    public static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10-second cooldown
 
     public static volatile boolean isTracking = false;
     public static boolean isPaused = false;
@@ -45,7 +47,14 @@ public class TrackingHandler {
         logger.info("[SCT]: Tracking started for collection: {}", collection);
 
         OverlayManager.setTrackingOverlayRendering(true);
+
+        // Always do initial fetch
         DataFetcher.fetchData(true);
+
+        // Schedule API fetching
+        if (ConfigAccess.isApiTrackingEnabled()) {
+            trackingTask = scheduler.scheduleWithFixedDelay(() -> DataFetcher.fetchData(false), 5, 5, TimeUnit.MINUTES);
+        }
     }
 
     public static void initTracking(long now) {
@@ -66,7 +75,6 @@ public class TrackingHandler {
             resetTrackingData(false);
 
             logger.info("[SCT]: Tracking stopped.");
-
         } else {
             ChatUtils.sendMessage("§cNo tracking active!", true);
             logger.warn("[SCT]: Attempted to stop tracking manually, but no tracking is active.");
@@ -151,6 +159,11 @@ public class TrackingHandler {
         leaderboardTrackingInitialized = false;
         startTime = 0;
         lastTime = 0;
+
+        if (trackingTask != null) {
+            trackingTask.cancel(false);
+            trackingTask = null;
+        }
 
         // Reset collection tracking
         lastApiCollection = -1L;

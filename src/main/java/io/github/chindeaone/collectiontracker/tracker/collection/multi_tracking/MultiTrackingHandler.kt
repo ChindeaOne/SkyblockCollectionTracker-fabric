@@ -3,6 +3,8 @@ package io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
@@ -24,7 +26,7 @@ object MultiTrackingHandler  {
 
     private val logger: Logger = LogManager.getLogger(MultiTrackingHandler::class.java)
     @JvmStatic
-    val COOLDOWN_MILLIS: Long = TimeUnit.SECONDS.toMillis(10) // 10 seconds cooldown
+    val COOLDOWN_MILLIS: Long = TimeUnit.SECONDS.toMillis(10) // 10-second cooldown
 
     @Volatile
     @JvmStatic
@@ -47,10 +49,16 @@ object MultiTrackingHandler  {
 
     @JvmStatic
     fun startMultiTracking() {
-        OverlayManager.setMultiTrackingOverlayRendering(true)
         logger.info("[SCT]: Starting multi tracking for player ${PlayerData.playerName}")
 
+        OverlayManager.setMultiTrackingOverlayRendering(true)
+
+        // Always do initial fetch
         MultiDataFetcher.fetchMultiCollectionData()
+
+        if (ConfigAccess.isApiTrackingEnabled()) {
+            trackingTask = scheduler.scheduleWithFixedDelay({ MultiDataFetcher.fetchMultiCollectionData(false) }, 5, 5, TimeUnit.MINUTES)
+        }
     }
 
     fun initMultiTracking() {
@@ -149,6 +157,11 @@ object MultiTrackingHandler  {
         multiStartTime = 0
         multiLastTime = 0
         leaderboardTrackingInitialized = false
+
+        if (trackingTask != null) {
+            trackingTask.cancel(false)
+            trackingTask = null
+        }
 
         clearMaps()
     }

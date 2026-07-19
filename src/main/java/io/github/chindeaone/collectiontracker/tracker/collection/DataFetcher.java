@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher;
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher;
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen;
 import io.github.chindeaone.collectiontracker.utils.PlayerData;
@@ -30,7 +31,7 @@ public class DataFetcher {
     private static final Map<String, Long> collectionCache = new ConcurrentHashMap<>();
     private static final Map<String, Long> cacheTimestamps = new ConcurrentHashMap<>();
     private static final Map<String, Long> leaderboardCacheTimestamps = new ConcurrentHashMap<>();
-    private static final long CACHE_LIFESPAN_MS = 180_000L; // 3 minutes
+    private static final long CACHE_LIFESPAN_MS = 240_000L; // 4 minutes
     private static final long LEADERBOARD_CACHE_LIFESPAN_MS = 3_600_000L; // 1 hour
     private static final AtomicBoolean leaderboardFetchInProgress = new AtomicBoolean(false);
 
@@ -45,19 +46,26 @@ public class DataFetcher {
             }
             if (!isInitialFetch && (!isTracking || isPaused)) return;
 
-            String playerUUID = PlayerData.getPlayerUUID();
             Long collectionData = getCachedData(collection);
 
             if (collectionData == null) {
-                String jsonData = fetchDataFromApi(playerUUID, collection);
+                String jsonData = fetchDataFromApi(collection);
                 if (jsonData == null) {
                     logger.error("[SCT]: Failed to fetch data from the Hypixel API");
-                    Minecraft.getInstance().execute(() -> Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
-                            new CustomCollectionScreen(
-                                    List.of(collection),
-                                    () -> {}
-                            )
-                    ));
+
+                    if (ConfigAccess.isApiTrackingEnabled()) {
+                        CollectionTracker.cancelScheduledTask();
+                    }
+
+                    if (isInitialFetch) {
+                        Minecraft.getInstance().execute(() -> Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
+                                new CustomCollectionScreen(
+                                        List.of(collection),
+                                        () -> {
+                                        }
+                                )
+                        ));
+                    }
                     return;
                 }
                 collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().getValue().getAsLong();
@@ -66,8 +74,12 @@ public class DataFetcher {
                 cacheTimestamps.put(collection, System.currentTimeMillis());
             }
 
-            TrackingRates.setCollection(collectionData);
-            logger.info("[SCT]: Data successfully fetched or retrieved for player with UUID: {} and collection: {}", playerUUID, collection);
+            if (isInitialFetch) {
+                TrackingRates.setCollection(collectionData);
+            } else {
+                TrackingRates.updateCollection(collectionData);
+            }
+            logger.info("[SCT]: Data successfully fetched or retrieved for collection: {}", collection);
         } catch (Exception e) {
             logger.error("[SCT]: Error fetching data from the Hypixel API: {}", e.getMessage(), e);
         }
@@ -84,14 +96,14 @@ public class DataFetcher {
         return null;
     }
 
-    private static String fetchDataFromApi(String playerUUID, String collection) {
+    private static String fetchDataFromApi(String collection) {
         Long lastFetched = cacheTimestamps.get(collection);
 
         if (lastFetched != null) {
             long elapsed = System.currentTimeMillis() - lastFetched;
-            logger.info("[SCT]: Cache expired for player {} collection {} (last fetched {} ms ago). Fetching new data.", playerUUID, collection, elapsed);
+            logger.info("[SCT]: Cache expired for collection {} (last fetched {} ms ago). Fetching new data.", collection, elapsed);
         } else {
-            logger.info("[SCT]: No cache present for player {} collection {}. Fetching data.", playerUUID, collection);
+            logger.info("[SCT]: No cache present for collection {}. Fetching data.", collection);
         }
 
         return HypixelApiFetcher.fetchJsonData(collection);
