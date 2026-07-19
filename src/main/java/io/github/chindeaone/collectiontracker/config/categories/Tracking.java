@@ -35,6 +35,15 @@ public class Tracking {
 
     @Expose
     @ConfigOption(
+            name = "Custom Collection Color",
+            desc = "Enable custom colors for collections."
+    )
+    @SerializedName("overlayTextColor")
+    @ConfigEditorBoolean
+    public boolean overlayTextColor = false;
+
+    @Expose
+    @ConfigOption(
             name = "Explicit values",
             desc = "Show full values instead of rounded values for the overlays and summary."
     )

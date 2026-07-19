@@ -84,15 +84,6 @@ public class CollectionConfig {
 
     @Expose
     @ConfigOption(
-            name = "Custom Collection Color",
-            desc = "Toggle this to enable color-coded collections."
-    )
-    @SerializedName("overlayTextColor")
-    @ConfigEditorBoolean
-    public boolean overlayTextColor = false;
-
-    @Expose
-    @ConfigOption(
             name = "Tracking Summary",
             desc = "Show tracking rates summary in chat when stopping a tracking session."
     )
