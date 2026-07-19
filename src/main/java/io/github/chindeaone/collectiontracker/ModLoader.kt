@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.CommissionKeybinds
+import io.github.chindeaone.collectiontracker.utils.ConfigStateUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
@@ -111,6 +112,7 @@ class ModLoader: ModInitializer {
             ScoreboardUtils.onTick(client)
             DeployableParser.onTick(client)
             InventoryListener.onTick(client)
+            ConfigStateUtils.onTick()
         }
     }
 }

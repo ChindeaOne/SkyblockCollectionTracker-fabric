@@ -26,6 +26,7 @@ public class CollectionTracker {
     public static String collection = "";
     public static List<String> collectionList = new LinkedList<>();
 
+    public static boolean isApiTracking = false;
     public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     public static ScheduledFuture<?> trackingTask;
 
@@ -48,7 +49,7 @@ public class CollectionTracker {
                     return;
                 }
 
-                if (TrackingHandler.isTracking || TrackingHandler.isPaused) {
+                if (TrackingHandler.isTracking) {
                     ChatUtils.sendMessage("§cAlready tracking a collection.", true);
                     return;
                 }
@@ -125,7 +126,7 @@ public class CollectionTracker {
                     return;
                 }
 
-                if (MultiTrackingHandler.isMultiTracking() || MultiTrackingHandler.isMultiPaused()) {
+                if (MultiTrackingHandler.isMultiTracking()) {
                     ChatUtils.sendMessage("§cAlready multi-tracking collections.", true);
                     return;
                 }

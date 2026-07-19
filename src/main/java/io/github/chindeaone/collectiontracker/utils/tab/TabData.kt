@@ -21,8 +21,8 @@ object TabData {
             return
         }
 
-        tickCounter++
-        if (tickCounter % 2 != 0) return
+        tickCounter = (tickCounter + 1) % 2
+        if (tickCounter != 0) return
 
         if (world != currentWorld) {
             world = currentWorld

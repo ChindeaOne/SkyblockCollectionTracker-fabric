@@ -20,11 +20,9 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
-import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
+import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.*;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
-import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler;
-import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask;
 
 public class TrackingHandler {
 
@@ -52,7 +50,9 @@ public class TrackingHandler {
         DataFetcher.fetchData(true);
 
         // Schedule API fetching
-        if (ConfigAccess.isApiTrackingEnabled()) {
+        isApiTracking = ConfigAccess.isApiTrackingEnabled();
+
+        if (isApiTracking) {
             trackingTask = scheduler.scheduleWithFixedDelay(() -> DataFetcher.fetchData(false), 5, 5, TimeUnit.MINUTES);
         }
     }
@@ -219,17 +219,14 @@ public class TrackingHandler {
             return;
         }
 
-        if (isTracking && isPaused) {
+        if (isPaused) {
             ChatUtils.sendMessage("§7Resuming tracking.", true);
             logger.info("[SCT]: Resuming tracking.");
             startTime = System.currentTimeMillis();
             isPaused = false;
-        } else if (!isPaused) {
+        } else {
             ChatUtils.sendMessage("§cTracking is already active!", true);
             logger.warn("[SCT]: Attempted to resume tracking, but tracking is already active.");
-        } else {
-            ChatUtils.sendMessage("§cTracking has not been started yet!", true);
-            logger.warn("[SCT]: Attempted to resume tracking, but tracking has not been started.");
         }
     }
 

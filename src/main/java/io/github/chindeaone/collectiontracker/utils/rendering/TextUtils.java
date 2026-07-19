@@ -15,9 +15,7 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarTyp
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig;
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.StringUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import java.util.List;
@@ -32,12 +30,6 @@ import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNu
 public class TextUtils {
 
     public static void updateTrackingLines(List<String> list) {
-        if (ConfigAccess.isCollectionLeaderboardEnabled() && !TrackingHandler.leaderboardTrackingInitialized) {
-            ChatUtils.sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true);
-            ConfigHelper.disableCollectionLeaderboardTracking();
-            return;
-        }
-
         list.clear();
         if (ConfigAccess.getStatsText().isEmpty()) return;
 
@@ -125,12 +117,6 @@ public class TextUtils {
     }
 
     private static String handleMoneyPerHour() {
-        if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
-            ConfigHelper.disableBazaar();
-            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
-            return null;
-        }
-
         if (collectionType == null) return null; // no collection type (probably rift collection)
 
         boolean hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
@@ -180,14 +166,7 @@ public class TextUtils {
     }
 
     private static String handleMoneyMade() {
-        if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
-            ConfigHelper.disableBazaar();
-            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
-            return null;
-        }
-
         if (collectionType == null) return null; // no collection type (probably rift collection)
-
 
         boolean hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0;
 
@@ -255,28 +234,6 @@ public class TextUtils {
 
     // Only if it has bazaar data and is enabled
     public static void updateTrackingExtraLines(List<String> list) {
-        list.clear();
-        if (!BazaarCollectionsManager.hasBazaarData) {
-            ConfigHelper.disableExtraStats();
-            ChatUtils.sendMessage("§cNo Bazaar data available for extra stats!", true);
-            list.clear();
-            return;
-        }
-
-        if (collectionType.equals("normal") && ConfigAccess.isShowExtraStats()) {
-            ConfigHelper.disableExtraStats();
-            ChatUtils.sendMessage("§cExtra stats are redundant here!", true);
-            list.clear();
-            return;
-        }
-
-        if (ConfigAccess.isShowExtraStats() && !ConfigAccess.isUsingBazaar()) {
-            ConfigHelper.disableExtraStats();
-            ChatUtils.sendMessage("§cDisabled extra stats since you don't use Bazaar prices!", true);
-            list.clear();
-            return;
-        }
-
         list.clear();
 
         list.add("§6§lExtra Stats:");
@@ -357,15 +314,6 @@ public class TextUtils {
     }
 
     public static void updateMultiTrackingLines(List<String> list, List<String> expanded, boolean showPrefixes) {
-        if (ConfigAccess.isCollectionLeaderboardEnabled() && !MultiTrackingHandler.getLeaderboardTrackingInitialized()) {
-            List<String> tracked = io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList;
-            if (tracked.size() == 1 && tracked.contains("gemstone")) {
-                ChatUtils.sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true);
-                ConfigHelper.disableCollectionLeaderboardTracking();
-                return;
-            }
-        }
-
         list.clear();
         for (String coll : CollectionTracker.collectionList) {
             if ("gemstone".equals(coll)) {
@@ -484,12 +432,6 @@ public class TextUtils {
     }
 
     private static String handleMoneyPerHourMulti(String coll) {
-        if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
-            ConfigHelper.disableBazaar();
-            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
-            return null;
-        }
-
         boolean useBazaar = ConfigAccess.isUsingBazaar();
         if ("gemstone".equals(coll)) {
             long totalRate = 0;
@@ -554,12 +496,6 @@ public class TextUtils {
     }
 
     private static String handleMoneyMadeMulti(String coll) {
-        if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
-            ConfigHelper.disableBazaar();
-            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true);
-            return null;
-        }
-
         boolean useBazaar = ConfigAccess.isUsingBazaar();
         if ("gemstone".equals(coll)) {
             long totalMoney = 0;
@@ -693,7 +629,7 @@ public class TextUtils {
 
     private static void handleMultiLeaderboard(List<String> list) {
         if (ConfigAccess.isCollectionLeaderboardEnabled()) {
-            List<String> tracked = io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList;
+            List<String> tracked = CollectionTracker.collectionList;
             if (tracked.size() == 1 && tracked.contains("gemstone")) {
                 addIfNotNull(list, "");
                 addIfNotNull(list, handleMultiNextPosition());

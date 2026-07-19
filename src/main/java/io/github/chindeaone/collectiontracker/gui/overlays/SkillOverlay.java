@@ -4,7 +4,6 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import net.minecraft.client.Minecraft;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.leaderboardTrackingInitialized;
 import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates.*;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
 import static io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatNumberOrPlaceholder;
@@ -115,11 +113,6 @@ public class SkillOverlay extends AbstractOverlay {
         skillOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(skillXpGained));
         skillOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(skillPerHour));
 
-        if (ConfigAccess.isSkillLeaderboardEnabled() && !leaderboardTrackingInitialized) {
-            ChatUtils.sendMessage("§cCan't enable skill leaderboard mid tracking. Enable this before tracking a skill!", true);
-            ConfigHelper.disableSkillLeaderboardTracking();
-        }
-
         addLeaderboardLines(skillOverlayLines, skillCurrentRank, skillNextRankUsername, skillNextRankAmount, skillTillNextRank, skillEtaToNextRank);
 
         skillOverlayLines.add("Uptime: " + SkillTrackingHandler.getUptime());
@@ -131,12 +124,6 @@ public class SkillOverlay extends AbstractOverlay {
         tamingOverlayLines.clear();
 
         if (skillName.equals("Taming")) {
-            ConfigHelper.disableTamingTracking();
-            return tamingOverlayLines;
-        }
-
-        if (ConfigAccess.isTamingTrackingEnabled() && SkillTrackingHandler.getUptimeInSeconds() > 1 && tamingXp == 0) {
-            ChatUtils.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true);
             ConfigHelper.disableTamingTracking();
             return tamingOverlayLines;
         }

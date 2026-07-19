@@ -39,8 +39,8 @@ object DeployableParser {
         val level = client.level ?: return
         val player = client.player ?: return
 
-        tickCounter++
-        if (tickCounter % 2 != 0) return
+        tickCounter = (tickCounter + 1) % 2
+        if (tickCounter != 0) return
 
         var found: Pair<ArmorStand, String>? = null
 
