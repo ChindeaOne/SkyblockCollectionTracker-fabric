@@ -191,7 +191,7 @@ public class CommandRegistry {
                 // sct restart
                 .then(ClientCommands.literal("restart")
                         .executes(_ -> {
-                            if (MultiTrackingHandler.isMultiTracking() || MultiTrackingHandler.isMultiPaused()) {
+                            if (MultiTrackingHandler.isMultiTracking()) {
                                 MultiTrackingHandler.restartMultiTracking();
                             } else {
                                 TrackingHandler.restartTracking();

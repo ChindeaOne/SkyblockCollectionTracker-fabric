@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.isPaused;
 import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.isTracking;
 
 public class SkillTracker {
@@ -29,7 +28,7 @@ public class SkillTracker {
             }
 
             try {
-                if (isTracking || isPaused) {
+                if (isTracking) {
                     ChatUtils.sendMessage("§cAlready tracking a skill.", true);
                     return;
                 }

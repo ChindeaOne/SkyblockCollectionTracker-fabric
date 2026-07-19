@@ -49,7 +49,7 @@ object InventoryListener {
             return
         }
 
-        if (isTracking && isTrackingPaused || isMultiTracking && isMultiTrackingPaused || !IslandTracker.isInRift) return
+        if (isTrackingPaused || isMultiTrackingPaused || !IslandTracker.isInRift) return
         if (ConfigAccess.isApiTrackingEnabled()) return
 
         tickCount++

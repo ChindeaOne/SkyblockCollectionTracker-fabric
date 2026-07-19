@@ -95,8 +95,8 @@ object ChatListener {
 
     fun sacksListener(component: Component, actionBar: Boolean) {
         if (actionBar) return
-        val normalTracking = TrackingHandler.isTracking && !TrackingHandler.isPaused
-        val multiTracking = MultiTrackingHandler.isMultiTracking && !MultiTrackingHandler.isMultiPaused
+        val normalTracking = TrackingHandler.isTracking
+        val multiTracking = MultiTrackingHandler.isMultiTracking
 
         if (!normalTracking && !multiTracking) return
         if (ConfigAccess.isApiTrackingEnabled()) return

@@ -180,17 +180,20 @@ object ColeweightTrackingHandler {
             return
         }
 
-        if (isTracking && isPaused) {
+        if (!isTracking) {
+            sendMessage("§cTracking has not been started yet!", true)
+            logger.warn("[SCT]: Attempted to resume Coleweight tracking, but tracking has not been started yet.")
+            return
+        }
+
+        if (isPaused) {
             sendMessage("§7Resuming Coleweight tracking.", true)
             logger.info("[SCT]: Resuming Coleweight tracking.")
             startTime = System.currentTimeMillis()
             isPaused = false
-        } else if (isTracking) {
+        } else {
             sendMessage("§cColeweight tracking is already active!", true)
             logger.warn("[SCT]: Attempted to resume Coleweight tracking, but tracking is already active and not paused.")
-        } else {
-            sendMessage("§cTracking has not been started yet!", true)
-            logger.warn("[SCT]: Attempted to resume Coleweight tracking, but tracking has not been started yet.")
         }
     }
 

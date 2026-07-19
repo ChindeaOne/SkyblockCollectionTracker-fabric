@@ -7,7 +7,6 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiPaused
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiTracking
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import net.minecraft.client.Minecraft
@@ -30,7 +29,7 @@ object MultiDataFetcher {
                 MultiTrackingHandler.stopMultiTracking()
                 return
             }
-            if (!isInitialFetch && (!isMultiTracking || isMultiPaused)) return
+            if (!isInitialFetch && !isMultiTracking) return
 
             var map = getCachedData()
 

@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
-import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isPaused;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking;
 
 public class DataFetcher {
@@ -44,7 +43,7 @@ public class DataFetcher {
                 TrackingHandler.stopTracking();
                 return;
             }
-            if (!isInitialFetch && (!isTracking || isPaused)) return;
+            if (!isInitialFetch && !isTracking) return;
 
             Long collectionData = getCachedData(collection);
 
