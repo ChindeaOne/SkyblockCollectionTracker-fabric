@@ -25,6 +25,13 @@ public class Misc {
         }
     }
 
+    public enum AbilityDisplayMode  {
+        CROSSHAIR_CIRCLE,
+        CROSSHAIR_BAR,
+        ITEM_DURABILITY,
+        ITEM_COOLDOWN
+    }
+
     @Expose
     @ConfigOption(
             name = "Timer precision",

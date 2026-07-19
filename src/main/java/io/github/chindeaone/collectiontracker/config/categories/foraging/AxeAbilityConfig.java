@@ -1,8 +1,10 @@
 package io.github.chindeaone.collectiontracker.config.categories.foraging;
 
 import com.google.gson.annotations.Expose;
+import io.github.chindeaone.collectiontracker.config.categories.Misc;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -15,6 +17,14 @@ public class AxeAbilityConfig {
     )
     @ConfigEditorBoolean
     public boolean displayAxeAbility = false;
+
+    @Expose
+    @ConfigOption(
+            name = "Axe Ability Display Mode",
+            desc = "Select a custom ability display."
+    )
+    @ConfigEditorDropdown
+    public Misc.AbilityDisplayMode mode = Misc.AbilityDisplayMode.CROSSHAIR_CIRCLE; // Default to crosshair circle
 
     @Expose
     @ConfigOption(

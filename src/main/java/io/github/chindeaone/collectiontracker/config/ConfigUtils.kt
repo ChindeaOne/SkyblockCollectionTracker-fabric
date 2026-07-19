@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.config
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
-import io.github.chindeaone.collectiontracker.config.categories.Abilities
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Farming
@@ -37,7 +36,6 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningSt
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 
@@ -200,10 +198,6 @@ val summaryStats: MultiCollectionConfig.SummaryStats get() = multiCollectionOver
 val skillConfig: SkillConfig get() = trackingConfig.skillConfig
 val enableTamingTracking: Boolean get() = skillConfig.enableTamingTracking
 
-// Abilities Config Accessors
-val abilitiesConfig: Abilities get() = modConfig.abilities
-val circle: Boolean get() = abilitiesConfig.circle
-
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
 val precision: Property<Int> get() = miscConfig.abilityPrecision
@@ -287,7 +281,10 @@ object ConfigAccess {
     fun hasCheckedUpdate(): Boolean = hasCheckedUpdate
 
     @JvmStatic
-    fun isOverlayTextColorEnabled(): Boolean = collectionConfig.overlayTextColor
+    fun isApiTrackingEnabled(): Boolean = trackingConfig.apiTracking
+
+    @JvmStatic
+    fun isOverlayTextColorEnabled(): Boolean = trackingConfig.overlayTextColor
 
     @JvmStatic
     fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionConfig.showTrackingRatesAtEndOfSession
@@ -551,10 +548,6 @@ object ConfigAccess {
     fun getCustomGoalEntry(name: String): LeaderboardConfig.CustomGoalEntry? {
         return customGoals[name.lowercase()]
     }
-
-    @JvmStatic
-    fun isCircle(): Boolean = circle
-
 }
 
 /**
@@ -777,14 +770,9 @@ object ConfigHelper {
     fun setPureOresRoutesEnabled(enabled: Boolean) {
         pureOresRoutesConfig.enablePureOresRoutes = enabled
     }
-}
 
-fun jumpToConfig(position: Position) {
-    val editor = GuiManager.getEditorInstance()
-    val option = editor.getOptionFromField(position.link) ?: return
-
-    editor.search("")
-    if (!editor.goToOption(option)) return
-
-    GuiManager.openEditor(editor)
+    @JvmStatic
+    fun setApiTracking(enabled: Boolean) {
+        trackingConfig.apiTracking = enabled
+    }
 }
