@@ -43,7 +43,11 @@ public class SacksTrackingManager {
             boolean isEnchanted = enchantedMultiplier != null;
             boolean isSuperEnchanted = superEnchantedMultiplier != null;
 
-            if (!itemName.equals(collectionName) && !isEnchanted && !isSuperEnchanted) continue;
+            boolean matchesCollection = type.equals("gemstone")
+                    ? itemName.contains(collectionName)
+                    : itemName.equals(collectionName);
+
+            if (!matchesCollection && !isEnchanted && !isSuperEnchanted) continue;
 
             if (type.equals("gemstone")) {
                 totalAmount += (long) amount * getGemstoneMultiplier(itemName);
@@ -84,10 +88,7 @@ public class SacksTrackingManager {
                 String itemName = entry.getKey();
                 int amount = entry.getValue();
 
-                if ("gemstone".equals(type) || GemstonesManager.checkIfGemstone(coll)) {
-                    long gain = (long) amount * getGemstoneMultiplier(itemName);
-                    totalAmount += gain;
-                } else if ("enchanted".equals(type)) {
+                if ("enchanted".equals(type)) {
                     Integer enchantedMultiplier = normalizedEnchantedMap.get(itemName);
                     Integer superEnchantedMultiplier = normalizedSuperEnchantedMap.get(itemName);
 
@@ -104,6 +105,8 @@ public class SacksTrackingManager {
                         totalAmount += amount;
                     }
                 } else {
+                    if (!itemName.equals(coll)) continue;
+
                     totalAmount += amount;
                 }
             }
