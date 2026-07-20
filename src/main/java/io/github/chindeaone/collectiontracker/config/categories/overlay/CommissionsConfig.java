@@ -13,7 +13,8 @@ public class CommissionsConfig {
     @Expose
     @ConfigOption(
             name = "Enable Commissions Overlay",
-            desc = "Toggles an overlay for mining commissions.")
+            desc = "Toggles an overlay for mining commissions."
+    )
     @ConfigEditorBoolean
     public boolean enableCommissionsOverlay = false;
 

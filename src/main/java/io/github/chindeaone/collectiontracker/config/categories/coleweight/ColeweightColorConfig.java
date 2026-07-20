@@ -13,14 +13,17 @@ public class ColeweightColorConfig {
 
     @Expose
     @ConfigOption(
-        name = "Custom Coleweight Rank Color",
+        name = "Enable Custom Rank Color",
         desc = "Allows you to customize your Coleweight rank color in chat."
     )
     @ConfigEditorBoolean
     public boolean enableCustomColor = false;
 
     @Expose
-    @ConfigOption(name = "Rank Color", desc = "Set a custom color.\n§cNote: Animated chroma doesn't work yet.")
+    @ConfigOption(
+            name = "Custom Rank Color",
+            desc = "Set a custom color.\n§cNote: Animated chroma doesn't work yet."
+    )
     @ConfigEditorColour
     public ChromaColour customColor = ChromaColour.fromStaticRGB(0, 0, 0, 0);
 

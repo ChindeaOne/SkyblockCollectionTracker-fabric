@@ -12,7 +12,7 @@ public class PickaxeAbilityConfig {
 
     @Expose
     @ConfigOption(
-            name = "Pickaxe Ability Display",
+            name = "Ability Display",
             desc = "Displays current pickaxe ability and remaining duration while active."
     )
     @ConfigEditorBoolean
@@ -20,7 +20,7 @@ public class PickaxeAbilityConfig {
 
     @Expose
     @ConfigOption(
-            name = "Pickaxe Ability Display Mode",
+            name = "Ability Display Mode",
             desc = "Select a custom ability display."
     )
     @ConfigEditorDropdown

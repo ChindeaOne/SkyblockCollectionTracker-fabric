@@ -12,7 +12,7 @@ public class LeaderboardConfig {
 
     @ConfigOption(
             name = "§eLeaderboard Overlay",
-            desc = "Shows your collection or skill rank (if eligible), next player and their collection/skill xp, eta until you reach them and progress to the next rank"
+            desc = "Shows your collection or skill rank (if eligible), next player and their collection/skill xp, eta until you pass them and progress to the next rank"
     )
     @ConfigEditorInfoText
     public boolean info = true;

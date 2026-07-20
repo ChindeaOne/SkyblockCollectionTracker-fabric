@@ -12,7 +12,7 @@ public class AxeAbilityConfig {
 
     @Expose
     @ConfigOption(
-            name = "Axe Ability Display",
+            name = "Ability Display",
             desc = "Displays current axe ability and remaining duration while active."
     )
     @ConfigEditorBoolean
@@ -20,7 +20,7 @@ public class AxeAbilityConfig {
 
     @Expose
     @ConfigOption(
-            name = "Axe Ability Display Mode",
+            name = "Ability Display Mode",
             desc = "Select a custom ability display."
     )
     @ConfigEditorDropdown

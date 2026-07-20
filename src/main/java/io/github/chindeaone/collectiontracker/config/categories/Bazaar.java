@@ -27,7 +27,7 @@ public class Bazaar {
 
     @Expose
     @ConfigOption(
-            name = "Use Bazaar Prices",
+            name = "Bazaar Prices",
             desc = "Toggle to use bazaar prices instead of NPC prices."
     )
     @ConfigEditorBoolean
@@ -43,16 +43,17 @@ public class Bazaar {
 
     @Expose
     @ConfigOption(
-            name = "Select Bazaar Version",
+            name = "Bazaar Version",
             desc = "Select the version you want to use for pricing."
     )
     @ConfigEditorDropdown
     public BazaarType bazaarType = BazaarType.ENCHANTED_VERSION; // Default to ENCHANTED_VERSION
 
     @Expose
-    @ConfigOption
-            (name = "Select Gemstone Variant",
-                    desc = "Select the variant you want to use for pricing.")
+    @ConfigOption(
+            name = "Gemstone Variant",
+            desc = "Select the variant you want to use for pricing."
+    )
     @ConfigEditorDropdown
     public GemstoneVariant gemstoneVariant = GemstoneVariant.FINE; // Default to FINE variant
 }
