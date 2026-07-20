@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
+import io.github.chindeaone.collectiontracker.config.categories.Misc;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
@@ -50,7 +51,10 @@ public class PickaxeAbilityOverlay extends AbstractOverlay{
                 RenderUtils.renderStrings(context, lines)
         );
 
-        if (ConfigAccess.isCircle()) RenderUtils.renderCooldownCircle(context, "pickaxe");
+        switch (ConfigAccess.getPickaxeAbilityDisplayIndicator()) {
+            case Misc.AbilityDisplayIndicator.CROSSHAIR_CIRCLE -> RenderUtils.renderCooldownCircle(context, "pickaxe");
+            case Misc.AbilityDisplayIndicator.CROSSHAIR_BAR -> RenderUtils.renderCooldownBar(context, "pickaxe");
+        }
     }
 
     @Override

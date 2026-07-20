@@ -20,11 +20,11 @@ public class PickaxeAbilityConfig {
 
     @Expose
     @ConfigOption(
-            name = "Ability Display Mode",
-            desc = "Select a custom ability display."
+            name = "Ability Indicator",
+            desc = "Select a custom ability indicator."
     )
     @ConfigEditorDropdown
-    public Misc.AbilityDisplayMode mode = Misc.AbilityDisplayMode.CROSSHAIR_CIRCLE; // Default to crosshair circle
+    public Misc.AbilityDisplayIndicator indicator = Misc.AbilityDisplayIndicator.NONE; // Default to none
 
     @Expose
     @ConfigOption(

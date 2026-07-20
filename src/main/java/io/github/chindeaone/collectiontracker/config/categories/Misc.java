@@ -25,11 +25,12 @@ public class Misc {
         }
     }
 
-    public enum AbilityDisplayMode  {
+    public enum AbilityDisplayIndicator {
         CROSSHAIR_CIRCLE,
         CROSSHAIR_BAR,
         ITEM_DURABILITY,
-        ITEM_COOLDOWN
+        ITEM_COOLDOWN,
+        NONE
     }
 
     @Expose

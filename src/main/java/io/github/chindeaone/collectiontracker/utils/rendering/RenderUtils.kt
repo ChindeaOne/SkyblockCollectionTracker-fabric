@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
+import io.github.chindeaone.collectiontracker.config.categories.Misc
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
@@ -243,6 +244,30 @@ object RenderUtils {
         }
     }
 
+    @JvmStatic
+    fun renderCooldownBar(context: GuiGraphicsExtractor, ability: String) {
+        val centerX = ScaleUtils.scaledWidth / 2f - 1f
+        val centerY = ScaleUtils.scaledHeight / 2f - 1f + 8f
+
+        val (cooldown, duration, maxCooldown, maxDuration) = getAbilityTimes(ability)
+
+        when {
+            cooldown <= 0.0 -> {
+                drawBar(context, centerX, centerY, 10f, 2f, 1f, ColorUtils.GREEN)
+            }
+
+            duration > 0.0 -> {
+                val progress = (duration / maxDuration).coerceIn(0.0, 1.0).toFloat()
+                drawBar(context, centerX, centerY, 10f, 2f, progress, ColorUtils.GREEN)
+            }
+
+            else -> {
+                val progress = (1.0 - cooldown / maxCooldown).coerceIn(0.0, 1.0).toFloat()
+                drawBar(context, centerX, centerY, 10f, 2f, progress, ColorUtils.RED)
+            }
+        }
+    }
+
     private fun drawArc(context: GuiGraphicsExtractor, centerX: Float, centerY: Float, direction: Float, sweepAngle: Float, color: Int) {
         if (sweepAngle == 0f) return
 
@@ -277,6 +302,21 @@ object RenderUtils {
                 add(point)
                 last = point
             }
+        }
+    }
+
+    private fun drawBar(context: GuiGraphicsExtractor, centerX: Float, centerY: Float, width: Float, height: Float, progress: Float, color: Int) {
+        val halfWidth = width / 2f
+        val halfHeight = height / 2f
+
+        val left = (centerX - halfWidth).roundToInt()
+        val top = (centerY - halfHeight).roundToInt()
+        val bottom = (centerY + halfHeight).roundToInt()
+
+        val progressWidth = (width * progress).roundToInt()
+
+        if (progressWidth > 0) {
+            context.fill(left, top, left + progressWidth, bottom, color)
         }
     }
 

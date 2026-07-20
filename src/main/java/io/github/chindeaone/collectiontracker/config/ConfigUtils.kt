@@ -88,6 +88,7 @@ val lanternDeployableConfig: LanternDeployableConfig get() = miningConfig.lanter
 val temporaryBuffsConfig: TemporaryBuffsConfig get() = miningConfig.temporaryBuffsConfig
 val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
+val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = hotmConfig.pickaxeAbilityConfig.indicator
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
 val lastPet: String get() = pickaxeAbilityConfig.lastPet
 val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
@@ -150,6 +151,7 @@ val axeAbilityConfig: AxeAbilityConfig get() = hotfConfig.axeAbilityConfig
 val cotfLevel: Property<Int> get() = hotfConfig.cotfLevel
 val abilityNameAxe: String get() = axeAbilityConfig.abilityNameAxe
 val displayAxeAbility: Boolean get() = axeAbilityConfig.displayAxeAbility
+val axeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = axeAbilityConfig.indicator
 val lotteryConfig: LotteryConfig get() = hotfConfig.lotteryConfig
 val enableLottery: Boolean get() = lotteryConfig.enableLottery
 val lastLotteryBuff: String get() = lotteryConfig.lastLotteryBuff
@@ -395,6 +397,9 @@ object ConfigAccess {
     fun isPickaxeAbilityDisplayed(): Boolean = displayPickaxeAbility
 
     @JvmStatic
+    fun getPickaxeAbilityDisplayIndicator(): Misc.AbilityDisplayIndicator = pickaxeAbilityDisplayIndicator
+
+    @JvmStatic
     fun getPickaxeAbilityName(): String = abilityName
 
     @JvmStatic
@@ -411,6 +416,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun isAxeAbilityDisplayed(): Boolean = displayAxeAbility
+
+    @JvmStatic
+    fun getAxeAbilityDisplayIndicator(): Misc.AbilityDisplayIndicator = axeAbilityDisplayIndicator
 
     @JvmStatic
     fun getAxeAbilityName(): String = abilityNameAxe
