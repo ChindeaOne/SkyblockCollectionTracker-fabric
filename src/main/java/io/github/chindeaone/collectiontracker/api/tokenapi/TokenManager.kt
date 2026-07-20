@@ -6,7 +6,7 @@ object TokenManager {
     var token: String? = null
         private set
 
-    fun fetchAndStoreToken() {
-        token = TokenFetcher.fetchToken()
+    fun fetchAndStoreToken(notify: Boolean = false) {
+        token = TokenFetcher.fetchToken(notify)
     }
 }

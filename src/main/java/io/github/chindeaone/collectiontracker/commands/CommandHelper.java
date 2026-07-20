@@ -20,7 +20,8 @@ public class CommandHelper {
                     new CommandEntry("/sct", "§eOpens the GUI."),
                     new CommandEntry("/sct commands", "§eShows this message."),
                     new CommandEntry("/sct commands <page>", "§eJumps to a specific commands page."),
-                    new CommandEntry("/sct changelog", "§eShows all recent changes to the mod.")
+                    new CommandEntry("/sct changelog", "§eShows all recent changes to the mod."),
+                    new CommandEntry("/sct token", "§eRequests a new token if one is missing.")
             )),
 
             new CommandPage("Editing", "§d", List.of(

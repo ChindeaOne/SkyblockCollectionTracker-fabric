@@ -4,6 +4,7 @@ import com.mojang.authlib.minecraft.MinecraftSessionService
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.utils.PlayerData
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -15,6 +16,7 @@ import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import kotlin.time.Duration.Companion.minutes
 
 object ApiManager {
     const val API_URL = "https://skyblockcollections.com/v2"
@@ -31,7 +33,10 @@ object ApiManager {
     var serverId: String? = null
         private set
 
-    fun authenticateMojang() {
+    private var lastTokenRequest = 0L
+
+    // Same logic as SkyblockPv
+    fun authenticateMojang(notify: Boolean = false) {
         serverId = UUID.randomUUID().toString()
         val profile = PlayerData.profileId
         val accessToken = PlayerData.accessToken
@@ -40,11 +45,28 @@ object ApiManager {
             session.joinServer(profile, accessToken, serverId)
             logger.info("Registered session with Mojang")
 
-
-            TokenManager.fetchAndStoreToken()
+            TokenManager.fetchAndStoreToken(notify)
         } catch (e: Exception) {
             logger.error("[SCT]: Failed to authenticate with Mojang servers: ${e.message}", e)
         }
+    }
+
+    // manual fetch
+    @JvmStatic
+    fun fetchToken() {
+        if (TokenManager.token != null) {
+            sendMessage("§cToken already exists.", true)
+            return
+        }
+
+        val now = System.currentTimeMillis()
+        if (now - lastTokenRequest < 1.minutes.inWholeMilliseconds) {
+            sendMessage("§cPlease wait before requesting a new token.", true)
+            return
+        }
+        lastTokenRequest = now
+
+        CompletableFuture.runAsync { authenticateMojang(true) }
     }
 
     fun request(
@@ -52,7 +74,7 @@ object ApiManager {
         headers: List<Pair<String, String>> = emptyList()
     ): HttpResponse<String> {
         val request = buildRequest(path, "GET", headers)
-        return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString())
+        return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
     }
 
     fun requestAsync(

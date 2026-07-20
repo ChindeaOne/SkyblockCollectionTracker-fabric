@@ -6,6 +6,7 @@ import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker;
+import io.github.chindeaone.collectiontracker.api.ApiManager;
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardConfig;
@@ -645,6 +646,13 @@ public class CommandRegistry {
                                     return 1;
                                 })
                         )
+                )
+                // sct token -> fetches a new token from the server
+                .then(ClientCommands.literal("token")
+                        .executes(_ -> {
+                            ApiManager.fetchToken();
+                            return 1;
+                        })
                 )
         ));
     }
