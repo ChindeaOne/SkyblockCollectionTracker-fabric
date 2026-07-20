@@ -30,9 +30,9 @@ object ConfigStateUtils {
     private fun checkApiTracking() {
         val trackingActive = TrackingHandler.isTracking || MultiTrackingHandler.isMultiTracking
 
-        if (trackingActive && ConfigAccess.isApiTrackingEnabled() != CollectionTracker.isApiTracking) {
+        if (trackingActive && !CollectionTracker.isApiTracking && ConfigAccess.isApiTrackingEnabled()) {
             ConfigHelper.setApiTracking(CollectionTracker.isApiTracking)
-            ChatUtils.sendMessage("§cCan't change API tracking while tracking is active!", true)
+            ChatUtils.sendMessage("§cCan't enable API tracking while tracking is active!", true)
         }
     }
 
