@@ -1,41 +1,29 @@
-/*
-  Class and methods implemented by referencing Skyblocker
- */
-package io.github.chindeaone.collectiontracker.utils.world
+package io.github.chindeaone.collectiontracker.utils.rendering
 
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.pipeline.RenderPipeline
-/*? if 26.2 {*/
-/*import com.mojang.blaze3d.systems.RenderPass
-*//*?}*/
 import com.mojang.blaze3d.systems.RenderSystem
-/*? if 26.2 {*/
-/*import net.minecraft.client.renderer.StagedVertexBuffer
-import org.joml.Matrix4fStack
-import java.util.Optional
-*//*?} else {*/
-
 import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.ByteBufferBuilder
 import com.mojang.blaze3d.vertex.MeshData
-import com.mojang.blaze3d.vertex.VertexFormat
-import net.minecraft.client.renderer.MappableRingBuffer
-import org.joml.Matrix4f
-import org.joml.Vector3f
-import org.lwjgl.system.MemoryUtil
-import java.nio.ByteBuffer
-import java.util.OptionalInt
-/*?}*/
 import com.mojang.blaze3d.vertex.VertexConsumer
+import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.TextureSetup
+import net.minecraft.client.renderer.MappableRingBuffer
 import net.minecraft.client.renderer.rendertype.RenderType
+import org.joml.Matrix4f
+import org.joml.Vector3f
 import org.joml.Vector4f
+import org.lwjgl.system.MemoryUtil
+import java.nio.ByteBuffer
 import java.util.OptionalDouble
+import java.util.OptionalInt
+import kotlin.collections.iterator
 
-object Renderer {
+object WorldRenderer {
 
     private val client: Minecraft = Minecraft.getInstance()
 
@@ -49,7 +37,7 @@ object Renderer {
     private var previousUniform: UniformBinding? = null
     private var previousDraw: StagedVertexBuffer.Draw? = null
     *//*?} else {*/
-    
+
     private val generalAllocator = ByteBufferBuilder(RenderType.SMALL_BUFFER_SIZE)
     private val allocators = HashMap<BatchKey, ByteBufferBuilder>()
 
@@ -128,7 +116,7 @@ object Renderer {
             requireNotNull(previousDraw) { "Expected previousDraw to be set before getting vertex builder" }
         )
         *//*?} else {*/
-        
+
         val key = BatchKey(pipeline, textureSetup, alphaMultiplier)
 
         val existing = batchedDraws[key]
@@ -176,7 +164,7 @@ object Renderer {
             prepare()
         }
         *//*?} else {*/
-        
+
         if (batchedDraws.isEmpty()) {
             return
         }
@@ -280,7 +268,7 @@ object Renderer {
         )
     }
     *//*?} else {*/
-    
+
     private fun endBatches() {
         for (draw in batchedDraws.values) {
             val meshData = draw.bufferBuilder.build() ?: continue
@@ -474,7 +462,7 @@ object Renderer {
                 /*RenderSystem.getModelViewMatrixCopy(),
                 Vector4f(1f, 1f, 1f, alphaMultiplier)
                 *//*?} else {*/
-                
+
                 RenderSystem.getModelViewMatrix(),
                 Vector4f(1f, 1f, 1f, alphaMultiplier),
                 modelOffset,
@@ -499,7 +487,7 @@ object Renderer {
         /*? if 26.2 {*/
         /*vertexBuffer.close()
         *//*?} else {*/
-        
+
         generalAllocator.close()
 
         for (allocator in allocators.values) {
@@ -516,7 +504,7 @@ object Renderer {
     }
 
     /*? if !26.2 {*/
-    
+
     private data class BatchKey(
         val pipeline: RenderPipeline,
         val textureSetup: TextureSetup,
@@ -547,7 +535,7 @@ object Renderer {
         val instanceCount: Int,
         val uniform: UniformBinding?
         *//*?} else {*/
-        
+
         val builtBuffer: MeshData,
         val vertices: GpuBuffer,
         val baseVertex: Int,

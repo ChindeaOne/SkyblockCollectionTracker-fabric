@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -72,7 +73,7 @@ object BlockOutline {
         r: Float,
         g: Float,
     ) {
-        val vc : VertexConsumer = Renderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
+        val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
 
         val matrix = Matrix4f().apply {
                 translate((pos.x - camera.pos.x).toFloat(), (pos.y - camera.pos.y).toFloat(), (pos.z - camera.pos.z).toFloat())
@@ -138,7 +139,7 @@ object BlockOutline {
                         glyph.textureView(),
                         RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)
                     )
-                    val vc: VertexConsumer = Renderer.getBuffer(RenderPipelines.TEXT_SEE_THROUGH, textureSetup)
+                    val vc: VertexConsumer = WorldRenderer.getBuffer(RenderPipelines.TEXT_SEE_THROUGH, textureSetup)
 
                     glyph.render(matrix, vc, LightCoordsUtil.FULL_BRIGHT, false)
                 }
@@ -161,7 +162,7 @@ object BlockOutline {
         val ey = (blockPos.y + 1.0 - camera.pos.y).toFloat()
         val ez = (blockPos.z + 0.5 - camera.pos.z).toFloat()
 
-        val vc : VertexConsumer = Renderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
+        val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
 
         val matrix = Matrix4f().apply {
             translate(sx, sy, sz)
@@ -187,7 +188,7 @@ object BlockOutline {
         blue: Float,
         alpha: Float = ConfigAccess.getHeatmapOpacity(),
     ) {
-        val vc : VertexConsumer = Renderer.getBuffer(CustomPipelines.HIGHLIGHT)
+        val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.HIGHLIGHT)
 
         val minX = pos.x.toFloat() - 0.001f
         val minY = pos.y.toFloat() - 0.001f
@@ -209,7 +210,7 @@ object BlockOutline {
         color: Color,
         alpha: Float = 1f,
     ) {
-        val vc : VertexConsumer = Renderer.getBuffer(CustomPipelines.HIGHLIGHT)
+        val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.HIGHLIGHT)
 
         val posMatrix = Matrix4f().apply {
             translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
@@ -280,7 +281,7 @@ object BlockOutline {
         box: AABB,
         camera: CameraRenderState,
     ) {
-        val vc : VertexConsumer = Renderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
+        val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
 
         val o = camera.orientation
         val rotation = Quaternionf(o.x, o.y, o.z, o.w)
