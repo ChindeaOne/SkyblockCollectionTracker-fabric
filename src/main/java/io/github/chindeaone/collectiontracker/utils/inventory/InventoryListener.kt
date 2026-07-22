@@ -26,6 +26,7 @@ object InventoryListener {
     private val slotSkipMap = mutableMapOf<Int, Long>()
     private val slotMatchHits = mutableMapOf<Int, Int>()
     private val lastInventoryState = mutableMapOf<Int, Int>()
+    private val lastItemNames = mutableMapOf<Int, String>()
 
     fun onTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
@@ -72,16 +73,26 @@ object InventoryListener {
         var soloGainToProcess = 0L
 
         for (i in 0 until 36) {
-            if ((slotSkipMap[i] ?: 0L) > now) continue
-
             val stack = inventory.getItem(i)
             if (stack.isEmpty) {
                 lastInventoryState[i] = 0
-                slotMatchHits[i] = 0
+                slotMatchHits.remove(i)
+                slotSkipMap.remove(i)
+                lastItemNames.remove(i)
                 continue
             }
 
             val itemName = StringUtils.normalizeText(stack.hoverName.string)
+
+            val previousItemName = lastItemNames[i]
+            if (previousItemName != itemName) {
+                slotSkipMap.remove(i)
+                slotMatchHits.remove(i)
+                lastItemNames[i] = itemName
+            }
+
+            if ((slotSkipMap[i] ?: 0L) > now) continue
+
             val currentCount = stack.count
 
             val isFirstTime = !lastInventoryState.containsKey(i)
@@ -165,7 +176,7 @@ object InventoryListener {
 
     private fun maxGainForCollection(collection: String): Int =
         when (collection) {
-            "half-eaten carrot" -> 5 // suppose max threshold
+            "half-eaten carrot" -> 8 // suppose max threshold
             else -> 1
         }
 }
