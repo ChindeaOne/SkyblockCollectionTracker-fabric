@@ -28,8 +28,6 @@ public class Misc {
     public enum AbilityDisplayIndicator {
         CROSSHAIR_CIRCLE,
         CROSSHAIR_BAR,
-        ITEM_DURABILITY,
-        ITEM_COOLDOWN,
         NONE
     }
 
