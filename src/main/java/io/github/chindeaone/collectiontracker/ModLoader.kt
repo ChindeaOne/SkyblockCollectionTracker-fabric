@@ -21,7 +21,7 @@ import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
 import io.github.chindeaone.collectiontracker.utils.world.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.world.DwarvenHeatmap
 import io.github.chindeaone.collectiontracker.utils.world.PrecisionMining
-import io.github.chindeaone.collectiontracker.utils.world.Renderer
+import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -37,7 +37,7 @@ import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.resources.Identifier
 import java.util.concurrent.CompletableFuture
 
-class ModLoader: ModInitializer {
+object ModLoader: ModInitializer {
 
     override fun onInitialize() {
         SkyblockCollectionTracker.init()
@@ -53,11 +53,16 @@ class ModLoader: ModInitializer {
         CompletableFuture.runAsync{ ApiManager.authenticateMojang() }
     }
 
+    var clientTicks = 0L
+
     private fun eventRegistration() {
         ClientTickEvents.END_CLIENT_TICK.register(ClientTickEvents.EndTick {client ->
             if (client.player == null) return@EndTick
             TickDispatcher.onEndClientTick(client)
+
+            clientTicks++
         })
+
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
         ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.onChatMessage(message) }
         ClientReceiveMessageEvents.GAME_CANCELED.register { message, actionBar -> ChatListener.sacksListener(message, actionBar) }
@@ -72,7 +77,7 @@ class ModLoader: ModInitializer {
                 DwarvenHeatmap.render(context)
                 PrecisionMining.render(context)
             } finally {
-                Renderer.executeDraws()
+                WorldRenderer.executeDraws()
             }
         }
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")

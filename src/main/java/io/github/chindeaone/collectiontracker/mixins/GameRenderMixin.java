@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.mixins;
 
-import io.github.chindeaone.collectiontracker.utils.world.Renderer;
+import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,6 +12,6 @@ public class GameRenderMixin {
 
     @Inject(method = "close", at = @At("HEAD"))
     private void sct$onGameRendererClose(CallbackInfo ci) {
-        Renderer.close();
+        WorldRenderer.close();
     }
 }
