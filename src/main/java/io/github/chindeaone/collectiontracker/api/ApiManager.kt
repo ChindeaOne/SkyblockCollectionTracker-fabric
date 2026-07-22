@@ -43,7 +43,7 @@ object ApiManager {
 
         try {
             session.joinServer(profile, accessToken, serverId)
-            logger.info("Registered session with Mojang")
+            logger.info("[SCT]: Registered session with Mojang")
 
             TokenManager.fetchAndStoreToken(notify)
         } catch (e: Exception) {

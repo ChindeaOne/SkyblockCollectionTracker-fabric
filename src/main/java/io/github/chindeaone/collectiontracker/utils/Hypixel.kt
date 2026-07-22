@@ -3,6 +3,7 @@
 */
 package io.github.chindeaone.collectiontracker.utils
 
+import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
@@ -37,6 +38,7 @@ object Hypixel {
     @JvmStatic
     var server = false
     var skyblock = false
+    private var updateCheckPerformed = false
 
     private var logger: Logger = LogManager.getLogger(Hypixel::class.java)
 
@@ -45,10 +47,10 @@ object Hypixel {
         server = false
         skyblock = false
         serverStatus = false
-        TrackingHandler.pauseTracking()
-        MultiTrackingHandler.pauseMultiTracking()
-        SkillTrackingHandler.pauseTracking()
-        ColeweightTrackingHandler.pauseTracking()
+        if (TrackingHandler.isTracking) TrackingHandler.pauseTracking()
+        if (MultiTrackingHandler.isMultiTracking) MultiTrackingHandler.pauseMultiTracking()
+        if (SkillTrackingHandler.isTracking) SkillTrackingHandler.pauseTracking()
+        if (ColeweightTrackingHandler.isTracking) ColeweightTrackingHandler.pauseTracking()
     }
 
     private fun checkServer() {
@@ -65,59 +67,88 @@ object Hypixel {
     }
 
     fun onTick(client: Minecraft) {
-        if (!HypixelUtils.isInHypixel) {
-            checkServer()
-            if (HypixelUtils.isInHypixel) {
-                ServerStatus.checkServerWithCallback(client::execute) { up ->
-                    serverStatus = up
+        checkServer()
 
-                    if (!serverStatus) {
-                        ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
-                        logger.warn("[SCT]: The API server is currently under maintenance.")
-                    } else {
-                        if (TokenManager.token == null) Minecraft.getInstance().execute {
-                            ChatUtils.sendMessage("§cCouldn't request an API token. Some tracking features might be unavailable. Use §e/sct token§c to retry manually.")
-                        }
-                        fetchData()
-                        logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
+        val wasOnSkyblock = skyblock
+        val isNowOnSkyblock = checkScoreboard(client)
 
-                        if (ConfigAccess.getUpdateType() != About.UpdateType.NONE) {
-                            CompletableFuture.runAsync {
-                                RepoUtils.checkGithubReleases()
-                                RepoUtils.checkLatestVersion()
-                            }.thenAcceptAsync  {
-                                if (RepoUtils.latestVersion != null) {
-                                    Minecraft.getInstance().execute {
-                                        ChatUtils.sendMessage(
-                                            "§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game."
-                                        )
-                                    }
-                                    logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
-                                    UpdaterManager.update()
-                                    ConfigHelper.disableUpdateChecks()
-                                } else {
-                                    if (!ConfigAccess.hasCheckedUpdate()) {
-                                        Minecraft.getInstance().execute {
-                                            ChatUtils.sendMessage("§aThe mod has been updated successfully.")
-                                            ChatUtils.sendCommandComponent("§eSee what changed here.", "/sct changelog")
-                                        }
-                                        ConfigHelper.enableUpdateChecks()
-                                        logger.info("[SCT]: The mod has been updated successfully.")
-                                    }
-                                    logger.info("[SCT]: No new version found.")
-                                }
-                            }
-                        } else{
-                            logger.info("[SCT]: Update stream is disabled.")
-                        }
-                    }
+        skyblock = isNowOnSkyblock
+
+        if (!wasOnSkyblock && isNowOnSkyblock && HypixelUtils.isInHypixel) {
+            initialize(client)
+        } else if (wasOnSkyblock && !isNowOnSkyblock) {
+            handleTrackersOutsideSkyblock()
+        }
+    }
+
+    private fun initialize(client: Minecraft) {
+        ServerStatus.checkServerWithCallback(client::execute) { up ->
+            serverStatus = up
+
+            if (!up) {
+                ChatUtils.sendMessage("§cThe API server is currently under maintenance. Tracking will be unavailable until the server is back online. Apologies for the inconvenience.")
+                logger.warn("[SCT]: The API server is currently under maintenance.")
+                return@checkServerWithCallback
+            }
+
+            loadData(client)
+            checkForUpdates()
+        }
+    }
+
+    private fun loadData(client: Minecraft) {
+        if (TokenManager.token != null) {
+            fetchData()
+            return
+        }
+
+        CompletableFuture.runAsync {
+            ApiManager.authenticateMojang()
+        }.thenRun {
+            client.execute {
+                if (TokenManager.token == null) {
+                    ChatUtils.sendMessage("§cCouldn't request an API token. Some tracking features might be unavailable. Use §e/sct token§c to retry manually.")
+                } else {
+                    fetchData()
                 }
             }
         }
+    }
 
-        val inSkyblock = checkScoreboard(client)
-        if (inSkyblock == skyblock) return
-        skyblock = inSkyblock
+    private fun checkForUpdates() {
+        if (updateCheckPerformed) return
+        updateCheckPerformed = true
+
+        logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
+
+        if (ConfigAccess.getUpdateType() == About.UpdateType.NONE) {
+            logger.info("[SCT]: Update stream is disabled.")
+            return
+        }
+
+        CompletableFuture.runAsync {
+            RepoUtils.checkGithubReleases()
+            RepoUtils.checkLatestVersion()
+        }.thenAccept {
+            Minecraft.getInstance().execute {
+                if (RepoUtils.latestVersion != null) {
+                    ChatUtils.sendMessage(
+                        "§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game."
+                    )
+                    logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
+                    UpdaterManager.update()
+                    ConfigHelper.disableUpdateChecks()
+                } else {
+                    if (!ConfigAccess.hasCheckedUpdate()) {
+                        ChatUtils.sendMessage("§aThe mod has been updated successfully.")
+                        ChatUtils.sendCommandComponent("§eSee what changed here.", "/sct changelog")
+                        ConfigHelper.enableUpdateChecks()
+                        logger.info("[SCT]: The mod has been updated successfully.")
+                    }
+                    logger.info("[SCT]: No new version found.")
+                }
+            }
+        }
     }
 
     fun fetchData() {
@@ -140,5 +171,12 @@ object Hypixel {
         val displayName = ScoreboardUtils.getScoreboardTitle(client) ?: return false
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
+    }
+
+    private fun handleTrackersOutsideSkyblock() {
+        if (TrackingHandler.isTracking) TrackingHandler.pauseTracking()
+        if (MultiTrackingHandler.isMultiTracking) MultiTrackingHandler.pauseMultiTracking()
+        if (SkillTrackingHandler.isTracking) SkillTrackingHandler.pauseTracking()
+        if (ColeweightTrackingHandler.isTracking) ColeweightTrackingHandler.pauseTracking()
     }
 }

@@ -4,7 +4,6 @@
 package io.github.chindeaone.collectiontracker
 
 import com.mojang.blaze3d.systems.RenderSystem
-import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.CommissionKeybinds
@@ -35,7 +34,6 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.resources.Identifier
-import java.util.concurrent.CompletableFuture
 
 object ModLoader: ModInitializer {
 
@@ -49,8 +47,6 @@ object ModLoader: ModInitializer {
 
         CommissionKeybinds.initKeyGuards()
         CustomPipelines.register()
-
-        CompletableFuture.runAsync{ ApiManager.authenticateMojang() }
     }
 
     var clientTicks = 0L
