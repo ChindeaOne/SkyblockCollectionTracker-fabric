@@ -22,7 +22,7 @@ public class FarmingweightColorConfig {
     @Expose
     @ConfigOption(
             name = "Custom Rank Color",
-            desc = "Set a custom color.\n§cNote: If both Coleweight and Farming Weight use animated chroma, Coleweight determines the animation speed."
+            desc = "§eNote: If both Coleweight and Farming Weight use animated chroma, Coleweight determines the animation speed."
     )
     @ConfigEditorColour
     public ChromaColour customColor = ChromaColour.fromStaticRGB(0, 0, 0, 0);
