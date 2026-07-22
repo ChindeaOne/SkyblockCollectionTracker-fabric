@@ -67,21 +67,26 @@ object Hypixel {
     }
 
     fun onTick(client: Minecraft) {
-        checkServer()
+        if (!HypixelUtils.isInHypixel) {
+            checkServer()
+        }
 
+        val isNowOnSkyblock = checkScoreboard(client) ?: return
         val wasOnSkyblock = skyblock
-        val isNowOnSkyblock = checkScoreboard(client)
 
+        if (wasOnSkyblock == isNowOnSkyblock) {
+            return
+        }
         skyblock = isNowOnSkyblock
 
-        if (!wasOnSkyblock && isNowOnSkyblock && HypixelUtils.isInHypixel) {
-            initialize(client)
-        } else if (wasOnSkyblock && !isNowOnSkyblock) {
-            handleTrackersOutsideSkyblock()
+        if (isNowOnSkyblock && HypixelUtils.isInHypixel) {
+            onSkyblockJoin(client) // initialize data fetching and update checking
+        } else {
+            onSkyblockLeave() // pause tracking when leaving Skyblock
         }
     }
 
-    private fun initialize(client: Minecraft) {
+    private fun onSkyblockJoin(client: Minecraft) {
         ServerStatus.checkServerWithCallback(client::execute) { up ->
             serverStatus = up
 
@@ -167,13 +172,13 @@ object Hypixel {
         ) }
     }
 
-    private fun checkScoreboard(client: Minecraft): Boolean {
-        val displayName = ScoreboardUtils.getScoreboardTitle(client) ?: return false
+    private fun checkScoreboard(client: Minecraft): Boolean? {
+        val displayName = ScoreboardUtils.getScoreboardTitle(client) ?: return null
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
-    private fun handleTrackersOutsideSkyblock() {
+    private fun onSkyblockLeave() {
         if (TrackingHandler.isTracking) TrackingHandler.pauseTracking()
         if (MultiTrackingHandler.isMultiTracking) MultiTrackingHandler.pauseMultiTracking()
         if (SkillTrackingHandler.isTracking) SkillTrackingHandler.pauseTracking()
