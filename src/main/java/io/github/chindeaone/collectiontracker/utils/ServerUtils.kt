@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
@@ -17,17 +18,14 @@ object ServerUtils {
     private const val NORMAL_CHECK_INTERVAL = 6000  // 5 minutes
     private const val COOLDOWN_CHECK_INTERVAL = 12000  // 10 minutes
 
-    private var tickCounter = 0
     private var currentCheckInterval = NORMAL_CHECK_INTERVAL
     private var consecutiveFailures = 0
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
     private val logger: Logger = LogManager.getLogger(ServerUtils::class.java)
 
-    fun onTick(client: Minecraft) {
-        tickCounter++
-        if (tickCounter >= currentCheckInterval) {
-            tickCounter = 0
+    fun onClientTick(client: Minecraft) {
+        if (ModLoader.clientTicks % currentCheckInterval == 0L) {
             executorService.submit { checkServerStatusPeriodically(client) }
         }
     }

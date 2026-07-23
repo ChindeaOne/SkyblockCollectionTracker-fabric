@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.inventory
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -21,14 +22,12 @@ import net.minecraft.world.item.Item
 
 object InventoryListener {
 
-    private var tickCount: Int = 0
-
     private val slotSkipMap = mutableMapOf<Int, Long>()
     private val slotMatchHits = mutableMapOf<Int, Int>()
     private val lastInventoryState = mutableMapOf<Int, Int>()
     private val lastItemNames = mutableMapOf<Int, String>()
 
-    fun onTick(client: Minecraft) {
+    fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
         if (/*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) {
             lastInventoryState.clear()
@@ -53,8 +52,7 @@ object InventoryListener {
         if (isTrackingPaused || isMultiTrackingPaused || !IslandTracker.isInRift) return
         if (ConfigAccess.isApiTrackingEnabled()) return
 
-        tickCount++
-        if (tickCount % 4 != 0) return
+        if (ModLoader.clientTicks % 4L != 0L) return
 
         val player = client.player ?: return
         val inventory = player.inventory

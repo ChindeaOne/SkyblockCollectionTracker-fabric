@@ -66,7 +66,7 @@ object Hypixel {
         server = hypixel
     }
 
-    fun onTick(client: Minecraft) {
+    fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isInHypixel) {
             checkServer()
         }

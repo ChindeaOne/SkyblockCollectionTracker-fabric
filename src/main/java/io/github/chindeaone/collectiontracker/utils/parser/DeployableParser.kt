@@ -3,6 +3,7 @@
 */
 package io.github.chindeaone.collectiontracker.utils.parser
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
@@ -30,17 +31,15 @@ object DeployableParser {
 
     private val MINING_DEPLOYABLE = listOf("Dwarven Lantern", "Mithril Lantern", "Titanium Lantern", "Glacite Lantern", "Will-o'-wisp")
     private val TIME_REGEX = Regex("""(\d+)s""")
-    private var tickCounter = 0
     private var internalTimerTicks = 0
     private var trackedEntity: ArmorStand? = null
 
-    fun onTick(client: Minecraft) {
+    fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
         val level = client.level ?: return
         val player = client.player ?: return
 
-        tickCounter = (tickCounter + 1) % 2
-        if (tickCounter != 0) return
+        if (ModLoader.clientTicks % 4L != 0L) return
 
         var found: Pair<ArmorStand, String>? = null
 
@@ -147,7 +146,6 @@ object DeployableParser {
         buff = ""
         buffColor = ""
         remainingTime = ""
-        tickCounter = 0
         internalTimerTicks = 0
         deployablePos = null
         isNear = false

@@ -22,7 +22,7 @@ object ScoreboardUtils {
     private var checkTime: Boolean = true
     var timeLeft: Int = 0
 
-    fun onTick(client: Minecraft) {
+    fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
 
         val world = client.level ?: return

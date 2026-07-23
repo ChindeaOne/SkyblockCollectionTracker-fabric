@@ -19,7 +19,7 @@ object SkyblockCollectionTracker {
         ConfigUtils.loadFromConfig()
     }
 
-    fun onTick(client: Minecraft) {
+    fun onClientTick(client: Minecraft) {
         val screenToOpen = screenToOpen ?: return
         screenTicks++
         if (screenTicks != 5) return

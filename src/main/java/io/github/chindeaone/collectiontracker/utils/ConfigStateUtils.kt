@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
@@ -13,11 +14,8 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 
 object ConfigStateUtils {
 
-    var tickCounter: Int = 0
-
-    fun onTick() {
-        tickCounter = (tickCounter + 1) % 2
-        if (tickCounter != 0) return
+    fun onClientTick() {
+        if (ModLoader.clientTicks % 4L != 0L) return
 
         checkApiTracking()
         checkCollectionLeaderboard()

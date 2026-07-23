@@ -49,14 +49,10 @@ object ModLoader: ModInitializer {
         CustomPipelines.register()
     }
 
-    var clientTicks = 0L
-
     private fun eventRegistration() {
         ClientTickEvents.END_CLIENT_TICK.register(ClientTickEvents.EndTick {client ->
             if (client.player == null) return@EndTick
             TickDispatcher.onEndClientTick(client)
-
-            clientTicks++
         })
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
@@ -101,19 +97,24 @@ object ModLoader: ModInitializer {
         }
     }
 
+    var clientTicks = 0L
+        private set
+
     private object TickDispatcher {
         fun onEndClientTick(client: Minecraft) {
+            clientTicks++
+
             // Call every onTick here
-            SkyblockCollectionTracker.onTick(client)
-            ServerUtils.onTick(client)
-            Hypixel.onTick(client)
+            SkyblockCollectionTracker.onClientTick(client)
+            ServerUtils.onClientTick(client)
+            Hypixel.onClientTick(client)
             CommissionKeybinds.onClientTick(client)
-            TabData.tickAndUpdateWidget(client)
+            TabData.onClientTick(client)
             BlockWatcher.onClientTick(client)
-            ScoreboardUtils.onTick(client)
-            DeployableParser.onTick(client)
-            InventoryListener.onTick(client)
-            ConfigStateUtils.onTick()
+            ScoreboardUtils.onClientTick(client)
+            DeployableParser.onClientTick(client)
+            InventoryListener.onClientTick(client)
+            ConfigStateUtils.onClientTick()
         }
     }
 }
