@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.hasCooldownAttribute
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils
@@ -33,7 +34,8 @@ object ChatListener {
         CONSUME("""^You consumed an? (.+?) and gained""", RegexOption.IGNORE_CASE),
         ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
         // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §aVIEW RULE"
-        AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)!""", RegexOption.IGNORE_CASE);
+        AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)!""", RegexOption.IGNORE_CASE),
+        ATTRIBUTE("""^ATTRIBUTE\s+LEVEL\s+UP\s+Pickaxe\s+Cooldown.*?➜\s*([\d]+|[IVX]+)\b""", RegexOption.IGNORE_CASE);
         val regex: Regex = Regex(pattern, options.toSet())
 
         fun find(input: CharSequence): MatchResult? = regex.find(input)
@@ -80,6 +82,7 @@ object ChatListener {
         val cleanText = text.removeColor()
 
         petSummoned(text)
+        setCooldownAttribute(cleanText)
         abilityListener(cleanText)
         onCooldownListener(cleanText)
         abilitySwapListener(cleanText)
@@ -115,6 +118,30 @@ object ChatListener {
         if (match != null) {
             parseSkillMessage(match)
         }
+    }
+
+    private fun setCooldownAttribute(text: String) {
+        if (hasCooldownAttribute()) return
+
+        val value = Patterns.ATTRIBUTE.find(text)?.groupValues?.get(1)
+        if (value != null) {
+            ConfigHelper.setCooldownAttribute(true)
+            ConfigHelper.setAttributeLevel(value.toLevel())
+        }
+    }
+
+    private fun String.toLevel(): Int = when (uppercase()) {
+        "I" -> 1
+        "II" -> 2
+        "III" -> 3
+        "IV" -> 4
+        "V" -> 5
+        "VI" -> 6
+        "VII" -> 7
+        "VIII" -> 8
+        "IX" -> 9
+        "X" -> 10
+        else -> toIntOrNull() ?: 0
     }
 
     private fun abilityListener(text: String) {
@@ -183,6 +210,8 @@ object ChatListener {
     }
 
     private fun petSummoned(text: String) {
+        if (hasCooldownAttribute()) return
+
         val match = Patterns.SUMMON.find(text) ?: return
         val petSegment = match.groupValues[1]
 
@@ -194,16 +223,11 @@ object ChatListener {
         AbilityUtils.updatePet(AbilityUtils.Pet(name = name, level = level, rarity = rarity, timestamp = System.currentTimeMillis(), isManual = true))
     }
 
-    private fun treeResetListener(text: String) {
-        when {
-            text.startsWith("You have reset your Heart of the Mountain", ignoreCase = true) -> FetchSkillTree.resetHotm()
-            text.startsWith("You have reset your Heart of the Forest", ignoreCase = true) -> FetchSkillTree.resetHotf()
-        }
-    }
-
     // Listen to Autopet swap messages
     @JvmStatic
     fun petSwapListener(text: String) {
+        if (hasCooldownAttribute()) return
+
         val match = Patterns.AUTOPET.find(text) ?: return
         val level = match.groupValues[1].toIntOrNull() ?: return
         if (level !in 1..200) return
@@ -409,9 +433,15 @@ object ChatListener {
                 "§6$num \uE054 Helix Fortune"
             }
             "Sweep" in text -> {
-                val rawPct = percentRegex.find(text)?.value
-                val pct = "${rawPct?.trimEnd('%')}%"
-                "§a$pct §2\uE023 Sweep"
+                var rawPct = percentRegex.find(text)?.value
+                var pct: String
+                if (rawPct != null) {
+                    pct = "${rawPct.trimEnd('%')}%"
+                    "§a$pct §2\uE023 Sweep"
+                } else {
+                    rawPct = numberRegex.find(text)?.value
+                    "§a$rawPct §2\uE023 Sweep"
+                }
             }
 
             // Beekeeper buffs
@@ -432,6 +462,13 @@ object ChatListener {
                 " §a$rawPct §a\uE05BExtra Critter"
             }
             else -> message // fallback to original text
+        }
+    }
+
+    private fun treeResetListener(text: String) {
+        when {
+            text.startsWith("You have reset your Heart of the Mountain", ignoreCase = true) -> FetchSkillTree.resetHotm()
+            text.startsWith("You have reset your Heart of the Forest", ignoreCase = true) -> FetchSkillTree.resetHotf()
         }
     }
 

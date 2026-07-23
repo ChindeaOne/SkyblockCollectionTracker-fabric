@@ -91,6 +91,8 @@ val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displ
 val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = hotmConfig.pickaxeAbilityConfig.indicator
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
 val lastPet: String get() = pickaxeAbilityConfig.lastPet
+val cooldownAttribute: Boolean get() = pickaxeAbilityConfig.cooldownAttribute
+val attributeLevel: Int get() = pickaxeAbilityConfig.attributeLevel
 val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
 val lastSkyMallBuff: String get() = skyMallConfig.lastSkyMallBuff
 val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIslandsOnly
@@ -406,6 +408,12 @@ object ConfigAccess {
     fun getLastPet(): String = lastPet
 
     @JvmStatic
+    fun hasCooldownAttribute(): Boolean = cooldownAttribute
+
+    @JvmStatic
+    fun getAttributeLevel(): Int = attributeLevel
+
+    @JvmStatic
     fun getLastSkyMallBuff(): String = lastSkyMallBuff
 
     @JvmStatic
@@ -568,32 +576,26 @@ object ConfigHelper {
         bazaarConfig.bazaarType = type
     }
 
-    @JvmStatic
     fun enableUpdateChecks() {
         aboutConfig.hasCheckedUpdate = true
     }
 
-    @JvmStatic
     fun disableUpdateChecks() {
         aboutConfig.hasCheckedUpdate = false
     }
 
-    @JvmStatic
     fun disableBazaar() {
         bazaarConfig.useBazaar = false
     }
 
-    @JvmStatic
     fun disableExtraStats() {
         collectionConfig.showExtraStats = false
     }
 
-    @JvmStatic
     fun disableCommissions() {
         commissionsConfig.enableCommissionsOverlay = false
     }
 
-    @JvmStatic
     fun disableMiningStats() {
         miningConfig.miningStatsConfig.enableMiningStatsOverlay = false
     }
@@ -603,17 +605,14 @@ object ConfigHelper {
         skillConfig.enableTamingTracking = false
     }
 
-    @JvmStatic
     fun disableForagingStats() {
         foragingStatsConfig.enableForagingStatsOverlay = false
     }
 
-    @JvmStatic
     fun disableCollectionLeaderboardTracking() {
         leaderboardOverlay.collectionLeaderboard = false
     }
 
-    @JvmStatic
     fun disableSkillLeaderboardTracking() {
         leaderboardOverlay.skillLeaderboard = false
     }
@@ -636,17 +635,22 @@ object ConfigHelper {
         }
     }
 
-    @JvmStatic
     fun setAbilityName(name: String) {
         pickaxeAbilityConfig.abilityName = name
     }
 
-    @JvmStatic
     fun setLastPet(pet: String) {
         pickaxeAbilityConfig.lastPet = pet
     }
 
-    @JvmStatic
+    fun setCooldownAttribute(enabled: Boolean) {
+        pickaxeAbilityConfig.cooldownAttribute = enabled
+    }
+
+    fun setAttributeLevel(level: Int) {
+        pickaxeAbilityConfig.attributeLevel = level
+    }
+
     fun setLastSkyMallBuff(buff: String) {
         skyMallConfig.lastSkyMallBuff = buff
     }
@@ -656,7 +660,6 @@ object ConfigHelper {
         skyMallConfig.enableSkyMall = false
     }
 
-    @JvmStatic
     fun setLastLotteryBuff(buff: String) {
         lotteryConfig.lastLotteryBuff = buff
     }
@@ -666,7 +669,6 @@ object ConfigHelper {
         lotteryConfig.enableLottery = false
     }
 
-    @JvmStatic
     fun setLastBeekeeperBuff(buff: String) {
         beekeeperConfig.lastBeekeeperBuff = buff
     }
@@ -676,12 +678,10 @@ object ConfigHelper {
         beekeeperConfig.enableBeekeeper = false
     }
 
-    @JvmStatic
     fun setAxeAbilityName(name: String) {
         axeAbilityConfig.abilityNameAxe = name
     }
 
-    @JvmStatic
     fun setDuration(refined: Long = -1, filet: Long = -1, potato: Long = -1, pumpkin: Long = -1) {
         if (refined != -1L) temporaryBuffsConfig.refinedCacaoTime = refined
         if (filet != -1L) temporaryBuffsConfig.filetTime = filet
@@ -689,27 +689,22 @@ object ConfigHelper {
         if (pumpkin != -1L) temporaryBuffsConfig.powderPumpkinTime = pumpkin
     }
 
-    @JvmStatic
     fun setProfessionalMS(ms: Int) {
         hotmConfig.professionalMS.set(ms)
     }
 
-    @JvmStatic
     fun setStrongArmMS(ms: Int) {
         hotmConfig.strongArmMS.set(ms)
     }
 
-    @JvmStatic
     fun setCotmLevel(level: Int) {
         hotmConfig.cotmLevel.set(level)
     }
 
-    @JvmStatic
     fun setCotfLevel(level: Int) {
         hotfConfig.cotfLevel.set(level)
     }
 
-    @JvmStatic
     fun setTitlePosition(x: Int, y: Int) {
         modConfig.misc.titlePosition = Position(x, y)
     }
@@ -734,47 +729,38 @@ object ConfigHelper {
         bazaarConfig.bazaarPriceType = type
     }
 
-    @JvmStatic
     fun setColeweightCustomColor(player: String, color: String) {
         coleweightColorConfig.customColors[player] = color
     }
 
-    @JvmStatic
     fun getColeweightColor(player: String): String? {
         return coleweightColorConfig.customColors[player]
     }
 
-    @JvmStatic
     fun removeColeweightCustomColor(player: String) {
         coleweightColorConfig.customColors.remove(player)
     }
 
-    @JvmStatic
     fun setFarmingweightCustomColor(player: String, color: String) {
         farmingweightColorConfig.customColors[player] = color
     }
 
-    @JvmStatic
     fun getFarmingweightColor(player: String): String? {
         return farmingweightColorConfig.customColors[player]
     }
 
-    @JvmStatic
     fun removeFarmingweightColor(player: String) {
         farmingweightColorConfig.customColors.remove(player)
     }
 
-    @JvmStatic
     fun setMineshaftSpawnRoutesEnabled(enabled: Boolean) {
         mineshaftRoutesConfig.enableMineshaftSpawnRoutes = enabled
     }
 
-    @JvmStatic
     fun setDwarvenMetalRoutesEnabled(enabled: Boolean) {
         dwarvenMetalsRoutesConfig.enableDwarvenMetalRoutes = enabled
     }
 
-    @JvmStatic
     fun setPureOresRoutesEnabled(enabled: Boolean) {
         pureOresRoutesConfig.enablePureOresRoutes = enabled
     }

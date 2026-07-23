@@ -57,6 +57,12 @@ public class PickaxeAbilityConfig {
     public String lastPet = "";
 
     @Expose
+    public boolean cooldownAttribute = false;
+
+    @Expose
+    public int attributeLevel = 0;
+
+    @Expose
     @ConfigLink(owner = PickaxeAbilityConfig.class, field = "displayPickaxeAbility")
     public Position pickaxeAbilityPosition = new Position(500, 150);
 }

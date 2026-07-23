@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.ConfigManager
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
@@ -179,18 +180,24 @@ object AbilityUtils {
             cooldown *= (1.0 - (snap.fuelTank.cooldownReduction))
         }
 
-        // Pet swap
-        lastPet?.let { pet ->
-            val petReduction = when {
-                pet.name.equals("Bal", ignoreCase = true) && pet.rarity >= PetRarity.LEGENDARY -> {
-                    pet.rarity.balReductionPerLevel * pet.level
+        if (ConfigAccess.hasCooldownAttribute()) {
+            cooldown *= (1.0 - ConfigAccess.getAttributeLevel() / 100f)
+        } else {
+            // Pet swap useless
+            lastPet?.let { pet ->
+                val petReduction = when {
+                    pet.name.equals("Bal", ignoreCase = true) && pet.rarity >= PetRarity.LEGENDARY -> {
+                        pet.rarity.balReductionPerLevel * pet.level
+                    }
+
+                    pet.name.equals("Crow", ignoreCase = true) -> {
+                        0.03 + (pet.rarity.crowReductionPerLevel * pet.level)
+                    }
+
+                    else -> 0.0
                 }
-                pet.name.equals("Crow", ignoreCase = true) -> {
-                    0.03 + (pet.rarity.crowReductionPerLevel * pet.level)
-                }
-                else -> 0.0
+                cooldown *= (1.0 - petReduction)
             }
-            cooldown *= (1.0 - petReduction)
         }
         // Sky Mall
         if (skyMallActive && miningIslands.contains(IslandTracker.currentMiningIsland)) {
@@ -211,6 +218,10 @@ object AbilityUtils {
 
     fun calculateAxeReduction(baseCooldown: Int): Double {
         val cooldown = baseCooldown.toDouble()
+
+        if (ConfigAccess.hasCooldownAttribute()) {
+            return cooldown
+        }
 
         lastPet?.let { pet ->
             val petReduction = when {
