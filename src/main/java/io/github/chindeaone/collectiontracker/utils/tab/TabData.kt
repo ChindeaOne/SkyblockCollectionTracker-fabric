@@ -1,28 +1,33 @@
 package io.github.chindeaone.collectiontracker.utils.tab
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.client.multiplayer.PlayerInfo
 
 object TabData {
 
     private var tabCache: List<String> = emptyList()
     private var world: ClientLevel? = null
-    private var tickCounter = 0
 
-    fun tickAndUpdateWidget(client: Minecraft) {
+    private val TAB_COMPARATOR = compareBy<PlayerInfo>(
+        { it.team?.name ?: "" }, { it.profile.name }
+        )
+
+    fun onClientTick(client: Minecraft) {
         val currentWorld = client.level
         if (currentWorld == null) {
             world = null
             return
         }
 
-        tickCounter = (tickCounter + 1) % 2
-        if (tickCounter != 0) return
+        if (ModLoader.clientTicks % 4L != 0L) return
 
         if (world != currentWorld) {
             world = currentWorld
@@ -45,10 +50,11 @@ object TabData {
             !ConfigAccess.isColeweightRankingInChat() &&
             !ConfigAccess.isFarmingweightRankingInChat()) return
 
-        val newList = readTab() ?: return
-        if (newList.isEmpty()) return
+        val newTab = readTab() ?: return
+        if (newTab.isEmpty()) return
+        if (newTab == tabCache) return
 
-        tabCache = newList
+        tabCache = newTab
         TabWidget.update(tabCache)
 
         IslandTracker.update()
@@ -65,21 +71,17 @@ object TabData {
         val tabOverlay = mc.gui /*? if 26.2 {*/ /*.hud *//*?}*/.tabList
 
         val result = connection.onlinePlayers
-            .sortedWith(compareBy({ it.team?.name ?: "" }, { it.profile.name }))
+            .sortedWith(TAB_COMPARATOR)
             .map { tabOverlay.getNameForDisplay(it).string }
 
-
-        return if (result.size > 80) result.subList(0, 80) else result
+        return if (result.size > 80) result.subList(0, 80) else result.dropLast(1)
     }
 
     fun parseWidgetData(lines: List<String>): List<String>? {
         val body = lines.drop(1)
-            .map { it.stripMinecraftFormatting().trim() }
+            .map { it.removeColor().trim() }
             .filter { it.isNotEmpty() }
 
         return body.ifEmpty { null }
     }
-
-    private fun String.stripMinecraftFormatting(): String =
-        replace(Regex("§."), "")
 }

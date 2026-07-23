@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.tab
 
+import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+
 enum class TabWidget(headerRegex: String) {
     // Thank you Skyhanni for all the widgets' regexes
     PLAYER_LIST(
@@ -347,8 +349,7 @@ enum class TabWidget(headerRegex: String) {
     PICKAXE_COOLDOWN(
         // language=RegExp
         "§9§lPickaxe Ability:",
-    ),
-    ;
+    );
 
     private val pattern: Regex = Regex("^\\s*($headerRegex)\\s*$")
 
@@ -360,51 +361,43 @@ enum class TabWidget(headerRegex: String) {
 
     companion object {
         fun update(tabLines: List<String>) {
-            val headerPatterns: List<Regex> = entries.map { it.pattern }
-
-            for (w in entries) {
-                val start = tabLines.indexOfFirst { w.pattern.containsMatchIn(it) }
-                if (start == -1) {
-                    w.isPresent = false
-                    w.lines = emptyList()
-                    continue
-                }
-
-                w.lines = sliceSection(
-                    tabLines = tabLines,
-                    startIndex = start,
-                    headerRegexes = headerPatterns,
-                )
-                w.isPresent = true
+            for (widget in entries) {
+                widget.isPresent = false
+                widget.lines = emptyList()
             }
-        }
 
-        private fun sliceSection(
-            tabLines: List<String>,
-            startIndex: Int,
-            headerRegexes: List<Regex>
-        ): List<String> {
-            val out = ArrayList<String>(11)
-            out += tabLines[startIndex]
+            val separators = ArrayList<Pair<Int, TabWidget>>(entries.size)
 
-            var bodyCount = 0
-            var i = startIndex + 1
-            while (i < tabLines.size && bodyCount < 10) {
-                val line = tabLines[i]
+            for ((index, line) in tabLines.withIndex()) {
+                entries.firstOrNull { it.pattern.matches(line) }?.let {
+                    separators += index to it
+                }
+            }
 
-                if (headerRegexes.any { it.matches(line) }) break
+            for (i in separators.indices) {
+                val (start, widget) = separators[i]
+                val end = separators.getOrNull(i + 1)?.first ?: tabLines.size
 
-                val strippedLine = line.replace(Regex("^§r"), "")
-                if (!strippedLine.startsWith(" ")) break
+                val out = ArrayList<String>(11)
+                out += tabLines[start]
 
-                if (line.replace(Regex("§."), "").trim().isNotEmpty()) {
+                var bodyCount = 0
+
+                for (j in start + 1 until end) {
+                    if (bodyCount >= 10) break
+
+                    val line = tabLines[j]
+
+                    if (!line.removePrefix("§r").startsWith(" ")) break
+                    if (line.removeColor().isBlank()) continue
+
                     out += line
                     bodyCount++
                 }
-                i++
-            }
 
-            return out
+                widget.lines = out
+                widget.isPresent = true
+            }
         }
     }
 }
