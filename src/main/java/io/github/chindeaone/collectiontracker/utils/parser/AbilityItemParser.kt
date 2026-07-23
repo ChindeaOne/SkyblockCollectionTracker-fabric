@@ -19,7 +19,7 @@ object AbilityItemParser {
         val lastLine = lines.last()
 
         val isAxe = AXE_REGEX.containsMatchIn(lastLine)
-        val hasBreakingPower = lines[1].startsWith("breaking power")
+        val hasBreakingPower = lines[1].startsWith("breaking power") || lines[2].startsWith("breaking power")
 
         if (!isAxe && !hasBreakingPower) return null
 
