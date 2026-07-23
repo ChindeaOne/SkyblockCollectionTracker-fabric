@@ -252,17 +252,17 @@ object RenderUtils {
 
         when {
             cooldown <= 0.0 -> {
-                drawBar(context, centerX, centerY, 10f, 2f, 1f, ColorUtils.GREEN)
+                drawBar(context, centerX, centerY, 11f, 2f, 1f, ColorUtils.GREEN)
             }
 
             duration > 0.0 -> {
                 val progress = (duration / maxDuration).coerceIn(0.0, 1.0).toFloat()
-                drawBar(context, centerX, centerY, 10f, 2f, progress, ColorUtils.GREEN)
+                drawBar(context, centerX, centerY, 11f, 2f, progress, ColorUtils.GREEN)
             }
 
             else -> {
                 val progress = (1.0 - cooldown / maxCooldown).coerceIn(0.0, 1.0).toFloat()
-                drawBar(context, centerX, centerY, 10f, 2f, progress, ColorUtils.RED)
+                drawBar(context, centerX, centerY, 11f, 2f, progress, ColorUtils.RED)
             }
         }
     }
