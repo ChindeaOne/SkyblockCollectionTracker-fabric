@@ -322,7 +322,7 @@ public class TextUtils {
                 String prefix = (showPrefixes && !showingCollection) ? (mainExpanded ? "§e[-]§r " : "§e[+]§r ") : "";
 
                 if (mainExpanded) {
-                    list.add(prefix + "§dGemstones:§r");
+                    list.add(prefix + "Gemstones: ");
 
                     GemstonePrices.multiGemstoneRecipes.forEach((type, _) -> {
                         if (MultiTrackingRates.getSeenGemstones().contains(type)) {
@@ -348,9 +348,7 @@ public class TextUtils {
                         case MONEY_MADE -> line = handleMoneyMadeMulti("gemstone");
                     }
                     if (line != null) {
-                        list.add(prefix + "§d" + line + "§r");
-                    } else {
-                        list.add(prefix + "§dGemstones:§r");
+                        list.add(prefix + line);
                     }
                 }
                 continue;

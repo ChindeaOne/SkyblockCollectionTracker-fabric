@@ -153,16 +153,11 @@ object RenderUtils {
                         }
                     }
 
-                    if (foundCollName.contains("Next Position") || foundCollName.contains("Till Next Position") || foundCollName.contains("ETA")) {
+                    if (foundCollName.contains("Next Position") || foundCollName.contains("Till Next Position") || foundCollName.contains("ETA") || foundCollName.contains("Gemstones")) {
                         color = ColorUtils.collectionColors["gemstone"]!!
-                    } else if (foundCollName.contains(" ")) {
-                        val firstWord = foundCollName.split(" ")[0].lowercase()
-                        val gemstoneTypes = arrayOf("ruby", "sapphire", "topaz", "amethyst", "jade", "jasper", "amber", "opal", "aquamarine", "peridot", "citrine", "onyx")
-                        color = if (gemstoneTypes.contains(firstWord)) {
-                            ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN
-                        } else {
-                            ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN
-                        }
+                    } else if (foundCollName.contains(" ")) { // all gemstones when it's expanded
+                        val firstWord = foundCollName.trim().substringBefore(' ').lowercase()
+                        color = ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN
                     } else {
                         color = ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: ColorUtils.GREEN
                     }
