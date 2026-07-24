@@ -25,6 +25,7 @@
 
 - Tracks collections and profit over time using sacks messages, via `/sct track <collection>`.
 - Supports multi-tracking via `/sct track <collection1> <collection2> ...`.
+- Provides an option to track via Hypixel's API instead of sacks.
 - Configurable overlay lines showing collection progress and profit rates.
 - Provides NPC/Bazaar prices for accurate profit tracking.
 - Detailed session summary at the end (best/worst rates, elapsed time, profit, etc.).
@@ -87,13 +88,14 @@
 - Shows current pickaxe/axe ability and remaining duration while active.
 - Cooldown updates live based on COTM/COTF, drill parts, and pet swaps.
 - Configurable title alert when the ability is ready or expired.
+- Configurable indicators for ability duration and cooldown.
 
 </details>
 
 <details>
-<summary><strong>Better Sky Mall/Lottery</strong></summary>
+<summary><strong>Better Sky Mall/Lottery/Beekeeper</strong></summary>
 
-- Shows current Sky Mall/Lottery buffs and their remaining time.
+- Shows current Sky Mall/Lottery/Beekeeper buffs and their remaining time.
 - Compacts chat messages.
 - Option to show overlays only in Mining/Foraging Islands.
 
