@@ -53,10 +53,10 @@ repositories {
         }
     }
 
-    // ModMenu
+    // Mod Menu
     exclusiveContent {
         forRepository {
-            maven(url = "https://maven.terraformersmc.com/releases")
+            maven(url = "https://maven.terraformersmc.com/")
         }
 
         filter {
