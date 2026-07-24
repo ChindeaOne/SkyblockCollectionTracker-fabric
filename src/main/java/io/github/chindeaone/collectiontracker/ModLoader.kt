@@ -64,7 +64,7 @@ object ModLoader: ModInitializer {
             if (!RenderSystem.isOnRenderThread()) return@register
 
             try {
-                /*? if 26.2 {*/ /*Renderer.prepare() *//*?}*/
+                /*? if 26.2 {*/ /*WorldRenderer.prepare() *//*?}*/
                 BlockOutline.renderWaypoint(context)
                 DwarvenHeatmap.render(context)
                 PrecisionMining.render(context)

@@ -1,27 +1,38 @@
+/*
+  Class and methods implemented by referencing Skyblocker
+ */
 package io.github.chindeaone.collectiontracker.utils.rendering
 
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.pipeline.RenderPipeline
+/*? if 26.2 {*/
+/*import com.mojang.blaze3d.systems.RenderPass
+*//*?}*/
 import com.mojang.blaze3d.systems.RenderSystem
+/*? if 26.2 {*/
+/*import net.minecraft.client.renderer.StagedVertexBuffer
+import org.joml.Matrix4fStack
+import java.util.Optional
+*//*?} else {*/
 import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.ByteBufferBuilder
 import com.mojang.blaze3d.vertex.MeshData
-import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.blaze3d.vertex.VertexFormat
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.MappableRingBuffer
-import net.minecraft.client.renderer.rendertype.RenderType
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import org.joml.Vector4f
 import org.lwjgl.system.MemoryUtil
 import java.nio.ByteBuffer
-import java.util.OptionalDouble
 import java.util.OptionalInt
-import kotlin.collections.iterator
+/*?}*/
+import com.mojang.blaze3d.vertex.VertexConsumer
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.render.TextureSetup
+import net.minecraft.client.renderer.rendertype.RenderType
+import org.joml.Vector4f
+import java.util.OptionalDouble
 
 object WorldRenderer {
 
