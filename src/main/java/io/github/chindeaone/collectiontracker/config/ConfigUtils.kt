@@ -65,7 +65,8 @@ val coleweightTrackerPosition: Position get() = modConfig.mining.coleweightConfi
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
-val updateType: About.UpdateType get() = aboutConfig.update
+val updateStream: About.UpdateStream get() = aboutConfig.update
+val updateType: About.UpdateType get() = aboutConfig.updateType
 val hasCheckedUpdate: Boolean get() = aboutConfig.hasCheckedUpdate
 
 // Bazaar Config Accessors
@@ -266,7 +267,8 @@ object ConfigAccess {
     @JvmStatic
     fun getColeweightTrackerPosition(): Position = coleweightTrackerPosition
 
-    @JvmStatic
+    fun getUpdateStream(): About.UpdateStream = updateStream
+
     fun getUpdateType(): About.UpdateType = updateType
 
     @JvmStatic

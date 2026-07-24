@@ -9,9 +9,13 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import java.net.URI
 
 object ChatUtils {
 
+    private val logger: Logger = LogManager.getLogger(ChatUtils::class.java)
     private val PREFIX: Component = Component.empty().append(ColorUtils.gradientText("[SCT] ")).withStyle(ChatFormatting.ITALIC)
 
     @JvmStatic
@@ -36,6 +40,7 @@ object ChatUtils {
         } else {
             component
         }
+
         Minecraft.getInstance().gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat.addClientSystemMessage(finalComponent)
     }
 
@@ -49,7 +54,28 @@ object ChatUtils {
                 val newStyle = style!!.withClickEvent(ClickEvent.RunCommand(command))
                 newStyle
             }
+
         sendComponent(component, prefix)
+    }
+
+    fun sendClickableLinkComponent(
+        text: String,
+        hover: String,
+        url: String?
+    ) {
+        if (url == null) {
+            logger.info("[SCT]: Error: URL is null. Cannot create clickable link.")
+            return
+        }
+
+        val clickableComponent = Component.literal(text)
+            .withStyle { style: Style? ->
+                val newStyle = style!!.withClickEvent(ClickEvent.OpenUrl(URI.create(url)))
+                    .withHoverEvent(HoverEvent.ShowText(Component.literal(hover)))
+                newStyle
+            }
+
+        sendComponent(clickableComponent, prefix = true)
     }
 
     fun String.asComponent(): Component = Component.literal(this)

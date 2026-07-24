@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.autoupdate
+package io.github.chindeaone.collectiontracker.updater
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -31,10 +31,10 @@ object UpdaterManager {
     }
 
     private fun setUpdateStream(): String {
-        val currentStream = ConfigAccess.getUpdateType()
+        val currentStream = ConfigAccess.getUpdateStream()
         return when (currentStream) {
-            About.UpdateType.RELEASE -> "release"
-            About.UpdateType.BETA -> "beta"
+            About.UpdateStream.RELEASE -> "release"
+            About.UpdateStream.BETA -> "beta"
             else -> "none"
         }
     }

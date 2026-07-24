@@ -15,7 +15,7 @@ import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
-import io.github.chindeaone.collectiontracker.autoupdate.UpdaterManager
+import io.github.chindeaone.collectiontracker.updater.UpdaterManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.About
@@ -23,6 +23,7 @@ import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrack
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
+import io.github.chindeaone.collectiontracker.updater.ModrinthData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils.serverStatus
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
@@ -124,9 +125,9 @@ object Hypixel {
         if (updateCheckPerformed) return
         updateCheckPerformed = true
 
-        logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateType())
+        logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateStream())
 
-        if (ConfigAccess.getUpdateType() == About.UpdateType.NONE) {
+        if (ConfigAccess.getUpdateStream() == About.UpdateStream.NONE) {
             logger.info("[SCT]: Update stream is disabled.")
             return
         }
@@ -137,11 +138,19 @@ object Hypixel {
         }.thenAccept {
             Minecraft.getInstance().execute {
                 if (RepoUtils.latestVersion != null) {
-                    ChatUtils.sendMessage(
-                        "§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game."
-                    )
+                    when (ConfigAccess.getUpdateType()) {
+                        About.UpdateType.AUTOMATIC -> {
+                            ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game.")
+                            UpdaterManager.update()
+                        }
+                        About.UpdateType.MANUAL -> {
+                            val url = ModrinthData.getModLink()
+                            ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e.", true)
+                            ChatUtils.sendClickableLinkComponent("§eClick here to manually download it.", "§eOpens the Modrinth page in your browser.", url)
+                        }
+                    }
+
                     logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
-                    UpdaterManager.update()
                     ConfigHelper.disableUpdateChecks()
                 } else {
                     if (!ConfigAccess.hasCheckedUpdate()) {

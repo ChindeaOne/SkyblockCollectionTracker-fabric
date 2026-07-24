@@ -69,13 +69,13 @@ object RepoUtils {
         latestReleaseTag = normalizeTags(latestReleaseTag)
         latestBetaTag = normalizeTags(latestBetaTag)
 
-        val chosenTag = if (ConfigAccess.getUpdateType() == About.UpdateType.BETA) {
+        val chosenTag = if (ConfigAccess.getUpdateStream() == About.UpdateStream.BETA) {
             latestBetaTag
         } else {
             latestReleaseTag
         }
 
-        val chosenNotes = if (ConfigAccess.getUpdateType() == About.UpdateType.BETA) {
+        val chosenNotes = if (ConfigAccess.getUpdateStream() == About.UpdateStream.BETA) {
             latestBetaNotes
         } else {
             latestReleaseNotes

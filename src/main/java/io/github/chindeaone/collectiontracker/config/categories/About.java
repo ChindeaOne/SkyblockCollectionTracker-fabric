@@ -8,10 +8,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class About {
 
-    public enum UpdateType {
+    public enum UpdateStream {
         NONE,
         RELEASE,
         BETA
+    }
+
+    public enum UpdateType {
+        MANUAL,
+        AUTOMATIC
     }
 
     @ConfigOption(name = "Current Version", desc = "This is the SkyblockCollectionTracker version you are currently running.")
@@ -30,14 +35,28 @@ public class About {
     @ConfigOption(
             name = "§bUpdate Stream",
             desc = """
-                    Choose how you want to be notified about updates:§f
-                     - §cNONE§e: No update checks§f
-                     - §aRELEASE§e: Notifies when a new stable version is available§f
-                     - §bBETA§e: Notifies about both stable and beta versions
+                    Choose which updates you want to receive notifications for:§f
+                    
+                    - §cNONE§7: Disable update notifications§f
+                    - §aRELEASE§7: Notify only for full releases§f
+                    - §eBETA§7: Notify for both full and beta releases
                     """
     )
     @ConfigEditorDropdown
-    public UpdateType update = UpdateType.RELEASE; //Default to RELEASE updates
+    public UpdateStream update = UpdateStream.RELEASE; //Default to RELEASE updates
+
+    @Expose
+    @ConfigOption(
+            name = "§eUpdate Type",
+            desc = """
+                    Choose how updates should be installed:§f
+                    
+                    - §2MANUAL§7: Provide a link to the Modrinth page§f
+                    - §4AUTOMATIC§7: Download updates after closing the game
+                    """
+    )
+    @ConfigEditorDropdown
+    public UpdateType updateType = UpdateType.MANUAL; //Default to MANUAL updates
 
     @Expose
     public boolean hasCheckedUpdate = true;
