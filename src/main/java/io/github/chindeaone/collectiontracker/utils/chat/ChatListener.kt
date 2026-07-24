@@ -81,13 +81,13 @@ object ChatListener {
         val text = message.string
         val cleanText = text.removeColor()
 
-        petSummoned(text)
-        setCooldownAttribute(cleanText)
-        abilityListener(cleanText)
-        onCooldownListener(cleanText)
-        abilitySwapListener(cleanText)
-        consumableListener(cleanText)
-        treeResetListener(cleanText)
+        if (cleanText.contains("summoned your")) petSummoned(text)
+        if (cleanText.contains("ATTRIBUTE")) setCooldownAttribute(cleanText)
+        if (cleanText.contains("used your")) abilityListener(cleanText)
+        if (cleanText.contains("on cooldown")) onCooldownListener(cleanText)
+        if (cleanText.contains("You selected")) abilitySwapListener(cleanText)
+        if (cleanText.contains("consumed")) consumableListener(cleanText)
+        if (cleanText.contains("You have reset")) treeResetListener(cleanText)
         sacksListener(message, actionBar = false)
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
@@ -123,7 +123,7 @@ object ChatListener {
     private fun setCooldownAttribute(text: String) {
         if (hasCooldownAttribute()) return
 
-        val value = Patterns.ATTRIBUTE.find(text)?.groupValues?.get(1)
+        val value = Patterns.ATTRIBUTE.find(text.trimStart())?.groupValues?.get(1)
         if (value != null) {
             ConfigHelper.setCooldownAttribute(true)
             ConfigHelper.setAttributeLevel(value.toLevel())
@@ -476,11 +476,11 @@ object ChatListener {
     fun coleweightHandle(message: Component): Component {
         if (!HypixelUtils.isOnSkyblock || !ConfigAccess.isColeweightRankingInChat()) return message
 
-        val text = message.string.removeColor()
-
         if (ConfigAccess.isOnlyOnMiningIslands()) {
             if (!MiningMapping.miningIslands.contains(IslandTracker.currentMiningIsland)) return message
         }
+
+        val text = message.string.removeColor()
 
         val left = text.substringBefore(":").trim()
         val tokens = left.split(" ")
@@ -501,14 +501,14 @@ object ChatListener {
 
     @JvmStatic
     fun farmingweightHandle(message: Component): Component {
-        if (!HypixelUtils.isOnSkyblock) return message
-        if (!ConfigAccess.isFarmingweightRankingInChat()) return message
-
-        val text = message.string.removeColor()
+        if (!HypixelUtils.isOnSkyblock || !ConfigAccess.isFarmingweightRankingInChat()) return message
 
         if (ConfigAccess.isOnlyOnFarmingIslands()) {
             if (!FarmingMapping.farmingAreas.contains(IslandTracker.currentFarmingIsland)) return message
         }
+
+        val text = message.string.removeColor()
+
 
         val left = text.substringBefore(":").trim()
         val tokens = left.split(" ")
