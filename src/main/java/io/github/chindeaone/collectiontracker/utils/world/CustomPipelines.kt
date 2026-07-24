@@ -7,8 +7,14 @@ import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.CompareOp
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
-import com.mojang.blaze3d.vertex.VertexFormat
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+//? if 26.2 {
+/*import net.minecraft.client.renderer.BindGroupLayouts
+import com.mojang.blaze3d.PrimitiveTopology
+import com.mojang.blaze3d.pipeline.BindGroupLayout
+*///?} else {
+import com.mojang.blaze3d.vertex.VertexFormat
+//?}
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 import java.util.Optional
@@ -34,8 +40,22 @@ object CustomPipelines {
                 .build()
         )
         CHROMA_TEXT = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            RenderPipeline.builder(/*? if 26.1 {*/ RenderPipelines.MATRICES_PROJECTION_SNIPPET /*?}*/)
                 .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/chroma_text"))
+                //? if 26.2 {
+                /*.withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).apply {
+                    withPrimitiveTopology(PrimitiveTopology.QUADS)
+                    withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
+                    withVertexShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
+                    withFragmentShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
+                    withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+                    withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+                    withBindGroupLayout(BindGroupLayout.builder()
+                        .withUniform("SctChromaUniforms", UniformType.UNIFORM_BUFFER)
+                        .build()
+                    )
+                }
+                *///?} else {
                 .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).apply {
                     withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
                     withVertexShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
@@ -43,6 +63,7 @@ object CustomPipelines {
                     withSampler("Sampler0")
                     withUniform("SctChromaUniforms", UniformType.UNIFORM_BUFFER)
                 }
+                //?}
                 .build()
         )
     }

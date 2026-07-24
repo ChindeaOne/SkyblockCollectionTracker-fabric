@@ -37,4 +37,10 @@ object ChromaRenderer {
             )
         }
     }
+
+    @JvmStatic
+    fun clearChromaUniforms() {
+        chromaUniform.clear()
+        chromaBufferSlice = null
+    }
 }

@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.mixins;
 
+//? if 26.2
+//import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
 import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,4 +16,18 @@ public class GameRenderMixin {
     private void sct$onGameRendererClose(CallbackInfo ci) {
         WorldRenderer.close();
     }
+
+    //? if 26.2 {
+    /*@Inject(
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/render/GuiRenderer;endFrame()V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private static void sct$clearChromaUniforms(CallbackInfo ci) {
+        ChromaRenderer.getChromaUniform().clear();
+    }
+    *///?}
 }

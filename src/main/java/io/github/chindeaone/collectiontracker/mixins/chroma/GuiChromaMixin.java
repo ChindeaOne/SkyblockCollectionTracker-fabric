@@ -3,12 +3,14 @@ package io.github.chindeaone.collectiontracker.mixins.chroma;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
+//? if 26.1 {
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
+//?}
 import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText;
 import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
 import io.github.chindeaone.collectiontracker.utils.world.CustomPipelines;
@@ -45,26 +47,43 @@ public class GuiChromaMixin {
         return original.call(state);
     }
 
-    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V", at = @At("HEAD"))
+    @Inject(
+            method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
+            at = @At("HEAD")
+    )
     public void prepareChromaUniform(
             Supplier<String> label,
             RenderTarget mainRenderTarget,
+            //? if 26.1
             GpuBufferSlice fogBuffer,
             GpuBufferSlice dynamicTransforms,
+            //? if 26.1
             GpuBuffer indexBuffer,
+            //? if 26.1
             IndexType indexType,
             int startIndex, int endIndex, CallbackInfo ci
     ) {
         ChromaRenderer.prepareUniform();
     }
 
-    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", ordinal = 1))
+    @Inject(
+            method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"
+                    //? if < 26.2
+                    , ordinal = 1
+            )
+    )
     private void bindChromaUniform(
             Supplier<String> label,
             RenderTarget mainRenderTarget,
+            //? if 26.1
             GpuBufferSlice fogBuffer,
             GpuBufferSlice dynamicTransforms,
+            //? if 26.1
             GpuBuffer indexBuffer,
+            //? if 26.1
             IndexType indexType,
             int startIndex, int endIndex, CallbackInfo ci,
             @Local(name = "renderPass") RenderPass renderPass

@@ -10,8 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderSystem.class)
 public class RenderSystemMixin {
 
+    //? if 26.1 {
     @Inject(method = "flipFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DynamicUniforms;reset()V"))
-    private static void clearChromaUniforms(CallbackInfo ci) {
-        ChromaRenderer.getChromaUniform().clear();
+    private static void sct$clearChromaUniforms(CallbackInfo ci) {
+        ChromaRenderer.clearChromaUniforms();
     }
+    //?}
 }
