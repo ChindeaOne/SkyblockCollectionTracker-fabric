@@ -1,13 +1,13 @@
-<h1 style="text-align: center;">
+<h1 align = "center">
     Skyblock Collection Tracker - Fabric
 </h1>
 
 
-<div style="text-align: center;">
+<div align = "center">
   <img src="src/main/resources/assets/skyblockcollectiontracker/logo.png" alt="Collection Tracker GUI" width="96">
 </div>
 
-<p style="text-align: center;">
+<p align = "center">
   <a href="https://modrinth.com/mod/sct">
     <img src="https://img.shields.io/modrinth/dt/sct?style=for-the-badge&logo=modrinth&label=Downloads" alt="Downloads" width="150">
   </a>
