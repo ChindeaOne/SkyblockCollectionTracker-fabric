@@ -1,9 +1,23 @@
-<h1 align = "center">Skyblock Collection Tracker - Fabric</h1>
+<h1 style="text-align: center;">
+    Skyblock Collection Tracker - Fabric
+</h1>
 
 
-<div align="center">
-  <img src="src/main/resources/assets/skyblockcollectiontracker/logo.png" alt="Collection Tracker GUI" width="80">
+<div style="text-align: center;">
+  <img src="src/main/resources/assets/skyblockcollectiontracker/logo.png" alt="Collection Tracker GUI" width="96">
 </div>
+
+<p style="text-align: center;">
+  <a href="https://modrinth.com/mod/sct">
+    <img src="https://img.shields.io/modrinth/dt/sct?style=for-the-badge&logo=modrinth&label=Downloads" alt="Downloads" width="150">
+  </a>
+  <a href="https://modrinth.com/mod/sct">
+    <img src="https://img.shields.io/modrinth/v/sct?style=for-the-badge&logo=modrinth&label=Version" alt="Version" width="150">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/ChindeaOne/SkyblockCollectionTracker-fabric?style=for-the-badge" alt="License" width="150">
+  </a>
+</p>
 
 ---
 
@@ -13,21 +27,21 @@
 2. Add the mod to your mods folder (`.minecraft/mods`).
 3. Make sure you have the [Fabric API](https://modrinth.com/mod/fabric-api/versions) and [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) in your Minecraft mods folder.
 4. Run Minecraft with the [Fabric installer](https://fabricmc.net/use/installer/) selected.
-5. Check all available commands via `/sct commands`.
-6. Configure any features in the gui via `/sct`.
+5. Access the config GUI using `/sct`.
+6. View all available commands with `/sct commands`.
 
 ---
 
 ## Features
 
 <details>
-<summary><strong>Collection/Profit Tracker</strong></summary>
+<summary><strong>Collection & Profit Tracker</strong></summary>
 
-- Tracks collections and profit over time using sacks messages, via `/sct track <collection>`.
+- Tracks collection progress and profit using sack messages, via `/sct track <collection>`.
 - Supports multi-tracking via `/sct track <collection1> <collection2> ...`.
 - Provides an option to track via Hypixel's API instead of sacks.
 - Configurable overlay lines showing collection progress and profit rates.
-- Provides NPC/Bazaar prices for accurate profit tracking.
+- Supports both NPC and Bazaar prices for profit calculations.
 - Detailed session summary at the end (best/worst rates, elapsed time, profit, etc.).
 - Provides leaderboard tracking for all collections, with data from Elite API.
 - `/sct collections` for all available collections.
@@ -52,7 +66,7 @@
 - Ported Precision Mining highlight.
 - Ported `/sct timer <set|pause|resume|stop>` command.
 - Ported `/sct stopwatch <start|pause|resume|stop>` command.
-- Tracking Coleweight via `/sct cw track` command.
+- Tracks Coleweight with `/sct cw track`.
 
 </details>
 
@@ -104,7 +118,7 @@
 <details>
 <summary><strong>Mining Deployable Tracker</strong></summary>
 
-- Display the lantern type and current time remaining while being in range.
+- Displays the lantern type and remaining duration while you're in range.
 - Configurable title alert when the deployable has expired and out of range.
 
 </details>
@@ -128,8 +142,9 @@
 
 ---
 
-## Credits
+## Documentation
 
-All credits can be found [here](CREDITS.md).
+- [FAQ](FAQ.md) — Common questions and troubleshooting.
+- [Credits](CREDITS.md) — Acknowledgements and attributions.
 
 ---
