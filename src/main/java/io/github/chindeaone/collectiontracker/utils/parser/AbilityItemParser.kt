@@ -16,7 +16,7 @@ object AbilityItemParser {
         else TooltipFlag.Default.NORMAL
 
     fun parse(lines: List<String>): AbilityUtils.AbilitySnapshot? {
-        val lastLine = lines.last()
+        val lastLine = lines.lastOrNull() ?: return null
 
         val isAxe = AXE_REGEX.containsMatchIn(lastLine)
         val hasBreakingPower = lines[1].startsWith("breaking power") || lines[2].startsWith("breaking power")
