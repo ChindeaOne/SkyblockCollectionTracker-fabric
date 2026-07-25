@@ -19,8 +19,8 @@ object AbilityItemParser {
         val lastLine = lines.lastOrNull() ?: return null
 
         val isAxe = AXE_REGEX.containsMatchIn(lastLine)
-        val hasBreakingPower = lines[1].startsWith("breaking power") || lines[2].startsWith("breaking power")
-
+        val hasBreakingPower = lines.getOrNull(1)?.startsWith("breaking power") == true ||
+                    lines.getOrNull(2)?.startsWith("breaking power") == true
         if (!isAxe && !hasBreakingPower) return null
 
         val isDrill = DRILL_REGEX.containsMatchIn(lastLine)
