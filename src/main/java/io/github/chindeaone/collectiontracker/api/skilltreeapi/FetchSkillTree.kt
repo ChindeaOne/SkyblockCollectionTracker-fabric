@@ -108,6 +108,7 @@ object FetchSkillTree {
         ConfigHelper.setProfessionalMS(0)
         ConfigHelper.setLastSkyMallBuff("")
         ChatListener.currentSkyMallBuff = ""
+        ChatListener.isPickaxeAbility = false
 
         if (pendingHotmReset == null || pendingHotmReset?.isDone != false) {
             pendingHotmReset = scheduler.schedule({
