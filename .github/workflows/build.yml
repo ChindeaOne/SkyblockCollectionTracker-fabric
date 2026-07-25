@@ -23,7 +23,7 @@ jobs:
       deployments: write
     steps:
       - name: Delete deployment
-        uses: strumwolf/delete-deployment-environment@v3.0.0
+        uses: strumwolf/delete-deployment-environment@v4.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: ci
