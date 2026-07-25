@@ -16,18 +16,23 @@ object AbilityItemParser {
         else TooltipFlag.Default.NORMAL
 
     fun parse(lines: List<String>): AbilityUtils.AbilitySnapshot? {
-        val lastLine = lines.lastOrNull() ?: return null
+        var isAxe = false
+        var hasBreakingPower = false
+        var isDrill = false
+        var isPickaxe = false
+        var isGauntlet = false
 
-        val isAxe = AXE_REGEX.containsMatchIn(lastLine)
-        val hasBreakingPower = lines.getOrNull(1)?.startsWith("breaking power") == true ||
-                    lines.getOrNull(2)?.startsWith("breaking power") == true
+        for (line in lines) {
+            if (!isAxe && AXE_REGEX.containsMatchIn(line)) isAxe = true
+            if (!hasBreakingPower && line.startsWith("breaking power")) hasBreakingPower = true
+            if (!isDrill && DRILL_REGEX.containsMatchIn(line)) isDrill = true
+            if (!isPickaxe && PICKAXE_REGEX.containsMatchIn(line)) isPickaxe = true
+            if (!isGauntlet && GAUNTLET_REGEX.containsMatchIn(line)) isGauntlet = true
+        }
+
         if (!isAxe && !hasBreakingPower) return null
 
-        val isDrill = DRILL_REGEX.containsMatchIn(lastLine)
-
-        val isMiningTool = isDrill ||
-                PICKAXE_REGEX.containsMatchIn(lastLine) ||
-                GAUNTLET_REGEX.containsMatchIn(lastLine)
+        val isMiningTool = isDrill || isPickaxe || isGauntlet
 
         if (isAxe) {
             return AbilityUtils.AxeAbilitySnapshot(

@@ -264,7 +264,7 @@ object ChatListener {
             snap = snap,
             skyMallActive = isSkyMallPickaxeAbilityActive(),
             abilityName = ability
-            )
+        )
 
         val durationMs = (AbilityUtils.getBaseDuration(ability, abilityLevel, hasBlueCheese) * 1000).toLong()
 
