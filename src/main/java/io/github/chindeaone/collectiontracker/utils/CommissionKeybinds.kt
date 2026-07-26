@@ -132,8 +132,11 @@ object CommissionKeybinds {
         currentScreen = container
         isMenuOpen = true
         attachListener(container.menu)
-    }
 
+        ScreenEvents.remove(container).register {
+            detachListener()
+        }
+    }
 
     fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
@@ -161,6 +164,11 @@ object CommissionKeybinds {
 
         val player = client.player ?: return
         val gm = client.gameMode ?: return
+
+        val playerMenu = player.containerMenu
+        if (playerMenu.containerId != screen.menu.containerId) {
+            return
+        }
 
         val wasCompleted = isCompletedCommission(clickedItem)
 
@@ -225,6 +233,8 @@ object CommissionKeybinds {
         attachedMenu = null
         wasDown.clear()
         isMenuOpen = false
+
+        CommissionWidget.allowTabUpdates()
     }
 
     private fun keybindCancelEvent() {

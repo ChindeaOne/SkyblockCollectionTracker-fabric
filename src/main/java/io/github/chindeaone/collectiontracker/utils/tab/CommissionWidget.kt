@@ -15,9 +15,14 @@ object CommissionWidget {
     private var firstInfoSeenTime: Long = 0L
 
     fun updateCommission(index: Int, newValue: String) {
+        if (rawCommissions.getOrNull(index) == newValue) return
+
         rawCommissions[index] = newValue
         lastCommissionSet = ArrayList(rawCommissions)
-        nextAllowedTime = System.currentTimeMillis() + 3000L // lock for 3s to allow tab data to update
+    }
+
+    fun allowTabUpdates() {
+        nextAllowedTime = System.currentTimeMillis() + 1000L
     }
 
     fun onTabWidgetsUpdate() {
