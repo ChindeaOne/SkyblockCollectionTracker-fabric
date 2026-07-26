@@ -94,6 +94,7 @@ object ModLoader: ModInitializer {
                     true
                 }
             }
+            CommissionKeybinds.onScreenChanged(screen)
         }
     }
 

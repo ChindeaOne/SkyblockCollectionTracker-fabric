@@ -33,7 +33,6 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerInput
-import net.minecraft.world.inventory.ContainerListener
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -64,29 +63,29 @@ object CommissionKeybinds {
     private var keyGuardActive = false
     private val guardedScreens: MutableSet<Screen> = Collections.newSetFromMap(WeakHashMap())
 
-    private val menuListener = object : ContainerListener {
-        override fun slotChanged(menu: AbstractContainerMenu, slotId: Int, stack: ItemStack) {
-            val commissionIndex = COMMISSION_SLOTS[slotId] ?: return
-            if (stack.isEmpty) return
+    private var currentScreen: AbstractContainerScreen<*>? = null
 
-            val client = Minecraft.getInstance()
-            val player = client.player ?: return
-            val level = client.level ?: return
+    @JvmStatic
+    fun onSlotUpdated(menu: AbstractContainerMenu, slot: Int, stack: ItemStack) {
+        if (attachedMenu !== menu) return
+        val commissionIndex = COMMISSION_SLOTS[slot] ?: return
+        if (stack.isEmpty) return
 
-            val tooltipContext = Item.TooltipContext.of(level.registryAccess())
-            val tooltipLines = stack.getTooltipLines(
-                tooltipContext,
-                player,
-                AbilityItemParser.tooltipFlag()
-            ).map { it.string }
+        val client = Minecraft.getInstance()
+        val player = client.player ?: return
+        val level = client.level ?: return
 
-            val name = findCommissionName(tooltipLines) ?: return
-            val progress = findProgress(tooltipLines)
+        val tooltipContext = Item.TooltipContext.of(level.registryAccess())
+        val tooltipLines = stack.getTooltipLines(
+            tooltipContext,
+            player,
+            AbilityItemParser.tooltipFlag()
+        ).map { it.string }
 
-            CommissionWidget.updateCommission(commissionIndex, "$name: $progress")
-        }
+        val name = findCommissionName(tooltipLines) ?: return
+        val progress = findProgress(tooltipLines)
 
-        override fun dataChanged(menu: AbstractContainerMenu, property: Int, value: Int) = Unit
+        CommissionWidget.updateCommission(commissionIndex, "$name: $progress")
     }
 
     private fun findCommissionName(lines: List<String>): String? {
@@ -121,31 +120,25 @@ object CommissionKeybinds {
         keybindCancelEvent()
     }
 
+    fun onScreenChanged(screen: Screen?) {
+        currentScreen = null
+        detachListener()
+
+        if (!HypixelUtils.isOnSkyblock) return
+
+        val container = screen as? AbstractContainerScreen<*> ?: return
+        if (!container.title.string.contains("Commissions", ignoreCase = true)) return
+
+        currentScreen = container
+        isMenuOpen = true
+        attachListener(container.menu)
+    }
+
+
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock) {
-            detachListener()
-            return
-        }
+        if (!HypixelUtils.isOnSkyblock) return
 
-        val screen = /*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ as? AbstractContainerScreen<*> ?: run {
-            detachListener()
-            return
-        }
-
-        val isCommissionsScreen = screen.title.string.contains("Commissions", ignoreCase = true)
-        isMenuOpen = isCommissionsScreen
-
-        if (!isCommissionsScreen) {
-            detachListener()
-            return
-        }
-
-        attachListener(screen.menu)
-
-        if (!ConfigAccess.isCommissionsKeybindsEnabled()) {
-            wasDown.clear()
-            return
-        }
+        val screen = currentScreen ?: return
 
         val now = System.currentTimeMillis()
         if (now - openedAt < CLICK_DEBOUNCE_MS) return
@@ -161,25 +154,29 @@ object CommissionKeybinds {
             else -> return
         }
 
-        if (slotIndex !in screen.menu.slots.indices) return
         val slot = screen.menu.getSlot(slotIndex)
-        val clickedItem = slot.item.copy()
         if (!slot.hasItem()) return
+
+        val clickedItem = slot.item.copy()
 
         val player = client.player ?: return
         val gm = client.gameMode ?: return
 
         val wasCompleted = isCompletedCommission(clickedItem)
 
-        gm.handleContainerInput(
-            screen.menu.containerId,
-            slotIndex,
-            0,
-            ContainerInput.PICKUP,
-            player
-        )
+        if (ConfigAccess.isCommissionsKeybindsEnabled()) {
+            gm.handleContainerInput(
+                screen.menu.containerId,
+                slotIndex,
+                0,
+                ContainerInput.PICKUP,
+                player
+            )
+        } else {
+            wasDown.clear()
+        }
 
-        if (wasCompleted) {
+        if (wasCompleted && ConfigAccess.isCommissionsTrackingEnabled()) {
             CommissionsTracker.onCommissionClaimed()
         }
 
@@ -214,17 +211,17 @@ object CommissionKeybinds {
 
     private fun attachListener(menu: AbstractContainerMenu) {
         if (attachedMenu === menu) return
-        detachListener()
+
         attachedMenu = menu
-        menu.addSlotListener(menuListener)
         wasDown.clear()
+
         openedAt = System.currentTimeMillis()
         lastClick = openedAt
     }
 
     private fun detachListener() {
-        val m = attachedMenu ?: return
-        m.removeSlotListener(menuListener)
+        if (attachedMenu == null) return
+
         attachedMenu = null
         wasDown.clear()
         isMenuOpen = false

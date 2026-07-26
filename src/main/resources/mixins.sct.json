@@ -11,7 +11,8 @@
     "chroma.GuiChromaMixin",
     "chroma.TextBuilderMixin",
     "chroma.GlyphTypesMixin",
-    "chroma.RenderSystemMixin"
+    "chroma.RenderSystemMixin",
+    "AbstractContainerMenuMixin"
   ],
   "injectors": {
     "defaultRequire": 1
