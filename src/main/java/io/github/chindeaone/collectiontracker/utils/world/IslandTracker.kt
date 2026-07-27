@@ -26,7 +26,6 @@ object IslandTracker {
 
     @JvmStatic var isInRift: Boolean = false
         private set
-    private var riftCheckTicks = 0
 
     fun update() {
         val areaWidget = TabWidget.AREA
@@ -68,12 +67,6 @@ object IslandTracker {
     }
 
     private fun updateRiftIsland(island: String) {
-        if (riftCheckTicks > 0) {
-            riftCheckTicks--
-            return
-        }
-        riftCheckTicks = 20
-
         val currentlyInRift = island.equals("The Rift", ignoreCase = true)
 
         if (currentlyInRift == isInRift) return
