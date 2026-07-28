@@ -66,6 +66,10 @@ public class TrackingHandler {
 
         startTime = now;
         lastTime = 0;
+
+        if (collectionType == null) {
+            logger.error("[SCT]: Collection type is null for collection: {}", collection);
+        }
     }
 
     public static void stopTrackingManual() {

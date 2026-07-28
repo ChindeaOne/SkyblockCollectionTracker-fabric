@@ -8,10 +8,14 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
 public class SacksTrackingManager {
+
+    private static final Logger logger = LogManager.getLogger(SacksTrackingManager.class);
 
     public static void onSacksGain(Map<String, Integer> sacksDetails) {
 
@@ -42,6 +46,11 @@ public class SacksTrackingManager {
 
             boolean isEnchanted = enchantedMultiplier != null;
             boolean isSuperEnchanted = superEnchantedMultiplier != null;
+
+            if (type == null) {
+                logger.error("[SCT]: Collection type is null for collection: {}", collectionName);
+                return;
+            }
 
             boolean matchesCollection = type.equals("gemstone")
                     ? itemName.contains(collectionName)
