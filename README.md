@@ -144,7 +144,7 @@
 
 ## Documentation
 
-- [FAQ](FAQ.md) — Common questions and troubleshooting.
-- [Credits](CREDITS.md) — Acknowledgements and attributions.
+- [FAQ](FAQ.md)
+- [Credits](CREDITS.md)
 
 ---
