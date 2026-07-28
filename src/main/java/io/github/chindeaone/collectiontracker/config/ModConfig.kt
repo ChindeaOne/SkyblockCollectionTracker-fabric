@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.categories.*
+import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -49,7 +50,9 @@ class ModConfig : Config() {
 
     override fun getTitle() : StructuredText {
         val modName = "SkyblockCollectionTracker"
-        return StructuredText.of("$modName by §3Chindea_YTB§r, config by §5Moulberry §rand §5nea89")
+        return StructuredText.empty()
+            .append(StructuredText.of(modName).withColour(ChromaText.PREFIX_COLOR_RGB))
+            .append(StructuredText.of(" by §3Chindea_YTB§r, config by §5Moulberry §rand §5nea89"))
     }
 
     override fun saveNow() {
