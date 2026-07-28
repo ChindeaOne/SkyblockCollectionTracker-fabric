@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft

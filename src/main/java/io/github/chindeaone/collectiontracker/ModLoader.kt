@@ -17,7 +17,7 @@ import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.tab.TabData
 import io.github.chindeaone.collectiontracker.utils.world.BlockOutline
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
-import io.github.chindeaone.collectiontracker.utils.world.CustomPipelines
+import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.world.DwarvenHeatmap
 import io.github.chindeaone.collectiontracker.utils.world.PrecisionMining
 import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
