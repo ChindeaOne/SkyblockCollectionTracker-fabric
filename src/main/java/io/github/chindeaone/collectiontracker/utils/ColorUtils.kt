@@ -31,6 +31,10 @@ object ColorUtils {
     const val RED: Int = 0xFFFF0000.toInt()
     const val DARK_GRAY: Int = 0xFFAAAAAA.toInt()
     const val SILVER_BLUE: Int = 0xFF7FB4DB.toInt()
+    const val DARK_AQUA: Int = 0xFF00AAAA.toInt()
+
+    val GRADIENT_START_COLOR: Color = Color(255, 212, 71)
+    val GRADIENT_END_COLOR: Color = Color(255, 159, 46)
 
     val skillColors: MutableMap<String, Int> = HashMap()
     val collectionColors: MutableMap<String, Int> = HashMap()
@@ -67,35 +71,12 @@ object ColorUtils {
     }
 
     // Inspired by Skyhanni's prefix gradient
-    fun gradientText(prefix: String): Component {
-        val firstBracket = prefix.indexOf('[')
-        val lastBracket = prefix.lastIndexOf(']')
-        val text = Component.empty()
-
-        val colorBracket = Color(0, 170, 170) // Dark Aqua
-        val colorStart = Color(255, 155, 0) // Orange
-        val colorEnd = Color(255, 185, 0) // Lighter Orange
-
-        for ((index, char) in prefix.withIndex()) {
-            val color = when (index) {
-                firstBracket, lastBracket -> colorBracket
-                in (firstBracket + 1) until lastBracket -> {
-                    val textLength = lastBracket - firstBracket - 1
-                    val t = (index - (firstBracket + 1)).toDouble() / (textLength - 1).coerceAtLeast(1)
-                    blendColors(colorStart, colorEnd, t)
-                }
-                else -> colorBracket
-            }
-            text.append(Component.literal(char.toString()).withStyle { it.withColor(color.rgb) })
-        }
-        return text
-    }
-
-    private fun blendColors(start: Color, end: Color, percent: Double): Color {
-        val r = (start.red + (end.red - start.red) * percent).toInt()
-        val g = (start.green + (end.green - start.green) * percent).toInt()
-        val b = (start.blue + (end.blue - start.blue) * percent).toInt()
-        return Color(r, g, b)
+    fun getPrefixComponent(): Component {
+        return Component.empty()
+            .append(Component.literal("[").withStyle { it.withColor(DARK_AQUA) })
+            .append(Component.literal("SCT").withStyle { ChromaText.prefixStyle() })
+            .append(Component.literal("]").withStyle { it.withColor(DARK_AQUA) })
+            .append(Component.literal(" "))
     }
 
     fun customCWColorComponent(rank: Int, isMe: Boolean, playerName: String): Component {

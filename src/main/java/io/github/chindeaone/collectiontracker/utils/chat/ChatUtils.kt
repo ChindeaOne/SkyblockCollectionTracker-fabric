@@ -16,7 +16,7 @@ import java.net.URI
 object ChatUtils {
 
     private val logger: Logger = LogManager.getLogger(ChatUtils::class.java)
-    private val PREFIX: Component = Component.empty().append(ColorUtils.gradientText("[SCT] ")).withStyle(ChatFormatting.ITALIC)
+    private val PREFIX: Component = ColorUtils.getPrefixComponent()
 
     @JvmStatic
     fun sendMessage(message: String, prefix: Boolean = true) {
