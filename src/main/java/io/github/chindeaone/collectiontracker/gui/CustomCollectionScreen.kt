@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
+import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
@@ -32,17 +33,14 @@ class CustomCollectionScreen(
         collectionList.forEachIndexed { index, s ->
             val yPos = startY + (index * 20)
             val displayName = TextUtils.formatCollectionName(s)
-            val box = EditBox(
+            val box = CollectionEditBox(
                 font,
                 width / 2 - 25,
                 yPos,
                 100,
                 20,
                 Component.literal(displayName)
-                )
-            // TODO: fix this later
-//            box.insertText { text -> text.all { it.isDigit() || it == '.' || it.lowercaseChar() in listOf('k', 'm', 'b') }}
-
+            )
             map[s] = box
             addRenderableWidget(box)
         }
@@ -125,6 +123,24 @@ class CustomCollectionScreen(
             (number.toDouble() * multiplier).toLong()
         } catch (_: NumberFormatException) {
             0L
+        }
+    }
+
+    class CollectionEditBox(
+        font: Font,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        message: Component
+    ) : EditBox(font, x, y, width, height, message) {
+
+        override fun insertText(input: String) {
+            val filtered = input.filter {
+                it.isDigit() || it == '.' || it == ',' || it.lowercaseChar() in listOf('k', 'm', 'b')
+            }
+
+            super.insertText(filtered)
         }
     }
 }
