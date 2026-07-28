@@ -26,7 +26,12 @@ public class GlyphTypesMixin {
 
     @Inject(method = "select", at = @At("HEAD"), cancellable = true)
     private void sct$select(CallbackInfoReturnable<RenderType> cir) {
-        if (ChromaText.getGlyphIsChroma()) {
+        if (ChromaText.getPrefixGlyph()) {
+            cir.setReturnValue(ChromaText.getPrefixGradientRenderType(this.sct$identifier));
+            return;
+        }
+
+        if (ChromaText.getChromaGlyph()) {
             cir.setReturnValue(ChromaText.getChromaRenderType(this.sct$identifier));
         }
     }

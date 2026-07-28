@@ -5,6 +5,9 @@ in vec2 texCoord0;
 
 layout(std140) uniform SctChromaUniforms {
     float timeOffset;
+    int mode; // 0 = chroma, 1 = prefix gradient
+    vec4 startColor;
+    vec4 endColor;
 };
 
 uniform sampler2D Sampler0;
@@ -33,16 +36,19 @@ void main() {
         discard;
     }
 
-    float hue = mod(
-        (gl_FragCoord.x - gl_FragCoord.y) / 600.0 - timeOffset,
-        1.0
-    );
+    float hue = (gl_FragCoord.x - gl_FragCoord.y) / 600.0 - timeOffset;
+    hue = hue - floor(hue);
 
-    vec3 chroma = hsb2rgb_smooth(vec3(
-        hue,
-        0.75,
-        rgb2b(originalColor.rgb)
-    ));
+    vec3 chroma;
+    if (mode == 0) {
+        chroma = hsb2rgb_smooth(vec3(
+            hue,
+            0.75,
+            rgb2b(originalColor.rgb)
+        ));
+    } else {
+        chroma = mix(startColor.rgb, endColor.rgb, hue) * rgb2b(originalColor.rgb);
+    }
 
     fragColor = vec4(chroma, originalColor.a);
 }

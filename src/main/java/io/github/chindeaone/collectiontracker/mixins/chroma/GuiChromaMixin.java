@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.mixins.chroma;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -13,7 +12,7 @@ import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
 //?}
 import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText;
 import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
-import io.github.chindeaone.collectiontracker.utils.world.CustomPipelines;
+import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines;
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.renderer.state.gui.GlyphRenderState;
@@ -38,6 +37,10 @@ public class GuiChromaMixin {
     private RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         if (state instanceof GlyphRenderState glyphState) {
             if (glyphState.renderable() instanceof GlyphInstance glyph) {
+                if (ChromaText.isPrefixGradientGlyph(glyph)) {
+                    return CustomPipelines.PREFIX_GRADIENT_TEXT;
+                }
+
                 if (ChromaText.isChromaGlyph(glyph)) {
                     return CustomPipelines.CHROMA_TEXT;
                 }
@@ -51,7 +54,7 @@ public class GuiChromaMixin {
             method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
             at = @At("HEAD")
     )
-    public void prepareChromaUniform(
+    public void prepareChromaUniforms(
             Supplier<String> label,
             RenderTarget mainRenderTarget,
             //? if 26.1
@@ -63,31 +66,31 @@ public class GuiChromaMixin {
             IndexType indexType,
             int startIndex, int endIndex, CallbackInfo ci
     ) {
-        ChromaRenderer.prepareUniform();
+        ChromaRenderer.prepareUniforms();
     }
 
     @Inject(
-            method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
+            method = "executeDraw",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"
-                    //? if < 26.2
-                    , ordinal = 1
+                    target = "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
             )
     )
-    private void bindChromaUniform(
-            Supplier<String> label,
-            RenderTarget mainRenderTarget,
-            //? if 26.1
-            GpuBufferSlice fogBuffer,
-            GpuBufferSlice dynamicTransforms,
+    private void bindChromaUniformPerDraw(
+            GuiRenderer.Draw draw,
+            RenderPass renderPass,
             //? if 26.1
             GpuBuffer indexBuffer,
             //? if 26.1
             IndexType indexType,
-            int startIndex, int endIndex, CallbackInfo ci,
-            @Local(name = "renderPass") RenderPass renderPass
+            CallbackInfo ci
     ) {
-        ChromaRenderer.bindUniform(renderPass);
+        RenderPipeline pipeline = draw.pipeline();
+
+        if (pipeline == CustomPipelines.CHROMA_TEXT) {
+            ChromaRenderer.bindNormalChroma(renderPass);
+        } else if (pipeline == CustomPipelines.PREFIX_GRADIENT_TEXT) {
+            ChromaRenderer.bindPrefixGradient(renderPass);
+        }
     }
 }

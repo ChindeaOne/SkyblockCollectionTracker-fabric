@@ -22,7 +22,7 @@ public class TextBuilderMixin {
     )
     private void sct$checkGlyph(CallbackInfo ci, @Local(name = "glyph") Styled drawable) {
         if (drawable instanceof GlyphInstance glyph) {
-            ChromaText.isChromaGlyph(glyph);
+            ChromaText.checkGlyph(glyph);
         }
     }
 }
