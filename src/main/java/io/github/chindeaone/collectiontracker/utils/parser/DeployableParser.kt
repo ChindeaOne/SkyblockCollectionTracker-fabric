@@ -57,7 +57,7 @@ object DeployableParser {
         }
 
         if (found == null) {
-            val candidates = EntityUtils.getEntitiesInRange().asIterable()
+            val candidates = EntityUtils.getEntitiesInRange()
             found = EntityUtils.findArmorStandByKeywords(candidates, MINING_DEPLOYABLE)
         }
 

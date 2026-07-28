@@ -2,33 +2,28 @@ package io.github.chindeaone.collectiontracker.utils.world
 
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 
 object EntityUtils {
 
-    fun getEntitiesInRange(): Sequence<Entity> {
+    fun getEntitiesInRange(): List<ArmorStand> {
         val mc = Minecraft.getInstance()
-        if (!mc.isSameThread) return emptySequence()
+        if (!mc.isSameThread) return emptyList()
 
-        val player = mc.player ?: return emptySequence()
-        val level = mc.level ?: return emptySequence()
+        val player = mc.player ?: return emptyList()
+        val level = mc.level ?: return emptyList()
         val searchBox = player.boundingBox.inflate(30.0)
 
-        return level.entitiesForRendering().asSequence().filter { entity ->
-            entity is ArmorStand && entity.boundingBox.intersects(searchBox)
-        }
+        return level.getEntitiesOfClass(ArmorStand::class.java, searchBox)
     }
 
-    fun findArmorStandByKeywords(entities: Iterable<Entity>, keywords: List<String>): Pair<ArmorStand, String>? {
+    fun findArmorStandByKeywords(entities: List<ArmorStand>, keywords: List<String>): Pair<ArmorStand, String>? {
         for (entity in entities) {
-            if (entity is ArmorStand) {
-                val name = entity.customName?.string ?: continue
-                val keyword = keywords.find { name.contains(it, ignoreCase = true) } ?: continue
-                return entity to keyword
-            }
+            val name = entity.customName?.string ?: continue
+            val keyword = keywords.find { name.contains(it, ignoreCase = true) } ?: continue
+            return entity to keyword
         }
         return null
     }
