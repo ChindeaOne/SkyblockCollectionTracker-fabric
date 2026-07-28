@@ -100,14 +100,14 @@ public class TextUtils {
             rankSuffix = " [#" + playerCurrentRank + "]";
         }
         return collectionAmount >= 0
-                ? formatCollectionName(collection) + " collection: " + formatNumber(collectionAmount) + rankSuffix
-                : formatCollectionName(collection) + " collection: Calculating...";
+                ? formatCollectionName(collection) + " : " + formatNumber(collectionAmount) + rankSuffix
+                : formatCollectionName(collection) + " : Calculating...";
     }
 
     private static String handleCollectionSession() {
         return collectionMade > 0
-                ? formatCollectionName(collection) + " collection (session): " + formatNumber(collectionMade)
-                : formatCollectionName(collection) + " collection (session): Calculating...";
+                ? formatCollectionName(collection) + " (session): " + formatNumber(collectionMade)
+                : formatCollectionName(collection) + " (session): Calculating...";
     }
 
     private static String handleCollectionPerHour() {
@@ -216,8 +216,8 @@ public class TextUtils {
 
     private static String handleCollectionSinceLast() {
         return collectionSinceLast > 0
-                ? formatCollectionName(collection) + " collection since last: " + formatNumber(collectionSinceLast)
-                : formatCollectionName(collection) + " collection since last: Calculating...";
+                ? formatCollectionName(collection) + " since last: " + formatNumber(collectionSinceLast)
+                : formatCollectionName(collection) + " since last: Calculating...";
     }
 
     private static String handleCollectionSinceLastTimer() {
@@ -413,14 +413,14 @@ public class TextUtils {
             rankSuffix = " [#" + MultiTrackingRates.getPlayerCurrentRank() + "]";
         }
         return MultiTrackingRates.getCollectionAmounts().getOrDefault(coll, -1L) >= 0
-                ? formatCollectionName(coll) + " collection: " + formatNumber(MultiTrackingRates.getCollectionAmounts().getOrDefault(coll, 0L)) + rankSuffix
-                : formatCollectionName(coll) + " collection: Calculating...";
+                ? formatCollectionName(coll) + " : " + formatNumber(MultiTrackingRates.getCollectionAmounts().getOrDefault(coll, 0L)) + rankSuffix
+                : formatCollectionName(coll) + " : Calculating...";
     }
 
     private static String handleCollectionSessionMulti(String coll) {
         return MultiTrackingRates.getCollectionMade().getOrDefault(coll, -1L) > 0
-                ? formatCollectionName(coll) + " collection (session): " + formatNumber(MultiTrackingRates.getCollectionMade().getOrDefault(coll, 0L))
-                : formatCollectionName(coll) + " collection (session): Calculating...";
+                ? formatCollectionName(coll) + " (session): " + formatNumber(MultiTrackingRates.getCollectionMade().getOrDefault(coll, 0L))
+                : formatCollectionName(coll) + " (session): Calculating...";
     }
 
     private static String handleCollectionPerHourMulti(String coll) {

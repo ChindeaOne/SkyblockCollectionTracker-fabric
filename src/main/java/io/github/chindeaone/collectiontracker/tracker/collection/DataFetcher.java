@@ -60,8 +60,7 @@ public class DataFetcher {
                         Minecraft.getInstance().execute(() -> Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
                                 new CustomCollectionScreen(
                                         List.of(collection),
-                                        () -> {
-                                        }
+                                        () -> {}
                                 )
                         ));
                     }
