@@ -153,7 +153,11 @@ object RenderUtils {
                         }
                     }
 
-                    if (foundCollName.contains("Next Position") || foundCollName.contains("Till Next Position") || foundCollName.contains("ETA") || foundCollName.contains("Gemstones")) {
+                    if (foundCollName.contains("Next Position") ||
+                        foundCollName.contains("Till Next Position") ||
+                        foundCollName.contains("ETA") ||
+                        foundCollName.contains("Gemstones") ||
+                        foundCollName.contains("Custom")) {
                         color = ColorUtils.collectionColors["gemstone"]!!
                     } else if (foundCollName.contains(" ")) { // all gemstones when it's expanded
                         val firstWord = foundCollName.trim().substringBefore(' ').lowercase()
