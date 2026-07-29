@@ -7,8 +7,14 @@ import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.CompareOp
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
-import com.mojang.blaze3d.vertex.VertexFormat
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+//? if 26.2 {
+/*import net.minecraft.client.renderer.BindGroupLayouts
+import com.mojang.blaze3d.PrimitiveTopology
+import com.mojang.blaze3d.pipeline.BindGroupLayout
+*///?} else {
+import com.mojang.blaze3d.vertex.VertexFormat
+//?}
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 import java.util.Optional
