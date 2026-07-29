@@ -18,6 +18,14 @@ public class ColeweightConfig {
 
     @Expose
     @ConfigOption(
+            name = "Coleweight Ranks in name tag",
+            desc = "Displays Coleweight ranks in the name tag of players."
+    )
+    @ConfigEditorBoolean
+    public boolean coleweightRankInNameTag = false;
+
+    @Expose
+    @ConfigOption(
             name = "Mining Islands Only",
             desc = "Show Coleweight ranks in chat only when on the Mining Islands."
     )

@@ -122,6 +122,8 @@ val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
 val coleweightConfig: ColeweightConfig get() = miningConfig.coleweightConfig
 val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityFormat
 val coleweightColorConfig: ColeweightColorConfig get() = coleweightConfig.coleweightColorConfig
+val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
+val coleweightRankInNameTag: Boolean get() = coleweightConfig.coleweightRankInNameTag
 val enableCustomCWColor: Boolean get() = coleweightColorConfig.enableCustomColor
 val customCWColor: ChromaColour get() = coleweightColorConfig.customColor
 val heatmapConfig: HeatmapConfig get() = coleweightConfig.heatmapConfig
@@ -135,7 +137,6 @@ val drawLineToPrecisionMining: Boolean get() = precisionMiningConfig.drawLineToP
 val miningStatsConfig: MiningStatsConfig get() = miningConfig.miningStatsConfig
 val enableMiningStatsConfig: Boolean get() = miningStatsConfig.enableMiningStatsOverlay
 val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsConfig.miningStatsOverlayInMiningIslandsOnly
-val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
 val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
 val showDetailedMiningFortune : Boolean get() = miningStatsConfig.showDetailedFortune
 val professionalMS: Property<Int> get() = hotmConfig.professionalMS
@@ -173,6 +174,7 @@ val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbility
 val farmingConfig: Farming get() = modConfig.farming
 val farmingweightConfig: FarmingweightConfig get() = farmingConfig.farmingweightConfig
 val farmingweightRankingInChat: Boolean get() = farmingweightConfig.farmingweightRankingInChat
+val farmingweightRankInNameTag: Boolean get() = farmingweightConfig.farmingweightRankInNameTag
 val onlyOnFarmingIslands: Boolean get() = farmingweightConfig.onlyOnFarmingIslands
 val farmingweightColorConfig: FarmingweightColorConfig get() = farmingweightConfig.farmingweightColorConfig
 val customFWColor: ChromaColour get() = farmingweightColorConfig.customColor
@@ -332,6 +334,9 @@ object ConfigAccess {
     fun isColeweightRankingInChat(): Boolean = coleweightRankingInChat
 
     @JvmStatic
+    fun isColeweightRankInNameTag(): Boolean = coleweightRankInNameTag
+
+    @JvmStatic
     fun isOnlyOnMiningIslands(): Boolean = onlyOnMiningIslands
 
     @JvmStatic
@@ -342,6 +347,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun isFarmingweightRankingInChat(): Boolean = farmingweightRankingInChat
+
+    @JvmStatic
+    fun isFarmingweightRankInNameTag(): Boolean = farmingweightRankInNameTag
 
     @JvmStatic
     fun isOnlyOnFarmingIslands(): Boolean = onlyOnFarmingIslands

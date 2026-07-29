@@ -17,6 +17,14 @@ public class FarmingweightConfig {
 
     @Expose
     @ConfigOption(
+            name = "Farming Weight Ranks in name tag",
+            desc = "Displays Farming Weight ranks in the name tag of players."
+    )
+    @ConfigEditorBoolean
+    public boolean farmingweightRankInNameTag = false;
+
+    @Expose
+    @ConfigOption(
             name = "Farming Islands Only",
             desc = "Show Farming Weight ranks in chat only when on Farming Islands."
     )
