@@ -11,7 +11,7 @@
 ---
 
 **Q: Why do I get prompted to input some values when starting tracking?**  
-**A:** Your Collection API is disabled.
+**A:** Your Collection API is disabled or the backend rate limit has been reached.
 
 ---
 
@@ -51,5 +51,5 @@ You can reduce inaccurate timers by enabling **Server Lag Protection** under **M
 
 ---
 
-**Q: Why can't I see my Coleweight/Farming Weight rank in chat?**  
+**Q: Why can't I see my Coleweight/Farming Weight rank in chat/name tag?**  
 **A:** Only players in the top 1000 of the respective leaderboard have their rank displayed. If you should be in the top 1000 but still don't see it, the leaderboard API was unavailable and the backend had no previously cached leaderboard data.
