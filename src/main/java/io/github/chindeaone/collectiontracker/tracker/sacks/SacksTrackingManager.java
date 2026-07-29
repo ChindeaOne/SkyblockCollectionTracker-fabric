@@ -167,53 +167,50 @@ public class SacksTrackingManager {
     }
 
     private static Map<String, Integer> normalizeMap(Map<String, Integer> map, boolean isSuperEnchanted, String collectionName) {
-        Map <String, Integer> normalizedMap = new HashMap<>();
+        Map<String, Integer> normalizedMap = new HashMap<>();
+
+        Map<String, String> overrides = isSuperEnchanted ? SUPER_ENCHANTED_DISPLAY_OVERRIDES : ENCHANTED_DISPLAY_OVERRIDES;
+
+        String override = overrides.get(collectionName);
+
         for (Map.Entry<String, Integer> entry : map.entrySet()) {
             String key = entry.getKey().toLowerCase().replace("_", " ");
-            if (isSuperEnchanted && superEnchantedSpecialItemNames.contains(collectionName) || !isSuperEnchanted && enchantedSpecialItemNames.contains(collectionName)) {
-                normalizedMap.put(specialItems(collectionName, isSuperEnchanted), entry.getValue());
-            } else normalizedMap.put(key, entry.getValue());
+            normalizedMap.put(override != null ? override : key, entry.getValue());
         }
 
         return normalizedMap;
     }
 
-    private static String specialItems(String collection, boolean isSuperEnchanted) {
-        if (isSuperEnchanted) {
-            return switch (collection) {
-                case "red mushroom" -> "enchanted red mushroom block";
-                case "brown mushroom" -> "enchanted brown mushroom block";
-                case "nether wart" -> "mutant nether wart";
-                case "melon slice" -> "enchanted melon";
-                case "raw porkchop" -> "enchanted cooked porkchop";
-                case "lily pad" -> "condensed lily pad";
-                case "raw cod" -> "enchanted cooked cod";
-                case "magmafish" -> "silver magmafish";
-                case "lotus" -> "silver lotus";
-                default -> "";
-            };
-        } else {
-            return switch (collection) {
-                case "cocoa beans" -> "enchanted cocoa beans";
-                case "nether wart" -> "enchanted nether wart";
-                case "melon slice" -> "enchanted melon slice";
-                case "raw rabbit" -> "enchanted raw rabbit";
-                case "raw mutton" -> "enchanted raw mutton";
-                case "raw porkchop" -> "enchanted raw porkchop";
-                case "end stone" -> "enchanted end stone";
-                case "nether quartz" -> "enchanted nether quartz";
-                case "slimeball" -> "enchanted slimeball";
-                case "lily pad" -> "enchanted lily pad";
-                case "ink sac" -> "enchanted ink sac";
-                case "raw cod" -> "enchanted raw cod";
-                case "tropical fish" -> "enchanted tropical fish";
-                case "magmafish" -> "gold magmafish";
-                case "lotus" -> "gold lotus";
-                default -> "";
-            };
-        }
-    }
+    private static final Map<String, String> ENCHANTED_DISPLAY_OVERRIDES = Map.ofEntries(
+            Map.entry("gold ingot", "enchanted gold ingot"),
+            Map.entry("iron ingot", "enchanted iron ingot"),
+            Map.entry("redstone dust", "enchanted redstone dust"),
+            Map.entry("end stone", "enchanted end stone"),
+            Map.entry("nether quartz", "enchanted nether quartz"),
+            Map.entry("cocoa beans", "enchanted cocoa beans"),
+            Map.entry("nether wart", "enchanted nether wart"),
+            Map.entry("melon slice", "enchanted melon slice"),
+            Map.entry("raw rabbit", "enchanted raw rabbit"),
+            Map.entry("raw mutton", "enchanted raw mutton"),
+            Map.entry("raw porkchop", "enchanted raw porkchop"),
+            Map.entry("slimeball", "enchanted slimeball"),
+            Map.entry("lily pad", "enchanted lily pad"),
+            Map.entry("ink sac", "enchanted ink sac"),
+            Map.entry("raw cod", "enchanted raw cod"),
+            Map.entry("tropical fish", "enchanted tropical fish"),
+            Map.entry("magmafish", "gold magmafish"),
+            Map.entry("lotus", "gold lotus")
+    );
 
-    private static final List<String> enchantedSpecialItemNames = Arrays.asList("cocoa beans", "nether wart", "melon slice", "raw rabbit", "raw mutton", "raw porkchop", "end stone", "nether quartz", "slimeball", "lily pad", "ink sac", "raw cod", "tropical fish", "magmafish", "lotus");
-    private static final List<String> superEnchantedSpecialItemNames = Arrays.asList("red mushroom", "brown mushroom", "nether wart", "melon slice", "raw porkchop", "raw cod", "lily pad", "magmafish", "lotus");
+    private static final Map<String, String> SUPER_ENCHANTED_DISPLAY_OVERRIDES = Map.ofEntries(
+            Map.entry("red mushroom", "enchanted red mushroom block"),
+            Map.entry("brown mushroom", "enchanted brown mushroom block"),
+            Map.entry("nether wart", "mutant nether wart"),
+            Map.entry("melon slice", "enchanted melon"),
+            Map.entry("raw porkchop", "enchanted cooked porkchop"),
+            Map.entry("lily pad", "condensed lily pad"),
+            Map.entry("raw cod", "enchanted cooked cod"),
+            Map.entry("magmafish", "silver magmafish"),
+            Map.entry("lotus", "silver lotus")
+    );
 }
