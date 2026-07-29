@@ -35,7 +35,12 @@ object ColeweightManager {
         }
 
         storage = if (isTop) {
-            storage.copy(leaderboard = list, leaderboardSet = list.map { it.name }.toHashSet())
+            storage.copy(
+                leaderboard = list,
+                leaderboardRanks = list.withIndex().associate {
+                    it.value.name.lowercase() to (it.index + 1)
+                }
+            )
         } else {
             storage.copy(tempLeaderboard = list)
         }

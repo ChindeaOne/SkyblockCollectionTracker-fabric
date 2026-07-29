@@ -96,6 +96,17 @@ object FarmingweightUtils {
     }
 
     @JvmStatic
+    fun getRankComponent(playerName: String): Component? {
+        val leaderboardRank = FarmingweightManager.storage.leaderboardRanks[playerName.lowercase()] ?: return null
+
+        return getRankComponent(
+            leaderboardRank,
+            playerName.equals(PlayerData.playerName, ignoreCase = true),
+            playerName
+        )
+    }
+
+    @JvmStatic
     fun setPlayerCustomColor(playerName: String, hexColor: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
             ChatUtils.sendMessage("§cYou cannot set a custom color for yourself like this. Use the feature in `/sct`.", true)

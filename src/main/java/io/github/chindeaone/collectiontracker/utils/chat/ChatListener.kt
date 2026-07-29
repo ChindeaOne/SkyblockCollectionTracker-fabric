@@ -485,18 +485,10 @@ object ChatListener {
         val left = text.substringBefore(":").trim()
         val tokens = left.split(" ")
 
-        val storage = ColeweightManager.storage
-        val playerName = tokens.firstOrNull(storage.leaderboardSet::contains) ?: return message
-        val leaderboardRank = storage.leaderboard.indexOfFirst { it.name.equals(playerName, ignoreCase = true) }
+        val playerName = tokens.firstOrNull { ColeweightManager.storage.leaderboardRanks.containsKey(it.lowercase()) } ?: return message
+        val rankSuffix = ColeweightUtils.getRankComponent(playerName) ?: return message
 
-        if (leaderboardRank != -1) {
-            val rank = leaderboardRank + 1
-            if (rank > 1000) return message // Don't show ranks for players outside of top 1000
-            val rankSuffix = ColeweightUtils.getCustomColor(rank, playerName.equals(PlayerData.playerName, ignoreCase = true), playerName)
-
-            return insertRankSuffix(message, rankSuffix)
-        }
-        return message
+        return insertRankSuffix(message, rankSuffix)
     }
 
     @JvmStatic
@@ -513,18 +505,10 @@ object ChatListener {
         val left = text.substringBefore(":").trim()
         val tokens = left.split(" ")
 
-        val storage = FarmingweightManager.storage
-        val playerName = tokens.firstOrNull(storage.leaderboardSet::contains) ?: return message
-        val leaderboardRank = storage.leaderboard.indexOfFirst { it.name.equals(playerName, ignoreCase = true) }
+        val playerName = tokens.firstOrNull { FarmingweightManager.storage.leaderboardRanks.containsKey(it.lowercase()) } ?: return message
+        val rankSuffix = FarmingweightUtils.getRankComponent(playerName) ?: return message
 
-        if (leaderboardRank != -1) {
-            val rank = leaderboardRank + 1
-            if (rank > 1000) return message // Don't show ranks for players outside of top 1000
-            val rankSuffix = FarmingweightUtils.getRankComponent(rank, playerName.equals(PlayerData.playerName, ignoreCase = true), playerName)
-
-            return insertRankSuffix(message, rankSuffix)
-        }
-        return message
+        return insertRankSuffix(message, rankSuffix)
     }
 
     private fun insertRankSuffix(message: Component, rankSuffix: Component): Component {

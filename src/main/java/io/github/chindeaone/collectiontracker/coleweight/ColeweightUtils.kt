@@ -67,7 +67,7 @@ object ColeweightUtils {
 
     private fun displayColeweight(playerName: String, storage: ColeweightStorage, detailed: Boolean = false) {
         val isMe = playerName.equals(PlayerData.playerName, ignoreCase = true)
-        val rankComp = getCustomColor(storage.rank, isMe, playerName)
+        val rankComp = getRankComponent(storage.rank, isMe, playerName)
 
         val fullMessage = Component.empty().append(rankComp).append(" §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
 
@@ -101,14 +101,25 @@ object ColeweightUtils {
                 val rank = start + index + 1
                 val isMe = entry.name.equals(PlayerData.playerName, ignoreCase = true)
                 val message = Component.empty()
-                    .append(getCustomColor(rank, isMe, entry.name))
+                    .append(getRankComponent(rank, isMe, entry.name))
                     .append(" §a${entry.name}: §b${entry.coleweight}")
                 ChatUtils.sendComponent(message, true)
             }
         }
     }
 
-    fun getCustomColor(rank: Int, isMe: Boolean, playerName: String): Component {
+    @JvmStatic
+    fun getRankComponent(playerName: String): Component? {
+        val leaderboardRank = ColeweightManager.storage.leaderboardRanks[playerName.lowercase()] ?: return null
+
+        return getRankComponent(
+            leaderboardRank,
+            playerName.equals(PlayerData.playerName, ignoreCase = true),
+            playerName
+        )
+    }
+
+    fun getRankComponent(rank: Int, isMe: Boolean, playerName: String): Component {
         return rank.toCWRankComponent(isMe, playerName)
     }
 

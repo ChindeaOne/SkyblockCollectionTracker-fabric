@@ -4,7 +4,7 @@ data class FarmingweightStorage(
     val weight: Float = 0f,
     val rank: Int = 0,
     val leaderboard: List<FarmingweightPlayer> = emptyList(),
-    val leaderboardSet: HashSet<String> = hashSetOf(),
+    val leaderboardRanks: Map<String, Int> = emptyMap(),
     val tempLeaderboard: List<FarmingweightPlayer> = emptyList(),
 
     val topColors: Map<String, String> = emptyMap()
