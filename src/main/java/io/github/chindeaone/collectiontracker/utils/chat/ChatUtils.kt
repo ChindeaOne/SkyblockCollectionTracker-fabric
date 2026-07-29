@@ -4,19 +4,27 @@ import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.ChatComponent
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.MessageSignature
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.net.URI
+import kotlin.math.abs
 
 object ChatUtils {
 
     private val logger: Logger = LogManager.getLogger(ChatUtils::class.java)
     private val PREFIX: Component = ColorUtils.getPrefixComponent()
+
+    private const val COMMAND_PAGE_MESSAGE_ID = 1
+    private const val CATEGORY_PAGE_MESSAGE_ID = 2
+    private val messageSignatures = mutableMapOf<Int, MessageSignature>()
 
     @JvmStatic
     fun sendMessage(message: String, prefix: Boolean = true) {
@@ -29,19 +37,52 @@ object ChatUtils {
         Minecraft.getInstance().gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat.addClientSystemMessage(text)
     }
 
-    fun sendEmptyMessage() {
+    private fun sendEmptyMessage() {
         sendMessage("", prefix = false)
     }
 
-    @JvmStatic
-    fun sendComponent(component: Component, prefix: Boolean = true) {
+    fun sendComponent(component: Component, prefix: Boolean = true, messageId: Int? = null) {
         val finalComponent = if (prefix) {
             Component.empty().append(PREFIX).append(component)
         } else {
             component
         }
 
-        Minecraft.getInstance().gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat.addClientSystemMessage(finalComponent)
+        val chat = Minecraft.getInstance().gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat
+
+        if (messageId == null) {
+            chat.addClientSystemMessage(finalComponent)
+        } else {
+            val signature = createMessageSignature(messageId)
+            removeChatMessage(chat, signature)
+            chat.addMessage(finalComponent, signature, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
+        }
+    }
+
+    private fun createMessageSignature(id: Int): MessageSignature {
+        val key = abs(id).mod(255 * 128)
+
+        return messageSignatures.getOrPut(key) {
+            val data = ByteArray(256)
+
+            val fullBytes = key / 128
+            data.fill(127, 0, fullBytes)
+
+            data[fullBytes] = (key % 128).toByte()
+
+            MessageSignature(data)
+        }
+    }
+
+    private fun removeChatMessage(chat: ChatComponent, signature: MessageSignature) {
+        val message = chat.allMessages.firstOrNull { it.signature == signature } ?: return
+        chat.allMessages.remove(message)
+
+        if (chat.trimmedMessages.removeIf { it.parent === message }) {
+            return
+        }
+
+        chat.refreshTrimmedMessages()
     }
 
     fun sendCommandComponent(
@@ -116,20 +157,30 @@ object ChatUtils {
     ) {
         val divider = fillChat()
         val title: Component = buildCommandTitleBar(page, totalPages).centerText()
-
-        sendEmptyMessage()
-        sendComponent(divider, prefix = false)
-        sendComponent(title, prefix = false)
-        sendComponent(divider, prefix = false)
-
         val categoryTitle: Component = Component.literal("$color§l$category").centerText()
-        sendComponent(categoryTitle, prefix = false)
 
-        for (command in commands) sendComponent(command, prefix = false)
+        val message = Component.empty()
 
-        sendEmptyMessage()
-        sendComponent(divider, prefix = false)
-        sendEmptyMessage()
+        fun appendLine(component: Component) {
+            if (!message.string.isEmpty()) {
+                message.append(Component.literal("\n"))
+            }
+            message.append(component)
+        }
+
+        appendLine(Component.empty())
+        appendLine(divider)
+        appendLine(title)
+        appendLine(divider)
+        appendLine(categoryTitle)
+
+        commands.forEach(::appendLine)
+
+        appendLine(Component.empty())
+        appendLine(divider)
+        appendLine(Component.empty())
+
+        sendComponent(message, prefix = false, messageId = COMMAND_PAGE_MESSAGE_ID)
     }
 
     private fun buildCommandTitleBar(page: Int, totalPages: Int): Component {
@@ -193,28 +244,38 @@ object ChatUtils {
     ) {
         val divider = fillChat()
         val title: Component = buildTitleBar(page, totalPages).centerText()
-
-        sendComponent(divider, prefix = false)
-        sendComponent(title, prefix = false)
-        sendComponent(divider, prefix = false)
-
         val collectionTitle: Component = Component.literal("$color§l$category Collections").centerText()
-        sendComponent(collectionTitle, prefix = false)
 
-        for (collection in collections) {
-            val message = Component.literal("   $color- $collection")
-                .withStyle { style: Style? ->
-                    style!!
-                        .withClickEvent(ClickEvent.RunCommand("/sct track $collection"))
-                        .withHoverEvent(
-                            HoverEvent.ShowText(
-                                Component.literal("§eClick to track the $color$collection§e collection!")
-                            )
-                        )
-                }
-            sendComponent(message, prefix = false)
+        val message = Component.empty()
+
+        fun appendLine(component: Component) {
+            if (message.string.isNotEmpty()) {
+                message.append(Component.literal("\n"))
+            }
+            message.append(component)
         }
-        sendComponent(divider, prefix = false)
+
+        appendLine(divider)
+        appendLine(title)
+        appendLine(divider)
+        appendLine(collectionTitle)
+
+        collections.forEach { collection ->
+            appendLine(
+                Component.literal("   $color- $collection")
+                    .withStyle {
+                        it.withClickEvent(ClickEvent.RunCommand("/sct track $collection"))
+                            .withHoverEvent(
+                                HoverEvent.ShowText(
+                                    Component.literal("§eClick to track the $color$collection§e collection!")
+                                )
+                            )
+                    }
+            )
+        }
+        appendLine(divider)
+
+        sendComponent(message, prefix = false, messageId = CATEGORY_PAGE_MESSAGE_ID)
     }
 
     private fun buildTitleBar(page: Int, totalPages: Int): Component {
