@@ -4,7 +4,6 @@ import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.hasCooldownAttribute
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils
@@ -30,12 +29,9 @@ object ChatListener {
         // Coleweight pattern
         ABILITY("""^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!""", RegexOption.IGNORE_CASE),
         CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? ?Ability""", RegexOption.IGNORE_CASE),
-        SUMMON("""^You summoned your (.+?)!"""),
         CONSUME("""^You consumed an? (.+?) and gained""", RegexOption.IGNORE_CASE),
         ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
-        // Example: "Autopet equipped your [Lvl 100] §6Bal§r§7! §aVIEW RULE"
-        AUTOPET("""^§cAutopet §eequipped your §7\[Lvl (\d{1,3})] (.+?)!""", RegexOption.IGNORE_CASE),
-        ATTRIBUTE("""^ATTRIBUTE\s+LEVEL\s+UP\s+Pickaxe\s+Cooldown.*?➜\s*([\d]+|[IVX]+)\b""", RegexOption.IGNORE_CASE);
+        ATTRIBUTE("""^ATTRIBUTE\s+LEVEL\s+UP\s+Pickaxe\s+Cooldown.*?([\d]+|[IVX]+)\b$""", RegexOption.IGNORE_CASE);
         val regex: Regex = Regex(pattern, options.toSet())
 
         fun find(input: CharSequence): MatchResult? = regex.find(input)
@@ -81,7 +77,6 @@ object ChatListener {
         val text = message.string
         val cleanText = text.removeColor()
 
-        if (cleanText.contains("summoned your")) petSummoned(text)
         if (cleanText.contains("ATTRIBUTE")) setCooldownAttribute(cleanText)
         if (cleanText.contains("used your")) abilityListener(cleanText)
         if (cleanText.contains("on cooldown")) onCooldownListener(cleanText)
@@ -121,7 +116,7 @@ object ChatListener {
     }
 
     private fun setCooldownAttribute(text: String) {
-        if (hasCooldownAttribute()) return
+        if (ConfigAccess.hasCooldownAttribute()) return
 
         val value = Patterns.ATTRIBUTE.find(text.trimStart())?.groupValues?.get(1)
         if (value != null) {
@@ -209,50 +204,6 @@ object ChatListener {
         }
     }
 
-    private fun petSummoned(text: String) {
-        if (hasCooldownAttribute()) return
-
-        val match = Patterns.SUMMON.find(text) ?: return
-        val petSegment = match.groupValues[1]
-
-        val name = petSegment.replace(" ✦", "").trim()
-
-        val level = if (AbilityUtils.lastPet?.name == name) AbilityUtils.lastPet!!.level else 100
-        val rarity = if (AbilityUtils.lastPet?.name == name) AbilityUtils.lastPet!!.rarity else AbilityUtils.PetRarity.LEGENDARY
-
-        AbilityUtils.updatePet(AbilityUtils.Pet(name = name, level = level, rarity = rarity, timestamp = System.currentTimeMillis(), isManual = true))
-    }
-
-    // Listen to Autopet swap messages
-    @JvmStatic
-    fun petSwapListener(text: String) {
-        if (hasCooldownAttribute()) return
-
-        val match = Patterns.AUTOPET.find(text) ?: return
-        val level = match.groupValues[1].toIntOrNull() ?: return
-        if (level !in 1..200) return
-        val petSegment = match.groupValues[2]
-
-        val name = petSegment
-            .replace(Regex("§."), "")
-            .replace(" ✦", "")
-            .trim()
-
-        val colorCodeMatch = Regex("§.").find(petSegment)
-        val code = colorCodeMatch?.value?.getOrNull(1)
-        val rarity = when (code) {
-            'f' -> AbilityUtils.PetRarity.COMMON
-            'a' -> AbilityUtils.PetRarity.UNCOMMON
-            '9' -> AbilityUtils.PetRarity.RARE
-            '5' -> AbilityUtils.PetRarity.EPIC
-            '6' -> AbilityUtils.PetRarity.LEGENDARY
-            'd' -> AbilityUtils.PetRarity.MYTHIC
-            else -> return
-        }
-
-        AbilityUtils.updatePet(AbilityUtils.Pet(name = name, level = level, rarity = rarity, timestamp = System.currentTimeMillis()))
-    }
-
     private fun startAbilityTimeline(ability: String, snap: AbilityUtils.PickaxeAbilitySnapshot?) {
         val cotm = ConfigAccess.getCotmLevel()
         val abilityLevel = if (cotm >= 2) 2 else 1
@@ -281,11 +232,7 @@ object ChatListener {
         val cotf = ConfigAccess.getCotfLevel()
         val abilityLevel = if (cotf >= 1) 2 else 1
 
-        val baseCooldown = AbilityUtils.getBaseAxeCooldown(ability, abilityLevel)
-        val finalCooldownSec = AbilityUtils.calculateAxeReduction(
-            baseCooldown = baseCooldown
-        )
-
+        val finalCooldownSec = AbilityUtils.getBaseAxeCooldown(ability, abilityLevel).toDouble()
         val durationMs = (AbilityUtils.getBaseAxeDuration(ability, abilityLevel) * 1000).toLong()
 
         maxAxeCooldown = finalCooldownSec

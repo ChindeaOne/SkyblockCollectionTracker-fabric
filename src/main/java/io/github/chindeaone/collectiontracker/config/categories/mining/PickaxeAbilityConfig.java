@@ -54,9 +54,6 @@ public class PickaxeAbilityConfig {
     public String abilityName = "";
 
     @Expose
-    public String lastPet = "";
-
-    @Expose
     public boolean cooldownAttribute = false;
 
     @Expose

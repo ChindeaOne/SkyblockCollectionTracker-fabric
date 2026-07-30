@@ -91,7 +91,6 @@ val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = hotmConfig.pickaxeAbilityConfig.indicator
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
-val lastPet: String get() = pickaxeAbilityConfig.lastPet
 val cooldownAttribute: Boolean get() = pickaxeAbilityConfig.cooldownAttribute
 val attributeLevel: Int get() = pickaxeAbilityConfig.attributeLevel
 val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
@@ -415,9 +414,6 @@ object ConfigAccess {
     fun getPickaxeAbilityName(): String = abilityName
 
     @JvmStatic
-    fun getLastPet(): String = lastPet
-
-    @JvmStatic
     fun hasCooldownAttribute(): Boolean = cooldownAttribute
 
     @JvmStatic
@@ -647,10 +643,6 @@ object ConfigHelper {
 
     fun setAbilityName(name: String) {
         pickaxeAbilityConfig.abilityName = name
-    }
-
-    fun setLastPet(pet: String) {
-        pickaxeAbilityConfig.lastPet = pet
     }
 
     fun setCooldownAttribute(enabled: Boolean) {

@@ -1,9 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
-import com.google.gson.annotations.Expose
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.config.ConfigHelper
-import io.github.chindeaone.collectiontracker.config.ConfigManager
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping.miningIslands
 
@@ -34,33 +31,12 @@ object AbilityUtils {
         PERFECTLY_CUT(0.10)
     }
 
-    enum class PetRarity(val balReductionPerLevel: Double, val crowReductionPerLevel: Double) {
-        COMMON(0.0, 0.0007),
-        UNCOMMON(0.0, 0.0007),
-        RARE(0.0, 0.0007),
-        EPIC(0.0,0.0012),
-        LEGENDARY(0.001,0.0012),
-        MYTHIC(0.0, 0.0) // for other mythic pets
-    }
-
-    data class Pet(
-        @Expose val name: String,
-        @Expose val level: Int,
-        @Expose val rarity: PetRarity,
-        @Expose val timestamp: Long = System.currentTimeMillis(),
-        @Expose val isManual: Boolean = false
-    )
-
     @Volatile
     var lastPickaxeSnap: PickaxeAbilitySnapshot? = null
 
     @Volatile
     var lastAxeSnap: AxeAbilitySnapshot? = null
     private const val MAX_AGE_MS = 3000L // 3 seconds
-
-    @Volatile
-    var lastPet: Pet? = null
-    private val gson = ConfigManager.gson
 
     var isMayhemCooldown: Boolean = false
 
@@ -69,11 +45,6 @@ object AbilityUtils {
             is PickaxeAbilitySnapshot -> lastPickaxeSnap = s
             is AxeAbilitySnapshot -> lastAxeSnap = s
         }
-    }
-
-    fun updatePet(pet: Pet) {
-        lastPet = pet
-        ConfigHelper.setLastPet(gson.toJson(pet))
     }
 
     fun recentOrNull(now: Long = System.currentTimeMillis()): PickaxeAbilitySnapshot? =
@@ -182,23 +153,8 @@ object AbilityUtils {
 
         if (ConfigAccess.hasCooldownAttribute()) {
             cooldown *= (1.0 - ConfigAccess.getAttributeLevel() / 100f)
-        } else {
-            // Pet swap useless
-            lastPet?.let { pet ->
-                val petReduction = when {
-                    pet.name.equals("Bal", ignoreCase = true) && pet.rarity >= PetRarity.LEGENDARY -> {
-                        pet.rarity.balReductionPerLevel * pet.level
-                    }
-
-                    pet.name.equals("Crow", ignoreCase = true) -> {
-                        0.03 + (pet.rarity.crowReductionPerLevel * pet.level)
-                    }
-
-                    else -> 0.0
-                }
-                cooldown *= (1.0 - petReduction)
-            }
         }
+
         // Sky Mall
         if (skyMallActive && miningIslands.contains(IslandTracker.currentMiningIsland)) {
             cooldown *= if (abilityName == "Pickobulus") {
@@ -214,24 +170,5 @@ object AbilityUtils {
         }
 
         return cooldown.coerceAtLeast(0.0)
-    }
-
-    fun calculateAxeReduction(baseCooldown: Int): Double {
-        val cooldown = baseCooldown.toDouble()
-
-        if (ConfigAccess.hasCooldownAttribute()) {
-            return cooldown
-        }
-
-        lastPet?.let { pet ->
-            val petReduction = when {
-                pet.name.equals("Crow", ignoreCase = true) -> {
-                    0.03 + (pet.rarity.crowReductionPerLevel * pet.level)
-                }
-                else -> 0.0
-            }
-            return cooldown * (1.0 - petReduction).coerceAtLeast(0.0)
-        }
-        return cooldown
     }
 }
