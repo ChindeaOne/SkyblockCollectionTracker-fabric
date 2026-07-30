@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.gui.GuiManager;
 import io.github.notenoughupdates.moulconfig.annotations.*;
-import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class Misc {
 
@@ -37,7 +36,7 @@ public class Misc {
             desc = "Change how many decimals cooldown and duration will show."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 2, minStep = 1)
-    public Property<Integer> abilityPrecision = Property.of(0);
+    public int abilityPrecision = 0;
 
     @Expose
     @ConfigOption(
@@ -45,7 +44,7 @@ public class Misc {
             desc = "How long (in seconds) will titles remain on screen."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 8, minStep = 1)
-    public Property<Integer> titleDisplayTimer = Property.of(3);
+    public int titleDisplayTimer = 3;
 
     @Expose
     @ConfigOption(

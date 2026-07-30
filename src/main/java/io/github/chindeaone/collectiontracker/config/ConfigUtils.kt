@@ -37,7 +37,6 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCol
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import io.github.notenoughupdates.moulconfig.observer.Property
 
 /**
  * Global accessors for the configuration.
@@ -87,7 +86,7 @@ val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
 val lanternDeployableConfig: LanternDeployableConfig get() = miningConfig.lanternDeployableConfig
 val temporaryBuffsConfig: TemporaryBuffsConfig get() = miningConfig.temporaryBuffsConfig
-val cotmLevel: Property<Int> get() = hotmConfig.cotmLevel
+val cotmLevel: Int get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = hotmConfig.pickaxeAbilityConfig.indicator
 val abilityName: String get() = pickaxeAbilityConfig.abilityName
@@ -127,7 +126,7 @@ val enableCustomCWColor: Boolean get() = coleweightColorConfig.enableCustomColor
 val customCWColor: ChromaColour get() = coleweightColorConfig.customColor
 val heatmapConfig: HeatmapConfig get() = coleweightConfig.heatmapConfig
 val enableHeatmap: Boolean get() = heatmapConfig.enableHeatmap
-val heatmapOpacity: Property<Float> get() = heatmapConfig.heatmapOpacity
+val heatmapOpacity: Float get() = heatmapConfig.heatmapOpacity
 val precisionMiningConfig: PrecisionMiningConfig get() = coleweightConfig.precisionMiningConfig
 val enablePrecisionMiningHighlight: Boolean get() = precisionMiningConfig.enablePrecisionMiningHighlight
 val drawLineToPrecisionMining: Boolean get() = precisionMiningConfig.drawLineToPrecisionMining
@@ -138,8 +137,8 @@ val enableMiningStatsConfig: Boolean get() = miningStatsConfig.enableMiningStats
 val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsConfig.miningStatsOverlayInMiningIslandsOnly
 val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
 val showDetailedMiningFortune : Boolean get() = miningStatsConfig.showDetailedFortune
-val professionalMS: Property<Int> get() = hotmConfig.professionalMS
-val strongArmMS: Property<Int> get() = hotmConfig.strongArmMS
+val professionalMS: Int get() = hotmConfig.professionalMS
+val strongArmMS: Int get() = hotmConfig.strongArmMS
 val enableDeployable: Boolean get() = lanternDeployableConfig.enableDeployable
 val showDeployableTitle: Boolean get() = lanternDeployableConfig.showDeployableTitle
 val deployableOutOfRangeWarning : Boolean get() = lanternDeployableConfig.deployableOutOfRangeWarning
@@ -151,7 +150,7 @@ val enableForagingStatsOverlay: Boolean get() = foragingStatsConfig.enableForagi
 val showDetailedForagingFortune: Boolean get() = foragingStatsConfig.showDetailedFortune
 val hotfConfig: HotfConfig get() = foragingConfig.hotfConfig
 val axeAbilityConfig: AxeAbilityConfig get() = hotfConfig.axeAbilityConfig
-val cotfLevel: Property<Int> get() = hotfConfig.cotfLevel
+val cotfLevel: Int get() = hotfConfig.cotfLevel
 val abilityNameAxe: String get() = axeAbilityConfig.abilityNameAxe
 val displayAxeAbility: Boolean get() = axeAbilityConfig.displayAxeAbility
 val axeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = axeAbilityConfig.indicator
@@ -206,8 +205,8 @@ val enableTamingTracking: Boolean get() = skillConfig.enableTamingTracking
 
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
-val precision: Property<Int> get() = miscConfig.abilityPrecision
-val titleDisplayTimer: Property<Int> get() = miscConfig.titleDisplayTimer
+val precision: Int get() = miscConfig.abilityPrecision
+val titleDisplayTimer: Int get() = miscConfig.titleDisplayTimer
 val titleScale: Misc.TitleScale get() = miscConfig.titleScale
 val abilityCooldownOnly: Boolean get() = miscConfig.abilityCooldownOnly
 val showTimerTitle: Boolean get() = miscConfig.showTimerTitle
@@ -363,10 +362,10 @@ object ConfigAccess {
     fun isShowDetailedMiningFortune(): Boolean = showDetailedMiningFortune
 
     @JvmStatic
-    fun getProfessionalMS(): Int = professionalMS.get()
+    fun getProfessionalMS(): Int = professionalMS
 
     @JvmStatic
-    fun getStrongArmMS(): Int = strongArmMS.get()
+    fun getStrongArmMS(): Int = strongArmMS
 
     @JvmStatic
     fun isForagingStatsOverlayEnabled(): Boolean = enableForagingStatsOverlay
@@ -375,7 +374,7 @@ object ConfigAccess {
     fun isShowDetailedForagingFortune(): Boolean = showDetailedForagingFortune
 
     @JvmStatic
-    fun getCotmLevel(): Int = cotmLevel.get()
+    fun getCotmLevel(): Int = cotmLevel
 
     @JvmStatic
     fun isSkyMallEnabled(): Boolean = enableSkyMall
@@ -438,16 +437,16 @@ object ConfigAccess {
     fun getAxeAbilityName(): String = abilityNameAxe
 
     @JvmStatic
-    fun getCotfLevel(): Int = cotfLevel.get()
+    fun getCotfLevel(): Int = cotfLevel
 
     @JvmStatic
-    fun getAbilityPrecision(): Int = precision.get()
+    fun getAbilityPrecision(): Int = precision
 
     @JvmStatic
     fun isColeweightAbilityFormat(): Boolean = coleweightAbilityFormat
 
     @JvmStatic
-    fun getTitleDisplayTimer(): Int = titleDisplayTimer.get()
+    fun getTitleDisplayTimer(): Int = titleDisplayTimer
 
     @JvmStatic
     fun isShowPickaxeReadyAbilityTitle(): Boolean = showPickaxeReadyAbilityTitle
@@ -531,7 +530,7 @@ object ConfigAccess {
     fun isHeatmapEnabled(): Boolean = enableHeatmap
 
     @JvmStatic
-    fun getHeatmapOpacity(): Float = heatmapOpacity.get()
+    fun getHeatmapOpacity(): Float = heatmapOpacity
 
     @JvmStatic
     fun isPrecisionMiningHighlightEnabled(): Boolean = enablePrecisionMiningHighlight
@@ -692,19 +691,19 @@ object ConfigHelper {
     }
 
     fun setProfessionalMS(ms: Int) {
-        hotmConfig.professionalMS.set(ms)
+        hotmConfig.professionalMS = ms
     }
 
     fun setStrongArmMS(ms: Int) {
-        hotmConfig.strongArmMS.set(ms)
+        hotmConfig.strongArmMS = ms
     }
 
     fun setCotmLevel(level: Int) {
-        hotmConfig.cotmLevel.set(level)
+        hotmConfig.cotmLevel = level
     }
 
     fun setCotfLevel(level: Int) {
-        hotfConfig.cotfLevel.set(level)
+        hotfConfig.cotfLevel = level
     }
 
     fun setTitlePosition(x: Int, y: Int) {

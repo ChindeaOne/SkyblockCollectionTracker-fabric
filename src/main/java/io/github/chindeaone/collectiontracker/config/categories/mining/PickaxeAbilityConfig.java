@@ -3,10 +3,7 @@ package io.github.chindeaone.collectiontracker.config.categories.mining;
 import com.google.gson.annotations.Expose;
 import io.github.chindeaone.collectiontracker.config.categories.Misc;
 import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.*;
 
 public class PickaxeAbilityConfig {
 
@@ -57,6 +54,11 @@ public class PickaxeAbilityConfig {
     public boolean cooldownAttribute = false;
 
     @Expose
+    @ConfigOption(
+            name = "Cooldown Attribute Level",
+            desc = "Manually set the attribute level for cooldown calculation."
+    )
+    @ConfigEditorSlider(minValue = 0, maxValue = 10, minStep = 1)
     public int attributeLevel = 0;
 
     @Expose
