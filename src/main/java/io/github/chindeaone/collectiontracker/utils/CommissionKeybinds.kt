@@ -58,7 +58,11 @@ object CommissionKeybinds {
     var isMenuOpen = false
         private set
 
-    private val COMMISSION_SLOTS = mapOf(11 to 0, 12 to 1, 14 to 2, 15 to 3)
+    private val SLOT_LAYOUTS = mapOf(
+        2 to intArrayOf(11, 15),
+        3 to intArrayOf(11, 13, 15),
+        4 to intArrayOf(11, 12, 14, 15)
+    )
 
     private var keyGuardActive = false
     private val guardedScreens: MutableSet<Screen> = Collections.newSetFromMap(WeakHashMap())
@@ -68,7 +72,7 @@ object CommissionKeybinds {
     @JvmStatic
     fun onSlotUpdated(menu: AbstractContainerMenu, slot: Int, stack: ItemStack) {
         if (attachedMenu !== menu) return
-        val commissionIndex = COMMISSION_SLOTS[slot] ?: return
+        val commissionIndex = getCommissionIndex(slot) ?: return
         if (stack.isEmpty) return
 
         val client = Minecraft.getInstance()
@@ -149,13 +153,7 @@ object CommissionKeybinds {
 
         val pressedIndex = resolveCommissionIndex(client) ?: return
 
-        val slotIndex = when (pressedIndex) {
-            0 -> 11
-            1 -> 12
-            2 -> 14
-            3 -> 15
-            else -> return
-        }
+        val slotIndex = getContainerSlot(pressedIndex) ?: return
 
         val slot = screen.menu.getSlot(slotIndex)
         if (!slot.hasItem()) return
@@ -189,6 +187,15 @@ object CommissionKeybinds {
         }
 
         lastClick = now
+    }
+
+    private fun getContainerSlot(commissionIndex: Int): Int? {
+        return SLOT_LAYOUTS[CommissionWidget.rawCommissions.size]?.getOrNull(commissionIndex)
+    }
+
+    private fun getCommissionIndex(slot: Int): Int? {
+        val layout = SLOT_LAYOUTS[CommissionWidget.rawCommissions.size] ?: return null
+        return layout.indexOf(slot).takeIf { it != -1 }
     }
 
     private fun resolveCommissionIndex(client: Minecraft): Int? {
@@ -267,7 +274,7 @@ object CommissionKeybinds {
             val slot = getHoveredSlot(container) ?: return@AllowKeyPress true
 
             val slotId = container.menu.slots.indexOf(slot)
-            if (slotId !in COMMISSION_SLOTS.keys) return@AllowKeyPress true
+            if (getCommissionIndex(slotId) == null) return@AllowKeyPress true
             if (!slot.hasItem()) return@AllowKeyPress true
 
             if (isCompletedCommission(slot.item.copy())) {
@@ -299,7 +306,7 @@ object CommissionKeybinds {
             ) ?: return@BeforeMouseClick
 
             val slotId = container.menu.slots.indexOf(slot)
-            if (slotId !in COMMISSION_SLOTS.keys) return@BeforeMouseClick
+            if (getCommissionIndex(slotId) == null) return@BeforeMouseClick
             if (!slot.hasItem()) return@BeforeMouseClick
 
             if (isCompletedCommission(slot.item.copy())) {
