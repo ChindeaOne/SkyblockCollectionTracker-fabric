@@ -3,7 +3,8 @@ package io.github.chindeaone.collectiontracker.gui.overlays;
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.parser.CommissionFormat;
+import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser;
+import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser.ActiveCommission;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget;
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker;
@@ -62,24 +63,18 @@ public class CommissionsOverlay extends AbstractOverlay{
     }
 
     private List<String> getCommissionsLines() {
-        List<String> raw = CommissionWidget.getRawCommissions();
-        if (raw.isEmpty()) return Collections.emptyList();
+        List<ActiveCommission> commissions = CommissionWidget.getCommissions();
+        if (commissions.isEmpty()) return Collections.emptyList();
 
         formattedCommissions.clear();
-        CommissionFormat.Area detectedArea = null;
+        CommissionParser.Area detectedArea = null;
 
-        for (String line : raw) {
-            String formatted = line;
-            String lowerLine = line.toLowerCase();
-            for (CommissionFormat.CommissionType type : CommissionFormat.getCOMMISSIONS()) {
-                String typeNameLower = type.getName().toLowerCase();
-                if (lowerLine.contains(typeNameLower)) {
-                    formatted = type.getFormat().invoke(line);
-                    if (detectedArea == null) detectedArea = type.getArea();
-                    break;
-                }
+        for (ActiveCommission commission : CommissionWidget.getCommissions()) {
+            formattedCommissions.add(commission.getFormattedLine());
+
+            if (detectedArea == null) {
+                detectedArea = commission.getType().getArea();
             }
-            formattedCommissions.add(formatted);
         }
 
         if (detectedArea != null) {

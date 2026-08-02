@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.mixins;
 
-import io.github.chindeaone.collectiontracker.utils.CommissionKeybinds;
+import io.github.chindeaone.collectiontracker.utils.CommissionUtils;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +13,7 @@ public class AbstractContainerMenuMixin {
 
     @Inject(method = "setItem", at = @At("TAIL"))
     private void onSetItem(int slot, int stateId, ItemStack itemStack, CallbackInfo ci) {
-        CommissionKeybinds.onSlotUpdated(
+        CommissionUtils.onSlotUpdated(
                 (AbstractContainerMenu)(Object)this,
                 slot,
                 itemStack

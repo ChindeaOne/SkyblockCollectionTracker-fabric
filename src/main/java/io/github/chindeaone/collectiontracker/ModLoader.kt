@@ -6,7 +6,7 @@ package io.github.chindeaone.collectiontracker
 import com.mojang.blaze3d.systems.RenderSystem
 import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
-import io.github.chindeaone.collectiontracker.utils.CommissionKeybinds
+import io.github.chindeaone.collectiontracker.utils.CommissionUtils
 import io.github.chindeaone.collectiontracker.utils.ConfigStateUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
@@ -45,7 +45,7 @@ object ModLoader: ModInitializer {
 
         CommandRegistry.init()
 
-        CommissionKeybinds.initKeyGuards()
+        CommissionUtils.initKeyGuards()
         CustomPipelines.register()
     }
 
@@ -94,7 +94,7 @@ object ModLoader: ModInitializer {
                     true
                 }
             }
-            CommissionKeybinds.onScreenChanged(screen)
+            CommissionUtils.onScreenChanged(screen)
         }
     }
 
@@ -109,7 +109,7 @@ object ModLoader: ModInitializer {
             SkyblockCollectionTracker.onClientTick(client)
             ServerUtils.onClientTick(client)
             Hypixel.onClientTick(client)
-            CommissionKeybinds.onClientTick(client)
+            CommissionUtils.onClientTick(client)
             TabData.onClientTick(client)
             BlockWatcher.onClientTick(client)
             ScoreboardUtils.onClientTick(client)

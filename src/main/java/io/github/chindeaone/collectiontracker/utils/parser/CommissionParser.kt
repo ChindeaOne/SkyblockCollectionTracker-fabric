@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
-object CommissionFormat {
+import io.github.chindeaone.collectiontracker.utils.ColorUtils
+
+object CommissionParser {
     enum class Area(val displayName: String) {
         DWARVEN_MINES("Dwarven Mines"),
         CRYSTAL_HOLLOWS("Crystal Hollows"),
@@ -11,37 +13,29 @@ object CommissionFormat {
         val name: String,
         val area: Area,
         val format: (String) -> String
-    )
-
-    // NEU Style
-    private fun formatLine(line: String): String {
-        var formatted = "§9$line§r"
-
-        // Format completion: DONE-> §a (Green), 66%-> §e (Yellow), 33%-> §6 (Orange), else §c (Red)
-        val completionRegex = Regex("(?i)DONE|\\d+(?:\\.\\d+)?%", RegexOption.IGNORE_CASE)
-        formatted = formatted.replace(completionRegex) {match ->
-            val raw = match.value
-
-            val color = when {
-                raw.equals("DONE", ignoreCase = true) -> "§a"
-                raw.endsWith("%") -> {
-                    val pct = raw.removeSuffix("%").toFloatOrNull()
-                    when {
-                        pct == null -> "§c"
-                        pct >= 66f -> "§e"
-                        pct >= 33f -> "§6"
-                        else -> "§c"
-                    }
-                }
-                else -> "§c"
-            }
-            "$color$raw§r"
-        }
-
-        return formatted
+    ) {
+        val key = name.lowercase()
+        val firstWord = name.substringBefore(' ').lowercase()
+        val color: Int get() = ColorUtils.collectionColors[firstWord] ?: ColorUtils.GREEN
     }
 
-    @JvmStatic
+    data class ActiveCommission(
+        val type: CommissionType,
+        var progress: String,
+    ) {
+        val completed: Boolean
+            get() = progress.equals("DONE", ignoreCase = true)
+
+        val isFresh: Boolean
+            get() = progress == "0%"
+
+        val displayLine: String
+            get() = "${type.name}: $progress"
+
+        val formattedLine: String
+            get() = type.format(displayLine)
+    }
+
     val COMMISSIONS = listOf(
         // Dwarven Mines
         CommissionType("Mithril Miner", Area.DWARVEN_MINES) { formatLine(it) },
@@ -102,4 +96,45 @@ object CommissionFormat {
         CommissionType("Umber Collector", Area.GLACITE_TUNNELS) { formatLine(it) },
         CommissionType("Tungsten Collector", Area.GLACITE_TUNNELS) { formatLine(it) },
     )
+
+    fun parseCommission(line: String): ActiveCommission? {
+        val name = line.substringBefore(':').trim()
+        val progress = line.substringAfter(':').trim()
+
+        val type = find(name) ?: return null
+
+        return ActiveCommission(type, progress)
+    }
+
+    // NEU Style
+    private fun formatLine(line: String): String {
+        var formatted = "§9$line§r"
+
+        // Format completion: DONE-> §a (Green), 66%-> §e (Yellow), 33%-> §6 (Orange), else §c (Red)
+        val completionRegex = Regex("(?i)DONE|\\d+(?:\\.\\d+)?%", RegexOption.IGNORE_CASE)
+        formatted = formatted.replace(completionRegex) {match ->
+            val raw = match.value
+
+            val color = when {
+                raw.equals("DONE", ignoreCase = true) -> "§a"
+                raw.endsWith("%") -> {
+                    val pct = raw.removeSuffix("%").toFloatOrNull()
+                    when {
+                        pct == null -> "§c"
+                        pct >= 66f -> "§e"
+                        pct >= 33f -> "§6"
+                        else -> "§c"
+                    }
+                }
+                else -> "§c"
+            }
+            "$color$raw§r"
+        }
+
+        return formatted
+    }
+
+    val BY_NAME = COMMISSIONS.associateBy { it.key }
+
+    fun find(name: String): CommissionType? = BY_NAME[name.lowercase()]
 }

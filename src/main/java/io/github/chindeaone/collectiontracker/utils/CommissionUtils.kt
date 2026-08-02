@@ -23,7 +23,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.mixins.AbstractContainerScreenAccessor
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
-import io.github.chindeaone.collectiontracker.utils.parser.CommissionFormat
+import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
@@ -39,7 +39,7 @@ import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW
 import java.util.*
 
-object CommissionKeybinds {
+object CommissionUtils {
 
     private var lastClick = -1L
     private var openedAt = 0L
@@ -97,7 +97,7 @@ object CommissionKeybinds {
             val trimmed = line.trim()
             if (trimmed.isEmpty()) continue
 
-            for (type in CommissionFormat.COMMISSIONS) {
+            for (type in CommissionParser.COMMISSIONS) {
                 if (trimmed.equals(type.name, ignoreCase = true)) {
                     return type.name
                 }
@@ -190,11 +190,11 @@ object CommissionKeybinds {
     }
 
     private fun getContainerSlot(commissionIndex: Int): Int? {
-        return SLOT_LAYOUTS[CommissionWidget.rawCommissions.size]?.getOrNull(commissionIndex)
+        return SLOT_LAYOUTS[CommissionWidget.commissions.size]?.getOrNull(commissionIndex)
     }
 
     private fun getCommissionIndex(slot: Int): Int? {
-        val layout = SLOT_LAYOUTS[CommissionWidget.rawCommissions.size] ?: return null
+        val layout = SLOT_LAYOUTS[CommissionWidget.commissions.size] ?: return null
         return layout.indexOf(slot).takeIf { it != -1 }
     }
 
@@ -240,8 +240,6 @@ object CommissionKeybinds {
         attachedMenu = null
         wasDown.clear()
         isMenuOpen = false
-
-        CommissionWidget.allowTabUpdates()
     }
 
     private fun keybindCancelEvent() {
