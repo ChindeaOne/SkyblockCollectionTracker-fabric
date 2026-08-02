@@ -79,8 +79,12 @@ val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
 val miningConfig: Mining get() = modConfig.mining
 val miningRoutesConfig: MiningRoutesConfig get() = miningConfig.miningRoutesConfig
 val commissionsConfig: CommissionsConfig get() = miningConfig.commissionsConfig
-val keybindConfig: KeybindConfig get() = commissionsConfig.keybindConfig
+val enableCommissionsOverlay: Boolean get() = commissionsConfig.enableCommissionsOverlay
+val completionTitle: Boolean get() = commissionsConfig.completionTitle
+val claimTitle: Boolean get() = commissionsConfig.claimTitle
+val customTitleColors: Boolean get() = commissionsConfig.customTitleColors
 val enableCommissionsTracking: Boolean get() = commissionsConfig.enableCommissionsTracking
+val keybindConfig: KeybindConfig get() = commissionsConfig.keybindConfig
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
@@ -280,10 +284,8 @@ object ConfigAccess {
     @JvmStatic
     fun isUsingBazaar(): Boolean = useBazaar
 
-    @JvmStatic
     fun getKeybindConfig(): KeybindConfig = keybindConfig
 
-    @JvmStatic
     fun hasCheckedUpdate(): Boolean = hasCheckedUpdate
 
     @JvmStatic
@@ -296,12 +298,17 @@ object ConfigAccess {
     fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionConfig.showTrackingRatesAtEndOfSession
 
     @JvmStatic
-    fun isCommissionsEnabled(): Boolean = commissionsConfig.enableCommissionsOverlay
+    fun isCommissionsEnabled(): Boolean = enableCommissionsOverlay
+
+    fun isCompletionTitleEnabled(): Boolean = completionTitle
+
+    fun isClaimTitleEnabled(): Boolean = claimTitle
+
+    fun isCustomTitleColorsEnabled(): Boolean = customTitleColors
 
     @JvmStatic
     fun isCommissionsTrackingEnabled(): Boolean = enableCommissionsTracking
 
-    @JvmStatic
     fun isCommissionsKeybindsEnabled(): Boolean = keybindConfig.enableCommissionsKeybinds
 
     @JvmStatic
@@ -328,34 +335,26 @@ object ConfigAccess {
     @JvmStatic
     fun getBazaarPriceType(): Bazaar.BazaarPriceType = bazaarPriceType
 
-    @JvmStatic
     fun isColeweightRankingInChat(): Boolean = coleweightRankingInChat
 
     @JvmStatic
     fun isColeweightRankInNameTag(): Boolean = coleweightRankInNameTag
 
-    @JvmStatic
     fun isOnlyOnMiningIslands(): Boolean = onlyOnMiningIslands
 
-    @JvmStatic
     fun isCustomCwColorEnabled(): Boolean = enableCustomCWColor
 
-    @JvmStatic
     fun getCustomCWColor(): ChromaColour = customCWColor
 
-    @JvmStatic
     fun isFarmingweightRankingInChat(): Boolean = farmingweightRankingInChat
 
     @JvmStatic
     fun isFarmingweightRankInNameTag(): Boolean = farmingweightRankInNameTag
 
-    @JvmStatic
     fun isOnlyOnFarmingIslands(): Boolean = onlyOnFarmingIslands
 
-    @JvmStatic
     fun isCustomFWColorEnabled(): Boolean = enableCustomFWColor
 
-    @JvmStatic
     fun getCustomFWColor(): ChromaColour = customFWColor
 
     @JvmStatic
@@ -373,25 +372,21 @@ object ConfigAccess {
     @JvmStatic
     fun isShowDetailedForagingFortune(): Boolean = showDetailedForagingFortune
 
-    @JvmStatic
     fun getCotmLevel(): Int = cotmLevel
 
     @JvmStatic
     fun isSkyMallEnabled(): Boolean = enableSkyMall
 
-    @JvmStatic
     fun isDisableSkyMallChatMessages(): Boolean = disableSkyMallChatMessages
 
     @JvmStatic
     fun isLotteryEnabled(): Boolean = enableLottery
 
-    @JvmStatic
-    fun isBeekeeperEnabled(): Boolean = enableBeekeeper
-
-    @JvmStatic
     fun isDisableLotteryChatMessages(): Boolean = disableLotteryChatMessages
 
     @JvmStatic
+    fun isBeekeeperEnabled(): Boolean = enableBeekeeper
+
     fun isDisableBeekeeperChatMessages(): Boolean = disableBeekeeperChatMessages
 
     @JvmStatic
@@ -412,19 +407,14 @@ object ConfigAccess {
     @JvmStatic
     fun getPickaxeAbilityName(): String = abilityName
 
-    @JvmStatic
     fun hasCooldownAttribute(): Boolean = cooldownAttribute
 
-    @JvmStatic
     fun getAttributeLevel(): Int = attributeLevel
 
-    @JvmStatic
     fun getLastSkyMallBuff(): String = lastSkyMallBuff
 
-    @JvmStatic
     fun getLastLotteryBuff(): String = lastLotteryBuff
 
-    @JvmStatic
     fun getLastBeekeeperBuff(): String = lastBeekeeperBuff
 
     @JvmStatic
@@ -436,7 +426,6 @@ object ConfigAccess {
     @JvmStatic
     fun getAxeAbilityName(): String = abilityNameAxe
 
-    @JvmStatic
     fun getCotfLevel(): Int = cotfLevel
 
     @JvmStatic
@@ -460,7 +449,6 @@ object ConfigAccess {
     @JvmStatic
     fun isShowAxeExpiredAbilityTitle(): Boolean = showAxeExpiredAbilityTitle
 
-    @JvmStatic
     fun getTitleScale(): Misc.TitleScale = titleScale
 
     @JvmStatic
@@ -472,7 +460,6 @@ object ConfigAccess {
     @JvmStatic
     fun isAbilityCooldownOnly(): Boolean = abilityCooldownOnly
 
-    @JvmStatic
     fun isServerLagProtectionEnabled(): Boolean = miscConfig.serverLagProtection
 
     @JvmStatic
@@ -481,31 +468,22 @@ object ConfigAccess {
     @JvmStatic
     fun isDeployableEnabled(): Boolean = enableDeployable
 
-    @JvmStatic
     fun isShowDeployableTitle(): Boolean = showDeployableTitle
 
-    @JvmStatic
     fun isDeployableOutOfRangeWarningEnabled(): Boolean = deployableOutOfRangeWarning
 
-    @JvmStatic
     fun isMineshaftRoutesEnabled(): Boolean = enableMineshaftRoutes
 
-    @JvmStatic
     fun isMineshaftSpawnRoutesEnabled(): Boolean = enableMineshaftSpawnRoutes
 
-    @JvmStatic
     fun getMineshaftSpawnRoutes(): MineshaftRoutes.MineshaftSpawnRoutes = mineshaftSpawnRoutes
 
-    @JvmStatic
     fun isDwarvenMetalRoutesEnabled(): Boolean = enableDwarvenMetalRoutes
 
-    @JvmStatic
     fun getDwarvenMetalRoutes(): DwarvenMetalsRoutes.DwarvenMetalRoutes = dwarvenMetalRoutes
 
-    @JvmStatic
     fun isPureOresRoutesEnabled(): Boolean = enablePureOresRoutes
 
-    @JvmStatic
     fun getPureOresRoutes(): PureOresRoutes.PureOreRoutes = pureOresRoutes
 
     @JvmStatic
@@ -514,40 +492,29 @@ object ConfigAccess {
     @JvmStatic
     fun isShowTempBuffExpiredTitle(): Boolean = showTempBuffExpiredTitle
 
-    @JvmStatic
     fun getRefinedCacaoTime(): Long = refinedCacaoTime
 
-    @JvmStatic
     fun getFiletTime(): Long = filetTime
 
-    @JvmStatic
     fun getPristinePotatoTime(): Long = pristinePotatoTime
 
-    @JvmStatic
     fun getPowderPumpkinTime(): Long = powderPumpkinTime
 
-    @JvmStatic
     fun isHeatmapEnabled(): Boolean = enableHeatmap
 
-    @JvmStatic
     fun getHeatmapOpacity(): Float = heatmapOpacity
 
-    @JvmStatic
     fun isPrecisionMiningHighlightEnabled(): Boolean = enablePrecisionMiningHighlight
 
-    @JvmStatic
     fun isDrawLineToPrecisionMiningEnabled(): Boolean = drawLineToPrecisionMining
 
     @JvmStatic
     fun getTrackingOptions(): MultiCollectionConfig.TrackingOptions = trackingOptions
 
-    @JvmStatic
     fun isMultiTrackingSummaryEnabled(): Boolean = multiTrackingSummary
 
-    @JvmStatic
     fun isMultiDetailedSummaryEnabled(): Boolean = multiDetailedSummary
 
-    @JvmStatic
     fun getSummaryStats(): MultiCollectionConfig.SummaryStats = summaryStats
 
     @JvmStatic

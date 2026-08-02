@@ -14,6 +14,7 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import io.github.chindeaone.collectiontracker.utils.*
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
+import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import io.github.chindeaone.collectiontracker.utils.world.FarmingMapping
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
@@ -31,7 +32,8 @@ object ChatListener {
         CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? ?Ability""", RegexOption.IGNORE_CASE),
         CONSUME("""^You consumed an? (.+?) and gained""", RegexOption.IGNORE_CASE),
         ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
-        ATTRIBUTE("""^ATTRIBUTE\s+LEVEL\s+UP\s+Pickaxe\s+Cooldown.*?([\d]+|[IVX]+)\b$""", RegexOption.IGNORE_CASE);
+        ATTRIBUTE("""^ATTRIBUTE\s+LEVEL\s+UP\s+Pickaxe\s+Cooldown.*?([\d]+|[IVX]+)\b$""", RegexOption.IGNORE_CASE),
+        COMMISSION("""^(.+?)\s+Commission Complete!.*$""", RegexOption.IGNORE_CASE);
         val regex: Regex = Regex(pattern, options.toSet())
 
         fun find(input: CharSequence): MatchResult? = regex.find(input)
@@ -83,6 +85,7 @@ object ChatListener {
         if (cleanText.contains("You selected")) abilitySwapListener(cleanText)
         if (cleanText.contains("consumed")) consumableListener(cleanText)
         if (cleanText.contains("You have reset")) treeResetListener(cleanText)
+        if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
         sacksListener(message, actionBar = false)
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
@@ -417,6 +420,13 @@ object ChatListener {
             text.startsWith("You have reset your Heart of the Mountain", ignoreCase = true) -> FetchSkillTree.resetHotm()
             text.startsWith("You have reset your Heart of the Forest", ignoreCase = true) -> FetchSkillTree.resetHotf()
         }
+    }
+
+    private fun commissionListener(text: String) {
+        val match = Patterns.COMMISSION.find(text) ?: return
+        val commissionName = match.groupValues[1].trim()
+
+        CommissionWidget.completeCollectorCommission(commissionName)
     }
 
     @JvmStatic

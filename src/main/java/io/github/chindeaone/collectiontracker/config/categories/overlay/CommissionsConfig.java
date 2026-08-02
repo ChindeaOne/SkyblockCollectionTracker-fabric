@@ -19,8 +19,28 @@ public class CommissionsConfig {
     public boolean enableCommissionsOverlay = false;
 
     @Expose
-    @ConfigLink(owner = CommissionsConfig.class, field = "enableCommissionsOverlay")
-    public Position commissionsOverlayPosition = new Position(50, 50);
+    @ConfigOption(
+            name = "Claim Notification Title",
+            desc = "Display a title when a commission is claimed."
+    )
+    @ConfigEditorBoolean
+    public boolean claimTitle = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Completion Notification Title",
+            desc = "Display a title when a commission is completed."
+    )
+    @ConfigEditorBoolean
+    public boolean completionTitle = true;
+
+    @Expose
+    @ConfigOption(
+            name = "Colored Notification Titles",
+            desc = "Color notification titles based on the required collection."
+    )
+    @ConfigEditorBoolean
+    public boolean customTitleColors = true;
 
     @Expose
     @ConfigOption(
@@ -34,4 +54,8 @@ public class CommissionsConfig {
     @ConfigOption(name = "Commissions Keybinds", desc = "")
     @Accordion
     public KeybindConfig keybindConfig = new KeybindConfig();
+
+    @Expose
+    @ConfigLink(owner = CommissionsConfig.class, field = "enableCommissionsOverlay")
+    public Position commissionsOverlayPosition = new Position(50, 50);
 }
