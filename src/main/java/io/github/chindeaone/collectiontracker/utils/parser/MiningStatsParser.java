@@ -88,6 +88,7 @@ public class MiningStatsParser {
         }
 
         if (!ctx.shouldShowSpecificFortune()) return;
+        ctx.specificFortuneName = ctx.getFortuneLabel();
 
         boolean match = switch (ctx.blockType) {
             case "dwarven_metals" -> line.contains("Dwarven Metal Fortune");
@@ -99,7 +100,6 @@ public class MiningStatsParser {
 
         if (match) {
             ctx.specificFortune = value;
-            ctx.specificFortuneName = ctx.getFortuneLabel();
 
             // Update last displayed specific fortune
             lastDisplayedSpecificFortune = ctx.specificFortuneName;
@@ -193,7 +193,7 @@ public class MiningStatsParser {
             if (!specificFortuneName.isEmpty()) {
                 if (total == 0) return ""; // Don't show if total is 0
                 String base = "§a" + specificFortuneName + ": §6" + symbol + total;
-                if (showDetailed) {
+                if (showDetailed && specificFortune != 0) {
                     base += " §7(§6" + globalFortune + " §7+ " + color + specificFortune + "§7)";
                 }
                 return base;
@@ -202,7 +202,7 @@ public class MiningStatsParser {
             if (!lastDisplayedSpecificFortune.isEmpty()) {
                 if (total == 0) return ""; // Don't show if total is 0
                 String base = "§a" + lastDisplayedSpecificFortune + ": §6" + symbol + total;
-                if (showDetailed) {
+                if (showDetailed && lastDisplayedSpecificFortuneValue != 0) {
                     base += " §7(§6" + globalFortune + " §7+ " + color + lastDisplayedSpecificFortuneValue + "§7)";
                 }
                 return base;
