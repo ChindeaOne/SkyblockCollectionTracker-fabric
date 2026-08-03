@@ -158,7 +158,7 @@ object RenderUtils {
                         foundCollName.contains("ETA") ||
                         foundCollName.contains("Gemstones") ||
                         foundCollName.contains("Custom")) {
-                        color = ColorUtils.collectionColors["gemstone"]!!
+                        color = ColorUtils.collectionColors["gemstone"] ?: ColorUtils.GREEN
                     } else if (foundCollName.contains(" ")) { // all gemstones when it's expanded
                         val firstWord = foundCollName.trim().substringBefore(' ').lowercase()
                         color = ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN

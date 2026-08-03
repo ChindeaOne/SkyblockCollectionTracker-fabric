@@ -41,7 +41,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 /**
  * Global accessors for the configuration.
  */
-val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config!!
+val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config ?: throw IllegalStateException("[SCT]: Config not initialized.")
 
 // Position Config Accessor
 val trackingPosition: Position get() = modConfig.tracking.collectionConfig.overlayPosition

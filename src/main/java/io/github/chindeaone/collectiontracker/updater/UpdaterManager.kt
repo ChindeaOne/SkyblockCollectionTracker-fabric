@@ -53,10 +53,11 @@ object UpdaterManager {
     }
 
     private fun queueUpdate() {
+        val update = potentialUpdate ?: return
         activePromise = CompletableFuture.supplyAsync {
-            potentialUpdate!!.prepareUpdate()
+            update.prepareUpdate()
         }.thenAcceptAsync {
-            potentialUpdate!!.executeUpdate()
+            update.executeUpdate()
         }
     }
 }

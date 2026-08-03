@@ -190,7 +190,8 @@ object CommissionUtils {
     }
 
     private fun getContainerSlot(commissionIndex: Int): Int? {
-        return SLOT_LAYOUTS[CommissionWidget.commissions.size]?.getOrNull(commissionIndex)
+        val layout = SLOT_LAYOUTS[CommissionWidget.commissions.size] ?: return null
+        return layout.getOrNull(commissionIndex)
     }
 
     private fun getCommissionIndex(slot: Int): Int? {

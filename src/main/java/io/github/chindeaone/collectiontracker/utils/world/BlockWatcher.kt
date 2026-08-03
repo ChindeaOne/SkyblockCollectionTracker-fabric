@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.HitResult
 
 object BlockWatcher {
 
@@ -27,25 +26,22 @@ object BlockWatcher {
         if (!HypixelUtils.isOnSkyblock) return
         val hitResult = client.hitResult
 
-        if (hitResult != null) {
-            if (hitResult.type == HitResult.Type.BLOCK) {
-                val blockHit = hitResult as BlockHitResult
-                val pos = blockHit.blockPos
+        (hitResult as? BlockHitResult)?.let { blockHit ->
+            val pos = blockHit.blockPos
 
-                val state = client.level?.getBlockState(pos) ?: return
-                val block = state.block
+            val state = client.level?.getBlockState(pos) ?: return
+            val block = state.block
 
-                blockBox = AABB(pos)
+            blockBox = AABB(pos)
 
-                blockId = BuiltInRegistries.BLOCK.getKey(block).toString()
+            blockId = BuiltInRegistries.BLOCK.getKey(block).toString()
 
-                updateMiningBlockType(blockId)
-                updateForagingBlockType(blockId)
-                precisionMiningBlockType(blockId)
-            } else if (hitResult.type == HitResult.Type.MISS) {
-                precisionMiningBlockType = ""
-                blockBox = null
-            }
+            updateMiningBlockType(blockId)
+            updateForagingBlockType(blockId)
+            precisionMiningBlockType(blockId)
+        } ?: run {
+            precisionMiningBlockType = ""
+            blockBox = null
         }
     }
 

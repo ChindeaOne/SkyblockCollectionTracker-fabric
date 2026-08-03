@@ -92,8 +92,7 @@ object ChatUtils {
     ) {
         val component = Component.literal(text)
             .withStyle { style: Style? ->
-                val newStyle = style!!.withClickEvent(ClickEvent.RunCommand(command))
-                newStyle
+                (style ?: Style.EMPTY).withClickEvent(ClickEvent.RunCommand(command))
             }
 
         sendComponent(component, prefix)
@@ -111,9 +110,8 @@ object ChatUtils {
 
         val clickableComponent = Component.literal(text)
             .withStyle { style: Style? ->
-                val newStyle = style!!.withClickEvent(ClickEvent.OpenUrl(URI.create(url)))
+                (style ?: Style.EMPTY).withClickEvent(ClickEvent.OpenUrl(URI.create(url)))
                     .withHoverEvent(HoverEvent.ShowText(Component.literal(hover)))
-                newStyle
             }
 
         sendComponent(clickableComponent, prefix = true)

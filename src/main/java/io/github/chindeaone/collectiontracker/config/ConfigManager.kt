@@ -61,16 +61,17 @@ class ConfigManager {
         configFile = File(configDirectory, "config.json")
 
         if (configFile.isFile) {
-            logger.info("Trying to load the config")
+            logger.info("[SCT]: Trying to load the config")
             tryReadConfig()
         }
 
         if (config == null) {
-            logger.info("Creating a clean config.")
+            logger.info("[SCT]: Creating a clean config.")
             config = ModConfig()
         }
 
-        val config = config!!
+        val config = config ?: error("[SCT]: Failed to initialize config")
+
         processor = MoulConfigProcessor(config)
         BuiltinMoulConfigGuis.addProcessors(processor)
         VersionManager.injectConfigProcessor(processor)

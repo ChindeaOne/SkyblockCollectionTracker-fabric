@@ -51,9 +51,11 @@ object DeployableParser {
             }
         }
 
-        if (found == null && deployablePos != null) {
-            val candidates = EntityUtils.getArmorStandsAround(level, deployablePos!!, 1.0, 5.0)
-            found = EntityUtils.findArmorStandByKeywords(candidates, MINING_DEPLOYABLE)
+        if (found == null) {
+            deployablePos?.let { pos ->
+                val candidates = EntityUtils.getArmorStandsAround(level, pos, 1.0, 5.0)
+                found = EntityUtils.findArmorStandByKeywords(candidates, MINING_DEPLOYABLE)
+            }
         }
 
         if (found == null) {
