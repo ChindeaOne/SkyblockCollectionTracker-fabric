@@ -51,9 +51,6 @@ public class PickaxeAbilityConfig {
     public String abilityName = "";
 
     @Expose
-    public boolean cooldownAttribute = false;
-
-    @Expose
     @ConfigOption(
             name = "Cooldown Attribute Level",
             desc = "Manually set the attribute level for cooldown calculation."

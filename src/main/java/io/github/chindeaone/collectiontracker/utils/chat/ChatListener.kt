@@ -123,7 +123,6 @@ object ChatListener {
 
         val value = Patterns.ATTRIBUTE.find(text.trimStart())?.groupValues?.get(1)
         if (value != null) {
-            ConfigHelper.setCooldownAttribute(true)
             ConfigHelper.setAttributeLevel(value.toLevel())
         }
     }
