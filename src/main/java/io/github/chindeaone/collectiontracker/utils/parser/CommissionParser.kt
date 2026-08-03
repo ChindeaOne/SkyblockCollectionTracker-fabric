@@ -16,7 +16,7 @@ object CommissionParser {
     ) {
         val key = name.lowercase()
         val firstWord = name.substringBefore(' ').lowercase()
-        val color: Int get() = ColorUtils.collectionColors[firstWord] ?: ColorUtils.GREEN
+        val color: Int? get() = ColorUtils.collectionColors[firstWord]
     }
 
     data class ActiveCommission(

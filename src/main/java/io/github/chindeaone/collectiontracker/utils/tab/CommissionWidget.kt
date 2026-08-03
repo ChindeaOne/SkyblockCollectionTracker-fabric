@@ -34,8 +34,7 @@ object CommissionWidget {
         if (!updated.isFresh) return
         if (!ConfigAccess.isClaimTitleEnabled()) return
 
-        val color = if (ConfigAccess.isCustomTitleColorsEnabled()) updated.type.color
-            else ColorUtils.YELLOW
+        val color = updated.type.color ?: ColorUtils.YELLOW
 
         val component = Component.empty()
             .append(Component.literal("New Commission: ").withColor(ColorUtils.YELLOW))
@@ -53,8 +52,7 @@ object CommissionWidget {
 
         if (!ConfigAccess.isCompletionTitleEnabled()) return
 
-        val color = if (ConfigAccess.isCustomTitleColorsEnabled()) active.type.color
-            else ColorUtils.GREEN
+        val color = active.type.color ?: ColorUtils.GREEN
 
         val component = Component.empty()
             .append(Component.literal(active.type.name).withColor(color))

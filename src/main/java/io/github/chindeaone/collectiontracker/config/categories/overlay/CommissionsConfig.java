@@ -36,14 +36,6 @@ public class CommissionsConfig {
 
     @Expose
     @ConfigOption(
-            name = "Colored Notification Titles",
-            desc = "Color notification titles based on the required collection."
-    )
-    @ConfigEditorBoolean
-    public boolean customTitleColors = true;
-
-    @Expose
-    @ConfigOption(
             name = "Enable Commissions Tracking",
             desc = "Toggles tracking for mining commissions."
     )
