@@ -32,7 +32,7 @@ object CommissionWidget {
         commissions[index] = updated
 
         if (!updated.isFresh) return
-        if (!ConfigAccess.isClaimTitleEnabled()) return
+        if (!ConfigAccess.isNewCommissionTitleEnabled()) return
 
         val color = updated.type.color ?: ColorUtils.YELLOW
 

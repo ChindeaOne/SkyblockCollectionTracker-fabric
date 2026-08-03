@@ -81,7 +81,7 @@ val miningRoutesConfig: MiningRoutesConfig get() = miningConfig.miningRoutesConf
 val commissionsConfig: CommissionsConfig get() = miningConfig.commissionsConfig
 val enableCommissionsOverlay: Boolean get() = commissionsConfig.enableCommissionsOverlay
 val completionTitle: Boolean get() = commissionsConfig.completionTitle
-val claimTitle: Boolean get() = commissionsConfig.claimTitle
+val newCommissionTitle: Boolean get() = commissionsConfig.newCommissionTitle
 val enableCommissionsTracking: Boolean get() = commissionsConfig.enableCommissionsTracking
 val keybindConfig: KeybindConfig get() = commissionsConfig.keybindConfig
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
@@ -300,7 +300,7 @@ object ConfigAccess {
 
     fun isCompletionTitleEnabled(): Boolean = completionTitle
 
-    fun isClaimTitleEnabled(): Boolean = claimTitle
+    fun isNewCommissionTitleEnabled(): Boolean = newCommissionTitle
 
     @JvmStatic
     fun isCommissionsTrackingEnabled(): Boolean = enableCommissionsTracking

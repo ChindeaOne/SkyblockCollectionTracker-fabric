@@ -20,11 +20,11 @@ public class CommissionsConfig {
 
     @Expose
     @ConfigOption(
-            name = "Claim Notification Title",
-            desc = "Display a title when a commission is claimed."
+            name = "New Commission Title",
+            desc = "Display a title when a new commission is received."
     )
     @ConfigEditorBoolean
-    public boolean claimTitle = true;
+    public boolean newCommissionTitle = true;
 
     @Expose
     @ConfigOption(
