@@ -91,6 +91,7 @@
 <summary><strong>Commissions Overlay and Claim Buttons</strong></summary>
 
 - Displays active commissions and progress from tab data.
+- Title notifications for completed and new commissions.
 - Toggleable commission tracking.
 - Keybinds for quick commission claiming.
 
