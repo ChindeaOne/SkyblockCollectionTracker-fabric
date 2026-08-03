@@ -434,7 +434,7 @@ object RenderUtils {
     }
 
     @JvmStatic
-    fun showTitle(title: Component, duration: Long = getTitleDisplayTimer() * 1000L) {
+    fun showTitle(title: Component, duration: Long = getTitleDisplayTimer()) {
         if (titleQueue.isEmpty()) {
             titleQueue.add(QueuedTitle(title, System.currentTimeMillis() + duration))
         } else {

@@ -82,7 +82,6 @@ val commissionsConfig: CommissionsConfig get() = miningConfig.commissionsConfig
 val enableCommissionsOverlay: Boolean get() = commissionsConfig.enableCommissionsOverlay
 val completionTitle: Boolean get() = commissionsConfig.completionTitle
 val claimTitle: Boolean get() = commissionsConfig.claimTitle
-val customTitleColors: Boolean get() = commissionsConfig.customTitleColors
 val enableCommissionsTracking: Boolean get() = commissionsConfig.enableCommissionsTracking
 val keybindConfig: KeybindConfig get() = commissionsConfig.keybindConfig
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
@@ -304,8 +303,6 @@ object ConfigAccess {
 
     fun isClaimTitleEnabled(): Boolean = claimTitle
 
-    fun isCustomTitleColorsEnabled(): Boolean = customTitleColors
-
     @JvmStatic
     fun isCommissionsTrackingEnabled(): Boolean = enableCommissionsTracking
 
@@ -435,7 +432,7 @@ object ConfigAccess {
     fun isColeweightAbilityFormat(): Boolean = coleweightAbilityFormat
 
     @JvmStatic
-    fun getTitleDisplayTimer(): Int = titleDisplayTimer
+    fun getTitleDisplayTimer(): Long = titleDisplayTimer * 1000L
 
     @JvmStatic
     fun isShowPickaxeReadyAbilityTitle(): Boolean = showPickaxeReadyAbilityTitle
