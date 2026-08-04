@@ -18,7 +18,7 @@ object IslandTracker {
     @JvmStatic var isInPark: Boolean = false
         private set
 
-    @JvmStatic var isInGalatea: Boolean = false
+    @JvmStatic var isInMoongladeMarsh: Boolean = false
         private set
 
     var currentIsland: String? = null
@@ -57,7 +57,7 @@ object IslandTracker {
             island.equals(name, ignoreCase = true)
         }
         isInPark = currentForagingIsland == "The Park"
-        isInGalatea = currentForagingIsland == "Galatea"
+        isInMoongladeMarsh = currentForagingIsland == "Moonglade Marsh"
 
         currentFarmingIsland = FarmingMapping.farmingAreas.firstOrNull { name ->
             island.equals(name, ignoreCase = true)
@@ -82,7 +82,7 @@ object IslandTracker {
         currentIsland = null
         currentMiningIsland = null
         currentForagingIsland = null
-        isInGalatea = false
+        isInMoongladeMarsh = false
         isInRift = false
     }
 }

@@ -33,7 +33,7 @@ object ForagingStatsWidget {
             lastStats = null
             lastBeaconStats = null
 
-            if (!IslandTracker.isInGalatea) {
+            if (!IslandTracker.isInMoongladeMarsh) {
                 rawStarbornTempleStats = ""
                 lastStarbornTempleStats = null
             }
@@ -51,8 +51,8 @@ object ForagingStatsWidget {
         }
 
         val widget = TabWidget.STATS
-        val beaconWidget = if (IslandTracker.isInGalatea) TabWidget.MOONGLADE_BEACON else TabWidget.TORRHUS_BEACON
-        val starbornTempleWidget = if (IslandTracker.isInGalatea) TabWidget.STARBORN_TEMPLE else null
+        val beaconWidget = if (IslandTracker.isInMoongladeMarsh) TabWidget.MOONGLADE_BEACON else TabWidget.TORRHUS_BEACON
+        val starbornTempleWidget = if (IslandTracker.isInMoongladeMarsh) TabWidget.STARBORN_TEMPLE else null
 
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible

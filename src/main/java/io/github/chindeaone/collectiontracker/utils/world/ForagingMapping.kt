@@ -4,7 +4,7 @@ object ForagingMapping {
 
     val foragingIslands = listOf(
         "The Park",
-        "Galatea",
+        "Moonglade Marsh",
         "Torrhus Canyon"
     )
 

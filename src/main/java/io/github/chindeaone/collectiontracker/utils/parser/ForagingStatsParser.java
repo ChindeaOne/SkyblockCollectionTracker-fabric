@@ -184,7 +184,7 @@ public class ForagingStatsParser {
                     : (baseSpecific + beaconSpecific));
             String stackDisplay = beaconStacks.isEmpty() ? "" : " §3(" + beaconStacks + ")";
 
-            // If player isn't on Galatea, use global fortune only
+            // If player isn't on Moonglade Marsh, use global fortune only
             if (IslandTracker.isInPark()) {
                 return "§aForaging Fortune: §6" + symbol + globalFortune;
             }
