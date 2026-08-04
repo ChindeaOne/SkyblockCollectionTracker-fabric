@@ -36,8 +36,13 @@ public class LeaderboardManager {
         return null;
     }
 
-    public static LeaderboardEntry getPlayerEntry(long amount) {
-        return getPlayerEntryRaw(amount);
+    public static int getPlayerRank(long amount) {
+        List<LeaderboardEntry> lb = currentLeaderboard;
+        if (lb.isEmpty()) {
+            return -1;
+        }
+
+        return findBinaryIndex(lb, amount) + 1;
     }
 
     public static LeaderboardEntry getPlayerEntry(String skill, long amount) {
@@ -46,6 +51,15 @@ public class LeaderboardManager {
 
         int index = findBinaryIndex(lb, amount);
         return index < lb.size() ? lb.get(index) : null;
+    }
+
+    public static int getPlayerRank(String skill, long amount) {
+        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
+        if (lb.isEmpty()) {
+            return -1;
+        }
+
+        return findBinaryIndex(lb, amount) + 1;
     }
 
     private static LeaderboardEntry getNextRankEntryRaw(long amount) {
@@ -157,8 +171,8 @@ public class LeaderboardManager {
         return getNextRankEntryRaw(skill, amount);
     }
 
-    public static LeaderboardEntry getPlayerEntry() {
-        return getPlayerEntryRaw(TrackingRates.collectionAmount);
+    public static int getPlayerRank() {
+        return getPlayerRank(TrackingRates.collectionAmount);
     }
 
     public static LeaderboardEntry getNextRankEntry() {

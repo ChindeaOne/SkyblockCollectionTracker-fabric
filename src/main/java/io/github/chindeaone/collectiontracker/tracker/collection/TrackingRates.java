@@ -87,12 +87,7 @@ public class TrackingRates {
     }
 
     public static void updateLeaderboardStats() {
-        LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry();
-        if (playerEntry != null) {
-            playerCurrentRank = playerEntry.rank();
-        } else {
-            playerCurrentRank = -1;
-        }
+        playerCurrentRank = LeaderboardManager.getPlayerRank();
 
         LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntry();
         if (nextEntry != null) {

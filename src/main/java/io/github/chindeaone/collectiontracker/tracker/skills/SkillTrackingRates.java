@@ -109,8 +109,7 @@ public class SkillTrackingRates {
     public static void updateSkillLeaderboardStats() {
         if (!ConfigAccess.isSkillLeaderboardEnabled()) return;
 
-        LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry(skillName, totalSkillXp);
-        skillCurrentRank = (playerEntry != null) ? playerEntry.rank() : -1;
+        skillCurrentRank = LeaderboardManager.getPlayerRank(skillName, totalSkillXp);
 
         LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntryForSkill(skillName, totalSkillXp);
         if (nextEntry != null) {
@@ -129,8 +128,7 @@ public class SkillTrackingRates {
     public static void updateTamingLeaderboardStats() {
         if (!ConfigAccess.isSkillLeaderboardEnabled() || !ConfigAccess.isTamingTrackingEnabled()) return;
 
-        LeaderboardEntry playerEntry = LeaderboardManager.getPlayerEntry("Taming", tamingXp + tamingXpGained);
-        tamingCurrentRank = (playerEntry != null) ? playerEntry.rank() : -1;
+        tamingCurrentRank = LeaderboardManager.getPlayerRank("Taming", tamingXp + tamingXpGained);
 
         LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntryForSkill("Taming", tamingXp + tamingXpGained);
         if (nextEntry != null) {

@@ -158,8 +158,7 @@ object MultiTrackingRates {
             !CollectionTracker.collectionList.contains("gemstone")) return
 
         val currentGemstoneAmount = collectionAmounts["gemstone"] ?: 0L
-        val playerEntry = LeaderboardManager.getPlayerEntry(currentGemstoneAmount)
-        playerCurrentRank = playerEntry?.rank() ?: -1
+        playerCurrentRank = LeaderboardManager.getPlayerRank(currentGemstoneAmount)
 
         val nextEntry = LeaderboardManager.getNextRankEntry(currentGemstoneAmount)
         if (nextEntry != null) {
