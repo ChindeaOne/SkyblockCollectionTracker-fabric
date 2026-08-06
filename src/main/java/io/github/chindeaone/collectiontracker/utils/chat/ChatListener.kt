@@ -46,8 +46,8 @@ object ChatListener {
     @JvmStatic var currentLotteryBuff = "§cUnknown"
     @JvmStatic var currentBeekeeperBuff = "§cUnknown"
 
-    @JvmStatic var nextBuffTime: Long = 0
-        private set
+    @JvmStatic
+    var nextBuffTime: Long = 0
     var abilityName: String? = null
 
     private var expectingSkyMallBuff = false
@@ -86,6 +86,8 @@ object ChatListener {
         if (cleanText.contains("consumed")) consumableListener(cleanText)
         if (cleanText.contains("You have reset")) treeResetListener(cleanText)
         if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
+        if (cleanText.startsWith("Disabled")) disableTreeBuffs(cleanText)
+        if (cleanText.startsWith("Enabled") || cleanText.startsWith("You equipped")) enableTreeBuffs(cleanText)
         sacksListener(message, actionBar = false)
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
@@ -232,7 +234,7 @@ object ChatListener {
 
     private fun startAxeAbilityTimeline(ability: String) {
         val cotf = ConfigAccess.getCotfLevel()
-        val abilityLevel = if (cotf >= 1) 2 else 1
+        val abilityLevel = if (cotf >= 2) 2 else 1
 
         val finalCooldownSec = AbilityUtils.getBaseAxeCooldown(ability, abilityLevel).toDouble()
         val durationMs = (AbilityUtils.getBaseAxeDuration(ability, abilityLevel) * 1000).toLong()
@@ -254,11 +256,9 @@ object ChatListener {
     fun dailyPerksUpdate(message: Component): Boolean {
         if (!HypixelUtils.isOnSkyblock) return false
 
-        val now = System.currentTimeMillis()
-
-        if (ScoreboardUtils.timeLeft > 0) {
-            nextBuffTime = now + ScoreboardUtils.timeLeft * 1000L
-            ScoreboardUtils.timeLeft = 0
+        val remaining = nextBuffTime - System.currentTimeMillis()
+        if (remaining > 60_000L && remaining < 19 * 60_000L) {
+            return false
         }
 
         val text = message.string.removeColor()
@@ -281,10 +281,6 @@ object ChatListener {
             }
             text.startsWith("New buff: ") -> {
                 val buffText = text.substringAfter("New buff: ").trim()
-                // Set default 20 mins only when a new buff is sent in chat
-                if (nextBuffTime - now < 10_000L) { // Allows chat checking 10 seconds before
-                    nextBuffTime = now + 1_200_000
-                }
 
                 val compact = compactBuffs(buffText)
                 if (expectingSkyMallBuff) {
@@ -333,7 +329,7 @@ object ChatListener {
         return false
     }
 
-    private fun compactBuffs(message: String): String {
+    fun compactBuffs(message: String): String {
         val text = message.trim().removeSuffix(".")
 
         val numberRegex = Regex("[+-]?\\d+")
@@ -363,7 +359,7 @@ object ChatListener {
                 val rawPct = percentRegex.find(text)?.value
                 "§a$rawPct §9Powder"
             }
-            "Goblins" in text -> {
+            "chance" in text -> {
                 val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
                 "§a$x §6Golden §7and §bDiamond §7Goblins"
             }
@@ -426,6 +422,49 @@ object ChatListener {
         val commissionName = match.groupValues[1].trim()
 
         CommissionWidget.completeCollectorCommission(commissionName)
+    }
+
+    private fun disableTreeBuffs(text: String) {
+        when (text) {
+            "Disabled Sky Mall" -> {
+                currentSkyMallBuff = "§cDisabled"
+                ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
+                isPickaxeAbility = false
+            }
+            "Disabled Lottery" -> {
+                currentLotteryBuff = "§cDisabled"
+                ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
+            }
+            "Disabled Beekeeper" -> {
+                currentBeekeeperBuff = "§cDisabled"
+                ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
+            }
+        }
+    }
+
+    private fun enableTreeBuffs(text: String) {
+        when (text) {
+            "Enabled Sky Mall" -> {
+                currentSkyMallBuff = "§cUnknown"
+                ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
+            }
+            "Enabled Lottery" -> {
+                currentLotteryBuff = "§cUnknown"
+                ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
+            }
+            "Enabled Beekeeper" -> {
+                currentBeekeeperBuff = "§cUnknown"
+                ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
+            }
+            else -> {
+                currentSkyMallBuff = "§cUnknown"
+                currentLotteryBuff = "§cUnknown"
+                currentBeekeeperBuff = "§cUnknown"
+                ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
+                ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
+                ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
+            }
+        }
     }
 
     @JvmStatic

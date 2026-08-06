@@ -3,10 +3,10 @@ package io.github.chindeaone.collectiontracker.utils.tab
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
-import io.github.chindeaone.collectiontracker.utils.CommissionUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser.ActiveCommission
+import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
@@ -67,7 +67,7 @@ object CommissionWidget {
             return
         }
 
-        if (CommissionUtils.isMenuOpen) {
+        if (ContainerParser.isCommissionMenuOpen) {
             return
         }
 

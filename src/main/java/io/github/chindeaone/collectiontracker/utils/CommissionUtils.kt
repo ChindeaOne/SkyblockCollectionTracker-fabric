@@ -24,6 +24,7 @@ import io.github.chindeaone.collectiontracker.mixins.AbstractContainerScreenAcce
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
+import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
@@ -41,9 +42,6 @@ import java.util.*
 
 object CommissionUtils {
 
-    private var lastClick = -1L
-    private var openedAt = 0L
-
     private val keybinds: List<Int> get() = listOf(
         ConfigAccess.getKeybindConfig().commission1,
         ConfigAccess.getKeybindConfig().commission2,
@@ -51,12 +49,7 @@ object CommissionUtils {
         ConfigAccess.getKeybindConfig().commission4
     )
 
-    private var attachedMenu: AbstractContainerMenu? = null
-    private val wasDown = HashMap<Int, Boolean>()
     private const val CLICK_DEBOUNCE_MS = 100L
-
-    var isMenuOpen = false
-        private set
 
     private val SLOT_LAYOUTS = mapOf(
         2 to intArrayOf(11, 15),
@@ -67,11 +60,9 @@ object CommissionUtils {
     private var keyGuardActive = false
     private val guardedScreens: MutableSet<Screen> = Collections.newSetFromMap(WeakHashMap())
 
-    private var currentScreen: AbstractContainerScreen<*>? = null
-
     @JvmStatic
     fun onSlotUpdated(menu: AbstractContainerMenu, slot: Int, stack: ItemStack) {
-        if (attachedMenu !== menu) return
+        if (ContainerParser.attachedCommissionMenu !== menu) return
         val commissionIndex = getCommissionIndex(slot) ?: return
         if (stack.isEmpty) return
 
@@ -124,32 +115,14 @@ object CommissionUtils {
         keybindCancelEvent()
     }
 
-    fun onScreenChanged(screen: Screen?) {
-        currentScreen = null
-        detachListener()
-
-        if (!HypixelUtils.isOnSkyblock) return
-
-        val container = screen as? AbstractContainerScreen<*> ?: return
-        if (!container.title.string.contains("Commissions", ignoreCase = true)) return
-
-        currentScreen = container
-        isMenuOpen = true
-        attachListener(container.menu)
-
-        ScreenEvents.remove(container).register {
-            detachListener()
-        }
-    }
-
     fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
 
-        val screen = currentScreen ?: return
+        val screen = ContainerParser.currentCommissionScreen ?: return
 
         val now = System.currentTimeMillis()
-        if (now - openedAt < CLICK_DEBOUNCE_MS) return
-        if (now - lastClick < CLICK_DEBOUNCE_MS) return
+        if (now - ContainerParser.openedAt < CLICK_DEBOUNCE_MS) return
+        if (now - ContainerParser.lastClick < CLICK_DEBOUNCE_MS) return
 
         val pressedIndex = resolveCommissionIndex(client) ?: return
 
@@ -179,14 +152,14 @@ object CommissionUtils {
                 player
             )
         } else {
-            wasDown.clear()
+            ContainerParser.wasDown.clear()
         }
 
         if (wasCompleted && ConfigAccess.isCommissionsTrackingEnabled()) {
             CommissionsTracker.onCommissionClaimed()
         }
 
-        lastClick = now
+        ContainerParser.lastClick = now
     }
 
     private fun getContainerSlot(commissionIndex: Int): Int? {
@@ -205,8 +178,8 @@ object CommissionUtils {
             if (keyCode == 0) continue
 
             val downNow = isKeyDown(client, keyCode)
-            val downBefore = wasDown[keyCode] == true
-            wasDown[keyCode] = downNow
+            val downBefore = ContainerParser.wasDown[keyCode] == true
+            ContainerParser.wasDown[keyCode] = downNow
 
             if (downNow && !downBefore) return i
         }
@@ -223,24 +196,6 @@ object CommissionUtils {
         } else {
             GLFW.glfwGetKey(window, keyCode) == GLFW.GLFW_PRESS
         }
-    }
-
-    private fun attachListener(menu: AbstractContainerMenu) {
-        if (attachedMenu === menu) return
-
-        attachedMenu = menu
-        wasDown.clear()
-
-        openedAt = System.currentTimeMillis()
-        lastClick = openedAt
-    }
-
-    private fun detachListener() {
-        if (attachedMenu == null) return
-
-        attachedMenu = null
-        wasDown.clear()
-        isMenuOpen = false
     }
 
     private fun keybindCancelEvent() {

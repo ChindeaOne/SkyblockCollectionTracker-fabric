@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 import net.minecraft.client.Minecraft
@@ -21,6 +22,7 @@ object ScoreboardUtils {
 
     private var checkTime: Boolean = true
     var timeLeft: Int = 0
+    private var lastMinutesSinceMidnight = -1
 
     fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
@@ -69,8 +71,6 @@ object ScoreboardUtils {
     }
 
     private fun checkSkyblockTime(rawLines: List<String>) {
-        if (!checkTime) return
-
         val timeLine = rawLines.firstOrNull { it.contains("am") || it.contains("pm") } ?: return
 
         timeRegex.find(timeLine)?.let { result ->
@@ -78,10 +78,8 @@ object ScoreboardUtils {
             val minute = result.groupValues[2].toInt()
             val amPm = result.groupValues[3]
 
-            // Skyblock time mapping
-            val sb10Minutes = 8.3 // real seconds per in-game 10 minutes
+            val sb10Minutes = 1200.0 / 144.0
 
-            // Convert parsed 12-hour time to 24-hour hour value
             val hour24 = when {
                 amPm.equals("am", ignoreCase = true) && hour == 12 -> 0
                 amPm.equals("am", ignoreCase = true) -> hour
@@ -90,17 +88,31 @@ object ScoreboardUtils {
             }
 
             val minutesSinceMidnight = hour24 * 60 + minute
-            val totalMinutesInDay = 24 * 60
-            var minutesUntilMidnight = (totalMinutesInDay - minutesSinceMidnight) % totalMinutesInDay
 
-            if (minutesSinceMidnight == 0) minutesUntilMidnight = 0
+            // Initial sync when joining
+            if (checkTime) {
+                val totalMinutesInDay = 24 * 60
+                var minutesUntilMidnight = (totalMinutesInDay - minutesSinceMidnight) % totalMinutesInDay
 
-            // Skyblock time only updates in 10-minute increments
-            val tenMinuteChunks = if (minutesUntilMidnight == 0) 0.0 else ceil(minutesUntilMidnight / 10.0)
-            val secondsLeft = tenMinuteChunks * sb10Minutes
+                if (minutesSinceMidnight == 0) minutesUntilMidnight = 0
 
-            timeLeft = secondsLeft.roundToInt()
-            checkTime = false
+                val tenMinuteChunks =
+                    if (minutesUntilMidnight == 0) 0.0
+                    else ceil(minutesUntilMidnight / 10.0)
+
+                val secondsLeft = tenMinuteChunks * sb10Minutes
+
+                timeLeft = secondsLeft.roundToInt()
+                checkTime = false
+                ChatListener.nextBuffTime = System.currentTimeMillis() + (timeLeft * 1000L)
+            }
+
+            // Detect transition to a new SkyBlock day
+            if (minutesSinceMidnight == 0 && lastMinutesSinceMidnight != 0) {
+                ChatListener.nextBuffTime = System.currentTimeMillis() + 20 * 60 * 1000L
+            }
+
+            lastMinutesSinceMidnight = minutesSinceMidnight
         }
     }
 
