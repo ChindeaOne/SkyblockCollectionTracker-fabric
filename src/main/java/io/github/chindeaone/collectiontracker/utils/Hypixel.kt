@@ -136,31 +136,29 @@ object Hypixel {
             RepoUtils.checkGithubReleases()
             RepoUtils.checkLatestVersion()
         }.thenAccept {
-            Minecraft.getInstance().execute {
-                if (RepoUtils.latestVersion != null) {
-                    when (ConfigAccess.getUpdateType()) {
-                        About.UpdateType.AUTOMATIC -> {
-                            ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game.")
-                            UpdaterManager.update()
-                        }
-                        About.UpdateType.MANUAL -> {
-                            val url = ModrinthData.getModLink()
-                            ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e.", true)
-                            ChatUtils.sendClickableLinkComponent("§eClick here to manually download it.", "§eOpens the Modrinth page in your browser.", url)
-                        }
+            if (RepoUtils.latestVersion != null) {
+                when (ConfigAccess.getUpdateType()) {
+                    About.UpdateType.AUTOMATIC -> {
+                        ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game.")
+                        UpdaterManager.update()
                     }
-
-                    logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
-                    ConfigHelper.disableUpdateChecks()
-                } else {
-                    if (!ConfigAccess.hasCheckedUpdate()) {
-                        ChatUtils.sendMessage("§aThe mod has been updated successfully.")
-                        ChatUtils.sendCommandComponent("§eSee what changed here.", "/sct changelog")
-                        ConfigHelper.enableUpdateChecks()
-                        logger.info("[SCT]: The mod has been updated successfully.")
+                    About.UpdateType.MANUAL -> {
+                        val url = ModrinthData.getModLink()
+                        ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e.", true)
+                        ChatUtils.sendClickableLinkComponent("§eClick here to manually download it.", "§eOpens the Modrinth page in your browser.", url)
                     }
-                    logger.info("[SCT]: No new version found.")
                 }
+
+                logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
+                ConfigHelper.disableUpdateChecks()
+            } else {
+                if (!ConfigAccess.hasCheckedUpdate()) {
+                    ChatUtils.sendMessage("§aThe mod has been updated successfully.")
+                    ChatUtils.sendCommandComponent("§eSee what changed here.", "/sct changelog")
+                    ConfigHelper.enableUpdateChecks()
+                    logger.info("[SCT]: The mod has been updated successfully.")
+                }
+                logger.info("[SCT]: No new version found.")
             }
         }
     }

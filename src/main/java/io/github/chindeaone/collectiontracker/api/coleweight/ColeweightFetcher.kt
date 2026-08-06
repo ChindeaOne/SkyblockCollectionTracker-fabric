@@ -5,7 +5,6 @@ import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import java.net.http.HttpResponse
@@ -119,15 +118,13 @@ object ColeweightFetcher {
             if (response.statusCode() == 200) {
                 logger.info("[SCT]: Successfully set global color for {}", playerName)
 
-                Minecraft.getInstance().execute {
-                    ChatUtils.sendComponent(
-                        Component.empty()
-                            .append("§aGlobal color set to ")
-                            .append(ColorUtils.coloredText(color))
-                            .append("."),
-                        true
-                    )
-                }
+                ChatUtils.sendComponent(
+                    Component.empty()
+                        .append("§aGlobal color set to ")
+                        .append(ColorUtils.coloredText(color))
+                        .append("."),
+                    true
+                )
             } else {
                 logger.warn(
                     "[SCT]: Failed to set global color for {}. HTTP {}",
@@ -162,9 +159,7 @@ object ColeweightFetcher {
     )
 
     private fun sendError(message: String) {
-        Minecraft.getInstance().execute {
-            ChatUtils.sendMessage(message, true)
-        }
+        ChatUtils.sendMessage(message, true)
     }
 
     private fun runCallback(callback: Runnable?) {

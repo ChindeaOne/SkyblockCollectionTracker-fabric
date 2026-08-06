@@ -6,7 +6,6 @@ import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import java.net.http.HttpResponse
@@ -93,15 +92,13 @@ object EliteApiFetcher {
             if (response.statusCode() == 200) {
                 logger.info("[SCT]: Successfully set global Farming Weight color for {}", playerName)
 
-                Minecraft.getInstance().execute {
-                    ChatUtils.sendComponent(
-                        Component.empty()
-                            .append("§aGlobal color set to ")
-                            .append(ColorUtils.coloredText(color))
-                            .append("."),
-                        true
-                    )
-                }
+                ChatUtils.sendComponent(
+                    Component.empty()
+                        .append("§aGlobal color set to ")
+                        .append(ColorUtils.coloredText(color))
+                        .append("."),
+                    true
+                )
             } else {
                 logger.warn("[SCT]: Failed to set global Farming Weight color for {}. HTTP {}", playerName, response.statusCode())
                 sendError("§cFailed to set global Farming Weight color.")
@@ -162,9 +159,7 @@ object EliteApiFetcher {
     )
 
     private fun sendError(message: String) {
-        Minecraft.getInstance().execute {
-            ChatUtils.sendMessage(message, true)
-        }
+        ChatUtils.sendMessage(message, true)
     }
 
     private fun runCallback(callback: Runnable?) {

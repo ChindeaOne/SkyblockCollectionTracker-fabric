@@ -7,7 +7,6 @@ import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.toFWRankComponent
-import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 
 object FarmingweightUtils {
@@ -65,7 +64,7 @@ object FarmingweightUtils {
         val fullMessage = Component.empty().append(rankComp)
             .append(" §e$playerName's Farming Weight: ${storage.weight}")
 
-        Minecraft.getInstance().execute { ChatUtils.sendComponent(fullMessage, true) }
+        ChatUtils.sendComponent(fullMessage, true)
     }
 
     private fun displayFarmingweightLeaderboard(position: Int) {
@@ -79,15 +78,13 @@ object FarmingweightUtils {
         }
         val subList = leaderboard.subList(start, end)
 
-        Minecraft.getInstance().execute {
-            subList.forEachIndexed { index, entry ->
-                val rank = start + index + 1
-                val isMe = entry.name.equals(PlayerData.playerName, ignoreCase = true)
-                val message = Component.empty()
-                    .append(getRankComponent(rank, isMe, entry.name))
-                    .append(" §a${entry.name}: §b${entry.weight}")
-                ChatUtils.sendComponent(message, true)
-            }
+        subList.forEachIndexed { index, entry ->
+            val rank = start + index + 1
+            val isMe = entry.name.equals(PlayerData.playerName, ignoreCase = true)
+            val message = Component.empty()
+                .append(getRankComponent(rank, isMe, entry.name))
+                .append(" §a${entry.name}: §b${entry.weight}")
+            ChatUtils.sendComponent(message, true)
         }
     }
 

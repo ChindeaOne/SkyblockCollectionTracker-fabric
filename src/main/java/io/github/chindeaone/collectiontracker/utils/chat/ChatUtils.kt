@@ -28,13 +28,19 @@ object ChatUtils {
 
     @JvmStatic
     fun sendMessage(message: String, prefix: Boolean = true) {
+        val mc = Minecraft.getInstance()
+        if (!mc.isSameThread) {
+            mc.execute { sendMessage(message, prefix) }
+            return
+        }
+
         val messageComponent = Component.literal(message)
         val text = if (prefix) {
             Component.empty().append(PREFIX).append(messageComponent)
         } else {
             messageComponent
         }
-        Minecraft.getInstance().gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat.addClientSystemMessage(text)
+        mc.gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat.addClientSystemMessage(text)
     }
 
     private fun sendEmptyMessage() {
@@ -42,13 +48,19 @@ object ChatUtils {
     }
 
     fun sendComponent(component: Component, prefix: Boolean = true, messageId: Int? = null) {
+        val mc = Minecraft.getInstance()
+        if (!mc.isSameThread) {
+            mc.execute { sendComponent(component, prefix, messageId) }
+            return
+        }
+
         val finalComponent = if (prefix) {
             Component.empty().append(PREFIX).append(component)
         } else {
             component
         }
 
-        val chat = Minecraft.getInstance().gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat
+        val chat = mc.gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat
 
         if (messageId == null) {
             chat.addClientSystemMessage(finalComponent)
