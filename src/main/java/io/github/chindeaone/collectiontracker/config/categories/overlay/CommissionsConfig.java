@@ -24,7 +24,7 @@ public class CommissionsConfig {
             desc = "Display a title when a new commission is received."
     )
     @ConfigEditorBoolean
-    public boolean newCommissionTitle = true;
+    public boolean newCommissionTitle = false;
 
     @Expose
     @ConfigOption(
@@ -32,7 +32,7 @@ public class CommissionsConfig {
             desc = "Display a title when a commission is completed."
     )
     @ConfigEditorBoolean
-    public boolean completionTitle = true;
+    public boolean completionTitle = false;
 
     @Expose
     @ConfigOption(
