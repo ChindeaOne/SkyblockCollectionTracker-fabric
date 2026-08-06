@@ -38,14 +38,14 @@ public class SkillUtils {
 
     public enum MaxSkillLevels {
         MINING(60),
-        FORAGING(54),
+        FORAGING(57),
         FISHING(50),
         FARMING(60),
         COMBAT(60),
         ALCHEMY(50),
         ENCHANTING(60),
         TAMING(60),
-        HUNTING(25),
+        HUNTING(50),
         CARPENTRY(50),
         RUNECRAFTING(25),
         SOCIAL(25);
