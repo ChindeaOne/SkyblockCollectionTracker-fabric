@@ -63,7 +63,7 @@ object ContainerParser {
 
         val screen = currentHotxScreen ?: return
 
-        if (client.screen !== screen) {
+        if (client./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ !== screen) {
             currentHotxScreen = null
             currentHotxType = null
             return
