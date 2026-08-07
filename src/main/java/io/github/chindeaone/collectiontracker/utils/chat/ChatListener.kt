@@ -121,7 +121,7 @@ object ChatListener {
     }
 
     private fun setCooldownAttribute(text: String) {
-        if (ConfigAccess.hasCooldownAttribute()) return
+        if (ConfigAccess.hasCooldownAttributeMaxed()) return
 
         val value = Patterns.ATTRIBUTE.find(text.trimStart())?.groupValues?.get(1)
         if (value != null) {

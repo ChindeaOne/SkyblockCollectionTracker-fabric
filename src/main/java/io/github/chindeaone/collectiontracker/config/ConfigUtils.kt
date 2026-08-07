@@ -405,6 +405,8 @@ object ConfigAccess {
 
     fun hasCooldownAttribute(): Boolean = getAttributeLevel() > 0
 
+    fun hasCooldownAttributeMaxed(): Boolean = getAttributeLevel() == 10
+
     fun getAttributeLevel(): Int = attributeLevel
 
     fun getLastSkyMallBuff(): String = lastSkyMallBuff
