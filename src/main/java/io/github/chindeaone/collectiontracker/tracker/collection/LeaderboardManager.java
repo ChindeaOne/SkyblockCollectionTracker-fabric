@@ -114,17 +114,12 @@ public class LeaderboardManager {
                     }
                     return getEntryAtPosition(goalEntry.position);
                 } else if (goalType == LeaderboardConfig.CustomGoalType.AMOUNT && goalEntry.amount != null) {
-                    LeaderboardEntry playerEntry = getPlayerEntryRaw(amount);
                     // default if player's collection is greater than the custom goal amount
-                    if (playerEntry != null && amount > goalEntry.amount) {
+                    if (amount >= goalEntry.amount) {
                         return getNextRankEntryRaw(amount);
                     }
-                    LeaderboardEntry entry = getNextRankEntryRaw(goalEntry.amount);
                     // If goal amount exceeds all players, return custom goal entry
-                    if (entry == null && !lb.isEmpty()) {
-                        return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
-                    }
-                    return entry;
+                    return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
                 }
             }
         }
@@ -152,17 +147,12 @@ public class LeaderboardManager {
                     }
                     return getSkillEntryAtPosition(skill, goalEntry.position);
                 } else if (goalType == LeaderboardConfig.CustomGoalType.AMOUNT && goalEntry.amount != null) {
-                    LeaderboardEntry playerEntry = getPlayerEntry(skill, amount);
                     // default if player's skill xp is greater than the custom goal amount
-                    if (playerEntry != null && amount > goalEntry.amount) {
+                    if (amount >= goalEntry.amount) {
                         return getNextRankEntryRaw(skill, amount);
                     }
-                    LeaderboardEntry entry = getNextRankEntryRaw(skill, goalEntry.amount);
-                    // If goal amount exceeds all players, return custom goal entry
-                    if (entry == null && !lb.isEmpty()) {
-                        return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
-                    }
-                    return entry;
+
+                    return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
                 }
             }
         }
@@ -191,17 +181,12 @@ public class LeaderboardManager {
                     }
                     return getEntryAtPosition(goalEntry.position);
                 } else if (goalType == LeaderboardConfig.CustomGoalType.AMOUNT && goalEntry.amount != null) {
-                    LeaderboardEntry playerEntry = getPlayerEntryRaw(TrackingRates.collectionAmount);
                     // default if player's collection is greater than the custom goal amount
-                    if (playerEntry != null && TrackingRates.collectionAmount > goalEntry.amount) {
+                    if (TrackingRates.collectionAmount >= goalEntry.amount) {
                         return getNextRankEntryRaw(TrackingRates.collectionAmount);
                     }
-                    LeaderboardEntry entry = getNextRankEntryRaw(goalEntry.amount);
                     // If goal amount exceeds all players, return custom goal entry
-                    if (entry == null && !currentLeaderboard.isEmpty()) {
-                        return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
-                    }
-                    return entry;
+                    return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
                 }
             }
         }
