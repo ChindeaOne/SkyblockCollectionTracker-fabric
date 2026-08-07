@@ -28,7 +28,7 @@ public class Mining {
     public MiningStatsConfig miningStatsConfig = new MiningStatsConfig();
 
     @Expose
-    @ConfigOption(name = "HOTM perks", desc = "")
+    @ConfigOption(name = "HOTM Perks", desc = "")
     @Accordion
     public HotmConfig hotmConfig = new HotmConfig();
 
