@@ -10,7 +10,8 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 
 object ConfigStateUtils {
 
@@ -23,6 +24,9 @@ object ConfigStateUtils {
         checkCollectionBazaar()
         checkMultiCollectionBazaar()
         checkSkillTracking()
+        checkSkyMallPerk()
+        checkLotteryPerk()
+        checkBeekeeperPerk()
     }
 
     private fun checkApiTracking() {
@@ -30,14 +34,14 @@ object ConfigStateUtils {
 
         if (trackingActive && !CollectionTracker.isApiTracking && ConfigAccess.isApiTrackingEnabled()) {
             ConfigHelper.setApiTracking(CollectionTracker.isApiTracking)
-            ChatUtils.sendMessage("§cCan't enable API tracking while tracking is active!", true)
+            sendMessage("§cCan't enable API tracking while tracking is active!", true)
         }
     }
 
     private fun checkCollectionLeaderboard() {
         if (TrackingHandler.isTracking  && ConfigAccess.isCollectionLeaderboardEnabled() && !TrackingHandler.leaderboardTrackingInitialized) {
             ConfigHelper.disableCollectionLeaderboardTracking()
-            ChatUtils.sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true)
+            sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true)
         }
     }
 
@@ -49,7 +53,7 @@ object ConfigStateUtils {
             !MultiTrackingHandler.leaderboardTrackingInitialized) {
 
             ConfigHelper.disableCollectionLeaderboardTracking()
-            ChatUtils.sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true)
+            sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true)
         }
     }
 
@@ -58,24 +62,24 @@ object ConfigStateUtils {
 
         if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableBazaar()
-            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true)
+            sendMessage("§cYou cannot use Bazaar prices for this collection!", true)
         }
 
         if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isShowExtraStats()) {
             ConfigHelper.disableExtraStats()
-            ChatUtils.sendMessage("§cNo Bazaar data available for extra stats!", true)
+            sendMessage("§cNo Bazaar data available for extra stats!", true)
             return
         }
 
         if (CollectionsManager.collectionType == "normal" && ConfigAccess.isShowExtraStats()) {
             ConfigHelper.disableExtraStats()
-            ChatUtils.sendMessage("§cExtra stats are redundant here!", true)
+            sendMessage("§cExtra stats are redundant here!", true)
             return
         }
 
         if (ConfigAccess.isShowExtraStats() && !ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableExtraStats()
-            ChatUtils.sendMessage("§cDisabled extra stats since you don't use Bazaar prices!", true)
+            sendMessage("§cDisabled extra stats since you don't use Bazaar prices!", true)
         }
     }
 
@@ -84,7 +88,7 @@ object ConfigStateUtils {
 
         if (!BazaarCollectionsManager.hasBazaarData && ConfigAccess.isUsingBazaar()) {
             ConfigHelper.disableBazaar()
-            ChatUtils.sendMessage("§cYou cannot use Bazaar prices for this collection!", true)
+            sendMessage("§cYou cannot use Bazaar prices for this collection!", true)
         }
     }
 
@@ -92,13 +96,40 @@ object ConfigStateUtils {
         if (!SkillTrackingHandler.isTracking) return
 
         if (ConfigAccess.isSkillLeaderboardEnabled() && !SkillTrackingHandler.leaderboardTrackingInitialized) {
-            ChatUtils.sendMessage("§cCan't enable skill leaderboard mid tracking. Enable this before tracking a skill!", true)
+            sendMessage("§cCan't enable skill leaderboard mid tracking. Enable this before tracking a skill!", true)
             ConfigHelper.disableSkillLeaderboardTracking()
         }
 
         if (ConfigAccess.isTamingTrackingEnabled() && SkillTrackingHandler.getUptimeInSeconds() > 1 && SkillTrackingRates.tamingXp == 0L) {
-            ChatUtils.sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true)
+            sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true)
             ConfigHelper.disableTamingTracking()
+        }
+    }
+
+    private fun checkSkyMallPerk() {
+        if (ChatListener.currentSkyMallBuff.isEmpty()) {
+            if (ConfigAccess.isSkyMallEnabled()) {
+                ConfigHelper.disableSkyMall()
+                sendMessage("§cYou don't have the Sky Mall perk unlocked.", true)
+            }
+        }
+    }
+
+    private fun checkLotteryPerk() {
+        if (ChatListener.currentLotteryBuff.isEmpty()) {
+            if (ConfigAccess.isLotteryEnabled()) {
+                ConfigHelper.disableLottery()
+                sendMessage("§cYou don't have the Lottery perk unlocked.", true)
+            }
+        }
+    }
+
+    private fun checkBeekeeperPerk() {
+        if (ChatListener.currentBeekeeperBuff.isEmpty()) {
+            if (ConfigAccess.isBeekeeperEnabled()) {
+                ConfigHelper.disableBeekeeper()
+                sendMessage("§cYou don't have the Beekeeper perk unlocked.", true)
+            }
         }
     }
 }

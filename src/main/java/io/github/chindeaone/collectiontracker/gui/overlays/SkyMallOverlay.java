@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
@@ -65,10 +64,7 @@ public class SkyMallOverlay extends AbstractOverlay {
 
     private List<String> getSkyMallLines() {
         skyMallOverlayLines.clear();
-        if (ChatListener.getCurrentSkyMallBuff().isEmpty()) {
-            if (ConfigAccess.isSkyMallEnabled()) ConfigHelper.disableSkyMall();
-            return Collections.emptyList();
-        }
+
         if (ConfigAccess.isSkyMallInMiningIslandsOnly() && !MiningMapping.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
 
         skyMallOverlayLines.add("§bSky Mall: " + ChatListener.getCurrentSkyMallBuff());

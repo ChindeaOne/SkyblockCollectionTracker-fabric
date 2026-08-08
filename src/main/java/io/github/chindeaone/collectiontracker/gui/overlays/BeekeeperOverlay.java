@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.core.Position;
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
@@ -64,10 +63,7 @@ public class BeekeeperOverlay extends AbstractOverlay{
 
     private List<String> getBeekeeperLines() {
         beekeeperOverlayLines.clear();
-        if (ChatListener.getCurrentBeekeeperBuff().isEmpty()) {
-            if (ConfigAccess.isBeekeeperEnabled()) ConfigHelper.disableBeekeeper();
-            return Collections.emptyList();
-        }
+
         if (ConfigAccess.isBeekeeperInForagingIslandsOnly() && ForagingStatsWidget.getCurrentForagingIsland() == null) return Collections.emptyList();
 
         beekeeperOverlayLines.add("§6Beekeeper: " + ChatListener.getCurrentBeekeeperBuff());
