@@ -29,9 +29,6 @@ object ContainerParser {
 
     private var currentHotxScreen: AbstractContainerScreen<*>? = null
     private var currentHotxType: HotxScreenType? = null
-    private var isSkyMallEnabled = false
-    private var isLotteryEnabled = false
-    private var isBeekeeperEnabled = false
 
     fun onScreenChanged(screen: Screen?) {
         if (!HypixelUtils.isOnSkyblock) return
@@ -83,11 +80,9 @@ object ContainerParser {
         val (enabled, effect) = result
 
         if (!enabled) {
-            isSkyMallEnabled = false
             return
         }
 
-        isSkyMallEnabled = true
         ChatListener.currentSkyMallBuff = effect
         ChatListener.isPickaxeAbility = effect.contains("cooldown", ignoreCase = true)
 
@@ -97,25 +92,15 @@ object ContainerParser {
 
     private fun handleHotf(screen: AbstractContainerScreen<*>, client: Minecraft) {
         findStack(screen, "Lottery")?.let { stack ->
-            parseEffect(stack, client)?.let { (enabled, effect) ->
-                if (enabled) {
-                    isLotteryEnabled = true
-                    ChatListener.currentLotteryBuff = effect
-                } else {
-                    isLotteryEnabled = false
-                }
+            parseEffect(stack, client)?.let { (_, effect) ->
+                ChatListener.currentLotteryBuff = effect
             }
         }
 
         val beekeeper = screen.menu.getSlot(7).item
         if (!beekeeper.isEmpty && beekeeper.hoverName.string == "Beekeeper") {
-            parseEffect(beekeeper, client)?.let { (enabled, effect) ->
-                if (enabled) {
-                    isBeekeeperEnabled = true
-                    ChatListener.currentBeekeeperBuff = effect
-                } else {
-                    isBeekeeperEnabled = false
-                }
+            parseEffect(beekeeper, client)?.let { (_, effect) ->
+                ChatListener.currentBeekeeperBuff = effect
             }
         }
 
@@ -145,7 +130,7 @@ object ContainerParser {
         val enabled = when {
             tooltip.contains("ENABLED") -> true
             tooltip.contains("DISABLED") -> false
-            else -> return null
+            else -> false
         }
 
         val effect = tooltip
@@ -154,9 +139,8 @@ object ContainerParser {
             .firstOrNull { it.isNotBlank() }
             ?.trim()
             ?.let(ChatListener::compactBuffs)
-            ?: return null
 
-        return enabled to effect
+        return enabled to (effect ?: if(enabled) "§cUnknown" else "")
     }
 
     private fun onCommissionScreen(container: AbstractContainerScreen<*>) {
