@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker
 
 import io.github.chindeaone.collectiontracker.config.ConfigManager
-import io.github.chindeaone.collectiontracker.utils.ConfigUtils
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.SharedConstants
 import net.minecraft.client.Minecraft
@@ -12,11 +11,11 @@ object SkyblockCollectionTracker {
     fun init() {
         configManager = ConfigManager()
 
+        configManager.loadFromConfig()
+
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.save() },
         )
-
-        ConfigUtils.loadFromConfig()
     }
 
     fun onClientTick(client: Minecraft) {
