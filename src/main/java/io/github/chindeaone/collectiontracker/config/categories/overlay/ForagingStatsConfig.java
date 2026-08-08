@@ -18,6 +18,14 @@ public class ForagingStatsConfig {
 
     @Expose
     @ConfigOption(
+            name = "Foraging Islands Only",
+            desc = "Allows the overlay to be rendered only in Foraging Islands."
+    )
+    @ConfigEditorBoolean
+    public boolean foragingStatsOverlayInForagingIslandsOnly = false;
+
+    @Expose
+    @ConfigOption(
             name = "Show detailed fortune",
             desc = "Shows the fortune breakdown in the overlay."
     )

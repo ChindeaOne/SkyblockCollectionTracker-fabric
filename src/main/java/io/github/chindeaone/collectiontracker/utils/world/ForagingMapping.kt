@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.world
 
 object ForagingMapping {
 
+    @JvmStatic
     val foragingIslands = listOf(
         "The Park",
         "Moonglade Marsh",

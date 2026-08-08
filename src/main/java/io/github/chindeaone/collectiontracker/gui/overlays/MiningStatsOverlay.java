@@ -65,6 +65,7 @@ public class MiningStatsOverlay extends AbstractOverlay{
 
     private List<String> getMiningLines() {
         if (ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly() && !MiningMapping.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
+
         List<String> raw = MiningStatsWidget.getRawStats();
         if (raw.isEmpty()) return Collections.emptyList();
 

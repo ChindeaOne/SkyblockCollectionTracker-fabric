@@ -9,7 +9,7 @@ object IslandTracker {
     @JvmStatic var currentMiningIsland: String? = null
         private set
 
-    var currentForagingIsland: String? = null
+    @JvmStatic var currentForagingIsland: String? = null
         private set
 
     var currentFarmingIsland: String? = null

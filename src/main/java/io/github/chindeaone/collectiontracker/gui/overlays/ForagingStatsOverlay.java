@@ -7,6 +7,8 @@ import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.tab.ForagingStatsWidget;
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher;
+import io.github.chindeaone.collectiontracker.utils.world.ForagingMapping;
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -61,6 +63,8 @@ public class ForagingStatsOverlay extends AbstractOverlay{
     }
 
     private List<String> getForagingLines() {
+        if (ConfigAccess.foragingStatsOverlayInForagingIslandsOnly() && !ForagingMapping.getForagingIslands().contains(IslandTracker.getCurrentForagingIsland())) return Collections.emptyList();
+
         List<String> raw = ForagingStatsWidget.getRawStats();
         List<String> rawBeacon = ForagingStatsWidget.getRawBeaconStats();
         String rawStarbornTemple = ForagingStatsWidget.getRawStarbornTempleStats();
