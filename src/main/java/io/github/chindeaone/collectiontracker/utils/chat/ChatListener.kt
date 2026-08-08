@@ -288,7 +288,7 @@ object ChatListener {
                     currentSkyMallBuff = compact
                     ConfigHelper.setLastSkyMallBuff(compact)
                     expectingSkyMallBuff = false
-                    if (ConfigAccess.isDisableSkyMallChatMessages()) return true // Don't render Sky Mall buff in chat, but update the buffs in overlay
+                    if (ConfigAccess.isSkyMallChatMessagesDisabled()) return true // Don't render Sky Mall buff in chat, but update the buffs in overlay
 
                     // Compact messages if overlay is enabled
                     if (ConfigAccess.isSkyMallEnabled()) {
@@ -301,7 +301,7 @@ object ChatListener {
                     currentLotteryBuff = compact
                     ConfigHelper.setLastLotteryBuff(compact)
                     expectingLotteryBuff = false
-                    if (ConfigAccess.isDisableLotteryChatMessages()) return true // Don't render Lottery buff in chat, but update the buffs in overlay
+                    if (ConfigAccess.isLotteryChatMessagesDisabled()) return true // Don't render Lottery buff in chat, but update the buffs in overlay
 
                     // Compact messages if overlay is enabled
                     if (ConfigAccess.isLotteryEnabled()) {
@@ -314,7 +314,7 @@ object ChatListener {
                     currentBeekeeperBuff = compact
                     ConfigHelper.setLastBeekeeperBuff(compact)
                     expectingBeekeeper = false
-                    if (ConfigAccess.isDisableBeekeeperChatMessages()) return true
+                    if (ConfigAccess.isBeekeeperChatMessagesDisabled()) return true
 
                     if (ConfigAccess.isBeekeeperEnabled()) {
                         ChatUtils.sendMessage("§eNew §6Beekeeper §eBuff§r: $compact", prefix = true)

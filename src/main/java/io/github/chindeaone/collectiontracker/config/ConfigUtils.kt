@@ -135,7 +135,7 @@ val drawLineToPrecisionMining: Boolean get() = precisionMiningConfig.drawLineToP
 
 // Overlays
 val miningStatsConfig: MiningStatsConfig get() = miningConfig.miningStatsConfig
-val enableMiningStatsConfig: Boolean get() = miningStatsConfig.enableMiningStatsOverlay
+val enableMiningStatsOverlay: Boolean get() = miningStatsConfig.enableMiningStatsOverlay
 val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsConfig.miningStatsOverlayInMiningIslandsOnly
 val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
 val showDetailedMiningFortune : Boolean get() = miningStatsConfig.showDetailedFortune
@@ -149,6 +149,7 @@ val deployableOutOfRangeWarning : Boolean get() = lanternDeployableConfig.deploy
 val foragingConfig: Foraging get() = modConfig.foraging
 val foragingStatsConfig: ForagingStatsConfig get() = foragingConfig.foragingStatsConfig
 val enableForagingStatsOverlay: Boolean get() = foragingStatsConfig.enableForagingStatsOverlay
+val foragingStatsOverlayInForagingIslandsOnly: Boolean get() = foragingStatsConfig.foragingStatsOverlayInForagingIslandsOnly
 val showDetailedForagingFortune: Boolean get() = foragingStatsConfig.showDetailedFortune
 val hotfConfig: HotfConfig get() = foragingConfig.hotfConfig
 val axeAbilityConfig: AxeAbilityConfig get() = hotfConfig.axeAbilityConfig
@@ -273,6 +274,8 @@ object ConfigAccess {
 
     fun getUpdateType(): About.UpdateType = updateType
 
+    fun getKeybindConfig(): KeybindConfig = keybindConfig
+
     @JvmStatic
     fun getBazaarType(): Bazaar.BazaarType = bazaarType
 
@@ -281,8 +284,6 @@ object ConfigAccess {
 
     @JvmStatic
     fun isUsingBazaar(): Boolean = useBazaar
-
-    fun getKeybindConfig(): KeybindConfig = keybindConfig
 
     fun hasCheckedUpdate(): Boolean = hasCheckedUpdate
 
@@ -308,7 +309,7 @@ object ConfigAccess {
     fun isCommissionsKeybindsEnabled(): Boolean = keybindConfig.enableCommissionsKeybinds
 
     @JvmStatic
-    fun isMiningStatsEnabled(): Boolean = enableMiningStatsConfig
+    fun isMiningStatsEnabled(): Boolean = enableMiningStatsOverlay
 
     @JvmStatic
     fun isMiningStatsOverlayInMiningIslandsOnly(): Boolean = miningStatsOverlayInMiningIslandsOnly
@@ -366,6 +367,9 @@ object ConfigAccess {
     fun isForagingStatsOverlayEnabled(): Boolean = enableForagingStatsOverlay
 
     @JvmStatic
+    fun foragingStatsOverlayInForagingIslandsOnly(): Boolean = foragingStatsOverlayInForagingIslandsOnly
+
+    @JvmStatic
     fun isShowDetailedForagingFortune(): Boolean = showDetailedForagingFortune
 
     fun getCotmLevel(): Int = cotmLevel
@@ -373,17 +377,17 @@ object ConfigAccess {
     @JvmStatic
     fun isSkyMallEnabled(): Boolean = enableSkyMall
 
-    fun isDisableSkyMallChatMessages(): Boolean = disableSkyMallChatMessages
+    fun isSkyMallChatMessagesDisabled(): Boolean = disableSkyMallChatMessages
 
     @JvmStatic
     fun isLotteryEnabled(): Boolean = enableLottery
 
-    fun isDisableLotteryChatMessages(): Boolean = disableLotteryChatMessages
+    fun isLotteryChatMessagesDisabled(): Boolean = disableLotteryChatMessages
 
     @JvmStatic
     fun isBeekeeperEnabled(): Boolean = enableBeekeeper
 
-    fun isDisableBeekeeperChatMessages(): Boolean = disableBeekeeperChatMessages
+    fun isBeekeeperChatMessagesDisabled(): Boolean = disableBeekeeperChatMessages
 
     @JvmStatic
     fun isSkyMallInMiningIslandsOnly(): Boolean = skyMallInMiningIslandsOnly
@@ -640,6 +644,136 @@ object ConfigHelper {
         beekeeperConfig.enableBeekeeper = false
     }
 
+    fun toggleMiningStats(): Boolean {
+        miningStatsConfig.enableMiningStatsOverlay = !enableMiningStatsOverlay
+        return enableMiningStatsOverlay
+    }
+
+    fun toggleMiningStatsOnlyOnMiningIslands(): Boolean {
+        miningStatsConfig.miningStatsOverlayInMiningIslandsOnly = !miningStatsOverlayInMiningIslandsOnly
+        return miningStatsOverlayInMiningIslandsOnly
+    }
+
+    fun togglePickaxeAbility(): Boolean {
+        pickaxeAbilityConfig.displayPickaxeAbility = !displayPickaxeAbility
+        return displayPickaxeAbility
+    }
+
+    fun togglePickaxeAbilityOnlyOnMiningIslands(): Boolean {
+        pickaxeAbilityConfig.pickaxeAbilityInMiningIslandsOnly = !pickaxeAbilityInMiningIslandsOnly
+        return pickaxeAbilityInMiningIslandsOnly
+    }
+
+    fun togglePickaxeAbilityReadyTitle(): Boolean {
+        pickaxeAbilityConfig.showPickaxeReadyAbilityTitle = !showPickaxeReadyAbilityTitle
+        return pickaxeAbilityConfig.showPickaxeReadyAbilityTitle
+    }
+
+    fun togglePickaxeAbilityExpiredTitle(): Boolean {
+        pickaxeAbilityConfig.showPickaxeExpiredAbilityTitle = !showPickaxeExpiredAbilityTitle
+        return showPickaxeExpiredAbilityTitle
+    }
+
+    fun toggleSkyMall(): Boolean {
+        skyMallConfig.enableSkyMall = !enableSkyMall
+        return enableSkyMall
+    }
+
+    fun toggleSkyMallOnlyOnMiningIslands(): Boolean {
+        skyMallConfig.skyMallInMiningIslandsOnly = !skyMallInMiningIslandsOnly
+        return skyMallInMiningIslandsOnly
+    }
+
+    fun toggleSkyMallChatMessages(): Boolean {
+        skyMallConfig.disableSkyMallChatMessages = !disableSkyMallChatMessages
+        return disableSkyMallChatMessages
+    }
+
+    fun toggleCommissionsOverlay(): Boolean {
+        commissionsConfig.enableCommissionsOverlay = !enableCommissionsOverlay
+        return enableCommissionsOverlay
+    }
+
+    fun toggleCommissionsTracking(): Boolean {
+        commissionsConfig.enableCommissionsTracking = !enableCommissionsTracking
+        return enableCommissionsTracking
+    }
+
+    fun toggleCommissionsKeybinds(): Boolean {
+        keybindConfig.enableCommissionsKeybinds = !keybindConfig.enableCommissionsKeybinds
+        return keybindConfig.enableCommissionsKeybinds
+    }
+
+    fun toggleTempBuffTracker(): Boolean {
+        temporaryBuffsConfig.enableTempBuffTracker = !enableTempBuffTracker
+        return enableTempBuffTracker
+    }
+
+    fun toggleTempBuffExpiredTitle(): Boolean {
+        temporaryBuffsConfig.showTempBuffExpiredTitle = !showTempBuffExpiredTitle
+        return showTempBuffExpiredTitle
+    }
+
+    fun toggleForagingStats(): Boolean {
+        foragingStatsConfig.enableForagingStatsOverlay = !enableForagingStatsOverlay
+        return enableForagingStatsOverlay
+    }
+
+    fun toggleForagingStatsOnlyOnForagingIslands(): Boolean {
+        foragingStatsConfig.foragingStatsOverlayInForagingIslandsOnly = !foragingStatsOverlayInForagingIslandsOnly
+        return foragingStatsOverlayInForagingIslandsOnly
+    }
+
+    fun toggleAxeAbility(): Boolean {
+        axeAbilityConfig.displayAxeAbility = !displayAxeAbility
+        return displayAxeAbility
+    }
+
+    fun toggleAxeAbilityOnlyOnForagingIslands(): Boolean {
+        axeAbilityConfig.axeAbilityInForagingIslandsOnly = !axeAbilityInForagingIslandsOnly
+        return axeAbilityInForagingIslandsOnly
+    }
+
+    fun toggleAxeAbilityReadyTitle(): Boolean {
+        axeAbilityConfig.showAxeReadyAbilityTitle = !showAxeReadyAbilityTitle
+        return showAxeReadyAbilityTitle
+    }
+
+    fun toggleAxeAbilityExpiredTitle(): Boolean {
+        axeAbilityConfig.showAxeExpiredAbilityTitle = !showAxeExpiredAbilityTitle
+        return showAxeExpiredAbilityTitle
+    }
+
+    fun toggleLottery(): Boolean {
+        lotteryConfig.enableLottery = !enableLottery
+        return enableLottery
+    }
+
+    fun toggleLotteryOnlyOnForagingIslands(): Boolean {
+        lotteryConfig.lotteryInForagingIslandsOnly = !lotteryInForagingIslandsOnly
+        return lotteryInForagingIslandsOnly
+    }
+
+    fun toggleLotteryChatMessages(): Boolean {
+        lotteryConfig.disableLotteryChatMessages = !disableLotteryChatMessages
+        return disableLotteryChatMessages
+    }
+
+    fun toggleBeekeeper(): Boolean {
+        beekeeperConfig.enableBeekeeper = !enableBeekeeper
+        return enableBeekeeper
+    }
+
+    fun toggleBeekeeperOnlyOnForagingIslands(): Boolean {
+        beekeeperConfig.beekeeperInForagingIslandsOnly = !beekeeperInForagingIslandsOnly
+        return beekeeperInForagingIslandsOnly
+    }
+
+    fun toggleBeekeeperChatMessages(): Boolean {
+        beekeeperConfig.disableBeekeeperChatMessages = !disableBeekeeperChatMessages
+        return disableBeekeeperChatMessages
+    }
+
     fun setAxeAbilityName(name: String) {
         axeAbilityConfig.abilityNameAxe = name
     }
@@ -715,14 +849,17 @@ object ConfigHelper {
         farmingweightColorConfig.customColors.remove(player)
     }
 
+    @JvmStatic
     fun setMineshaftSpawnRoutesEnabled(enabled: Boolean) {
         mineshaftRoutesConfig.enableMineshaftSpawnRoutes = enabled
     }
 
+    @JvmStatic
     fun setDwarvenMetalRoutesEnabled(enabled: Boolean) {
         dwarvenMetalsRoutesConfig.enableDwarvenMetalRoutes = enabled
     }
 
+    @JvmStatic
     fun setPureOresRoutesEnabled(enabled: Boolean) {
         pureOresRoutesConfig.enablePureOresRoutes = enabled
     }
