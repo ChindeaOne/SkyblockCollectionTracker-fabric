@@ -257,7 +257,7 @@ object ChatListener {
         if (!HypixelUtils.isOnSkyblock) return false
 
         val remaining = nextBuffTime - System.currentTimeMillis()
-        if (remaining > 60_000L && remaining < 19 * 60_000L) {
+        if ((remaining > 60_000L && remaining < 19 * 60_000L) && ScoreboardUtils.checkTime) {
             return false
         }
 

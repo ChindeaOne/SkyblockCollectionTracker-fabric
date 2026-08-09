@@ -20,7 +20,7 @@ object ScoreboardUtils {
     @JvmStatic
     var coldValue: Int = 0
 
-    private var checkTime: Boolean = true
+    var checkTime: Boolean = true
     var timeLeft: Int = 0
     private var lastMinutesSinceMidnight = -1
 
