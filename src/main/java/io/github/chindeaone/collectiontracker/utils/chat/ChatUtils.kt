@@ -247,14 +247,17 @@ object ChatUtils {
     @JvmStatic
     fun sendCategoryPage(
         category: String,
-        color: String,
+        color: Int,
         collections: MutableList<String>,
         page: Int,
         totalPages: Int
     ) {
         val divider = fillChat()
         val title: Component = buildTitleBar(page, totalPages).centerText()
-        val collectionTitle: Component = Component.literal("$color§l$category Collections").centerText()
+        val collectionTitle: Component = Component.literal("$category Collections")
+            .withColor(color)
+            .withStyle(ChatFormatting.BOLD)
+            .centerText()
 
         val message = Component.empty()
 

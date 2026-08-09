@@ -8,8 +8,8 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
-import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -46,7 +46,7 @@ object RenderUtils {
         drawOverlayFrame(context, pos) {
             drawRoundedRect(context, 0, -yPadding, pos.width, totalBoxHeight, radius, ColorUtils.DUMMY_BG)
 
-            val overlayText = Component.literal(label).withStyle(ChatFormatting.GREEN)
+            val overlayText = Component.literal(label).withColor(Colors.GREEN.color)
             val textScale = 0.8f
 
             val textHeight = fr.lineHeight * textScale
@@ -57,7 +57,7 @@ object RenderUtils {
 
             context.pose().pushMatrix()
             context.pose().scale(textScale, textScale)
-            context.centeredText(fr, overlayText, xPos.toInt(), yPos.toInt(), ColorUtils.WHITE)
+            context.centeredText(fr, overlayText, xPos.toInt(), yPos.toInt(), Colors.WHITE.color)
             context.pose().popMatrix()
         }
     }
@@ -82,10 +82,10 @@ object RenderUtils {
 
         val radius = (overlayH / 12).coerceAtLeast(1)
 
-        val color: Int = if (withColor) (ColorUtils.collectionColors[CollectionTracker.collection]) ?: ColorUtils.GREEN  else ColorUtils.GREEN
+        val color: Int = if (withColor) (ColorUtils.collectionColors[CollectionTracker.collection]) ?: Colors.GREEN.color else Colors.GREEN.color
 
-        if (color != ColorUtils.GREEN) {
-            val outlineShade = ColorUtils.DARK_GRAY
+        if (color != Colors.GREEN.color) {
+            val outlineShade = Colors.DARK_GRAY.color
 
             val startX = -padding
             val startY = -padding
@@ -135,7 +135,7 @@ object RenderUtils {
         var y = 0
 
         for (line in lines) {
-            var color: Int = ColorUtils.GREEN
+            var color: Int = Colors.GREEN.color
             if (withColor) {
                 val splitIndex = line.indexOf(": ")
                 if (splitIndex != -1) {
@@ -158,12 +158,12 @@ object RenderUtils {
                         foundCollName.contains("ETA") ||
                         foundCollName.contains("Gemstones") ||
                         foundCollName.contains("Custom")) {
-                        color = ColorUtils.collectionColors["gemstone"] ?: ColorUtils.GREEN
+                        color = ColorUtils.collectionColors["gemstone"] ?: Colors.GREEN.color
                     } else if (foundCollName.contains(" ")) { // all gemstones when it's expanded
                         val firstWord = foundCollName.trim().substringBefore(' ').lowercase()
-                        color = ColorUtils.collectionColors[firstWord.trim()] ?: ColorUtils.GREEN
+                        color = ColorUtils.collectionColors[firstWord.trim()] ?: Colors.GREEN.color
                     } else {
-                        color = ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: ColorUtils.GREEN
+                        color = ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: Colors.GREEN.color
                     }
                 }
             }
@@ -177,7 +177,7 @@ object RenderUtils {
     fun renderSkillStringsWithTaming(context: GuiGraphicsExtractor, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
         var y = 0
 
-        val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: ColorUtils.GREEN
+        val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
         for (line in lines) {
             drawHelper(line, context, y, color)
             y += fr.lineHeight
@@ -185,7 +185,7 @@ object RenderUtils {
 
         if (withTaming) {
             y += fr.lineHeight
-            val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: ColorUtils.GREEN
+            val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: Colors.GREEN.color
             for (line in tamingLines) {
                 drawHelper(line, context, y, tamingColor)
                 y += fr.lineHeight
@@ -209,7 +209,7 @@ object RenderUtils {
         var y = 0
 
         for (line in lines) {
-            context.text(fr, line, 0, y, ColorUtils.WHITE, true)
+            context.text(fr, line, 0, y, Colors.WHITE.color, true)
             y += fr.lineHeight
         }
     }
@@ -223,7 +223,7 @@ object RenderUtils {
 
         when {
             cooldown <= 0.0 -> {
-                drawArc(context, centerX, centerY, -90f, 360f, ColorUtils.GREEN)
+                drawArc(context, centerX, centerY, -90f, 360f, Colors.GREEN.color)
             }
 
             duration > 0.0 -> {
@@ -231,13 +231,13 @@ object RenderUtils {
                 val sweep = (360 * progress).toFloat()
                 val start = -90f + (360f - sweep)
 
-                drawArc(context, centerX, centerY, start, sweep, ColorUtils.GREEN)
+                drawArc(context, centerX, centerY, start, sweep, Colors.GREEN.color)
             }
 
             else -> {
                 val progress = (1.0 - cooldown / maxCooldown).coerceIn(0.0, 1.0)
 
-                drawArc(context, centerX, centerY, -90f, (-360 * progress).toFloat(), ColorUtils.RED)
+                drawArc(context, centerX, centerY, -90f, (-360 * progress).toFloat(), Colors.RED.color)
             }
         }
     }
@@ -251,17 +251,17 @@ object RenderUtils {
 
         when {
             cooldown <= 0.0 -> {
-                drawBar(context, centerX, centerY, 11f, 2f, 1f, ColorUtils.GREEN)
+                drawBar(context, centerX, centerY, 11f, 2f, 1f, Colors.GREEN.color)
             }
 
             duration > 0.0 -> {
                 val progress = (duration / maxDuration).coerceIn(0.0, 1.0).toFloat()
-                drawBar(context, centerX, centerY, 11f, 2f, progress, ColorUtils.GREEN)
+                drawBar(context, centerX, centerY, 11f, 2f, progress, Colors.GREEN.color)
             }
 
             else -> {
                 val progress = (1.0 - cooldown / maxCooldown).coerceIn(0.0, 1.0).toFloat()
-                drawBar(context, centerX, centerY, 11f, 2f, progress, ColorUtils.RED)
+                drawBar(context, centerX, centerY, 11f, 2f, progress, Colors.RED.color)
             }
         }
     }
@@ -325,7 +325,6 @@ object RenderUtils {
         val maxDuration: Double
     )
 
-
     private fun getAbilityTimes(ability: String) = when (ability) {
         "axe" -> AbilityTimes(
             ChatListener.finalAxeCooldown,
@@ -351,16 +350,16 @@ object RenderUtils {
 
             val scaleStr = String.format("%.2f\n\n", activePosition.scale)
 
-            val positionText = Component.literal("Position Editor\n").withStyle(ChatFormatting.BLUE)
-                .append(Component.literal(" X: ").withStyle(ChatFormatting.GRAY))
-                .append(Component.literal("${activePosition.x}").withStyle(ChatFormatting.YELLOW))
-                .append(Component.literal("  Y: ").withStyle(ChatFormatting.GRAY))
-                .append(Component.literal("${activePosition.y}").withStyle(ChatFormatting.YELLOW))
-                .append(Component.literal("  Scale: ").withStyle(ChatFormatting.GRAY))
-                .append(Component.literal(scaleStr).withStyle(ChatFormatting.AQUA))
-                .append(Component.literal("Use mouse wheel to resize the overlay\n").withStyle(ChatFormatting.YELLOW))
-                .append(Component.literal("Use middle click to reset the scale\n").withStyle(ChatFormatting.YELLOW))
-                .append(Component.literal("Right-click to open the config").withStyle(ChatFormatting.RED))
+            val positionText = Component.literal("Position Editor\n").withColor(Colors.BLUE.color)
+                .append(Component.literal(" X: ").withColor(Colors.GRAY.color))
+                .append(Component.literal("${activePosition.x}").withColor(Colors.YELLOW.color))
+                .append(Component.literal("  Y: ").withColor(Colors.GRAY.color))
+                .append(Component.literal("${activePosition.y}").withColor(Colors.YELLOW.color))
+                .append(Component.literal("  Scale: ").withColor(Colors.GRAY.color))
+                .append(Component.literal(scaleStr).withColor(Colors.AQUA.color))
+                .append(Component.literal("Use mouse wheel to resize the overlay\n").withColor(Colors.YELLOW.color))
+                .append(Component.literal("Use middle click to reset the scale\n").withColor(Colors.YELLOW.color))
+                .append(Component.literal("Right-click to open the config").withColor(Colors.GOLD.color))
 
             drawTooltipsHelper(context, positionText, x, y)
         }
@@ -368,7 +367,7 @@ object RenderUtils {
 
     fun drawEditorHudTitle(context: GuiGraphicsExtractor, pos: Position?) {
         val textScale = 0.75f
-        val resizeText = Component.literal("").withStyle(ChatFormatting.GREEN)
+        val resizeText = Component.literal("").withColor(Colors.GREEN.color)
 
         val textWidth = fr.width(resizeText)
         val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
@@ -376,17 +375,17 @@ object RenderUtils {
 
         context.pose().pushMatrix()
         context.pose().scale(textScale, textScale)
-        context.text(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), ColorUtils.WHITE, true)
+        context.text(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), Colors.WHITE.color, true)
         context.pose().popMatrix()
 
         if (pos != null) {
             val x = ScaleUtils.mouseX + 12
             val y = ScaleUtils.mouseY - 12
 
-            val positionText = Component.literal("Position Editor\n").withStyle(ChatFormatting.BLUE)
-                .append(Component.literal(" Y: ").withStyle(ChatFormatting.GRAY))
-                .append(Component.literal("${pos.y}\n\n").withStyle(ChatFormatting.YELLOW))
-                .append(Component.literal("You can only move the title vertically").withStyle(ChatFormatting.YELLOW))
+            val positionText = Component.literal("Position Editor\n").withColor(Colors.BLUE.color)
+                .append(Component.literal(" Y: ").withColor(Colors.GRAY.color))
+                .append(Component.literal("${pos.y}\n\n").withColor(Colors.YELLOW.color))
+                .append(Component.literal("You can only move the title vertically").withColor(Colors.YELLOW.color))
 
             drawTooltipsHelper(context, positionText, x, y)
         }
@@ -413,7 +412,7 @@ object RenderUtils {
         context.pose().scale(textScale, textScale)
         lines.forEachIndexed { index, line ->
             val yOffset = index * (fr.lineHeight + space)
-            context.text(fr, line, 0, yOffset, ColorUtils.YELLOW, true)
+            context.text(fr, line, 0, yOffset, Colors.YELLOW.color, true)
         }
         context.pose().popMatrix()
     }
@@ -462,7 +461,7 @@ object RenderUtils {
         context.pose().pushMatrix()
         context.pose().translate(screenWidth / 2f, y)
         context.pose().scale(scale, scale)
-        context.centeredText(fr, title, 0, yOffset.toInt(), ColorUtils.WHITE)
+        context.centeredText(fr, title, 0, yOffset.toInt(), Colors.WHITE.color)
         context.pose().popMatrix()
     }
 
@@ -485,7 +484,7 @@ object RenderUtils {
 
         // Render current version first
         SkyblockCollectionTracker.VERSION.let { version ->
-            context.centeredText(fr, "Version: $version", screenWidth / 2, startY - 20, ColorUtils.GREEN)
+            context.centeredText(fr, "Version: $version", screenWidth / 2, startY - 20, Colors.GREEN.color)
         }
 
         context.enableScissor(startX, startY, startX + overlayWidth, startY + overlayHeight)
@@ -507,10 +506,10 @@ object RenderUtils {
             }
             // Set header colors
             val color = when {
-                line.contains("## What's New") -> ColorUtils.GREEN
-                line.contains("## Improvements") -> ColorUtils.YELLOW
-                line.contains("## Bug Fixes") -> ColorUtils.AQUA
-                else -> ColorUtils.WHITE
+                line.contains("## What's New") -> Colors.GREEN.color
+                line.contains("## Improvements") -> Colors.YELLOW.color
+                line.contains("## Bug Fixes") -> Colors.AQUA.color
+                else -> Colors.WHITE.color
             }
             // clear Markdown
             val cleanLine = trimmed.replace("## ", "")
@@ -555,7 +554,7 @@ object RenderUtils {
         return totalHeight
     }
 
-    private fun drawTooltipBox(context: GuiGraphicsExtractor, x: Float, y: Float, width: Float, height: Float, padding: Float = 4f, borderColor: Int = ColorUtils.GRAY) {
+    private fun drawTooltipBox(context: GuiGraphicsExtractor, x: Float, y: Float, width: Float, height: Float, padding: Float = 4f, borderColor: Int = Colors.GRAY.color) {
         val x1 = (x - padding).toInt()
         val y1 = (y - padding).toInt()
         val x2 = (x + width + padding).toInt()

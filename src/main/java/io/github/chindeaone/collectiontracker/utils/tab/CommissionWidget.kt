@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.tab
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
-import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser.ActiveCommission
@@ -34,10 +34,10 @@ object CommissionWidget {
         if (!updated.isFresh) return
         if (!ConfigAccess.isNewCommissionTitleEnabled()) return
 
-        val color = updated.type.color ?: ColorUtils.YELLOW
+        val color = updated.type.color ?: Colors.YELLOW.color
 
         val component = Component.empty()
-            .append(Component.literal("New Commission: ").withColor(ColorUtils.YELLOW))
+            .append(Component.literal("New Commission: ").withColor(Colors.YELLOW.color))
             .append(Component.literal(updated.type.name).withColor(color))
 
         RenderUtils.showTitle(component, 1500)
@@ -52,11 +52,11 @@ object CommissionWidget {
 
         if (!ConfigAccess.isCompletionTitleEnabled()) return
 
-        val color = active.type.color ?: ColorUtils.GREEN
+        val color = active.type.color ?: Colors.GREEN.color
 
         val component = Component.empty()
             .append(Component.literal(active.type.name).withColor(color))
-            .append(Component.literal(" Completed!").withColor(ColorUtils.GREEN))
+            .append(Component.literal(" Completed!").withColor(Colors.GREEN.color))
 
         RenderUtils.showTitle(component, 1500)
     }

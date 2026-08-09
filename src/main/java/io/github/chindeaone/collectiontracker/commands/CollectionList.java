@@ -1,8 +1,10 @@
 package io.github.chindeaone.collectiontracker.commands;
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
+import io.github.chindeaone.collectiontracker.utils.Colors;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -10,26 +12,18 @@ public class CollectionList {
 
     private static final int PAGE_SIZE = 15; // Max collections per page
 
-    private record Page(String category, String color, List<String> collections) {}
+    private record Page(String category, int color, List<String> collections) {}
 
     public static void sendCollectionList(int page) {
-        Map<String, String> categoryColors = new LinkedHashMap<>();
-        categoryColors.put("Farming", "§a"); // Green
-        categoryColors.put("Mining", "§6"); // Gold
-        categoryColors.put("Combat", "§c"); // Red
-        categoryColors.put("Foraging", "§2"); // Dark green
-        categoryColors.put("Fishing", "§b"); // Aqua
-        categoryColors.put("Rift", "§5"); // Dark purple
-        categoryColors.put("Miscellaneous", "§8"); // Dark gray
+        Map<String, Integer> categoryColors = getStringIntegerMap();
 
         // Ordered categories
-        List<Map.Entry<String, Set<String>>> categories =
-                new ArrayList<>(CollectionsManager.collections.entrySet());
+        List<Map.Entry<String, Set<String>>> categories = new ArrayList<>(CollectionsManager.collections.entrySet());
 
         List<Page> pages = new ArrayList<>();
         for (Map.Entry<String, Set<String>> entry : categories) {
             String category = entry.getKey();
-            String color = categoryColors.getOrDefault(category, "§f");
+            int color = categoryColors.get(category);
 
             List<String> allCollections = new ArrayList<>(entry.getValue());
             if (allCollections.isEmpty()) {
@@ -51,6 +45,18 @@ public class CollectionList {
         Page current = pages.get(page - 1);
 
         ChatUtils.sendCategoryPage(current.category, current.color, current.collections, page, totalPages);
+    }
+
+    private static @NonNull Map<String, Integer> getStringIntegerMap() {
+        Map<String, Integer> categoryColors = new LinkedHashMap<>();
+        categoryColors.put("Farming", Colors.GREEN.getColor());
+        categoryColors.put("Mining", Colors.GOLD.getColor());
+        categoryColors.put("Combat", Colors.RED.getColor());
+        categoryColors.put("Foraging", Colors.DARK_GREEN.getColor());
+        categoryColors.put("Fishing", Colors.AQUA.getColor());
+        categoryColors.put("Rift", Colors.DARK_PURPLE.getColor());
+        categoryColors.put("Miscellaneous", Colors.DARK_GRAY.getColor());
+        return categoryColors;
     }
 
     public static Integer getPageForCategory(String categoryInput) {

@@ -20,18 +20,30 @@ fun Int.toFWRankComponent(isMe: Boolean, playerName: String): Component =
 fun Color.toChromaColor(alpha: Int = this.alpha, chromaSpeedMillis: Int = 0): ChromaColour =
     ChromaColour.fromRGB(red, green, blue, chromaSpeedMillis, alpha)
 
+@Suppress("unused")
+enum class Colors(val colorCode: Char, val color: Int) {
+    BLACK('0', 0xFF000000.toInt()),
+    DARK_BLUE('1', 0xFF0000AA.toInt()),
+    DARK_GREEN('2', 0xFF00AA00.toInt()),
+    DARK_AQUA('3', 0xFF00AAAA.toInt()),
+    DARK_RED('4', 0xFFAA0000.toInt()),
+    DARK_PURPLE('5', 0xFFAA00AA.toInt()),
+    GOLD('6', 0xFFFFAA00.toInt()),
+    GRAY('7', 0xFFAAAAAA.toInt()),
+    DARK_GRAY('8', 0xFF555555.toInt()),
+    BLUE('9', 0xFF5555FF.toInt()),
+    GREEN('a', 0xFF55FF55.toInt()),
+    AQUA('b', 0xFF55FFFF.toInt()),
+    RED('c', 0xFFFF5555.toInt()),
+    LIGHT_PURPLE('d', 0xFFFF55FF.toInt()),
+    YELLOW('e', 0xFFFFFF55.toInt()),
+    WHITE('f', 0xFFFFFFFF.toInt());
+}
+
 object ColorUtils {
     const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
     const val DUMMY_BG: Int = 0x80404040.toInt()
-    const val WHITE: Int = 0xFFFFFFFF.toInt()
-    const val GREEN: Int = 0xFF55FF55.toInt()
-    const val YELLOW: Int = 0xFFFFFF55.toInt()
-    const val AQUA: Int = 0xFF55FFFF.toInt()
-    const val GRAY: Int = 0xFFAAAAAA.toInt()
-    const val RED: Int = 0xFFFF0000.toInt()
-    const val DARK_GRAY: Int = 0xFFAAAAAA.toInt()
     const val SILVER_BLUE: Int = 0xFF7FB4DB.toInt()
-    const val DARK_AQUA: Int = 0xFF00AAAA.toInt()
 
     val GRADIENT_START_COLOR: Color = Color(255, 212, 71)
     val GRADIENT_END_COLOR: Color = Color(255, 159, 46)
@@ -73,9 +85,9 @@ object ColorUtils {
     // Inspired by Skyhanni's prefix gradient
     fun getPrefixComponent(): Component {
         return Component.empty()
-            .append(Component.literal("[").withStyle { it.withColor(DARK_AQUA) })
+            .append(Component.literal("[").withColor(Colors.DARK_AQUA.color))
             .append(Component.literal("SCT").withStyle { ChromaText.prefixStyle() })
-            .append(Component.literal("]").withStyle { it.withColor(DARK_AQUA) })
+            .append(Component.literal("]").withColor(Colors.DARK_AQUA.color))
             .append(Component.literal(" "))
     }
 
@@ -153,7 +165,7 @@ object ColorUtils {
 
     fun collToColor(collection: String): Component {
         return Component.literal(collection).withStyle {
-            val colorInt = collectionColors[collection.lowercase()] ?: WHITE
+            val colorInt = collectionColors[collection.lowercase()] ?: Colors.WHITE.color
             it.withColor(TextColor.fromRgb(colorInt))
         }
     }
