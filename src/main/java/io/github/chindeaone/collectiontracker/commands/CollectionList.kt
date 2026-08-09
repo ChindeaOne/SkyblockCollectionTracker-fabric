@@ -3,9 +3,6 @@ package io.github.chindeaone.collectiontracker.commands
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import net.minecraft.util.Mth
-
-import java.util.*
 import kotlin.math.ceil
 
 object CollectionList {
@@ -44,7 +41,7 @@ object CollectionList {
         if (pages.isEmpty()) return
 
         val totalPages = pages.size
-        val page = Mth.clamp(page, 1, totalPages)
+        val page = page.coerceIn(1, totalPages)
 
         val current = pages[page - 1]
 

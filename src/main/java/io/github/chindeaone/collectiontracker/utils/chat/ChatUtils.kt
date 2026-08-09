@@ -145,8 +145,8 @@ object ChatUtils {
         }
     }
 
-    private fun fillChat(symbol: String = "-", color: Int = Colors.GOLD.color, width: Int = getWidth()): Component {
-        val symbolComponent = Component.literal(symbol).withStyle(Formatting.STRIKETHROUGH.format).withColor(color)
+    private fun fillChat(width: Int = getWidth()): Component {
+        val symbolComponent = Component.literal("-").withStyle(Formatting.STRIKETHROUGH.format).withColor(Colors.GOLD.color)
         val symbolWidth = Minecraft.getInstance().font.width(symbolComponent)
         if (symbolWidth <= 0) return symbolComponent
         if (symbolWidth >= width) return symbolComponent
