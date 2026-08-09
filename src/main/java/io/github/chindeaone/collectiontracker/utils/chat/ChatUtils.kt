@@ -1,7 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils.chat
 
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
-import net.minecraft.ChatFormatting
+import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.Formatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
@@ -144,8 +145,8 @@ object ChatUtils {
         }
     }
 
-    private fun fillChat(symbol: String = "-", style: ChatFormatting = ChatFormatting.GOLD, width: Int = getWidth()): Component {
-        val symbolComponent = Component.literal(symbol).withStyle(style, ChatFormatting.STRIKETHROUGH)
+    private fun fillChat(symbol: String = "-", color: Int = Colors.GOLD.color, width: Int = getWidth()): Component {
+        val symbolComponent = Component.literal(symbol).withStyle(Formatting.STRIKETHROUGH.format).withColor(color)
         val symbolWidth = Minecraft.getInstance().font.width(symbolComponent)
         if (symbolWidth <= 0) return symbolComponent
         if (symbolWidth >= width) return symbolComponent
@@ -160,14 +161,14 @@ object ChatUtils {
     @JvmStatic
     fun sendCommandPage(
         category: String,
-        color: String,
+        color: Int,
         commands: List<MutableComponent>,
         page: Int,
         totalPages: Int
     ) {
         val divider = fillChat()
         val title: Component = buildCommandTitleBar(page, totalPages).centerText()
-        val categoryTitle: Component = Component.literal("$color§l$category").centerText()
+        val categoryTitle: Component = Component.literal(category).withStyle(Formatting.BOLD.format).withColor(color).centerText()
 
         val message = Component.empty()
 
@@ -198,28 +199,35 @@ object ChatUtils {
 
         if (page > 1) {
             title.append(
-                Component.literal("§6<< ")
+                Component.literal("<< ")
                     .withStyle {
                         it.withClickEvent(ClickEvent.RunCommand("/sct commands ${page - 1}"))
-                            .withHoverEvent(HoverEvent.ShowText(Component.literal("§7Previous page")))
+                            .withHoverEvent(HoverEvent.ShowText(Component.literal("Previous page").withColor(Colors.GRAY.color)))
                     }
+                    .withColor(Colors.GOLD.color)
             )
         } else {
-            title.append(Component.literal("§7<< "))
+            title.append(Component.literal("<< ").withColor(Colors.GRAY.color))
         }
 
-        title.append(Component.literal("§6§lSkyblockCollectionTracker §7- §eCommands §7($page/$totalPages)"))
+        title.append(
+            Component.empty()
+                .append(Component.literal("SkyblockCollectionTracker").withStyle(Formatting.BOLD.format).withColor(Colors.GOLD.color))
+                .append(Component.literal(" - Commands").withColor(Colors.YELLOW.color))
+                .append(Component.literal(" ($page/$totalPages)").withColor(Colors.GRAY.color))
+        )
 
         if (page < totalPages) {
             title.append(
-                Component.literal(" §6>>")
+                Component.literal(" >>")
                     .withStyle {
                         it.withClickEvent(ClickEvent.RunCommand("/sct commands ${page + 1}"))
-                            .withHoverEvent(HoverEvent.ShowText(Component.literal("§7Next page")))
+                            .withHoverEvent(HoverEvent.ShowText(Component.literal("Next page").withColor(Colors.GRAY.color)))
                     }
+                    .withColor(Colors.GOLD.color)
             )
         } else {
-            title.append(Component.literal(" §7>>"))
+            title.append(Component.literal(" >>").withColor(Colors.GRAY.color))
         }
         return title
     }
@@ -255,8 +263,8 @@ object ChatUtils {
         val divider = fillChat()
         val title: Component = buildTitleBar(page, totalPages).centerText()
         val collectionTitle: Component = Component.literal("$category Collections")
+            .withStyle(Formatting.BOLD.format)
             .withColor(color)
-            .withStyle(ChatFormatting.BOLD)
             .centerText()
 
         val message = Component.empty()
@@ -275,15 +283,18 @@ object ChatUtils {
 
         collections.forEach { collection ->
             appendLine(
-                Component.literal("   $color- $collection")
+                Component.literal("   - $collection")
                     .withStyle {
                         it.withClickEvent(ClickEvent.RunCommand("/sct track $collection"))
                             .withHoverEvent(
                                 HoverEvent.ShowText(
-                                    Component.literal("§eClick to track the $color$collection§e collection!")
+                                    Component.literal("Click to track the ").withColor(Colors.YELLOW.color)
+                                        .append(Component.literal(collection).withColor(color))
+                                        .append(Component.literal(" collection!").withColor(Colors.YELLOW.color))
                                 )
                             )
                     }
+                    .withColor(color)
             )
         }
         appendLine(divider)
@@ -296,28 +307,35 @@ object ChatUtils {
 
         if (page > 1) {
             title.append(
-                Component.literal("§6<< ")
+                Component.literal("<< ")
                     .withStyle {
                         it.withClickEvent(ClickEvent.RunCommand("/sct collections ${page - 1}"))
-                            .withHoverEvent(HoverEvent.ShowText(Component.literal("§7Previous category")))
+                            .withHoverEvent(HoverEvent.ShowText(Component.literal("Previous category").withColor(Colors.GRAY.color)))
                     }
+                    .withColor(Colors.GOLD.color)
             )
         } else {
-            title.append(Component.literal("§7<< "))
+            title.append(Component.literal("<< ").withColor(Colors.GRAY.color))
         }
 
-        title.append(Component.literal("§6§lSkyblockCollectionTracker §7- §eCollections §7($page/$totalPages)"))
+        title.append(
+            Component.empty()
+                .append(Component.literal("SkyblockCollectionTracker").withStyle(Formatting.BOLD.format).withColor(Colors.GOLD.color))
+                .append(Component.literal(" - Collections").withColor(Colors.YELLOW.color))
+                .append(Component.literal(" ($page/$totalPages)").withColor(Colors.GRAY.color))
+        )
 
         if (page < totalPages) {
             title.append(
-                Component.literal(" §6>>")
+                Component.literal(" >>")
                     .withStyle {
                         it.withClickEvent(ClickEvent.RunCommand("/sct collections ${page+1}"))
-                          .withHoverEvent(HoverEvent.ShowText(Component.literal("§7Next category")) )
+                          .withHoverEvent(HoverEvent.ShowText(Component.literal("Next category").withColor(Colors.GRAY.color)))
                     }
+                    .withColor(Colors.GOLD.color)
             )
         } else {
-            title.append(Component.literal(" §7>>"))
+            title.append(Component.literal(" >>").withColor(Colors.GRAY.color))
         }
         return title
     }

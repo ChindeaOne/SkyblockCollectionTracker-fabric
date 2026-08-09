@@ -7,6 +7,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.TextColor
 import java.awt.Color
@@ -21,7 +22,7 @@ fun Color.toChromaColor(alpha: Int = this.alpha, chromaSpeedMillis: Int = 0): Ch
     ChromaColour.fromRGB(red, green, blue, chromaSpeedMillis, alpha)
 
 @Suppress("unused")
-enum class Colors(val colorCode: Char, val color: Int) {
+enum class Colors(private val colorCode: Char, val color: Int) {
     BLACK('0', 0xFF000000.toInt()),
     DARK_BLUE('1', 0xFF0000AA.toInt()),
     DARK_GREEN('2', 0xFF00AA00.toInt()),
@@ -38,6 +39,16 @@ enum class Colors(val colorCode: Char, val color: Int) {
     LIGHT_PURPLE('d', 0xFFFF55FF.toInt()),
     YELLOW('e', 0xFFFFFF55.toInt()),
     WHITE('f', 0xFFFFFFFF.toInt());
+}
+
+@Suppress("unused")
+enum class Formatting(private val code: Char, val format: ChatFormatting) {
+    OBFUSCATED('k', ChatFormatting.OBFUSCATED),
+    BOLD('l', ChatFormatting.BOLD),
+    STRIKETHROUGH('m', ChatFormatting.STRIKETHROUGH),
+    UNDERLINE('n', ChatFormatting.UNDERLINE),
+    ITALIC('o', ChatFormatting.ITALIC),
+    RESET('r', ChatFormatting.RESET);
 }
 
 object ColorUtils {
@@ -164,16 +175,11 @@ object ColorUtils {
     }
 
     fun collToColor(collection: String): Component {
-        return Component.literal(collection).withStyle {
-            val colorInt = collectionColors[collection.lowercase()] ?: Colors.WHITE.color
-            it.withColor(TextColor.fromRgb(colorInt))
-        }
+        return Component.literal(collection).withColor(collectionColors[collection.lowercase()] ?: Colors.WHITE.color)
     }
 
     @JvmStatic
     fun coloredText(color: String): Component {
-        return Component.literal(color).withStyle{
-            it.withColor(TextColor.fromRgb(Color.decode(color).rgb))
-        }
+        return Component.literal(color).withColor(TextColor.fromRgb(Color.decode(color).rgb).value)
     }
 }

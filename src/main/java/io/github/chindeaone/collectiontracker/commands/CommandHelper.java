@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.commands;
 
+import io.github.chindeaone.collectiontracker.utils.Colors;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -13,10 +14,10 @@ public class CommandHelper {
 
     private record CommandEntry(String command, String description) {}
 
-    private record CommandPage(String category, String color, List<CommandEntry> entries) {}
+    private record CommandPage(String category, int color, List<CommandEntry> entries) {}
 
     private static final List<CommandPage> PAGES = List.of(
-            new CommandPage("General", "§e", List.of(
+            new CommandPage("General", Colors.YELLOW.getColor(), List.of(
                     new CommandEntry("/sct", "§eOpens the GUI."),
                     new CommandEntry("/sct commands", "§eShows this message."),
                     new CommandEntry("/sct commands <page>", "§eJumps to a specific commands page."),
@@ -24,12 +25,12 @@ public class CommandHelper {
                     new CommandEntry("/sct token", "§eRequests a new token if one is missing.")
             )),
 
-            new CommandPage("Editing", "§d", List.of(
+            new CommandPage("Editing", Colors.LIGHT_PURPLE.getColor(), List.of(
                     new CommandEntry("/sct edit", "§eOpens the position editor."),
                     new CommandEntry("/sct edit title", "§eOpens the title position editor.")
             )),
 
-            new CommandPage("Collection Tracking", "§3", List.of(
+            new CommandPage("Collection Tracking", Colors.AQUA.getColor(), List.of(
                     new CommandEntry("/sct collections", "§eShows all available collections (page 1)."),
                     new CommandEntry("/sct collections <page | category>", "§eJumps to a specific collections page or category."),
                     new CommandEntry("/sct track <collection 1> <collection 2> ...", "§eTracks one or more collections at once."),
@@ -39,7 +40,7 @@ public class CommandHelper {
                     new CommandEntry("/sct stop", "§eStops collection tracking.")
             )),
 
-            new CommandPage("Skill Tracking", "§6", List.of(
+            new CommandPage("Skill Tracking", Colors.GOLD.getColor(), List.of(
                     new CommandEntry("/sct skill track <skill>", "§eTracks your skill progress."),
                     new CommandEntry("/sct skill pause", "§ePauses skill tracking."),
                     new CommandEntry("/sct skill resume", "§eResumes skill tracking."),
@@ -47,13 +48,13 @@ public class CommandHelper {
                     new CommandEntry("/sct skill stop", "§eStops skill tracking.")
             )),
 
-            new CommandPage("Miscellaneous", "§9", List.of(
+            new CommandPage("Miscellaneous", Colors.BLUE.getColor(), List.of(
                     new CommandEntry("/sct setCustomGoalPosition <name> <position>", "§eSets a custom leaderboard position goal for a collection or skill."),
                     new CommandEntry("/sct setCustomGoalAmount <name> <amount>", "§eSets a custom amount goal (e.g. 10m, 1b) for a collection or skill."),
                     new CommandEntry("/sct commissions reset", "§eResets the commissions tracker.")
             )),
 
-            new CommandPage("Coleweight", "§b", List.of(
+            new CommandPage("Coleweight", Colors.AQUA.getColor(), List.of(
                     new CommandEntry("/sct cw", "§eShows your Coleweight."),
                     new CommandEntry("/sct cw find [player]", "§eShows a player's Coleweight."),
                     new CommandEntry("/sct cw detailed [player]", "§eShows detailed Coleweight information."),
@@ -73,7 +74,7 @@ public class CommandHelper {
                     new CommandEntry("/sct stopwatch <start | pause | resume | stop>", "§eManages the stopwatch.")
             )),
 
-            new CommandPage("Farming Weight", "§a", List.of(
+            new CommandPage("Farming Weight", Colors.GREEN.getColor(), List.of(
                     new CommandEntry("/sct fw", "§eShows your Farming Weight."),
                     new CommandEntry("/sct fw find [player]", "§eShows a player's Farming Weight."),
                     new CommandEntry("/sct fw lb <length>", "§eShows the Farming Weight leaderboard."),
