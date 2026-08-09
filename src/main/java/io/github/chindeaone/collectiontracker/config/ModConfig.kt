@@ -4,10 +4,13 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.categories.*
+import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText
 import io.github.notenoughupdates.moulconfig.Config
+import io.github.notenoughupdates.moulconfig.Social
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
+import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 
 class ModConfig : Config() {
@@ -57,5 +60,15 @@ class ModConfig : Config() {
 
     override fun saveNow() {
         SkyblockCollectionTracker.configManager.save()
+    }
+
+    private val github = MyResourceLocation("skyblockcollectiontracker", "social/github.png")
+    private val modrinth = MyResourceLocation("skyblockcollectiontracker", "social/modrinth.png")
+
+    override fun getSocials(): List<Social> {
+        return listOf(
+            Social.forLink(StructuredText.of("GitHub").withColour(Colors.GRAY.color), github, "https://github.com/ChindeaOne/SkyblockCollectionTracker-fabric"),
+            Social.forLink(StructuredText.of("Modrinth").withColour(Colors.GREEN.color), modrinth, "https://modrinth.com/mod/sct")
+        )
     }
 }
