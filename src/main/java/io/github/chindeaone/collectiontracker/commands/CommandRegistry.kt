@@ -59,14 +59,14 @@ object CommandRegistry {
         .then(ClientCommands.literal("commands")
             // sct commands -> shows first page of commands
             .executes {
-                CommandHelper.showCommands(1)
+                CommandList.showCommands(1)
                 1
             }
             // sct commands <page>
             .then(ClientCommands.argument("page", IntegerArgumentType.integer(1))
                 .executes {
                     val page: Int = IntegerArgumentType.getInteger(it, "page")
-                    CommandHelper.showCommands(page)
+                    CommandList.showCommands(page)
                     1
                 }
             )

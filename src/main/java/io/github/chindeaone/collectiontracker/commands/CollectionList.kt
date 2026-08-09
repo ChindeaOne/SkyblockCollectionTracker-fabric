@@ -1,83 +1,86 @@
-package io.github.chindeaone.collectiontracker.commands;
+package io.github.chindeaone.collectiontracker.commands
 
-import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
-import io.github.chindeaone.collectiontracker.utils.Colors;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import net.minecraft.util.Mth;
-import org.jspecify.annotations.NonNull;
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import net.minecraft.util.Mth
 
-import java.util.*;
+import java.util.*
+import kotlin.math.ceil
 
-public class CollectionList {
+object CollectionList {
 
-    private static final int PAGE_SIZE = 15; // Max collections per page
+    private const val PAGE_SIZE = 15 // Max collections per page
 
-    private record Page(String category, int color, List<String> collections) {}
+    private data class Page(
+        val category: String,
+        val color: Int,
+        val collections: List<String>
+    )
 
-    public static void sendCollectionList(int page) {
-        Map<String, Integer> categoryColors = getStringIntegerMap();
+    fun sendCollectionList(page: Int) {
+        val categoryColors = getCategoryColors()
 
         // Ordered categories
-        List<Map.Entry<String, Set<String>>> categories = new ArrayList<>(CollectionsManager.collections.entrySet());
+        val categories = CollectionsManager.collections.entries
 
-        List<Page> pages = new ArrayList<>();
-        for (Map.Entry<String, Set<String>> entry : categories) {
-            String category = entry.getKey();
-            int color = categoryColors.get(category);
+        val pages = ArrayList<Page>()
+        for (entry in categories) {
+            val category = entry.key
+            val color = categoryColors[category]!!
 
-            List<String> allCollections = new ArrayList<>(entry.getValue());
+            val allCollections = ArrayList(entry.value)
             if (allCollections.isEmpty()) {
-                pages.add(new Page(category, color, Collections.emptyList()));
-                continue;
+                pages.add(Page(category, color, emptyList()))
+                continue
             }
 
-            for (int i = 0; i < allCollections.size(); i += PAGE_SIZE) {
-                int end = Math.min(i + PAGE_SIZE, allCollections.size());
-                List<String> sub = allCollections.subList(i, end);
-                pages.add(new Page(category, color, new ArrayList<>(sub)));
+            for (i in allCollections.indices step PAGE_SIZE) {
+                val end = (i + PAGE_SIZE).coerceAtMost(allCollections.size)
+                val sub = allCollections.subList(i, end)
+                pages.add(Page(category, color, sub))
             }
         }
-        if (pages.isEmpty()) return;
+        if (pages.isEmpty()) return
 
-        int totalPages = pages.size();
-        page = Mth.clamp(page, 1, totalPages);
+        val totalPages = pages.size
+        val page = Mth.clamp(page, 1, totalPages)
 
-        Page current = pages.get(page - 1);
+        val current = pages[page - 1]
 
-        ChatUtils.sendCategoryPage(current.category, current.color, current.collections, page, totalPages);
+        ChatUtils.sendCategoryPage(current.category, current.color, current.collections, page, totalPages)
     }
 
-    private static @NonNull Map<String, Integer> getStringIntegerMap() {
-        Map<String, Integer> categoryColors = new LinkedHashMap<>();
-        categoryColors.put("Farming", Colors.GREEN.getColor());
-        categoryColors.put("Mining", Colors.GOLD.getColor());
-        categoryColors.put("Combat", Colors.RED.getColor());
-        categoryColors.put("Foraging", Colors.DARK_GREEN.getColor());
-        categoryColors.put("Fishing", Colors.AQUA.getColor());
-        categoryColors.put("Rift", Colors.DARK_PURPLE.getColor());
-        categoryColors.put("Miscellaneous", Colors.DARK_GRAY.getColor());
-        return categoryColors;
+    private fun getCategoryColors(): MutableMap<String, Int> {
+        val categoryColors = mutableMapOf<String, Int>()
+        categoryColors["Farming"] = Colors.GREEN.color
+        categoryColors["Mining"] = Colors.GOLD.color
+        categoryColors["Combat"] = Colors.RED.color
+        categoryColors["Foraging"] = Colors.DARK_GREEN.color
+        categoryColors["Fishing"] = Colors.AQUA.color
+        categoryColors["Rift"] = Colors.DARK_PURPLE.color
+        categoryColors["Miscellaneous"] = Colors.DARK_GRAY.color
+        return categoryColors
     }
 
-    public static Integer getPageForCategory(String categoryInput) {
-        Map<String, Set<String>> collectionsMap = CollectionsManager.collections;
+    fun getPageForCategory(categoryInput: String): Int? {
+        val collectionsMap = CollectionsManager.collections
 
-        int pageIndex = 1;
+        var pageIndex = 1
 
-        for (Map.Entry<String, Set<String>> entry : collectionsMap.entrySet()) {
-            String category = entry.getKey();
-            List<String> allCollections = new ArrayList<>(entry.getValue());
+        for (entry in collectionsMap.entries) {
+            val category = entry.key
+            val allCollections = ArrayList(entry.value)
 
-            int pagesForThisCategory = Math.max(1,
-                    (int) Math.ceil(allCollections.size() / (double) PAGE_SIZE));
+            val pagesForThisCategory = 1.coerceAtLeast(ceil(allCollections.size / PAGE_SIZE.toDouble()).toInt())
 
-            if (category.equalsIgnoreCase(categoryInput)) {
-                return pageIndex; // first page of this category
+            if (category.equals(categoryInput, ignoreCase = true)) {
+                return pageIndex // first page of this category
             }
 
-            pageIndex += pagesForThisCategory;
+            pageIndex += pagesForThisCategory
         }
 
-        return null;
+        return null
     }
 }
