@@ -1,9 +1,7 @@
 package io.github.chindeaone.collectiontracker.config
 
 import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import io.github.chindeaone.collectiontracker.config.error.ConfigError
 import io.github.chindeaone.collectiontracker.config.version.VersionManager
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
@@ -25,25 +23,20 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import java.nio.file.AtomicMoveNotSupportedException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import kotlin.concurrent.fixedRateTimer
 import kotlin.jvm.java
 
 class ConfigManager {
 
     companion object {
-        val gson: Gson = GsonBuilder().setPrettyPrinting()
+        val gson: Gson = GsonBuilder()
+            .setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
-            .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
-                override fun write(out: JsonWriter, value: UUID) {
-                    out.value(value.toString())
-                }
-
-                override fun read(reader: JsonReader): UUID {
-                    return UUID.fromString(reader.nextString())
-                }
-            }.nullSafe())
             .enableComplexMapKeySerialization()
             .create()
     }
@@ -51,7 +44,10 @@ class ConfigManager {
     private val logger: Logger = LogManager.getLogger(ConfigManager::class)
 
     private var configDirectory = File("config/sct")
+    private var configBackupDirectory = File("config/sct/backups")
     private var configFile: File
+    private var configBackupFile: File
+
     var config: ModConfig? = null
     private var lastSaveTime = 0L
 
@@ -59,7 +55,9 @@ class ConfigManager {
 
     init {
         configDirectory.mkdirs()
+        configBackupDirectory.mkdirs()
         configFile = File(configDirectory, "config.json")
+        configBackupFile = File(configBackupDirectory, "config_backup.json")
 
         if (configFile.isFile) {
             logger.info("[SCT]: Trying to load the config")
@@ -125,7 +123,7 @@ class ConfigManager {
             // Remove null entries
             config?.let { removeNulls(it) }
         } catch (e: Exception) {
-            throw ConfigError("Could not load config", e)
+            throw ConfigError("[SCT]: Could not load config", e)
         }
     }
 
@@ -199,10 +197,10 @@ class ConfigManager {
     }
 
     @Synchronized
-    fun save() {
+    fun save(auto: Boolean = false) {
         TemporaryBuffsParser.saveDurations()
         lastSaveTime = System.currentTimeMillis()
-        val config = config ?: error("Cannot save null config.")
+        val config = config ?: error("[SCT]: Cannot save null config.")
 
         configDirectory.mkdirs()
         val unit = configDirectory.resolve("config.json.write")
@@ -210,6 +208,24 @@ class ConfigManager {
         try {
             OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8).use { writer ->
                 writer.write(gson.toJson(config))
+            }
+
+            if (!auto && configFile.exists()) {
+                try {
+                    val dateFolder = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                    val datedBackupDir = configBackupDirectory.resolve(dateFolder)
+                    datedBackupDir.mkdirs()
+
+                    val datedBackupFile = datedBackupDir.resolve("config_backup.json")
+
+                    Files.copy(
+                        configFile.toPath(),
+                        datedBackupFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING
+                    )
+                } catch (e: IOException) {
+                    logger.error("[SCT]: Could not create backup of config", e)
+                }
             }
 
             try {
@@ -220,17 +236,27 @@ class ConfigManager {
                     StandardCopyOption.ATOMIC_MOVE
                 )
             } catch (e: AtomicMoveNotSupportedException) {
-                logger.warn("Atomic move not supported, falling back to non-atomic move", e)
+                logger.warn("[SCT]: Atomic move not supported, falling back to non-atomic move", e)
                 Files.move(
                     unit.toPath(),
                     configFile.toPath(),
                     StandardCopyOption.REPLACE_EXISTING
                 )
+                return
             }
-
         } catch (e: IOException) {
             unit.delete() // cleanup best effort
-            logger.error("Could not save config", e)
+            logger.error("[SCT]: Could not save config", e)
+            return
+        }
+        if (auto) {
+            logger.info("[SCT]: Config auto-saved.")
+        }
+    }
+
+    fun startAutoSave() {
+        fixedRateTimer("sct-auto-save", daemon = true, initialDelay = 60_000L, period = 60_000L) {
+            save(true)
         }
     }
 }

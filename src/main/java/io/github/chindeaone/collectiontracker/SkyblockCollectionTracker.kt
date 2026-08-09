@@ -10,8 +10,8 @@ object SkyblockCollectionTracker {
 
     fun init() {
         configManager = ConfigManager()
-
         configManager.loadFromConfig()
+        configManager.startAutoSave()
 
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.save() },
