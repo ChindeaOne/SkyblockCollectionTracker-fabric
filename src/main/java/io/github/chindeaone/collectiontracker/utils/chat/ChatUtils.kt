@@ -158,7 +158,6 @@ object ChatUtils {
 
     private fun getWidth(): Int = ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get())
 
-    @JvmStatic
     fun sendCommandPage(
         category: String,
         color: Int,
@@ -252,11 +251,10 @@ object ChatUtils {
         sendEmptyMessage()
     }
 
-    @JvmStatic
     fun sendCategoryPage(
         category: String,
         color: Int,
-        collections: MutableList<String>,
+        collections: List<String>,
         page: Int,
         totalPages: Int
     ) {
