@@ -463,6 +463,7 @@ object ChatListener {
                 ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
                 ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
                 ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
+                isPickaxeAbility = false
             }
         }
     }
