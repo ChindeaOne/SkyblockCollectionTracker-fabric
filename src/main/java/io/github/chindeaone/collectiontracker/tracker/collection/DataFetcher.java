@@ -150,7 +150,8 @@ public class DataFetcher {
                 entries.add(new LeaderboardEntry(
                         entryObject.get("username").getAsString(),
                         entryObject.get("rank").getAsInt(),
-                        entryObject.get("amount").getAsLong()
+                        entryObject.get("amount").getAsLong(),
+                        ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").getAsBoolean()
                 ));
             }
             LeaderboardManager.set(entries);

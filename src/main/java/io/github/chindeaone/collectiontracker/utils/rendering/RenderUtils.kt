@@ -156,6 +156,8 @@ object RenderUtils {
                     if (foundCollName.contains("Next Position") ||
                         foundCollName.contains("Till Next Position") ||
                         foundCollName.contains("ETA") ||
+                        foundCollName.contains("Passed") ||
+                        foundCollName.contains("Difference") ||
                         foundCollName.contains("Gemstones") ||
                         foundCollName.contains("Custom")) {
                         color = ColorUtils.collectionColors["gemstone"] ?: Colors.GREEN.color

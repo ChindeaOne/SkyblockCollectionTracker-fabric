@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.api.eliteapi
 
 import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -126,11 +127,14 @@ object EliteApiFetcher {
     @JvmStatic
     fun fetchCollectionLeaderboard(collection: String): String? {
         return try {
+            val includeWiped = if (ConfigAccess.isIncludeWipedProfilesEnabled()) "true" else "false"
+
             val response = authenticatedGet(
                 "collection/leaderboard/${collection.replace(" ", "-")}",
                 mutableListOf(
                     "Authorization" to "Bearer ${TokenManager.token}",
-                    "X-UUID" to PlayerData.playerUUID
+                    "X-UUID" to PlayerData.playerUUID,
+                    "X-CONTAINS-WIPED" to includeWiped
                 )
             )
 

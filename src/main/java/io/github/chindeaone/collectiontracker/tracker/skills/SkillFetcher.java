@@ -107,7 +107,8 @@ public class SkillFetcher {
                 entries.add(new LeaderboardEntry(
                         username,
                         entryObject.get("rank").getAsInt(),
-                        entryObject.get("amount").getAsLong()
+                        entryObject.get("amount").getAsLong(),
+                        ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").getAsBoolean()
                 ));
             }
 

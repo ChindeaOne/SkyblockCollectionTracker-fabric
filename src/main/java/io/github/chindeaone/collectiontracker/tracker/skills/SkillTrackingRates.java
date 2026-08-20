@@ -37,9 +37,11 @@ public class SkillTrackingRates {
     public static volatile long skillNextRankAmount = -1L;
     public static volatile long skillTillNextRank = -1L;
     public static volatile String skillEtaToNextRank = null;
+    public static volatile boolean isNextSkillWiped = false;
     public static volatile String skillPreviousRankUsername = null;
     public static volatile long skillPreviousRankAmount = -1L;
     public static volatile long skillAbovePreviousRankAmount = -1L;
+    public static volatile boolean isPreviousSkillWiped = false;
 
     // Taming Leaderboard tracking data
     public static volatile int tamingCurrentRank = -1;
@@ -47,9 +49,11 @@ public class SkillTrackingRates {
     public static volatile long tamingNextRankAmount = -1L;
     public static volatile long tamingTillNextRank = -1L;
     public static volatile String tamingEtaToNextRank = null;
+    public static volatile boolean isNextTamingWiped = false;
     public static volatile String tamingPreviousRankUsername = null;
     public static volatile long tamingPreviousRankAmount = -1L;
     public static volatile long tamingAbovePreviousRankAmount = -1L;
+    public static volatile boolean isPreviousTamingWiped = false;
 
     public static void initTracking(int level, long xp) {
         skillLevel = level;
@@ -123,11 +127,13 @@ public class SkillTrackingRates {
             skillNextRankAmount = nextEntry.amount();
             skillTillNextRank = skillNextRankAmount - totalSkillXp;
             updateSkillEta();
+            isNextSkillWiped = nextEntry.wiped();
         } else {
             skillNextRankUsername = null;
             skillNextRankAmount = -1L;
             skillTillNextRank = -1L;
             skillEtaToNextRank = null;
+            isNextSkillWiped = false;
         }
 
         LeaderboardEntry previousEntry = LeaderboardManager.getPreviousRankEntryForSkill(skillName, totalSkillXp);
@@ -135,10 +141,12 @@ public class SkillTrackingRates {
             skillPreviousRankUsername = previousEntry.username();
             skillPreviousRankAmount = previousEntry.amount();
             skillAbovePreviousRankAmount = totalSkillXp - skillPreviousRankAmount;
+            isPreviousSkillWiped = previousEntry.wiped();
         } else {
             skillPreviousRankUsername = null;
             skillPreviousRankAmount = -1L;
             skillAbovePreviousRankAmount = -1L;
+            isPreviousSkillWiped = false;
         }
     }
 
@@ -153,11 +161,13 @@ public class SkillTrackingRates {
             tamingNextRankAmount = nextEntry.amount();
             tamingTillNextRank = tamingNextRankAmount - (tamingXp + tamingXpGained);
             updateTamingEta();
+            isNextTamingWiped = nextEntry.wiped();
         } else {
             tamingNextRankUsername = null;
             tamingNextRankAmount = -1L;
             tamingTillNextRank = -1L;
             tamingEtaToNextRank = null;
+            isNextTamingWiped = false;
         }
 
         LeaderboardEntry previousEntry = LeaderboardManager.getPreviousRankEntryForSkill("Taming", tamingXp + tamingXpGained);
@@ -165,10 +175,12 @@ public class SkillTrackingRates {
             tamingPreviousRankUsername = previousEntry.username();
             tamingPreviousRankAmount = previousEntry.amount();
             tamingAbovePreviousRankAmount = (tamingXp + tamingXpGained) - tamingPreviousRankAmount;
+            isPreviousTamingWiped = previousEntry.wiped();
         } else {
             tamingPreviousRankUsername = null;
             tamingPreviousRankAmount = -1L;
             tamingAbovePreviousRankAmount = -1L;
+            isPreviousTamingWiped = false;
         }
     }
 

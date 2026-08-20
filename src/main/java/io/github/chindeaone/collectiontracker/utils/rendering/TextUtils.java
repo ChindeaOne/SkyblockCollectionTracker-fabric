@@ -61,10 +61,12 @@ public class TextUtils {
 
         if (ConfigAccess.isCustomPositionEnabled()) {
             if (nextRankAmount == -1) return "Custom Position: Calculating...";
+            if (isNextWiped) return String.format("Custom Position (%s-wiped): %s", nextRankUsername, formatNumber(nextRankAmount));
             return String.format("Custom Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount));
         }
 
         if (nextRankUsername == null) return "Next Position: Calculating...";
+        if (isNextWiped) return String.format("Next Position (%s-wiped): %s", nextRankUsername, formatNumber(nextRankAmount));
         return String.format("Next Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount));
     }
 
@@ -96,6 +98,7 @@ public class TextUtils {
         if (LeaderboardManager.isEmpty() || !ConfigAccess.isPreviousPositionEnabled()) return null;
 
         if (previousRankUsername == null) return "Passed: Calculating...";
+        if (isPreviousWiped) return String.format("Passed (%s-wiped): %s", previousRankUsername, formatNumber(previousRankAmount));
         return String.format("Passed (%s): %s", previousRankUsername, formatNumber(previousRankAmount));
     }
 
@@ -111,10 +114,12 @@ public class TextUtils {
 
         if (ConfigAccess.isCustomPositionEnabled()) {
             if (MultiTrackingRates.getNextRankAmount() == -1) return "Custom Position: Calculating...";
+            if (MultiTrackingRates.isNextWiped()) return String.format("Custom Position (%s-wiped): %s", MultiTrackingRates.getNextRankUsername(), formatNumber(MultiTrackingRates.getNextRankAmount()));
             return String.format("Custom Position (%s): %s", MultiTrackingRates.getNextRankUsername(), formatNumber(MultiTrackingRates.getNextRankAmount()));
         }
 
         if (MultiTrackingRates.getNextRankUsername() == null) return "Next Position: Calculating...";
+        if (MultiTrackingRates.isNextWiped()) return String.format("Next Position (%s-wiped): %s", MultiTrackingRates.getNextRankUsername(), formatNumber(MultiTrackingRates.getNextRankAmount()));
         return String.format("Next Position (%s): %s", MultiTrackingRates.getNextRankUsername(), formatNumber(MultiTrackingRates.getNextRankAmount()));
     }
 
@@ -148,6 +153,7 @@ public class TextUtils {
         if (LeaderboardManager.isEmpty() || !ConfigAccess.isPreviousPositionEnabled()) return null;
 
         if (MultiTrackingRates.getPreviousRankUsername() == null) return "Passed: Calculating...";
+        if (MultiTrackingRates.isPreviousWiped()) return String.format("Passed (%s-wiped): %s", MultiTrackingRates.getPreviousRankUsername(), formatNumber(MultiTrackingRates.getPreviousRankAmount()));
         return String.format("Passed (%s): %s", MultiTrackingRates.getPreviousRankUsername(), formatNumber(MultiTrackingRates.getPreviousRankAmount()));
     }
 
@@ -455,6 +461,7 @@ public class TextUtils {
                             .filter(entry -> entry.getKey().endsWith(suffix))
                             .filter(entry -> entry.getKey().contains("_normal") || entry.getKey().contains("_" + type) || entry.getKey().contains("_" + variant))
                             .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
+                    list.add("");
                     list.add("§eOverall $/h (Bazaar): " + formatNumber(total));
                 }
             }
@@ -470,6 +477,7 @@ public class TextUtils {
                             .filter(entry -> entry.getKey().endsWith(suffix))
                             .filter(entry -> entry.getKey().contains("_normal") || entry.getKey().contains("_" + type) || entry.getKey().contains("_" + variant))
                             .mapToLong(java.util.Map.Entry::getValue).filter(v -> v > 0).sum();
+                    list.add("");
                     list.add("§eOverall $ made (Bazaar): " + formatNumber(total));
                 }
             }

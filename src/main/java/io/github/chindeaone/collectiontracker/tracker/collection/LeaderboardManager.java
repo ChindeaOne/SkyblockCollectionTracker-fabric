@@ -213,6 +213,7 @@ public class LeaderboardManager {
 
     public static LeaderboardEntry getEntryAtPosition(int position) {
         List<LeaderboardEntry> lb = currentLeaderboard;
+
         if (lb.isEmpty() || position < 1 || position > lb.size()) {
             return null;
         }
@@ -236,7 +237,7 @@ public class LeaderboardManager {
     }
 
     public static int findBinaryIndex(List<LeaderboardEntry> lb, long targetAmount) {
-        int index = Collections.binarySearch(lb, new LeaderboardEntry("", 0, targetAmount),
+        int index = Collections.binarySearch(lb, new LeaderboardEntry("", 0, targetAmount, ConfigAccess.isIncludeWipedProfilesEnabled()),
                 (a, b) -> Long.compare(b.amount(), a.amount()));
 
         if (index < 0) {
