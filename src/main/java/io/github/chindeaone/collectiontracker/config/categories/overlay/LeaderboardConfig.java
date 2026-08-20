@@ -42,6 +42,14 @@ public class LeaderboardConfig {
 
     @Expose
     @ConfigOption(
+            name = "Include Wiped Profiles",
+            desc = "Leaderboards will include wiped players.\n§eNote: This feature is temporary, until admins will remove wiped players from the API."
+    )
+    @ConfigEditorBoolean
+    public boolean includeWipedProfiles = false;
+
+    @Expose
+    @ConfigOption(
             name = "Enable Custom Position",
             desc = "Enables a custom position for the leaderboard. This will show your progress towards the custom position instead of the next player on the leaderboard"
     )

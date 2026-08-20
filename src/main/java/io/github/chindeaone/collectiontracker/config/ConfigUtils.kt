@@ -192,6 +192,7 @@ val leaderboardOverlay: LeaderboardConfig get() = trackingConfig.leaderboardConf
 val collectionLeaderboard: Boolean get() = leaderboardOverlay.collectionLeaderboard
 val skillLeaderboard: Boolean get() = leaderboardOverlay.skillLeaderboard
 val previousPosition: Boolean get() = leaderboardOverlay.previousPosition
+val includeWipedProfiles: Boolean get() = leaderboardOverlay.includeWipedProfiles
 val customPosition: Boolean get() = leaderboardOverlay.customPosition
 val customGoals: Map<String, Int> get() = leaderboardOverlay.customPositions
 
@@ -527,6 +528,9 @@ object ConfigAccess {
 
     @JvmStatic
     fun isPreviousPositionEnabled(): Boolean = previousPosition
+
+    @JvmStatic
+    fun isIncludeWipedProfilesEnabled(): Boolean = includeWipedProfiles
 
     @JvmStatic
     fun isCustomPositionEnabled(): Boolean = customPosition
