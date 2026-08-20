@@ -559,10 +559,10 @@ object CommandRegistry {
             )
         )
 
-        // sct setCustomGoalPosition -> set custom position goal
-        .then(ClientCommands.literal("setCustomGoalPosition")
+        // sct setCustomPosition -> set custom position goal
+        .then(ClientCommands.literal("setCustomPosition")
             .executes {
-                ChatUtils.sendMessage("§cUsage: /sct setCustomGoalPosition <collection/skill name> <position>", true)
+                ChatUtils.sendMessage("§cUsage: /sct setCustomPosition <collection/skill name> <position>", true)
                 1
             }
             .then(ClientCommands.argument("goal", StringArgumentType.greedyString())
@@ -572,7 +572,7 @@ object CommandRegistry {
 
                     val lastSpace = input.lastIndexOf(' ')
                     if (lastSpace == -1) {
-                        ChatUtils.sendMessage("§cUsage: /sct setCustomGoalPosition <collection/skill name> <position>", true)
+                        ChatUtils.sendMessage("§cUsage: /sct setCustomPosition <collection/skill name> <position>", true)
                         return@executes 1
                     }
 
@@ -591,50 +591,49 @@ object CommandRegistry {
                         return@executes 1
                     }
 
-                    ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.POSITION)
-                    ConfigHelper.setCustomGoal(name, position, null)
+                    ConfigHelper.setCustomGoal(name, position)
 
-                    ChatUtils.sendMessage("§aCustom goal set for $name at position $position", true)
+                    ChatUtils.sendMessage("§aCustom position set for $name at position $position", true)
                     1
                 }
             )
         )
 
-        // sct setCustomGoalAmount -> set custom amount goal
-        .then(ClientCommands.literal("setCustomGoalAmount")
-            .executes {
-                ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true)
-                1
-            }
-            .then(ClientCommands.argument("goal", StringArgumentType.greedyString())
-                .suggests(CUSTOM_GOAL_AMOUNT_SUGGESTIONS)
-                .executes {
-                    val input = StringArgumentType.getString(it, "goal").trim()
-
-                    val lastSpace = input.lastIndexOf(' ')
-                    if (lastSpace == -1) {
-                        ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true)
-                        return@executes 1
-                    }
-
-                    val name = input.substring(0, lastSpace).trim()
-                    val amountStr = input.substring(lastSpace + 1).trim()
-
-                    val amount = parseAmount(amountStr)
-
-                    if (amount < 0) {
-                        ChatUtils.sendMessage("§cInvalid value!", true)
-                        return@executes 1
-                    }
-
-                    ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.AMOUNT)
-                    ConfigHelper.setCustomGoal(name, null, amount)
-
-                    ChatUtils.sendMessage("§aCustom goal set for $name at amount $amountStr", true)
-                    1
-                }
-            )
-        )
+//        // sct setCustomGoalAmount -> set custom amount goal
+//        .then(ClientCommands.literal("setCustomGoalAmount")
+//            .executes {
+//                ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true)
+//                1
+//            }
+//            .then(ClientCommands.argument("goal", StringArgumentType.greedyString())
+//                .suggests(CUSTOM_GOAL_AMOUNT_SUGGESTIONS)
+//                .executes {
+//                    val input = StringArgumentType.getString(it, "goal").trim()
+//
+//                    val lastSpace = input.lastIndexOf(' ')
+//                    if (lastSpace == -1) {
+//                        ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true)
+//                        return@executes 1
+//                    }
+//
+//                    val name = input.substring(0, lastSpace).trim()
+//                    val amountStr = input.substring(lastSpace + 1).trim()
+//
+//                    val amount = parseAmount(amountStr)
+//
+//                    if (amount < 0) {
+//                        ChatUtils.sendMessage("§cInvalid value!", true)
+//                        return@executes 1
+//                    }
+//
+//                    ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.AMOUNT)
+//                    ConfigHelper.setCustomGoal(name, null, amount)
+//
+//                    ChatUtils.sendMessage("§aCustom goal set for $name at amount $amountStr", true)
+//                    1
+//                }
+//            )
+//        )
 
         // sct commissions reset -> resets commissions tracker
         .then(ClientCommands.literal("commissions")

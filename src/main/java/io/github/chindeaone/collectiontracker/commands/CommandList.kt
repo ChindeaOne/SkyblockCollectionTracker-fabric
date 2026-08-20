@@ -52,8 +52,7 @@ object CommandList {
         )),
 
         CommandPage("Miscellaneous", Colors.BLUE.color, listOf(
-                CommandEntry("/sct setCustomGoalPosition <name> <position>", "Sets a custom leaderboard position goal for a collection or skill."),
-                CommandEntry("/sct setCustomGoalAmount <name> <amount>", "Sets a custom amount goal (e.g. 10m, 1b) for a collection or skill."),
+                CommandEntry("/sct setCustomPosition <name> <position>", "Sets a custom leaderboard position goal for a collection or skill."),
                 CommandEntry("/sct commissions reset", "Resets the commissions tracker.")
         )),
 

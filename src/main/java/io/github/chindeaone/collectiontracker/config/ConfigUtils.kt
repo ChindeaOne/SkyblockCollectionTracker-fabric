@@ -191,9 +191,9 @@ val explicitValues: Boolean get() = trackingConfig.explicitValues
 val leaderboardOverlay: LeaderboardConfig get() = trackingConfig.leaderboardConfig
 val collectionLeaderboard: Boolean get() = leaderboardOverlay.collectionLeaderboard
 val skillLeaderboard: Boolean get() = leaderboardOverlay.skillLeaderboard
-val customGoal: Boolean get() = leaderboardOverlay.customGoal
-val customGoalType: LeaderboardConfig.CustomGoalType get() = leaderboardOverlay.customGoalType
-val customGoals: Map<String, LeaderboardConfig.CustomGoalEntry> get() = leaderboardOverlay.customGoals
+val previousPosition: Boolean get() = leaderboardOverlay.previousPosition
+val customPosition: Boolean get() = leaderboardOverlay.customPosition
+val customGoals: Map<String, Int> get() = leaderboardOverlay.customPositions
 
 // Multi Collection Tracking Config Accessors
 val multiCollectionOverlay: MultiCollectionConfig get() = trackingConfig.multiCollectionConfig
@@ -526,16 +526,16 @@ object ConfigAccess {
     fun isSkillLeaderboardEnabled(): Boolean = skillLeaderboard
 
     @JvmStatic
-    fun isCustomGoalEnabled(): Boolean = customGoal
+    fun isPreviousPositionEnabled(): Boolean = previousPosition
 
     @JvmStatic
-    fun getCustomGoalType(): LeaderboardConfig.CustomGoalType = customGoalType
+    fun isCustomPositionEnabled(): Boolean = customPosition
 
     @JvmStatic
-    fun getCustomGoals(): Map<String, LeaderboardConfig.CustomGoalEntry> = customGoals
+    fun getCustomGoals(): Map<String, Int> = customGoals
 
     @JvmStatic
-    fun getCustomGoalEntry(name: String): LeaderboardConfig.CustomGoalEntry? {
+    fun getCustomPositionEntry(name: String): Int? {
         return customGoals[name.lowercase()]
     }
 }
@@ -592,20 +592,12 @@ object ConfigHelper {
     }
 
     @JvmStatic
-    fun setCustomGoalType(type: LeaderboardConfig.CustomGoalType) {
-        leaderboardOverlay.customGoalType = type
-    }
-
-    @JvmStatic
-    fun setCustomGoal(name: String, position: Int?, amount: Long?) {
+    fun setCustomGoal(name: String, position: Int?) {
         val lowercase = name.lowercase()
-        if (position == null && amount == null) {
-            leaderboardOverlay.customGoals.remove(lowercase)
+        if (position == null) {
+            leaderboardOverlay.customPositions.remove(lowercase)
         } else {
-            val existingEntry = leaderboardOverlay.customGoals[lowercase]
-            val finalPosition = position ?: existingEntry?.position
-            val finalAmount = amount ?: existingEntry?.amount
-            leaderboardOverlay.customGoals[lowercase] = LeaderboardConfig.CustomGoalEntry(finalPosition, finalAmount)
+            leaderboardOverlay.customPositions[lowercase] = position
         }
     }
 
