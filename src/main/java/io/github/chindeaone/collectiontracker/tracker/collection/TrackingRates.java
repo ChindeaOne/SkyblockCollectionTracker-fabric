@@ -58,6 +58,9 @@ public class TrackingRates {
     public static volatile long nextRankAmount = -1L;
     public static volatile String etaToNextRank = null;
     public static volatile long collectionTillNextRank = -1L;
+    public static volatile String previousRankUsername = null;
+    public static volatile long previousRankAmount = -1L;
+    public static volatile long collectionAbovePreviousRankAmount = -1L;
 
     public static void setCollection(long value) {
         long now = System.currentTimeMillis();
@@ -106,6 +109,17 @@ public class TrackingRates {
             nextRankAmount = -1L;
             collectionTillNextRank = -1L;
             etaToNextRank = null;
+        }
+
+        LeaderboardEntry previousEntry = LeaderboardManager.getPreviousRankEntry();
+        if (previousEntry != null) {
+            previousRankUsername = previousEntry.username();
+            previousRankAmount = previousEntry.amount();
+            collectionAbovePreviousRankAmount = collectionAmount - previousRankAmount;
+        } else {
+            previousRankUsername = null;
+            previousRankAmount = -1L;
+            collectionAbovePreviousRankAmount = -1L;
         }
     }
 

@@ -13,7 +13,6 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardConfig;
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
@@ -51,15 +50,18 @@ public class TextUtils {
             addIfNotNull(list, handleNextPosition());
             addIfNotNull(list, handleCollectionTillNextRank());
             addIfNotNull(list, handleEta());
+            addIfNotNull(list, "");
+            addIfNotNull(list, handlePreviousPosition());
+            addIfNotNull(list, handleCollectionAbovePreviousRank());
         }
     }
 
     private static String handleNextPosition() {
         if (LeaderboardManager.isEmpty() || playerCurrentRank == 1) return null;
 
-        if (isAmountGoal()) {
-            if (nextRankAmount == -1) return "Custom Goal: Calculating...";
-            return "Custom Goal: " + formatNumber(nextRankAmount);
+        if (ConfigAccess.isCustomPositionEnabled()) {
+            if (nextRankAmount == -1) return "Custom Position: Calculating...";
+            return String.format("Custom Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount));
         }
 
         if (nextRankUsername == null) return "Next Position: Calculating...";
@@ -69,9 +71,9 @@ public class TextUtils {
     private static String handleCollectionTillNextRank() {
         if (LeaderboardManager.isEmpty() || playerCurrentRank == 1) return null;
 
-        if (isAmountGoal()) {
-            if (collectionTillNextRank == -1) return "Till Custom Goal: Calculating...";
-            return "Till Custom Goal: " + formatNumber(collectionTillNextRank);
+        if (ConfigAccess.isCustomPositionEnabled()) {
+            if (collectionTillNextRank == -1) return "Till Custom Position: Calculating...";
+            return "Till Custom Position: " + formatNumber(collectionTillNextRank);
         }
 
         if (collectionTillNextRank == -1) return "Till Next Position: Calculating...";
@@ -81,23 +83,36 @@ public class TextUtils {
     private static String handleEta() {
         if (LeaderboardManager.isEmpty() || playerCurrentRank == 1) return null;
 
-        if (isAmountGoal()) {
-            if (etaToNextRank == null || etaToNextRank.isEmpty()) return "ETA to Custom Goal: Calculating...";
-            return "ETA to Custom Goal: " + etaToNextRank;
+        if (ConfigAccess.isCustomPositionEnabled()) {
+            if (etaToNextRank == null || etaToNextRank.isEmpty()) return "ETA to Custom Position: Calculating...";
+            return "ETA to Custom Position: " + etaToNextRank;
         }
 
         if (etaToNextRank == null || etaToNextRank.isEmpty()) return "ETA: Calculating...";
         return "ETA: " + etaToNextRank;
     }
 
+    private static String handlePreviousPosition() {
+        if (LeaderboardManager.isEmpty() || !ConfigAccess.isPreviousPositionEnabled()) return null;
+
+        if (previousRankUsername == null) return "Passed: Calculating...";
+        return String.format("Passed (%s): %s", previousRankUsername, formatNumber(previousRankAmount));
+    }
+
+    private static String handleCollectionAbovePreviousRank() {
+        if (LeaderboardManager.isEmpty() || !ConfigAccess.isPreviousPositionEnabled()) return null;
+
+        if (collectionAbovePreviousRankAmount == -1) return "Difference: Calculating...";
+        return "Difference: " + formatNumber(collectionAbovePreviousRankAmount);
+    }
+
     private static String handleMultiNextPosition() {
         if (LeaderboardManager.isEmpty() || MultiTrackingRates.getPlayerCurrentRank() == 1) return null;
 
-        if (isAmountGoal()) {
-            if (MultiTrackingRates.getNextRankAmount() == -1) return "Custom Goal: Calculating...";
-            return "Custom Goal: " + formatNumber(MultiTrackingRates.getNextRankAmount());
+        if (ConfigAccess.isCustomPositionEnabled()) {
+            if (MultiTrackingRates.getNextRankAmount() == -1) return "Custom Position: Calculating...";
+            return String.format("Custom Position (%s): %s", MultiTrackingRates.getNextRankUsername(), formatNumber(MultiTrackingRates.getNextRankAmount()));
         }
-
 
         if (MultiTrackingRates.getNextRankUsername() == null) return "Next Position: Calculating...";
         return String.format("Next Position (%s): %s", MultiTrackingRates.getNextRankUsername(), formatNumber(MultiTrackingRates.getNextRankAmount()));
@@ -106,9 +121,9 @@ public class TextUtils {
     private static String handleMultiCollectionTillNextRank() {
         if (LeaderboardManager.isEmpty() || MultiTrackingRates.getPlayerCurrentRank() == 1) return null;
 
-        if (isAmountGoal()) {
-            if (MultiTrackingRates.getCollectionTillNextRank() == -1) return "Till Custom Goal: Calculating...";
-            return "Till Custom Goal: " + formatNumber(MultiTrackingRates.getCollectionTillNextRank());
+        if (ConfigAccess.isCustomPositionEnabled()) {
+            if (MultiTrackingRates.getCollectionTillNextRank() == -1) return "Till Custom Position: Calculating...";
+            return "Till Custom Position: " + formatNumber(MultiTrackingRates.getCollectionTillNextRank());
         }
 
         if (MultiTrackingRates.getCollectionTillNextRank() == -1) return "Till Next Position: Calculating...";
@@ -118,19 +133,29 @@ public class TextUtils {
     private static String handleMultiEta() {
         if (LeaderboardManager.isEmpty() || MultiTrackingRates.getPlayerCurrentRank() == 1) return null;
 
-        if (isAmountGoal()) {
+        if (ConfigAccess.isCustomPositionEnabled()) {
             if (MultiTrackingRates.getEtaToNextRank() == null || MultiTrackingRates.getEtaToNextRank().isEmpty()) {
-                return "ETA to Custom Goal: Calculating...";
+                return "ETA to Custom Position: Calculating...";
             }
-            return "ETA to Custom Goal: " + MultiTrackingRates.getEtaToNextRank();
+            return "ETA to Custom Position: " + MultiTrackingRates.getEtaToNextRank();
         }
 
         if (MultiTrackingRates.getEtaToNextRank() == null || MultiTrackingRates.getEtaToNextRank().isEmpty()) return "ETA: Calculating...";
         return "ETA: " + MultiTrackingRates.getEtaToNextRank();
     }
 
-    private static boolean isAmountGoal() {
-        return ConfigAccess.isCustomGoalEnabled() && ConfigAccess.getCustomGoalType() == LeaderboardConfig.CustomGoalType.AMOUNT;
+    private static String handleMultiPreviousPosition() {
+        if (LeaderboardManager.isEmpty() || !ConfigAccess.isPreviousPositionEnabled()) return null;
+
+        if (MultiTrackingRates.getPreviousRankUsername() == null) return "Passed: Calculating...";
+        return String.format("Passed (%s): %s", MultiTrackingRates.getPreviousRankUsername(), formatNumber(MultiTrackingRates.getPreviousRankAmount()));
+    }
+
+    private static String handleMultiCollectionAbovePreviousRank() {
+        if (LeaderboardManager.isEmpty() || !ConfigAccess.isPreviousPositionEnabled()) return null;
+
+        if (MultiTrackingRates.getCollectionAbovePreviousRankAmount() == -1) return "Difference: Calculating...";
+        return "Difference: " + formatNumber(MultiTrackingRates.getCollectionAbovePreviousRankAmount());
     }
 
     private static void addIfNotNull(List<String> list, String line) {
@@ -677,6 +702,9 @@ public class TextUtils {
                 addIfNotNull(list, handleMultiNextPosition());
                 addIfNotNull(list, handleMultiCollectionTillNextRank());
                 addIfNotNull(list, handleMultiEta());
+                addIfNotNull(list, "");
+                addIfNotNull(list, handleMultiPreviousPosition());
+                addIfNotNull(list, handleMultiCollectionAbovePreviousRank());
             }
         }
     }

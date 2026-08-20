@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.config.categories.overlay;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import java.util.HashMap;
@@ -35,38 +34,20 @@ public class LeaderboardConfig {
 
     @Expose
     @ConfigOption(
-            name = "Enable Custom Goal",
-            desc = "Enables a custom goal for the leaderboard overlay. This will show your progress towards the custom goal instead of the next player on the leaderboard"
+            name = "Enable Previous Position",
+            desc = "Show details about the previous position on the leaderboard."
     )
     @ConfigEditorBoolean
-    public boolean customGoal = false;
+    public boolean previousPosition = false;
 
     @Expose
     @ConfigOption(
-            name = "Custom Goal Type",
-            desc = "Select whether your custom goals use position-based or amount-based targets\n§ePosition: Target a specific rank\n§eAmount: Target a specific collection/skill amount"
+            name = "Enable Custom Position",
+            desc = "Enables a custom position for the leaderboard. This will show your progress towards the custom position instead of the next player on the leaderboard"
     )
-    @ConfigEditorDropdown
-    public CustomGoalType customGoalType = CustomGoalType.AMOUNT;
+    @ConfigEditorBoolean
+    public boolean customPosition = false;
 
     @Expose
-    public Map<String, CustomGoalEntry> customGoals = new HashMap<>();
-
-    public static class CustomGoalEntry {
-        @Expose
-        public Integer position;
-
-        @Expose
-        public Long amount;
-
-        public CustomGoalEntry(Integer position, Long amount) {
-            this.position = position;
-            this.amount = amount;
-        }
-    }
-
-    public enum CustomGoalType {
-        POSITION,
-        AMOUNT
-    }
+    public Map<String, Integer> customPositions = new HashMap<>();
 }

@@ -50,6 +50,9 @@ object MultiTrackingRates {
     @JvmStatic var nextRankAmount = -1L
     @JvmStatic var etaToNextRank: String? = null
     @JvmStatic var collectionTillNextRank = -1L
+    @JvmStatic var previousRankUsername: String? = null
+    @JvmStatic var previousRankAmount = -1L
+    @JvmStatic var collectionAbovePreviousRankAmount = -1L
 
     fun setCollections(values: Map<String, Long>) {
         val now = System.currentTimeMillis()
@@ -178,6 +181,17 @@ object MultiTrackingRates {
             nextRankAmount = -1L
             collectionTillNextRank = -1L
             etaToNextRank = null
+        }
+
+        val previousEntry = LeaderboardManager.getPreviousRankEntry(currentGemstoneAmount)
+        if (previousEntry != null) {
+            previousRankUsername = previousEntry.username()
+            previousRankAmount = previousEntry.amount()
+            collectionAbovePreviousRankAmount = currentGemstoneAmount - previousRankAmount
+        } else {
+            previousRankUsername = null
+            previousRankAmount = -1L
+            collectionAbovePreviousRankAmount = -1L
         }
     }
 

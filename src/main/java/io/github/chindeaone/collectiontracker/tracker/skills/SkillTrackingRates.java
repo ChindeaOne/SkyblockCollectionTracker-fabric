@@ -37,6 +37,9 @@ public class SkillTrackingRates {
     public static volatile long skillNextRankAmount = -1L;
     public static volatile long skillTillNextRank = -1L;
     public static volatile String skillEtaToNextRank = null;
+    public static volatile String skillPreviousRankUsername = null;
+    public static volatile long skillPreviousRankAmount = -1L;
+    public static volatile long skillAbovePreviousRankAmount = -1L;
 
     // Taming Leaderboard tracking data
     public static volatile int tamingCurrentRank = -1;
@@ -44,6 +47,9 @@ public class SkillTrackingRates {
     public static volatile long tamingNextRankAmount = -1L;
     public static volatile long tamingTillNextRank = -1L;
     public static volatile String tamingEtaToNextRank = null;
+    public static volatile String tamingPreviousRankUsername = null;
+    public static volatile long tamingPreviousRankAmount = -1L;
+    public static volatile long tamingAbovePreviousRankAmount = -1L;
 
     public static void initTracking(int level, long xp) {
         skillLevel = level;
@@ -123,6 +129,17 @@ public class SkillTrackingRates {
             skillTillNextRank = -1L;
             skillEtaToNextRank = null;
         }
+
+        LeaderboardEntry previousEntry = LeaderboardManager.getPreviousRankEntryForSkill(skillName, totalSkillXp);
+        if (previousEntry != null) {
+            skillPreviousRankUsername = previousEntry.username();
+            skillPreviousRankAmount = previousEntry.amount();
+            skillAbovePreviousRankAmount = totalSkillXp - skillPreviousRankAmount;
+        } else {
+            skillPreviousRankUsername = null;
+            skillPreviousRankAmount = -1L;
+            skillAbovePreviousRankAmount = -1L;
+        }
     }
 
     public static void updateTamingLeaderboardStats() {
@@ -141,6 +158,17 @@ public class SkillTrackingRates {
             tamingNextRankAmount = -1L;
             tamingTillNextRank = -1L;
             tamingEtaToNextRank = null;
+        }
+
+        LeaderboardEntry previousEntry = LeaderboardManager.getPreviousRankEntryForSkill("Taming", tamingXp + tamingXpGained);
+        if (previousEntry != null) {
+            tamingPreviousRankUsername = previousEntry.username();
+            tamingPreviousRankAmount = previousEntry.amount();
+            tamingAbovePreviousRankAmount = (tamingXp + tamingXpGained) - tamingPreviousRankAmount;
+        } else {
+            tamingPreviousRankUsername = null;
+            tamingPreviousRankAmount = -1L;
+            tamingAbovePreviousRankAmount = -1L;
         }
     }
 

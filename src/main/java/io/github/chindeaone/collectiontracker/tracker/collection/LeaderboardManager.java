@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.tracker.collection;
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardConfig;
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
 
 import java.util.Collections;
@@ -77,6 +76,21 @@ public class LeaderboardManager {
         return null;
     }
 
+    private static LeaderboardEntry getPreviousRankEntryRaw(long amount) {
+        List<LeaderboardEntry> lb = currentLeaderboard;
+        if (lb.isEmpty()) {
+            return null;
+        }
+
+        int index = findBinaryIndex(lb, amount);
+
+        if (index < lb.size() - 1) {
+            return lb.get(index + 1);
+        }
+
+        return null;
+    }
+
     private static LeaderboardEntry getNextRankEntryRaw(String skill, long amount) {
         List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
         if (lb.isEmpty()) {
@@ -93,34 +107,38 @@ public class LeaderboardManager {
         return null;
     }
 
+    private static LeaderboardEntry getPreviousRankEntryRaw(String skill, long amount) {
+        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
+        if (lb.isEmpty()) {
+            return null;
+        }
+
+        int index = findBinaryIndex(lb, amount);
+
+        if (index < lb.size() - 1) {
+            return lb.get(index + 1);
+        }
+
+        return null;
+    }
+
     public static LeaderboardEntry getNextRankEntry(long amount) {
         List<LeaderboardEntry> lb = currentLeaderboard;
         if (lb.isEmpty()) {
             return null;
         }
 
-        // Custom goal
-        if (ConfigAccess.isCustomGoalEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
-            LeaderboardConfig.CustomGoalEntry goalEntry = ConfigAccess.getCustomGoalEntry("gemstone");
+        // Custom position
+        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
+            Integer position = ConfigAccess.getCustomPositionEntry("gemstone");
 
-            if (goalEntry != null) {
-                LeaderboardConfig.CustomGoalType goalType = ConfigAccess.getCustomGoalType();
-
-                if (goalType == LeaderboardConfig.CustomGoalType.POSITION && goalEntry.position != null) {
-                    LeaderboardEntry playerEntry = getPlayerEntryRaw(amount);
-                    // default if player already passed the goal position
-                    if (playerEntry != null && playerEntry.rank() < goalEntry.position) {
-                        return getNextRankEntryRaw(amount);
-                    }
-                    return getEntryAtPosition(goalEntry.position);
-                } else if (goalType == LeaderboardConfig.CustomGoalType.AMOUNT && goalEntry.amount != null) {
-                    // default if player's collection is greater than the custom goal amount
-                    if (amount >= goalEntry.amount) {
-                        return getNextRankEntryRaw(amount);
-                    }
-                    // If goal amount exceeds all players, return custom goal entry
-                    return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
+            if (position != null) {
+                LeaderboardEntry playerEntry = getPlayerEntryRaw(amount);
+                // default if player already passed the goal position
+                if (playerEntry != null && playerEntry.rank() < position) {
+                    return getNextRankEntryRaw(amount);
                 }
+                return getEntryAtPosition(position);
             }
         }
 
@@ -132,28 +150,17 @@ public class LeaderboardManager {
         List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
         if (lb.isEmpty()) return null;
 
-        // Custom goal
-        if (ConfigAccess.isCustomGoalEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
-            LeaderboardConfig.CustomGoalEntry goalEntry = ConfigAccess.getCustomGoalEntry(skill);
+        // Custom position
+        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
+            Integer position = ConfigAccess.getCustomPositionEntry(skill);
 
-            if (goalEntry != null) {
-                LeaderboardConfig.CustomGoalType goalType = ConfigAccess.getCustomGoalType();
-
-                if (goalType == LeaderboardConfig.CustomGoalType.POSITION && goalEntry.position != null) {
-                    LeaderboardEntry playerEntry = getPlayerEntry(skill, amount);
-                    // default if player already passed the goal position
-                    if (playerEntry != null && playerEntry.rank() < goalEntry.position) {
-                        return getNextRankEntryRaw(skill, amount);
-                    }
-                    return getSkillEntryAtPosition(skill, goalEntry.position);
-                } else if (goalType == LeaderboardConfig.CustomGoalType.AMOUNT && goalEntry.amount != null) {
-                    // default if player's skill xp is greater than the custom goal amount
-                    if (amount >= goalEntry.amount) {
-                        return getNextRankEntryRaw(skill, amount);
-                    }
-
-                    return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
+            if (position != null) {
+                LeaderboardEntry playerEntry = getPlayerEntry(skill, amount);
+                // default if player already passed the goal position
+                if (playerEntry != null && playerEntry.rank() < position) {
+                    return getNextRankEntryRaw(skill, amount);
                 }
+                return getSkillEntryAtPosition(skill, position);
             }
         }
 
@@ -161,38 +168,47 @@ public class LeaderboardManager {
         return getNextRankEntryRaw(skill, amount);
     }
 
+    public static LeaderboardEntry getPreviousRankEntry(String skill, long amount) {
+        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
+        if (lb.isEmpty()) return null;
+
+        return getPreviousRankEntryRaw(skill, amount);
+    }
+
+    public static LeaderboardEntry getPreviousRankEntry(long amount) {
+        List<LeaderboardEntry> lb = currentLeaderboard;
+        if (lb.isEmpty()) {
+            return null;
+        }
+
+        return getPreviousRankEntryRaw(amount);
+    }
+
     public static int getPlayerRank() {
         return getPlayerRank(TrackingRates.collectionAmount);
     }
 
     public static LeaderboardEntry getNextRankEntry() {
-        // Custom goal
-        if (ConfigAccess.isCustomGoalEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
-            LeaderboardConfig.CustomGoalEntry goalEntry = ConfigAccess.getCustomGoalEntry(CollectionTracker.collection);
+        // Custom position
+        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
+            Integer position = ConfigAccess.getCustomPositionEntry(CollectionTracker.collection);
 
-            if (goalEntry != null) {
-                LeaderboardConfig.CustomGoalType goalType = ConfigAccess.getCustomGoalType();
-
-                if (goalType == LeaderboardConfig.CustomGoalType.POSITION && goalEntry.position != null) {
-                    LeaderboardEntry playerEntry = getPlayerEntryRaw(TrackingRates.collectionAmount);
-                    // default if player already passed the goal position
-                    if (playerEntry != null && playerEntry.rank() < goalEntry.position) {
-                        return getNextRankEntryRaw(TrackingRates.collectionAmount);
-                    }
-                    return getEntryAtPosition(goalEntry.position);
-                } else if (goalType == LeaderboardConfig.CustomGoalType.AMOUNT && goalEntry.amount != null) {
-                    // default if player's collection is greater than the custom goal amount
-                    if (TrackingRates.collectionAmount >= goalEntry.amount) {
-                        return getNextRankEntryRaw(TrackingRates.collectionAmount);
-                    }
-                    // If goal amount exceeds all players, return custom goal entry
-                    return new LeaderboardEntry("Custom Goal", 0, goalEntry.amount);
+            if (position != null) {
+                LeaderboardEntry playerEntry = getPlayerEntryRaw(TrackingRates.collectionAmount);
+                // default if player already passed the goal position
+                if (playerEntry != null && playerEntry.rank() < position) {
+                    return getNextRankEntryRaw(TrackingRates.collectionAmount);
                 }
+                return getEntryAtPosition(position);
             }
         }
 
         // Default
         return getNextRankEntryRaw(TrackingRates.collectionAmount);
+    }
+
+    public static LeaderboardEntry getPreviousRankEntry() {
+        return getPreviousRankEntryRaw(TrackingRates.collectionAmount);
     }
 
     public static LeaderboardEntry getEntryAtPosition(int position) {
@@ -205,6 +221,10 @@ public class LeaderboardManager {
 
     public static LeaderboardEntry getNextRankEntryForSkill(String skill, long skillXp) {
         return getNextRankEntry(skill, skillXp);
+    }
+
+    public static LeaderboardEntry getPreviousRankEntryForSkill(String skill, long skillXp) {
+        return getPreviousRankEntry(skill, skillXp);
     }
 
     public static LeaderboardEntry getSkillEntryAtPosition(String skill, int position) {
