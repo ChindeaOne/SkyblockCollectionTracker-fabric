@@ -143,7 +143,7 @@ object CommandRegistry {
                         }
                     }
 
-                    if (foundCollections.size > 1 || (foundCollections.size == 1 && collections[0].equals("gemstone", ignoreCase = true))) {
+                    if (foundCollections.size > 1 || (foundCollections.size == 1 && foundCollections[0].equals("gemstone", ignoreCase = true))) {
                         CollectionTracker.startMultiTracking(foundCollections)
                     } else if (foundCollections.size == 1) {
                         CollectionTracker.startTracking(foundCollections[0])
