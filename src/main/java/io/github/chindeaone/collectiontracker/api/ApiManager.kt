@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration.Companion.minutes
 
 object ApiManager {
-    const val API_URL = "https://skyblockcollections.com/v2"
+    const val API_URL = "https://api.skyblockcollections.com/v3"
     const val AGENT_BASE = "SCT"
 
     private val logger: Logger = LogManager.getLogger(ApiManager::class.java)
@@ -48,6 +48,22 @@ object ApiManager {
             TokenManager.fetchAndStoreToken(notify)
         } catch (e: Exception) {
             logger.error("[SCT]: Failed to authenticate with Mojang servers: ${e.message}", e)
+        }
+    }
+
+    // tell the backend this player is no longer online
+    fun removePlayer() {
+        if (TokenManager.token == null) return
+        try {
+            val headers = listOf(
+                "Authorization" to "Bearer ${TokenManager.token}",
+                "X-NAME" to PlayerData.cachedName
+            )
+
+            invalidateSession("player-logout", headers)
+            logger.info("[SCT]: Successfully invalidated session on the backend")
+        } catch (e: Exception) {
+            logger.error("[SCT]: Failed to invalidate session on the backend: ${e.message}", e)
         }
     }
 
@@ -86,6 +102,14 @@ object ApiManager {
     }
 
     fun post(
+        path: String,
+        headers: List<Pair<String, String>> = emptyList()
+    ): HttpResponse<String> {
+        val request = buildRequest(path, "POST", headers)
+        return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
+    }
+
+    fun invalidateSession(
         path: String,
         headers: List<Pair<String, String>> = emptyList()
     ): HttpResponse<String> {

@@ -32,7 +32,7 @@ object EliteApiFetcher {
                 logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
                 TokenManager.fetchAndStoreToken()
 
-                handleFarmingweightResponse(authenticatedGet("farming", authHeaders(uuid, playerName)), playerName) { body ->
+                handleFarmingweightResponse(authenticatedGet("farmingweight", authHeaders(uuid, playerName)), playerName) { body ->
                     FarmingweightManager.updateFarmingweight(body)
                     logger.info("[SCT]: Successfully fetched Farming Weight for {}", playerName)
                     runCallback(onComplete)
@@ -84,6 +84,7 @@ object EliteApiFetcher {
     fun setGlobalColor(playerName: String, uuid: String, color: String) {
         try {
             val headers = authHeaders(uuid, playerName).apply {
+                remove("X-NAME" to playerName)
                 add("X-COLOR" to color)
             }
 
@@ -195,7 +196,7 @@ object EliteApiFetcher {
             logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
             TokenManager.fetchAndStoreToken()
 
-            response = ApiManager.post("farming/color",
+            response = ApiManager.post("farmingweight/color",
                 headers.map {
                     if (it.first == "Authorization")
                         "Authorization" to "Bearer ${TokenManager.token}"

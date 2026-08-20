@@ -5,6 +5,16 @@ import java.util.UUID
 
 object PlayerData {
 
+    private var cachedPlayerName: String = ""
+
+    fun init() {
+        val user = Minecraft.getInstance().user
+        cachedPlayerName = user.name
+    }
+
+    val cachedName: String
+        get() = cachedPlayerName
+
     @JvmStatic
     val playerUUID: String
         get() = profileId.toString().replace("-", "")

@@ -20,7 +20,7 @@ object TokenFetcher {
             }
 
             val headers = listOf(
-                "X-UUID" to PlayerData.profileId.toString(),
+                "X-UUID" to PlayerData.playerUUID,
                 "X-NAME" to PlayerData.playerName,
                 "X-SERVER-ID" to serverId
             )

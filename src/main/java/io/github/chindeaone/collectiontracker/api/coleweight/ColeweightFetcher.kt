@@ -111,6 +111,7 @@ object ColeweightFetcher {
     fun setGlobalColor(playerName: String, uuid: String, color: String) {
         try {
             val headers = authHeaders(uuid, playerName).apply {
+                remove("X-NAME" to playerName)
                 add("X-COLOR" to color)
             }
             val response = authenticatedPost(headers)

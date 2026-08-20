@@ -4,7 +4,6 @@
 package io.github.chindeaone.collectiontracker
 
 import com.mojang.blaze3d.systems.RenderSystem
-import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.CommissionUtils
 import io.github.chindeaone.collectiontracker.utils.ConfigStateUtils
@@ -39,15 +38,14 @@ import net.minecraft.resources.Identifier
 object ModLoader: ModInitializer {
 
     override fun onInitialize() {
+        eventRegistration()
+        CustomPipelines.register()
+
         SkyblockCollectionTracker.init()
 
         OverlayManager.overlayRegistration()
-        eventRegistration()
-
-        CommandRegistry.init()
 
         CommissionUtils.initKeyGuards()
-        CustomPipelines.register()
     }
 
     private fun eventRegistration() {

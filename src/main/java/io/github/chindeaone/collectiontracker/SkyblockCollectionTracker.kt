@@ -1,6 +1,9 @@
 package io.github.chindeaone.collectiontracker
 
+import io.github.chindeaone.collectiontracker.api.ApiManager
+import io.github.chindeaone.collectiontracker.commands.CommandRegistry
 import io.github.chindeaone.collectiontracker.config.ConfigManager
+import io.github.chindeaone.collectiontracker.utils.PlayerData
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.SharedConstants
 import net.minecraft.client.Minecraft
@@ -9,28 +12,36 @@ import net.minecraft.client.gui.screens.Screen
 object SkyblockCollectionTracker {
 
     fun init() {
+        PlayerData.init()
+        CommandRegistry.init()
+
+        configInit()
+
+        Runtime.getRuntime().addShutdownHook(
+            Thread { configManager.save() }
+        )
+
+        Runtime.getRuntime().addShutdownHook(
+            Thread { ApiManager.removePlayer() }
+        )
+    }
+
+    private fun configInit(){
         configManager = ConfigManager()
         configManager.loadFromConfig()
         configManager.startAutoSave()
-
-        Runtime.getRuntime().addShutdownHook(
-            Thread { configManager.save() },
-        )
     }
 
     fun onClientTick(client: Minecraft) {
         val screenToOpen = screenToOpen ?: return
-        screenTicks++
-        if (screenTicks != 5) return
+        if (ModLoader.clientTicks % 5 != 0L) return
         shouldCloseScreen = true
         client./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(screenToOpen)
-        screenTicks = 0
         this.screenToOpen = null
     }
 
     var screenToOpen: Screen? = null
     var shouldCloseScreen: Boolean = true
-    private var screenTicks = 0
 
     lateinit var configManager: ConfigManager
 
