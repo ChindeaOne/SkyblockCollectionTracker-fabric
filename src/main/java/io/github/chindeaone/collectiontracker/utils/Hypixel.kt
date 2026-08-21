@@ -11,7 +11,7 @@ import io.github.chindeaone.collectiontracker.api.colors.FetchColors
 import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.FetchVersions
-import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
+import io.github.chindeaone.collectiontracker.api.serverapi.FetchRepoData
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
@@ -134,7 +134,7 @@ object Hypixel {
         }
 
         CompletableFuture.runAsync {
-            RepoUtils.checkGithubReleases()
+            FetchRepoData.checkGithubReleases()
             RepoUtils.checkLatestVersion()
         }.thenAccept {
             if (!VersionUtils.checkIfVersionIsSupported()) {

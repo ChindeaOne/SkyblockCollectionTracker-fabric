@@ -1,17 +1,11 @@
-package io.github.chindeaone.collectiontracker.api.serverapi
+package io.github.chindeaone.collectiontracker.utils
 
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
-import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.categories.About
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Logger
 
 object RepoUtils {
-
-    private val logger: Logger = LogManager.getLogger(RepoUtils::class.java)
 
     @JvmStatic
     var latestVersion: String? = null
@@ -34,37 +28,13 @@ object RepoUtils {
 
     private val currentVersion = SkyblockCollectionTracker.VERSION
 
-    @JvmStatic
-    fun checkGithubReleases(): Boolean {
-        return try {
-            val headers = listOf(
-                "X-MINECRAFT-VERSION" to SkyblockCollectionTracker.MC_VERSION
-            )
-
-            val response = ApiManager.request("github", headers)
-
-            val status = response.statusCode()
-            if (status != 200) {
-                logger.error("[SCT]: Failed to fetch GitHub releases, response code: {}", status)
-                return false
-            }
-
-            val jsonResponse = JsonParser.parseString(response.body()).asJsonObject
-            logger.info("[SCT]: Successfully fetched GitHub releases")
-
-            latestReleaseTag = getNullableString(jsonResponse, "latest_tag")
-            latestBetaTag = getNullableString(jsonResponse, "latest_beta_tag")
-            latestReleaseNotes = getNullableString(jsonResponse, "latest_release_notes")
-            latestBetaNotes = getNullableString(jsonResponse, "latest_beta_notes")
-
-            true
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching GitHub releases: ", e)
-            false
-        }
+    fun parseData(json: JsonObject) {
+        latestReleaseTag = getNullableString(json, "latest_tag")
+        latestBetaTag = getNullableString(json, "latest_beta_tag")
+        latestReleaseNotes = getNullableString(json, "latest_release_notes")
+        latestBetaNotes = getNullableString(json, "latest_beta_notes")
     }
 
-    @JvmStatic
     fun checkLatestVersion() {
         latestReleaseTag = normalizeTags(latestReleaseTag)
         latestBetaTag = normalizeTags(latestBetaTag)
@@ -115,11 +85,7 @@ object RepoUtils {
         tag ?: return null
 
         var normalizedTag = tag
-
-        // Remove 'v' prefix if present
-        if (tag.startsWith("v")) {
-            normalizedTag = tag.substring(1)
-        }
+        if (tag.startsWith("v")) normalizedTag = tag.substring(1)
 
         // Remove metadata if present
         val plusIndex = normalizedTag.indexOf('+')

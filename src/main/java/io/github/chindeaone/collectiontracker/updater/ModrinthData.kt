@@ -4,7 +4,7 @@ import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.ApiManager.HTTP_CLIENT
 import io.github.chindeaone.collectiontracker.api.ApiManager.agent
-import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
+import io.github.chindeaone.collectiontracker.utils.RepoUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.net.URI

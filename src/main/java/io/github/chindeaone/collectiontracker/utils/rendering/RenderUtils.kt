@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.rendering
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
-import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -9,6 +8,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDispla
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.RepoUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -305,6 +305,7 @@ object RenderUtils {
         }
     }
 
+    @Suppress("SameParameterValue")
     private fun drawBar(context: GuiGraphicsExtractor, centerX: Float, centerY: Float, width: Float, height: Float, progress: Float, color: Int) {
         val halfWidth = width / 2f
         val halfHeight = height / 2f
