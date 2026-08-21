@@ -36,7 +36,7 @@ public class Tracking {
     @Expose
     @ConfigOption(
             name = "API Tracking",
-            desc = "Switch to tracking via Hypixel's API instead of sack messages.\n\n§eNote: Using the API will update the overlays slower, but it will count items in stash."
+            desc = "Switch to tracking via Hypixel's API instead of sack messages.\n\n§eNote: Using the API will update the overlays slower, but it will count items in stash. Prefer this if you shaft or change lobbies a lot."
     )
     @SerializedName("apiTracking")
     @ConfigEditorBoolean
@@ -45,7 +45,7 @@ public class Tracking {
     @Expose
     @ConfigOption(
             name = "Custom Collection Color",
-            desc = "Renders the collection overlay text using a custom color instead of the default green."
+            desc = "Renders the collection overlay text using a custom color instead of the default one."
     )
     @SerializedName("overlayTextColor")
     @ConfigEditorBoolean
@@ -54,7 +54,7 @@ public class Tracking {
     @Expose
     @ConfigOption(
             name = "Explicit values",
-            desc = "Show full values instead of rounded values for all overlays and summaries."
+            desc = "Show full values instead of formatted values for all overlays and summaries."
     )
     @SerializedName("explicitValues")
     @ConfigEditorBoolean

@@ -14,7 +14,7 @@ public class Foraging {
     public ForagingStatsConfig foragingStatsConfig = new ForagingStatsConfig();
 
     @Expose
-    @ConfigOption(name = "HOTF Perks", desc = "")
+    @ConfigOption(name = "HotF Perks", desc = "")
     @Accordion
     public HotfConfig hotfConfig = new HotfConfig();
 }

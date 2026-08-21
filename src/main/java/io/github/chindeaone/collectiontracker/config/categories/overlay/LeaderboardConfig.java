@@ -10,7 +10,7 @@ import java.util.Map;
 public class LeaderboardConfig {
 
     @ConfigOption(
-            name = "§eLeaderboard Overlay",
+            name = "§eLeaderboard Info",
             desc = "Shows your collection or skill rank (if eligible), next player and their collection/skill xp, eta until you pass them and progress to the next rank"
     )
     @ConfigEditorInfoText
