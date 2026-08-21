@@ -55,7 +55,18 @@ object ModLoader: ModInitializer {
         })
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
-        ClientReceiveMessageEvents.GAME.register { message, _ -> ChatListener.onChatMessage(message) }
+        ClientReceiveMessageEvents.GAME.register { message, actionBar ->
+            if (actionBar) return@register
+
+            ChatListener.onChatMessage(message)
+        }
+        ClientReceiveMessageEvents.MODIFY_GAME.register { message, actionBar ->
+            if (actionBar) return@register message
+
+            ChatListener.farmingweightHandle(
+                ChatListener.coleweightHandle(message)
+            )
+        }
         ClientReceiveMessageEvents.GAME_CANCELED.register { message, actionBar -> ChatListener.sacksListener(message, actionBar) }
 
         UseItemCallback.EVENT.register { player, _, hand -> InventoryListener.checkHandItem(player, hand) }

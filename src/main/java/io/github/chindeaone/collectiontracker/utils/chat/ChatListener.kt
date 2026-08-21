@@ -468,7 +468,6 @@ object ChatListener {
         }
     }
 
-    @JvmStatic
     fun coleweightHandle(message: Component): Component {
         if (!HypixelUtils.isOnSkyblock || !ConfigAccess.isColeweightRankingInChat()) return message
 
@@ -477,6 +476,7 @@ object ChatListener {
         }
 
         val text = message.string.removeColor()
+        if (text.startsWith("[SCT]")) return message
 
         val left = text.substringBefore(":").trim()
         val tokens = left.split(" ")
@@ -487,7 +487,6 @@ object ChatListener {
         return insertRankSuffix(message, rankSuffix)
     }
 
-    @JvmStatic
     fun farmingweightHandle(message: Component): Component {
         if (!HypixelUtils.isOnSkyblock || !ConfigAccess.isFarmingweightRankingInChat()) return message
 
@@ -496,7 +495,7 @@ object ChatListener {
         }
 
         val text = message.string.removeColor()
-
+        if (text.startsWith("[SCT]")) return message
 
         val left = text.substringBefore(":").trim()
         val tokens = left.split(" ")
@@ -514,7 +513,7 @@ object ChatListener {
         val newComponent = MutableComponent.create(message.contents).withStyle(message.style)
         var hasRank = false
 
-        for (i in message.siblings.indices) {
+        for (i in siblings.indices) {
             val sibling = siblings[i]
             val text = sibling.string
 
