@@ -4,7 +4,6 @@
   "mixins": [
     "AbstractContainerScreenAccessor",
     "ChatScreenMixin",
-    "ChatWeightMixin",
     "ClientPacketListenerMixin",
     "ParticleMixin",
     "GameRenderMixin",
