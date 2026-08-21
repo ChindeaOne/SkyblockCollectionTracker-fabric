@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneLis
 import io.github.chindeaone.collectiontracker.api.colors.FetchColors
 import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
+import io.github.chindeaone.collectiontracker.api.serverapi.FetchVersions
 import io.github.chindeaone.collectiontracker.api.serverapi.RepoUtils
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
 import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
@@ -136,6 +137,11 @@ object Hypixel {
             RepoUtils.checkGithubReleases()
             RepoUtils.checkLatestVersion()
         }.thenAccept {
+            if (!VersionUtils.checkIfVersionIsSupported()) {
+                ChatUtils.sendMessage("§cSkyblockCollectionTracker is no longer supported on this Minecraft version. Please update to a newer version of Minecraft!")
+                return@thenAccept
+            }
+
             if (RepoUtils.latestVersion != null) {
                 when (ConfigAccess.getUpdateType()) {
                     About.UpdateType.AUTOMATIC -> {
@@ -177,6 +183,7 @@ object Hypixel {
             mining = true,
             foraging = true
         ) }
+        if (!FetchVersions.hasVersions) CompletableFuture.runAsync { FetchVersions.fetchVersions() }
     }
 
     private fun checkScoreboard(client: Minecraft): Boolean? {

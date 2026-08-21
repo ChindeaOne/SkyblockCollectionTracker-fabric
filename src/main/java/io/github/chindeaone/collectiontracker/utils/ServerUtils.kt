@@ -1,7 +1,15 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.ModLoader
+import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
+import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionList
+import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
+import io.github.chindeaone.collectiontracker.api.colors.FetchColors
+import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
+import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
+import io.github.chindeaone.collectiontracker.api.serverapi.FetchVersions
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
+import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
@@ -60,9 +68,23 @@ object ServerUtils {
     }
 
     private fun checkIfDataWasFetched() {
-        if (ServerStatus.hasData()) return
+        if (hasData()) return
 
         Hypixel.fetchData()
         logger.info("[SCT]: Attempting to load missing data")
+    }
+
+    @Synchronized
+    private fun hasData(): Boolean {
+        return FetchColors.hasColors &&
+                FetchNpcPrices.hasNpcPrice &&
+                FetchCollectionList.hasCollectionList &&
+                FetchGemstoneList.hasGemstoneList &&
+                FetchSkillTree.hasSkillTree &&
+                ColeweightFetcher.hasColeweightTopColors &&
+                ColeweightFetcher.hasColeweightLb &&
+                EliteApiFetcher.hasFarmingweightTopColors &&
+                EliteApiFetcher.hasFarmingweightLb &&
+                FetchVersions.hasVersions
     }
 }
