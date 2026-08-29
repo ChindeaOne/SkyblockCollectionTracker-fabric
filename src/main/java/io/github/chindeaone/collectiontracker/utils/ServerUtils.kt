@@ -9,7 +9,6 @@ import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.FetchVersions
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
-import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
@@ -80,7 +79,6 @@ object ServerUtils {
                 FetchNpcPrices.hasNpcPrice &&
                 FetchCollectionList.hasCollectionList &&
                 FetchGemstoneList.hasGemstoneList &&
-                FetchSkillTree.hasSkillTree &&
                 ColeweightFetcher.hasColeweightTopColors &&
                 ColeweightFetcher.hasColeweightLb &&
                 EliteApiFetcher.hasFarmingweightTopColors &&

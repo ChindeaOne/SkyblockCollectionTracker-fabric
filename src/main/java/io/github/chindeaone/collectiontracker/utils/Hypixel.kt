@@ -13,7 +13,6 @@ import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.FetchVersions
 import io.github.chindeaone.collectiontracker.api.serverapi.FetchRepoData
 import io.github.chindeaone.collectiontracker.api.serverapi.ServerStatus
-import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.updater.UpdaterManager
@@ -179,10 +178,6 @@ object Hypixel {
         if (!ColeweightFetcher.hasColeweightTopColors) CompletableFuture.runAsync { ColeweightFetcher.fetchColeweightTopColors() }
         if (!EliteApiFetcher.hasFarmingweightLb) CompletableFuture.runAsync { EliteApiFetcher.fetchFarmingweightLbTop1k() }
         if (!EliteApiFetcher.hasFarmingweightTopColors) CompletableFuture.runAsync { EliteApiFetcher.fetchFarmingweightTopColors() }
-        if (!FetchSkillTree.hasSkillTree) CompletableFuture.runAsync { FetchSkillTree.fetchSkillTree(
-            mining = true,
-            foraging = true
-        ) }
         if (!FetchVersions.hasVersions) CompletableFuture.runAsync { FetchVersions.fetchVersions() }
     }
 

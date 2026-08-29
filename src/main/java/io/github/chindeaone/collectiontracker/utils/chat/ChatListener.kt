@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils.chat
 
-import io.github.chindeaone.collectiontracker.api.skilltreeapi.FetchSkillTree
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -412,8 +411,21 @@ object ChatListener {
 
     private fun treeResetListener(text: String) {
         when {
-            text.startsWith("You have reset your Heart of the Mountain", ignoreCase = true) -> FetchSkillTree.resetHotm()
-            text.startsWith("You have reset your Heart of the Forest", ignoreCase = true) -> FetchSkillTree.resetHotf()
+            text.startsWith("You have reset your Heart of the Mountain", ignoreCase = true) -> {
+                ConfigHelper.setStrongArmMS(0)
+                ConfigHelper.setProfessionalMS(0)
+                ConfigHelper.setLastSkyMallBuff("")
+
+                currentSkyMallBuff = ""
+                isPickaxeAbility = false
+            }
+            text.startsWith("You have reset your Heart of the Forest", ignoreCase = true) -> {
+                ConfigHelper.setLastLotteryBuff("")
+                ConfigHelper.setLastBeekeeperBuff("")
+
+                currentLotteryBuff = ""
+                currentBeekeeperBuff = ""
+            }
         }
     }
 
