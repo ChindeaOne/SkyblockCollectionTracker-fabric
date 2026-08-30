@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -91,7 +90,7 @@ public class CollectionTracker {
                 }
 
                 // Fetch bazaar data and leaderboard data asynchronously
-                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(collection))
+                FetchBazaarPrice.fetchData(collection)
                         .thenRunAsync(() -> DataFetcher.fetchLeaderboardData(collection))
                         .thenRun(TrackingHandler::startTracking);
             } catch (Exception e) {
@@ -166,7 +165,7 @@ public class CollectionTracker {
                 }
 
                 // Fetch bazaar data asynchronously
-                CompletableFuture.runAsync(() -> FetchBazaarPrice.fetchData(collectionList))
+                FetchBazaarPrice.fetchData(collectionList)
                         .thenRunAsync(() -> {
                             if (collectionList.size() == 1 && collectionList.contains("gemstone")) {
                                 String collection = "gemstone";
