@@ -20,7 +20,7 @@ object ServerUtils {
     @JvmStatic
     var serverStatus = false
 
-    private const val CHECK_INTERVAL = 12000L  // 10 minutes
+    private const val CHECK_INTERVAL = 600_000L
 
     private val logger: Logger = LogManager.getLogger(ServerUtils::class.java)
 
