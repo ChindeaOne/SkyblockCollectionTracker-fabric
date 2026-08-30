@@ -27,18 +27,6 @@ object ColeweightFetcher {
         onComplete: Runnable?
     ) {
         ApiManager.requestAsync("coleweight", authHeaders(uuid, playerName)).thenAccept { response ->
-            if (response.statusCode() == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-                TokenManager.fetchAndStoreToken()
-
-                handleColeweightResponse(authenticatedGet(authHeaders(uuid, playerName)), playerName) { body ->
-                    ColeweightManager.updateColeweight(body)
-                    logger.info("[SCT]: Successfully fetched Coleweight for {}", playerName)
-                    runCallback(onComplete)
-                }
-                return@thenAccept
-            }
-
             handleColeweightResponse(response, playerName) { body ->
                 ColeweightManager.updateColeweight(body)
                 logger.info("[SCT]: Successfully fetched Coleweight for {}", playerName)
@@ -172,43 +160,11 @@ object ColeweightFetcher {
     }
 
     private fun authenticatedGet(headers: List<Pair<String, String>>): HttpResponse<String> {
-        var response = ApiManager.request("coleweight", headers)
-
-        if (response.statusCode() == 401) {
-            logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-            TokenManager.fetchAndStoreToken()
-
-            response = ApiManager.request(
-                "coleweight",
-                headers.map {
-                    if (it.first == "Authorization")
-                        "Authorization" to "Bearer ${TokenManager.token}"
-                    else it
-                }
-            )
-        }
-        return response
+        return ApiManager.request("coleweight", headers)
     }
 
     private fun authenticatedPost(headers: List<Pair<String, String>>): HttpResponse<String> {
-
-        var response = ApiManager.post("coleweight/color", headers)
-
-        if (response.statusCode() == 401) {
-            logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-
-            TokenManager.fetchAndStoreToken()
-
-            response = ApiManager.post(
-                "coleweight/color",
-                headers.map {
-                    if (it.first == "Authorization")
-                        "Authorization" to "Bearer ${TokenManager.token}"
-                    else it
-                }
-            )
-        }
-        return response
+        return ApiManager.post("coleweight/color", headers)
     }
 
     private inline fun handleColeweightResponse(

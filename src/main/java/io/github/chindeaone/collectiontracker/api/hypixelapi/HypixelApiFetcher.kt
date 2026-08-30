@@ -15,13 +15,7 @@ object HypixelApiFetcher {
     @JvmStatic
     fun fetchJsonData(collection: String): String? {
         try {
-            var response = requestHelper(collection, CollectionsManager.collectionSource)
-
-            if (response.statusCode() == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-                TokenManager.fetchAndStoreToken()
-                response = requestHelper(collection, CollectionsManager.collectionSource)
-            }
+            val response = requestHelper(collection, CollectionsManager.collectionSource)
 
             return when (response.statusCode()) {
                 200 -> response.body()
@@ -47,13 +41,7 @@ object HypixelApiFetcher {
             val collection: String = CollectionTracker.collectionList.joinToString()
             val collectionSource: String = CollectionsManager.multiCollectionSource.joinToString()
 
-            var response = requestHelper(collection, collectionSource)
-
-            if (response.statusCode() == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-                TokenManager.fetchAndStoreToken()
-                response = requestHelper(collection, collectionSource)
-            }
+            val response = requestHelper(collection, collectionSource)
 
             return when (response.statusCode()) {
                 200 -> response.body()
@@ -62,9 +50,9 @@ object HypixelApiFetcher {
                     logger.warn("[SCT]: Collection API disabled in game.")
                     null
                 }
-                
+
                 else -> {
-                    logger.error("[SCT]: Token refresh failed.")
+                    logger.error("[SCT]: Failed to fetch multi-collection data. HTTP {}", response.statusCode())
                     null
                 }
             }

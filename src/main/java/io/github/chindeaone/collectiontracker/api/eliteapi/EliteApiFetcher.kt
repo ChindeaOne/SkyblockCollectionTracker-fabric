@@ -29,18 +29,6 @@ object EliteApiFetcher {
         onComplete: Runnable?
     ) {
         ApiManager.requestAsync("farmingweight", authHeaders(uuid, playerName)).thenAccept { response ->
-            if (response.statusCode() == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-                TokenManager.fetchAndStoreToken()
-
-                handleFarmingweightResponse(authenticatedGet("farmingweight", authHeaders(uuid, playerName)), playerName) { body ->
-                    FarmingweightManager.updateFarmingweight(body)
-                    logger.info("[SCT]: Successfully fetched Farming Weight for {}", playerName)
-                    runCallback(onComplete)
-                }
-                return@thenAccept
-            }
-
             handleFarmingweightResponse(response, playerName) { body ->
                 FarmingweightManager.updateFarmingweight(body)
                 logger.info("[SCT]: Successfully fetched Farming Weight for {}", playerName)
@@ -176,39 +164,11 @@ object EliteApiFetcher {
     }
 
     private fun authenticatedGet(path: String, headers: List<Pair<String, String>>): HttpResponse<String> {
-        var response = ApiManager.request(path, headers)
-
-        if (response.statusCode() == 401) {
-            logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-            TokenManager.fetchAndStoreToken()
-
-            response = ApiManager.request(path,
-                headers.map {
-                    if (it.first == "Authorization")
-                        "Authorization" to "Bearer ${TokenManager.token}"
-                    else it
-                }
-            )
-        }
-        return response
+        return ApiManager.request(path, headers)
     }
 
     private fun authenticatedPost(headers: List<Pair<String, String>>): HttpResponse<String> {
-        var response = ApiManager.post("farmingweight/color", headers)
-
-        if (response.statusCode() == 401) {
-            logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-            TokenManager.fetchAndStoreToken()
-
-            response = ApiManager.post("farmingweight/color",
-                headers.map {
-                    if (it.first == "Authorization")
-                        "Authorization" to "Bearer ${TokenManager.token}"
-                    else it
-                }
-            )
-        }
-        return response
+        return ApiManager.post("farmingweight/color", headers)
     }
 
     private inline fun handleFarmingweightResponse(
