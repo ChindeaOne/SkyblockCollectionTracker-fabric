@@ -60,7 +60,7 @@ object ApiManager {
     fun removePlayer() {
         if (TokenManager.token == null) return
         try {
-            val headers = listOf(
+            val headers = mapOf(
                 "Authorization" to "Bearer ${TokenManager.token}",
                 "X-NAME" to PlayerData.cachedName
             )
@@ -92,7 +92,7 @@ object ApiManager {
 
     fun request(
         path: String,
-        headers: List<Pair<String, String>> = emptyList()
+        headers: Map<String, String> = emptyMap()
     ): HttpResponse<String> {
         val request = buildRequest(path, "GET", headers)
         return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
@@ -100,23 +100,23 @@ object ApiManager {
 
     fun requestAsync(
         path: String,
-        headers: List<Pair<String, String>> = emptyList()
+        headers: Map<String, String> = emptyMap()
     ): CompletableFuture<HttpResponse<String>> {
         val request = buildRequest(path, "GET", headers)
         return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
     }
 
-    fun post(
+    fun postAsync(
         path: String,
-        headers: List<Pair<String, String>> = emptyList()
-    ): HttpResponse<String> {
+        headers: Map<String, String> = emptyMap()
+    ): CompletableFuture<HttpResponse<String>> {
         val request = buildRequest(path, "POST", headers)
-        return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
+        return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
     }
 
     fun invalidateSession(
         path: String,
-        headers: List<Pair<String, String>> = emptyList()
+        headers: Map<String, String> = emptyMap()
     ) {
         val request = buildRequest(path, "POST", headers)
         HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
@@ -125,7 +125,7 @@ object ApiManager {
     private fun buildRequest(
         path: String,
         method: String,
-        headers: List<Pair<String, String>>
+        headers: Map<String, String>
     ): HttpRequest {
         val builder = HttpRequest.newBuilder(URI.create("$API_URL/$path"))
             .timeout(Duration.ofSeconds(5))

@@ -133,30 +133,34 @@ public class DataFetcher {
             }
             logger.info("[SCT]: Fetching leaderboard data for collection: {}", targetCollection);
 
-            String jsonData = EliteApiFetcher.fetchCollectionLeaderboard(targetCollection);
-            if (jsonData == null) {
-                logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API");
-                ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true);
-                return;
-            }
+            EliteApiFetcher.fetchCollectionLeaderboard(targetCollection).thenAccept( jsonData -> {
+                if (jsonData == null) {
+                    logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API");
+                    ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true);
+                    return;
+                }
 
-            JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
-            JsonArray entriesArray = jsonObject.getAsJsonArray("entries");
-            List<LeaderboardEntry> entries = new ArrayList<>(entriesArray.size());
+                JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
+                JsonArray entriesArray = jsonObject.getAsJsonArray("entries");
+                List<LeaderboardEntry> entries = new ArrayList<>(entriesArray.size());
 
-            for (int i = 0; i < entriesArray.size(); i++) {
-                JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
-                if (entryObject.get("username").getAsString().equalsIgnoreCase(PlayerData.getPlayerName())) continue;
-                entries.add(new LeaderboardEntry(
-                        entryObject.get("username").getAsString(),
-                        entryObject.get("rank").getAsInt(),
-                        entryObject.get("amount").getAsLong(),
-                        ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").getAsBoolean()
-                ));
-            }
-            LeaderboardManager.set(entries);
-            leaderboardCacheTimestamps.put(targetCollection, System.currentTimeMillis());
-            logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", targetCollection);
+                for (int i = 0; i < entriesArray.size(); i++) {
+                    JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
+                    if (entryObject.get("username").getAsString().equalsIgnoreCase(PlayerData.getPlayerName())) continue;
+                    entries.add(new LeaderboardEntry(
+                            entryObject.get("username").getAsString(),
+                            entryObject.get("rank").getAsInt(),
+                            entryObject.get("amount").getAsLong(),
+                            ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").getAsBoolean()
+                    ));
+                }
+                LeaderboardManager.set(entries);
+                leaderboardCacheTimestamps.put(targetCollection, System.currentTimeMillis());
+                logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", targetCollection);
+            }).exceptionally(throwable -> {
+                logger.error("[SCT]: Error fetching leaderboard data: {}", throwable.getMessage(), throwable);
+                return null;
+            });
         } catch (Exception e) {
             logger.error("[SCT]: Error fetching leaderboard data: {}", e.getMessage(), e);
         } finally {

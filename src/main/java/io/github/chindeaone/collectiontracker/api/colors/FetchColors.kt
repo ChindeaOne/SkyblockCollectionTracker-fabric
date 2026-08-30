@@ -13,7 +13,7 @@ object FetchColors {
     var hasColors: Boolean = false
 
     fun fetchColorsData() {
-        ApiManager.requestAsync("collection-colors", listOf())
+        ApiManager.requestAsync("collection-colors")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val json = JsonParser.parseString(response.body()).asJsonObject
@@ -23,8 +23,7 @@ object FetchColors {
                 } else {
                     logger.error("[SCT]: Failed to fetch colors data. Server responded with code: {}", response.statusCode())
                 }
-            }
-            .exceptionally { e ->
+            }.exceptionally { e ->
                 logger.error("[SCT]: An error occurred while fetching colors data: ", e)
                 null
             }

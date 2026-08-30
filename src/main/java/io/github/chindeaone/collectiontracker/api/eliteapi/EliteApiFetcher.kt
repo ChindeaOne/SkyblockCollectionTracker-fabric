@@ -4,12 +4,10 @@ import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
-import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
-import java.net.http.HttpResponse
+import java.util.concurrent.CompletableFuture
 
 object EliteApiFetcher {
 
@@ -23,33 +21,54 @@ object EliteApiFetcher {
     var hasFarmingweightTopColors = false
         private set
 
-    fun fetchFarmingweightDataAsync(
-        playerName: String,
-        uuid: String,
-        onComplete: Runnable?
-    ) {
-        ApiManager.requestAsync("farmingweight", authHeaders(uuid, playerName)).thenAccept { response ->
-            handleFarmingweightResponse(response, playerName) { body ->
-                FarmingweightManager.updateFarmingweight(body)
-                logger.info("[SCT]: Successfully fetched Farming Weight for {}", playerName)
-                runCallback(onComplete)
-            }
+    fun fetchFarmingweightData(playerName: String, uuid: String): CompletableFuture<String?> {
+        return ApiManager.requestAsync("farmingweight", authHeaders(uuid, playerName))
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
 
-        }.exceptionally {
-            logger.error("[SCT]: Error fetching Farming Weight.", it)
-            null
-        }
+                        if (body.isNullOrBlank()) {
+                            ChatUtils.sendMessage("§cCouldn't find $playerName's Farming Weight.")
+                            logger.warn("[SCT]: Empty response for {}", playerName)
+                            null
+                        } else body
+                    }
+                    429 -> {
+                        ChatUtils.sendMessage("§cRate limit exceeded for $playerName's Farming Weight.")
+                        logger.warn("[SCT]: Rate limit exceeded for {}", playerName)
+                        null
+                    }
+                    else -> {
+                        ChatUtils.sendMessage("§cError fetching Farming Weight for $playerName.")
+                        logger.warn("[SCT]: Error fetching Farming Weight for {}: HTTP {}", playerName, response.statusCode())
+                        null
+                    }
+                }
+            }
+            .exceptionally {
+                logger.error("[SCT]: Error fetching Farming Weight.", it)
+                null
+            }
     }
 
-    fun fetchFarmingweightLbAsync(onComplete: Runnable?) {
-        ApiManager.requestAsync("farmingweight/lb")
-            .thenAccept { response ->
-                handleStringResponse(response, "Received empty response when fetching Farming Weight leaderboard.") { body ->
-                    FarmingweightManager.updateFarmingweightLb(body, false)
-                    logger.info("[SCT]: Successfully fetched Farming Weight leaderboard.")
-                    runCallback(onComplete)
-                }
+    fun fetchFarmingweightLeaderboard(): CompletableFuture<String?> {
+        return ApiManager.requestAsync("farmingweight/lb")
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
 
+                        if (body.isNullOrBlank()) {
+                            logger.warn("[SCT]: Received empty response when fetching Farming Weight leaderboard.")
+                            null
+                        } else body
+                    }
+                    else -> {
+                        logger.warn("[SCT]: Failed to fetch Farming Weight leaderboard. HTTP {}", response.statusCode())
+                        null
+                    }
+                }
             }.exceptionally {
                 logger.error("[SCT]: Error fetching Farming Weight leaderboard.", it)
                 null
@@ -57,167 +76,107 @@ object EliteApiFetcher {
     }
 
     fun fetchFarmingweightLbTop1k() {
-        try {
-            val response = ApiManager.request("farmingweight/top1k")
+        ApiManager.requestAsync("farmingweight/top1k")
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
 
-            handleStringResponse(response, "Received empty response when fetching Farming Weight leaderboard.") { body ->
-                FarmingweightManager.updateFarmingweightLb(body, true)
-                hasFarmingweightLb = true
-                logger.info("[SCT]: Successfully fetched Farming Weight leaderboard.")
+                        if (body.isNullOrBlank()) {
+                            logger.warn("[SCT]: Received empty response when fetching Farming Weight top 1k.")
+                            null
+                        } else body
+                    } else -> {
+                        logger.warn("[SCT]: Failed to fetch Farming Weight top 1k. HTTP {}", response.statusCode())
+                        null
+                    }
+                }
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching Farming Weight leaderboard.", e)
-        }
+            .thenAccept { body ->
+                if (body != null) {
+                    FarmingweightManager.updateFarmingweightLb(body, true)
+                }
+            }.exceptionally { e ->
+                logger.error("[SCT]: Error fetching Farming Weight leaderboard.", e)
+                null
+            }
     }
 
-    fun setGlobalColor(playerName: String, uuid: String, color: String) {
-        try {
-            val headers = authHeaders(uuid, playerName).apply {
-                remove("X-NAME" to playerName)
-                add("X-COLOR" to color)
-            }
-
-            val response = authenticatedPost(headers)
-
+    fun setGlobalColor(playerName: String, uuid: String, color: String): CompletableFuture<Boolean> {
+        return ApiManager.postAsync("farmingweight/color", authHeaders(uuid, playerName).apply {
+            remove("X-NAME")
+            put("X-COLOR", color)
+        }).thenApply { response ->
             if (response.statusCode() == 200) {
                 logger.info("[SCT]: Successfully set global Farming Weight color for {}", playerName)
-
-                ChatUtils.sendComponent(
-                    Component.empty()
-                        .append("§aGlobal color set to ")
-                        .append(ColorUtils.coloredText(color))
-                        .append("."),
-                    true
-                )
+                true
             } else {
                 logger.warn("[SCT]: Failed to set global Farming Weight color for {}. HTTP {}", playerName, response.statusCode())
-                sendError("§cFailed to set global Farming Weight color.")
+                false
             }
-        } catch (e: Exception) {
+        }.exceptionally { e ->
             logger.error("[SCT]: Error setting Farming Weight color.", e)
+            false
         }
     }
 
     fun fetchFarmingweightTopColors() {
-        try {
-            val response = ApiManager.request("farmingweight/colors")
-
-            handleStringResponse(response, "Received empty response when fetching Farming Weight top colors.") { body ->
-                FarmingweightManager.updateFarmingweightTopColors(body)
-                hasFarmingweightTopColors = true
-                logger.info("[SCT]: Successfully fetched Farming Weight top colors.")
+        ApiManager.requestAsync("farmingweight/colors")
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
+                        if (body.isNullOrBlank()) {
+                            logger.warn("[SCT]: Received empty response when fetching Farming Weight top colors.")
+                            null
+                        } else body
+                    }
+                    else -> {
+                        logger.warn("[SCT]: Failed to fetch Farming Weight top colors. HTTP {}", response.statusCode())
+                        null
+                    }
+                }
+            }.thenAccept { body ->
+                if (body != null) {
+                    FarmingweightManager.updateFarmingweightTopColors(body)
+                    hasFarmingweightTopColors = true
+                    logger.info("[SCT]: Successfully fetched Farming Weight top colors.")
+                }
+            }.exceptionally { e ->
+                logger.error("[SCT]: Error fetching Farming Weight top colors.", e)
+                null
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching Farming Weight top colors.", e)
-        }
     }
 
     @JvmStatic
-    fun fetchCollectionLeaderboard(collection: String): String? {
-        return try {
-            val includeWiped = if (ConfigAccess.isIncludeWipedProfilesEnabled()) "true" else "false"
+    fun fetchCollectionLeaderboard(collection: String): CompletableFuture<String?> {
+        return ApiManager.requestAsync("collection/leaderboard/${collection.replace(" ", "-")}", authHeaders(PlayerData.playerUUID, PlayerData.playerName).apply{
+            remove("X-NAME")
+            put("X-CONTAINS-WIPED", if (ConfigAccess.isIncludeWipedProfilesEnabled()) "true" else "false")
+        }).thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> response.body()
 
-            val response = authenticatedGet(
-                "collection/leaderboard/${collection.replace(" ", "-")}",
-                mutableListOf(
-                    "Authorization" to "Bearer ${TokenManager.token}",
-                    "X-UUID" to PlayerData.playerUUID,
-                    "X-CONTAINS-WIPED" to includeWiped
-                )
-            )
+                    429 -> {
+                        logger.warn("[SCT]: Farming Weight API rate limit exceeded.")
+                        null
+                    }
 
-            when (response.statusCode()) {
-                200 -> response.body()
-
-                429 -> {
-                    logger.warn("[SCT]: Farming Weight API rate limit exceeded.")
-                    null
+                    else -> {
+                        logger.error("[SCT]: Failed to fetch leaderboard data. HTTP {}", response.statusCode())
+                        null
+                    }
                 }
-
-                else -> {
-                    logger.error("[SCT]: Failed to fetch leaderboard data. HTTP {}", response.statusCode())
-                    null
-                }
+            }.exceptionally { e ->
+                logger.error("[SCT]: Error fetching leaderboard data.", e)
+                null
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching leaderboard data.", e)
-            null
-        }
     }
 
-    private fun authHeaders(uuid: String, playerName: String) = mutableListOf(
+    private fun authHeaders(uuid: String, playerName: String) = mutableMapOf(
         "Authorization" to "Bearer ${TokenManager.token}",
         "X-UUID" to uuid,
         "X-NAME" to playerName
     )
-
-    private fun sendError(message: String) {
-        ChatUtils.sendMessage(message, true)
-    }
-
-    private fun runCallback(callback: Runnable?) {
-        try {
-            callback?.run()
-        } catch (e: Exception) {
-            logger.error("[SCT]: An error occurred while executing callback.", e)
-        }
-    }
-
-    private fun authenticatedGet(path: String, headers: List<Pair<String, String>>): HttpResponse<String> {
-        return ApiManager.request(path, headers)
-    }
-
-    private fun authenticatedPost(headers: List<Pair<String, String>>): HttpResponse<String> {
-        return ApiManager.post("farmingweight/color", headers)
-    }
-
-    private inline fun handleFarmingweightResponse(
-        response: HttpResponse<String>,
-        playerName: String,
-        onSuccess: (String) -> Unit
-    ) {
-        when (response.statusCode()) {
-            200 -> {
-                val body = response.body()
-
-                if (body.isNullOrBlank()) {
-                    sendError("§cCouldn't find $playerName's Farming Weight.")
-                    logger.warn("[SCT]: Empty response for {}", playerName)
-                    return
-                }
-                onSuccess(body)
-            }
-
-            429 -> {
-                logger.warn("[SCT]: Farming Weight API rate limit exceeded.")
-                sendError("§cFarming Weight fetching limit reached! Try again later.")
-            }
-
-            else -> {
-                logger.warn("[SCT]: Failed to fetch Farming Weight for {}. HTTP {}", playerName, response.statusCode())
-                sendError("§cCouldn't find $playerName's Farming Weight.")
-            }
-        }
-    }
-
-    private inline fun handleStringResponse(
-        response: HttpResponse<String>,
-        emptyMessage: String,
-        success: (String) -> Unit
-    ) {
-        when (response.statusCode()) {
-            200 -> {
-                val body = response.body()
-
-                if (body.isNullOrBlank()) {
-                    logger.warn(emptyMessage)
-                    return
-                }
-                success(body)
-            }
-
-            else -> logger.warn("[SCT]: Request failed. HTTP {}",response.statusCode())
-        }
-    }
 }
 

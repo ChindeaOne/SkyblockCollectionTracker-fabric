@@ -19,7 +19,7 @@ object SkillApiFetcher {
     @JvmStatic
     fun fetchSkillsData() {
         try {            
-            val headers = listOf(
+            val headers = mapOf(
                 "Authorization" to "Bearer ${TokenManager.token}",
                 "X-UUID" to PlayerData.playerUUID,
             )

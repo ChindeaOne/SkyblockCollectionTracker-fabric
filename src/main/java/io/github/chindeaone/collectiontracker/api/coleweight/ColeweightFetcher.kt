@@ -3,11 +3,9 @@ package io.github.chindeaone.collectiontracker.api.coleweight
 import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
-import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
-import java.net.http.HttpResponse
+import java.util.concurrent.CompletableFuture
 
 object ColeweightFetcher {
 
@@ -21,202 +19,136 @@ object ColeweightFetcher {
     var hasColeweightTopColors = false
         private set
 
-    fun fetchColeweightDataAsync(
-        playerName: String,
-        uuid: String,
-        onComplete: Runnable?
-    ) {
-        ApiManager.requestAsync("coleweight", authHeaders(uuid, playerName)).thenAccept { response ->
-            handleColeweightResponse(response, playerName) { body ->
-                ColeweightManager.updateColeweight(body)
-                logger.info("[SCT]: Successfully fetched Coleweight for {}", playerName)
-                runCallback(onComplete)
+    fun fetchColeweightData(playerName: String, uuid: String): CompletableFuture<String?> {
+        return ApiManager.requestAsync("coleweight", authHeaders(uuid, playerName))
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
+
+                        if (body.isNullOrBlank()) {
+                            ChatUtils.sendMessage("§cCouldn't find $playerName's coleweight.")
+                            logger.warn("[SCT]: Empty response for {}", playerName)
+                            null
+                        } else body
+                    }
+                    429 -> {
+                        logger.warn("[SCT]: Coleweight API rate limit exceeded.")
+                        ChatUtils.sendMessage("§cColeweight fetching limit reached! Try again later.")
+                        null
+                    }
+                    else -> {
+                        logger.warn("[SCT]: Failed to fetch Coleweight for {}. HTTP {}", playerName, response.statusCode())
+                        ChatUtils.sendMessage("§cCouldn't find $playerName's coleweight.")
+                        null
+                    }
+                }
+            }.exceptionally {
+                logger.error("[SCT]: Error fetching Coleweight.", it)
+                null
             }
-        }.exceptionally {
-            logger.error("[SCT]: Error fetching Coleweight.", it)
-            null
-        }
     }
 
-    fun fetchColeweightLbAsync(onComplete: Runnable?) {
-        ApiManager.requestAsync("coleweight/lb")
-            .thenAccept { response ->
+    fun fetchColeweightLeaderboard(): CompletableFuture<String?> {
+        return ApiManager.requestAsync("coleweight/lb")
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
 
-                handleStringResponse(
-                    response,
-                    "Received empty response when fetching Coleweight leaderboard."
-                ) { body ->
-                    ColeweightManager.updateColeweightLb(body, false)
-                    logger.info("[SCT]: Successfully fetched Coleweight leaderboard.")
-                    runCallback(onComplete)
+                        if (body.isNullOrBlank()) {
+                            logger.warn("[SCT]: Received empty response when fetching Coleweight leaderboard.")
+                            null
+                        } else body
+                    }
+                    else -> {
+                        logger.warn("[SCT]: Failed to fetch Coleweight leaderboard. HTTP {}", response.statusCode())
+                        null
+                    }
                 }
-
-            }
-            .exceptionally {
+            }.exceptionally {
                 logger.error("[SCT]: Error fetching Coleweight leaderboard.", it)
                 null
             }
     }
 
     fun fetchColeweightLbTop1k() {
-        try {
-            val response = ApiManager.request("coleweight/top1k")
+        ApiManager.requestAsync("coleweight/top1k")
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
 
-            handleStringResponse(response, "Received empty response when fetching Coleweight leaderboard.") { body ->
-                ColeweightManager.updateColeweightLb(body, true)
-                hasColeweightLb = true
-                logger.info("[SCT]: Successfully fetched Coleweight leaderboard.")
+                        if (body.isNullOrBlank()) {
+                            logger.warn("[SCT]: Received empty response when fetching Coleweight top 1k.")
+                            null
+                        } else body
+                    }
+                    else -> {
+                        logger.warn("[SCT]: Failed to fetch Coleweight top 1k. HTTP {}", response.statusCode())
+                        null
+                    }
+                }
+            }.thenAccept { body ->
+                if (body != null) {
+                    ColeweightManager.updateColeweightLb(body, true)
+                }
+            }.exceptionally {
+                logger.error("[SCT]: Error fetching Coleweight top 1k.", it)
+                null
             }
-
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching Coleweight leaderboard.", e)
-        }
     }
 
-    fun fetchColeweightData(playerName: String, uuid: String): String? {
-        return try {
-            val response = authenticatedGet(authHeaders(uuid, playerName))
-
-            when (response.statusCode()) {
-
-                200 -> {
-                    logger.info("[SCT]: Successfully fetched Coleweight for {}", playerName)
-                    response.body()
-                }
-
-                else -> {
-                    sendError("§cCouldn't find your coleweight.")
-                    logger.warn("[SCT]: Failed to fetch Coleweight for {}. HTTP {}", playerName, response.statusCode())
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching Coleweight.", e)
-            null
-        }
-    }
-
-    fun setGlobalColor(playerName: String, uuid: String, color: String) {
-        try {
-            val headers = authHeaders(uuid, playerName).apply {
-                remove("X-NAME" to playerName)
-                add("X-COLOR" to color)
-            }
-            val response = authenticatedPost(headers)
-
+    fun setGlobalColor(playerName: String, uuid: String, color: String): CompletableFuture<Boolean> {
+        return ApiManager.postAsync("coleweight/color", authHeaders(uuid, playerName).apply {
+            remove("X-NAME")
+            put("X-COLOR", color)
+        }).thenApply { response ->
             if (response.statusCode() == 200) {
                 logger.info("[SCT]: Successfully set global color for {}", playerName)
-
-                ChatUtils.sendComponent(
-                    Component.empty()
-                        .append("§aGlobal color set to ")
-                        .append(ColorUtils.coloredText(color))
-                        .append("."),
-                    true
-                )
+                true
             } else {
-                logger.warn(
-                    "[SCT]: Failed to set global color for {}. HTTP {}",
-                    playerName,
-                    response.statusCode()
-                )
-                sendError("§cFailed to set global Coleweight color.")
+                logger.warn("[SCT]: Failed to set global color for {}. HTTP {}", playerName, response.statusCode())
+                false
             }
-        } catch (e: Exception) {
+        }.exceptionally { e ->
             logger.error("[SCT]: Error setting Coleweight color.", e)
+            false
         }
     }
 
     fun fetchColeweightTopColors() {
-        try {
-            val response = ApiManager.request("coleweight/colors")
+        ApiManager.requestAsync("coleweight/colors")
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
 
-            handleStringResponse(response, "Received empty response when fetching Coleweight top colors.") { body ->
-                ColeweightManager.updateColeweightTopColors(body)
-                hasColeweightTopColors = true
-                logger.info("[SCT]: Successfully fetched Coleweight top colors.")
+                        if (body.isNullOrBlank()) {
+                            logger.warn("[SCT]: Received empty response when fetching Coleweight top colors.")
+                            null
+                        } else body
+                    }
+                    else -> {
+                        logger.warn("[SCT]: Failed to fetch Coleweight top colors. HTTP {}", response.statusCode())
+                        null
+                    }
+                }
+            }.thenAccept { body ->
+                if (body != null) {
+                    ColeweightManager.updateColeweightTopColors(body)
+                    hasColeweightTopColors = true
+                    logger.info("[SCT]: Successfully fetched Coleweight top colors.")
+                }
+            }.exceptionally {
+                logger.error("[SCT]: Error fetching Coleweight top colors.", it)
+                null
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching Coleweight top colors.", e)
-        }
     }
 
-    private fun authHeaders(uuid: String, playerName: String) = mutableListOf(
+    private fun authHeaders(uuid: String, playerName: String) = mutableMapOf(
         "Authorization" to "Bearer ${TokenManager.token}",
         "X-UUID" to uuid,
         "X-NAME" to playerName
     )
-
-    private fun sendError(message: String) {
-        ChatUtils.sendMessage(message, true)
-    }
-
-    private fun runCallback(callback: Runnable?) {
-        try {
-            callback?.run()
-        } catch (e: Exception) {
-            logger.error("[SCT]: An error occurred while executing callback.", e)
-        }
-    }
-
-    private fun authenticatedGet(headers: List<Pair<String, String>>): HttpResponse<String> {
-        return ApiManager.request("coleweight", headers)
-    }
-
-    private fun authenticatedPost(headers: List<Pair<String, String>>): HttpResponse<String> {
-        return ApiManager.post("coleweight/color", headers)
-    }
-
-    private inline fun handleColeweightResponse(
-        response: HttpResponse<String>,
-        playerName: String,
-        onSuccess: (String) -> Unit
-    ) {
-        when (response.statusCode()) {
-
-            200 -> {
-                val body = response.body()
-
-                if (body.isNullOrBlank()) {
-                    sendError("§cCouldn't find $playerName's coleweight.")
-                    logger.warn("[SCT]: Empty response for {}", playerName)
-                    return
-                }
-                onSuccess(body)
-            }
-
-            429 -> {
-                logger.warn("[SCT]: Coleweight API rate limit exceeded.")
-                sendError("§cColeweight fetching limit reached! Try again later.")
-            }
-
-            else -> {
-                logger.warn("[SCT]: Failed to fetch Coleweight for {}. HTTP {}", playerName, response.statusCode())
-                sendError("§cCouldn't find $playerName's coleweight.")
-            }
-        }
-    }
-
-    private inline fun handleStringResponse(
-        response: HttpResponse<String>,
-        emptyMessage: String,
-        success: (String) -> Unit
-    ) {
-        when (response.statusCode()) {
-            200 -> {
-                val body = response.body()
-
-                if (body.isNullOrBlank()) {
-                    logger.warn(emptyMessage)
-                    return
-                }
-                success(body)
-            }
-
-            else -> logger.warn(
-                "[SCT]: Request failed. HTTP {}",
-                response.statusCode()
-            )
-        }
-    }
 }

@@ -14,7 +14,7 @@ object FetchNpcPrices {
     var hasNpcPrice: Boolean = false
 
     fun fetchPrices() {
-        ApiManager.requestAsync("npc", listOf())
+        ApiManager.requestAsync("npc")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val prices = Gson().fromJson<Map<String, Int>>(
@@ -29,8 +29,7 @@ object FetchNpcPrices {
                 } else {
                     logger.error("[SCT]: Failed to fetch NPC prices. HTTP {}", response.statusCode())
                 }
-            }
-            .exceptionally { e ->
+            }.exceptionally { e ->
                 logger.error("[SCT]: Error while receiving the npc prices", e)
                 null
             }

@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import org.apache.logging.log4j.LogManager
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -34,23 +35,31 @@ object ColeweightDataFetcher {
 
             if (!ColeweightTrackingHandler.isTracking || ColeweightTrackingHandler.isPaused) return
 
-            val data = getData()
-            if (data.isEmpty()) {
-                logger.error("[SCT]: Failed to fetch Coleweight data")
-                return
+            getData().thenAccept { data ->
+                if (data.isEmpty()) {
+                    logger.error("[SCT]: Failed to fetch Coleweight data")
+                    return@thenAccept
+                }
+
+                try {
+                    val coleweight = JsonParser.parseString(data).asJsonObject.get("coleweight").asFloat
+
+                    logger.info("[SCT]: Coleweight data fetched successfully: $coleweight")
+                    ColeweightTrackingRates.calculateRates(coleweight)
+                } catch (e: Exception) {
+                    logger.error("[SCT]: Error parsing Coleweight data: ${e.message}", e)
+                    return@thenAccept
+                }
+            }.exceptionally { e ->
+                logger.error("[SCT]: Error fetching Coleweight data: ${e.message}", e)
+                null
             }
-            val coleweight = JsonParser.parseString(data).asJsonObject.get("coleweight").asFloat
-
-            logger.info("[SCT]: Coleweight data fetched successfully: $coleweight")
-            ColeweightTrackingRates.calculateRates(coleweight)
-
         } catch (e: Exception) {
             logger.error("[SCT]: Error fetching Coleweight data: ${e.message}", e)
         }
     }
 
-    @JvmStatic
-    fun getData(): String {
+    fun getData(): CompletableFuture<String> {
         val uuid = PlayerData.playerUUID
         val name = PlayerData.playerName
 
@@ -60,18 +69,24 @@ object ColeweightDataFetcher {
         if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < CACHE_LIFESPAN_MS) {
             val elapsed: Long = System.currentTimeMillis() - lastFetched
             logger.info("[SCT]: Returning cached data for player with UUID: {} (cache age: {} ms)", uuid, elapsed)
-            return cache[cacheKey] ?: ""
+            return CompletableFuture.completedFuture(cache[cacheKey] ?: "")
         }
 
-        val jsonData = ColeweightFetcher.fetchColeweightData(name, uuid)
-
-        if (!jsonData.isNullOrEmpty()) {
-            cache[cacheKey] = jsonData
-            cacheTimestamps[cacheKey] = System.currentTimeMillis()
-            return jsonData
-        }
-
-        return ""
+        return ColeweightFetcher.fetchColeweightData(name, uuid)
+            .thenApply { data ->
+                if (data.isNullOrEmpty()) {
+                    logger.warn("[SCT]: Received empty response when fetching Coleweight data for player: {}", name)
+                    ""
+                } else {
+                    cache[cacheKey] = data
+                    cacheTimestamps[cacheKey] = System.currentTimeMillis()
+                    data
+                }
+            }
+            .exceptionally { e ->
+                logger.error("[SCT]: Error fetching Coleweight data for player: {}: {}", name, e.message)
+                ""
+            }
     }
 
     fun clearCache() {

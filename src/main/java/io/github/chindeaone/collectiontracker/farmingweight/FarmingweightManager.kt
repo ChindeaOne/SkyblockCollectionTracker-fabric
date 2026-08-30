@@ -9,7 +9,6 @@ object FarmingweightManager {
     var storage: FarmingweightStorage = FarmingweightStorage()
         private set
 
-    @JvmStatic
     fun updateFarmingweight(data: String) {
         val root = JsonParser.parseString(data).asJsonObject
 
@@ -19,7 +18,6 @@ object FarmingweightManager {
         )
     }
 
-    @JvmStatic
     fun updateFarmingweightLb(data: String, isTop: Boolean) {
         val rootElem = JsonParser.parseString(data)
         val entries = when {
@@ -50,7 +48,6 @@ object FarmingweightManager {
         }
     }
 
-    @JvmStatic
     fun updateFarmingweightTopColors(data: String) {
         val obj = JsonParser.parseString(data).asJsonObject
         val colorMap = mutableMapOf<String, String>()

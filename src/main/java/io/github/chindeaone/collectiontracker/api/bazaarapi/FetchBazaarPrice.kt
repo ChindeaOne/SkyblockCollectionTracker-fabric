@@ -75,8 +75,7 @@ object FetchBazaarPrice {
                 }
 
                 logger.info("[SCT]: Successfully fetched bazaar price for collection list '{}'", collections)
-            }
-            .exceptionally { e ->
+            }.exceptionally { e ->
                 logger.error("[SCT]: Error fetching bazaar price for collections '{}': {}", collections, e.message)
                 null
             }
@@ -85,7 +84,7 @@ object FetchBazaarPrice {
     private fun requestHelper(collection: String) =
         ApiManager.requestAsync(
             "bazaar",
-            listOf(
+            mapOf(
                 "Authorization" to "Bearer ${TokenManager.token}",
                 "X-UUID" to PlayerData.playerUUID,
                 "X-COLLECTION" to collection

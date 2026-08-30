@@ -14,7 +14,7 @@ object FetchCollectionList {
     var hasCollectionList: Boolean = false
 
     fun fetchCollectionList() {
-        ApiManager.requestAsync("collections", listOf())
+        ApiManager.requestAsync("collections")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val json = JsonParser.parseString(response.body()).asJsonObject
@@ -32,8 +32,7 @@ object FetchCollectionList {
                 } else {
                     logger.error("[SCT]: Failed to fetch collection list. HTTP {}", response.statusCode())
                 }
-            }
-            .exceptionally { e ->
+            }.exceptionally { e ->
                 logger.error("[SCT]: Error while receiving the collection list", e)
                 null
             }

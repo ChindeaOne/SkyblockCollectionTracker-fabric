@@ -65,7 +65,7 @@ object HypixelApiFetcher {
     private fun requestHelper(collection: String, collectionSource: String) =
         ApiManager.request(
             "hypixelapi",
-            listOf(
+            mapOf(
                 "Authorization" to "Bearer ${TokenManager.token}",
                 "X-UUID" to PlayerData.playerUUID,
                 "X-COLLECTION" to collection,

@@ -15,12 +15,6 @@ object ColeweightUtils {
     private var lastPlayer: String? = null
     private const val COOLDOWN_DURATION = 5 * 60 * 1000L // 5 minutes cd
 
-    private fun isPlayerCached(name: String): Boolean {
-        val lastFetch = playerCooldowns[name] ?: 0L
-        return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
-    }
-
-    @JvmStatic
     fun getColeweight(playerName: String, detailed: Boolean = false) {
         if (!ServerUtils.serverStatus) {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
@@ -35,19 +29,27 @@ object ColeweightUtils {
             return
         }
 
-        ColeweightFetcher.fetchColeweightDataAsync(playerName, PlayerData.playerUUID) {
-            playerCooldowns[playerName] = System.currentTimeMillis()
-            lastPlayer = playerName
-            displayColeweight(playerName, ColeweightManager.storage, detailed)
-        }
+        ColeweightFetcher.fetchColeweightData(playerName, PlayerData.playerUUID)
+            .thenAccept { body ->
+                if (body == null) return@thenAccept
+
+                ColeweightManager.updateColeweight(body)
+
+                playerCooldowns[playerName] = System.currentTimeMillis()
+                lastPlayer = playerName
+                displayColeweight(playerName, ColeweightManager.storage, detailed)
+            }
     }
 
-    @JvmStatic
     fun getColeweightDetailed(playerName: String) {
         getColeweight(playerName, true)
     }
 
-    @JvmStatic
+    private fun isPlayerCached(name: String): Boolean {
+        val lastFetch = playerCooldowns[name] ?: 0L
+        return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
+    }
+
     fun getColeweightLeaderboard(position: Int) {
         if (!ServerUtils.serverStatus) {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
@@ -59,16 +61,20 @@ object ColeweightUtils {
         }
 
         ChatUtils.sendMessage("§aFetching Top $position in Coleweight...", true)
-        ColeweightFetcher.fetchColeweightLbAsync {
-            displayColeweightLeaderboard(position)
-        }
+        ColeweightFetcher.fetchColeweightLeaderboard()
+            .thenAccept { body ->
+                if (body == null) return@thenAccept
+                ColeweightManager.updateColeweightLb(body, false)
+
+                displayColeweightLeaderboard(position)
+            }
     }
 
     private fun displayColeweight(playerName: String, storage: ColeweightStorage, detailed: Boolean = false) {
         val isMe = playerName.equals(PlayerData.playerName, ignoreCase = true)
-        val rankComp = getRankComponent(storage.rank, isMe, playerName)
+        val rankComponent = getRankComponent(storage.rank, isMe, playerName)
 
-        val fullMessage = Component.empty().append(rankComp).append(" §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
+        val fullMessage = Component.empty().append(rankComponent).append(" §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
 
         if (detailed) {
             fullMessage.append("\n§6Experience:")
@@ -120,7 +126,6 @@ object ColeweightUtils {
         return rank.toCWRankComponent(isMe, playerName)
     }
 
-    @JvmStatic
     fun setPlayerCustomColor(playerName: String, hexColor: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
             ChatUtils.sendMessage("§cYou cannot set a custom color for yourself like this. Use the feature in `/sct`.", true)
@@ -131,7 +136,6 @@ object ColeweightUtils {
         ChatUtils.sendComponent(Component.empty().append("§aCustom color for ").append(playerName).append("§a set to ").append(color).append("§a."), true)
     }
 
-    @JvmStatic
     fun removePlayerCustomColor(playerName: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
             ChatUtils.sendMessage("§cYou cannot remove a custom color for yourself like this. Use the feature in `/sct`.", true)
@@ -141,7 +145,6 @@ object ColeweightUtils {
         ChatUtils.sendMessage("§aCustom color for $playerName removed.", true)
     }
 
-    @JvmStatic
     fun setGlobalColor(color: String) {
         val playerName = PlayerData.playerName
         val uuid = PlayerData.playerUUID
@@ -151,6 +154,14 @@ object ColeweightUtils {
             ChatUtils.sendMessage("§cYou must be in the top 10 of the Coleweight leaderboard to set a global color.", true)
             return
         }
+
         ColeweightFetcher.setGlobalColor(playerName,uuid, color)
+            .thenAccept { success ->
+                if (success) {
+                    ChatUtils.sendComponent(Component.empty().append("§aGlobal color set to ").append(ColorUtils.coloredText(color)).append("."), true)
+                } else {
+                    ChatUtils.sendMessage("§cFailed to set global Coleweight color.", true)
+                }
+            }
     }
 }

@@ -20,7 +20,6 @@ object FarmingweightUtils {
         return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
     }
 
-    @JvmStatic
     fun getFarmingweight(playerName: String) {
         if (!ServerUtils.serverStatus) {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
@@ -34,14 +33,17 @@ object FarmingweightUtils {
             return
         }
 
-        EliteApiFetcher.fetchFarmingweightDataAsync(playerName, PlayerData.playerUUID) {
-            playerCooldowns[playerName] = System.currentTimeMillis()
-            lastPlayer = playerName
-            displayFarmingweight(playerName, FarmingweightManager.storage)
-        }
+        EliteApiFetcher.fetchFarmingweightData(playerName, PlayerData.playerUUID).thenAccept { body ->
+                if (body == null) return@thenAccept
+
+                FarmingweightManager.updateFarmingweight(body)
+
+                playerCooldowns[playerName] = System.currentTimeMillis()
+                lastPlayer = playerName
+                displayFarmingweight(playerName, FarmingweightManager.storage)
+            }
     }
 
-    @JvmStatic
     fun getFarmingweightLeaderboard(position: Int) {
         if (!ServerUtils.serverStatus) {
             ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
@@ -53,7 +55,10 @@ object FarmingweightUtils {
         }
 
         ChatUtils.sendMessage("§aFetching Top $position in Farming Weight...", true)
-        EliteApiFetcher.fetchFarmingweightLbAsync {
+        EliteApiFetcher.fetchFarmingweightLeaderboard().thenAccept { body ->
+            if (body == null) return@thenAccept
+            FarmingweightManager.updateFarmingweightLb(body, false)
+
             displayFarmingweightLeaderboard(position)
         }
     }
@@ -61,8 +66,7 @@ object FarmingweightUtils {
     private fun displayFarmingweight(playerName: String, storage: FarmingweightStorage) {
         val isMe = playerName.equals(PlayerData.playerName, ignoreCase = true)
         val rankComp = getRankComponent(storage.rank, isMe, playerName)
-        val fullMessage = Component.empty().append(rankComp)
-            .append(" §e$playerName's Farming Weight: ${storage.weight}")
+        val fullMessage = Component.empty().append(rankComp).append(" §e$playerName's Farming Weight: ${storage.weight}")
 
         ChatUtils.sendComponent(fullMessage, true)
     }
@@ -103,7 +107,6 @@ object FarmingweightUtils {
         )
     }
 
-    @JvmStatic
     fun setPlayerCustomColor(playerName: String, hexColor: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
             ChatUtils.sendMessage("§cYou cannot set a custom color for yourself like this. Use the feature in `/sct`.", true)
@@ -114,7 +117,6 @@ object FarmingweightUtils {
         ChatUtils.sendComponent(Component.empty().append("§aCustom color for ").append(playerName).append("§a set to ").append(color).append("§a."), true)
     }
 
-    @JvmStatic
     fun removePlayerCustomColor(playerName: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
             ChatUtils.sendMessage("§cYou cannot remove a custom color for yourself like this. Use the feature in `/sct`.", true)
@@ -124,7 +126,6 @@ object FarmingweightUtils {
         ChatUtils.sendMessage("§aCustom color for $playerName removed.", true)
     }
 
-    @JvmStatic
     fun setGlobalColor(color: String) {
         val playerName = PlayerData.playerName
         val uuid = PlayerData.playerUUID
@@ -134,6 +135,14 @@ object FarmingweightUtils {
             ChatUtils.sendMessage("§cYou must be in the top 10 of the Farming Weight leaderboard to set a global color.", true)
             return
         }
+
         EliteApiFetcher.setGlobalColor(playerName, uuid, color)
+            .thenAccept { success ->
+                if (success) {
+                    ChatUtils.sendComponent(Component.empty().append("§aGlobal color set to ").append(ColorUtils.coloredText(color)).append("."), true)
+                } else {
+                    ChatUtils.sendMessage("§cFailed to set global Farming Weight color.", true)
+                }
+            }
     }
 }

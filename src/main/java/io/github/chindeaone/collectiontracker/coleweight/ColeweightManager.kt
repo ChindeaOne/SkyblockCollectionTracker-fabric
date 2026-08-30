@@ -9,14 +9,13 @@ object ColeweightManager {
     var storage: ColeweightStorage = ColeweightStorage()
         private set
 
-    @JvmStatic
     fun updateColeweight(data: String) {
         val root = JsonParser.parseString(data).asJsonObject
 
         storage = storage.copy(
-            coleweight = root.get("coleweight").asFloat,
-            rank = root.get("rank").asInt,
-            percentage = root.get("percentile").asFloat,
+            coleweight = if (root.has("coleweight")) root.get("coleweight").asFloat else 0f,
+            rank = if (root.has("rank")) root.get("rank").asInt else 0,
+            percentage = if (root.has("percentile")) root.get("percentile").asFloat else 0f,
             experience = parseDetail("experience", root),
             powder = parseDetail("powder", root),
             collection = parseDetail("collection", root),
@@ -24,7 +23,6 @@ object ColeweightManager {
         )
     }
 
-    @JvmStatic
     fun updateColeweightLb(data: String, isTop: Boolean) {
         val arr = JsonParser.parseString(data).asJsonArray
         val list = arr.map { el ->
@@ -47,6 +45,8 @@ object ColeweightManager {
     }
 
     private fun parseDetail(name: String, root: JsonObject): Map<String, Float> {
+        if (!root.has(name)) return emptyMap()
+
         val obj = root.getAsJsonObject(name)
         val entries = mutableMapOf<String, Float>()
 
@@ -56,7 +56,6 @@ object ColeweightManager {
         return entries
     }
 
-    @JvmStatic
     fun updateColeweightTopColors(data: String) {
         val obj = JsonParser.parseString(data).asJsonObject
         val colorMap = mutableMapOf<String, String>()

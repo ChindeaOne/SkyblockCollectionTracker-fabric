@@ -13,7 +13,7 @@ object FetchGemstoneList {
     var hasGemstoneList: Boolean = false
 
     fun fetchGemstoneList() {
-        ApiManager.requestAsync("gemstones", listOf())
+        ApiManager.requestAsync("gemstones")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val json = JsonParser.parseString(response.body()).asJsonObject
@@ -24,8 +24,7 @@ object FetchGemstoneList {
                 } else {
                     logger.error("[SCT]: Failed to fetch gemstone list. HTTP {}", response.statusCode())
                 }
-            }
-            .exceptionally { e ->
+            }.exceptionally { e ->
                 logger.error("[SCT]: Error while receiving the gemstone list", e)
                 null
             }

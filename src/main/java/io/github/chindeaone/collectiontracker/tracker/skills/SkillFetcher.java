@@ -89,32 +89,36 @@ public class SkillFetcher {
             }
             logger.info("[SCT]: Fetching leaderboard data for skill: {}", skillName);
 
-            String jsonData = EliteApiFetcher.fetchCollectionLeaderboard(skillName.toLowerCase());
-            if (jsonData == null) {
-                logger.error("[SCT]: Failed to fetch leaderboard data for skill {} from the Elite API", skillName);
-                return;
-            }
+            EliteApiFetcher.fetchCollectionLeaderboard(skillName.toLowerCase()).thenAccept( jsonData -> {
+                if (jsonData == null) {
+                    logger.error("[SCT]: Failed to fetch leaderboard data for skill {} from the Elite API", skillName);
+                    return;
+                }
 
-            JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
-            JsonArray entriesArray = jsonObject.getAsJsonArray("entries");
-            List<LeaderboardEntry> entries = new ArrayList<>(entriesArray.size());
+                JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
+                JsonArray entriesArray = jsonObject.getAsJsonArray("entries");
+                List<LeaderboardEntry> entries = new ArrayList<>(entriesArray.size());
 
-            for (int i = 0; i < entriesArray.size(); i++) {
-                JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
-                String username = entryObject.get("username").getAsString();
-                if (username.equalsIgnoreCase(PlayerData.getPlayerName())) continue;
+                for (int i = 0; i < entriesArray.size(); i++) {
+                    JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
+                    String username = entryObject.get("username").getAsString();
+                    if (username.equalsIgnoreCase(PlayerData.getPlayerName())) continue;
 
-                entries.add(new LeaderboardEntry(
-                        username,
-                        entryObject.get("rank").getAsInt(),
-                        entryObject.get("amount").getAsLong(),
-                        ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").getAsBoolean()
-                ));
-            }
+                    entries.add(new LeaderboardEntry(
+                            username,
+                            entryObject.get("rank").getAsInt(),
+                            entryObject.get("amount").getAsLong(),
+                            ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").getAsBoolean()
+                    ));
+                }
 
-            LeaderboardManager.setSkillLeaderboard(skillName, entries);
-            leaderboardCacheTimestamps.put(skillName.toLowerCase(), System.currentTimeMillis());
-            logger.info("[SCT]: Leaderboard data successfully fetched and updated for skill: {}", skillName);
+                LeaderboardManager.setSkillLeaderboard(skillName, entries);
+                leaderboardCacheTimestamps.put(skillName.toLowerCase(), System.currentTimeMillis());
+                logger.info("[SCT]: Leaderboard data successfully fetched and updated for skill: {}", skillName);
+            }).exceptionally(ex -> {
+                logger.error("[SCT]: Exception occurred while fetching leaderboard data for skill {}: {}", skillName, ex.getMessage(), ex);
+                return null;
+            });
         } catch (Exception e) {
             logger.error("[SCT]: Error fetching skill leaderboard data for {}: {}", skillName, e.getMessage(), e);
         } finally {

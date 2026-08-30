@@ -20,7 +20,7 @@ object TokenFetcher {
                 return CompletableFuture.completedFuture(null)
             }
 
-            val headers = listOf(
+            val headers = mapOf(
                 "X-UUID" to PlayerData.playerUUID,
                 "X-NAME" to PlayerData.playerName,
                 "X-SERVER-ID" to serverId
@@ -46,8 +46,7 @@ object TokenFetcher {
 
                         json["token"].asString
                     }
-                }
-                .exceptionally { e ->
+                }.exceptionally { e ->
                     logger.error("[SCT]: Failed to fetch token", e)
                     null
                 }
