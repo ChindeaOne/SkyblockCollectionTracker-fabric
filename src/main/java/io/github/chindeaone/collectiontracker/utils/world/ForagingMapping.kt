@@ -16,7 +16,8 @@ object ForagingMapping {
         "Helix Fortune",
         "Mangrove Fortune",
         "Sweep",
-        "Foraging Wisdom"
+        "Foraging Wisdom",
+        "Timber"
     )
 
     val foragingBlockPerType = mapOf(

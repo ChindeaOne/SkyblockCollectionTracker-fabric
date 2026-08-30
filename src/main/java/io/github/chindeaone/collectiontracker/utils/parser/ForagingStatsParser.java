@@ -53,6 +53,8 @@ public class ForagingStatsParser {
                 processFortuneLine(line, ctx, false);
             } else if (line.contains("Foraging Wisdom")) {
                 ctx.wisdom.parse(line);
+            } else if (line.contains("Timber")) {
+                ctx.timber.parse(line);
             }
         }
 
@@ -61,6 +63,10 @@ public class ForagingStatsParser {
         }
 
         formatted.add(ctx.formatTotalFortune());
+
+        if (!"0".equals(ctx.timber.value)) {
+            formatted.add(ctx.timber.format());
+        }
 
         if (!"0".equals(ctx.wisdom.value)) {
             formatted.add(ctx.wisdom.format());
@@ -149,6 +155,7 @@ public class ForagingStatsParser {
 
         Stat sweep = new Stat("Sweep", "\uE023", "§2");
         Stat wisdom = new Stat("Foraging Wisdom", "☯", "§3");
+        Stat timber = new Stat("Timber", "\uE02E", "§4");
 
         ForagingContext(String blockType) {
             this.blockType = blockType;
