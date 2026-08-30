@@ -13,6 +13,7 @@ object ScoreboardUtils {
 
     private val locationSymbols: Regex = Regex("[\uE067\uE020]\\s*") // ф is for Rift
     private val timeRegex = Regex("(\\d{1,2}):(\\d{2})(am|pm)")
+    private val scoreboardTitlePattern = Regex("SK[YI]BLOCK(?: CO-OP| GUEST)?(?: [♲☀Ⓑ])?")
 
     var location: String = ""
     var lastLocation: String = ""
@@ -116,11 +117,13 @@ object ScoreboardUtils {
         }
     }
 
-    fun getScoreboardTitle(client: Minecraft): String? {
+    fun checkScoreboard(client: Minecraft): Boolean? {
         val world = client.level ?: return null
         val objective = world.scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR) ?: return null
         val displayName = objective.displayName.string
-        return displayName
+
+        val scoreboardTitle = displayName.removeColor()
+        return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
     private fun checkIfMineshaft(rawLines: List<String>) {
