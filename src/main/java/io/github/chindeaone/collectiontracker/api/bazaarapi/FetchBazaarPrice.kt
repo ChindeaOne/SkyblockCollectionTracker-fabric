@@ -8,85 +8,82 @@ import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import org.apache.logging.log4j.LogManager
+import java.util.concurrent.CompletableFuture
 
 object FetchBazaarPrice {
 
     private val logger = LogManager.getLogger(FetchBazaarPrice::class.java)
 
     @JvmStatic
-    fun fetchData(collection: String) {
-        try {
-            val response = requestHelper(collection)
+    fun fetchData(collection: String): CompletableFuture<Void> {
+        return requestHelper(collection)
+            .thenAccept { response ->
+                if (response.statusCode() != 200) {
+                    logger.error("[SCT]: Failed to fetch bazaar price for collection '{}', response code: {}", collection, response.statusCode())
+                    return@thenAccept
+                }
 
-            if (response.statusCode() != 200) {
-                return
+                val jsonObject = JsonParser.parseString(response.body()).asJsonObject
+
+                val collectionObject = jsonObject.entrySet().first().value.asJsonObject
+                val entry = collectionObject.entrySet().first()
+
+                val type = entry.key
+                val data = entry.value.asJsonObject.toString()
+
+                if (type == "gemstone") {
+                    GemstonePrices.setPrices(data)
+                } else {
+                    BazaarCollectionsManager.setPricesAndRecipes(data, type)
+                }
+
+                CollectionsManager.collectionType = type
+                logger.info("[SCT]: Successfully fetched bazaar price for collection '{}'", collection)
             }
-
-            val jsonObject = JsonParser.parseString(response.body()).asJsonObject
-
-            val collectionObject = jsonObject.entrySet().first().value.asJsonObject
-            val entry = collectionObject.entrySet().first()
-
-            val type = entry.key
-            val data = entry.value.asJsonObject.toString()
-
-            if (type == "gemstone") {
-                GemstonePrices.setPrices(data)
-            } else {
-                BazaarCollectionsManager.setPricesAndRecipes(data, type)
+            .exceptionally { e ->
+                logger.error("[SCT]: Error fetching bazaar price for collection '{}': {}", collection, e.message)
+                null
             }
-
-            CollectionsManager.collectionType = type
-            logger.info("[SCT]: Successfully fetched bazaar price for collection '{}'", collection)
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching bazaar price for collection '{}': {}", collection, e.message)
-        }
     }
 
     @JvmStatic
-    fun fetchData(collections: List<String>) {
-        try {
-            val requestCollections = addGemstones(collections)
-
-            var response = requestHelper(requestCollections.joinToString(", "))
-
-            if (response.statusCode() == 401) {
-                logger.warn("[SCT]: Invalid or expired token. Fetching a new one and retrying...")
-                TokenManager.fetchAndStoreToken()
-                response = requestHelper(requestCollections.joinToString(", "))
-            }
-
-            if (response.statusCode() != 200) {
-                return
-            }
-
-            val jsonObject = JsonParser.parseString(response.body()).asJsonObject
-
-            for ((collectionId, wrapperElement) in jsonObject.entrySet()) {
-                val typeWrapper = wrapperElement.asJsonObject
-
-                val typeEntry = typeWrapper.entrySet().firstOrNull() ?: continue
-
-                val type = typeEntry.key
-                val data = typeEntry.value.asJsonObject.toString()
-
-                if (type == "gemstone") {
-                    GemstonePrices.setPrices(collectionId, data)
-                } else {
-                    BazaarCollectionsManager.setPricesAndRecipes(collectionId, data, type)
+    fun fetchData(collections: List<String>): CompletableFuture<Void> {
+        return requestHelper(addGemstones(collections).joinToString(", "))
+            .thenAccept { response ->
+                if (response.statusCode() != 200) {
+                    logger.error("[SCT]: Failed to fetch bazaar price for collections '{}', response code: {}", collections, response.statusCode())
+                    return@thenAccept
                 }
 
-                CollectionsManager.multiCollectionTypes[collectionId] = type
-            }
+                val jsonObject = JsonParser.parseString(response.body()).asJsonObject
 
-            logger.info("[SCT]: Successfully fetched bazaar price for collection list '{}'", collections)
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching bazaar price for collections '{}': {}", collections, e.message)
-        }
+                for ((collectionId, wrapperElement) in jsonObject.entrySet()) {
+                    val typeWrapper = wrapperElement.asJsonObject
+
+                    val typeEntry = typeWrapper.entrySet().firstOrNull() ?: continue
+
+                    val type = typeEntry.key
+                    val data = typeEntry.value.asJsonObject.toString()
+
+                    if (type == "gemstone") {
+                        GemstonePrices.setPrices(collectionId, data)
+                    } else {
+                        BazaarCollectionsManager.setPricesAndRecipes(collectionId, data, type)
+                    }
+
+                    CollectionsManager.multiCollectionTypes[collectionId] = type
+                }
+
+                logger.info("[SCT]: Successfully fetched bazaar price for collection list '{}'", collections)
+            }
+            .exceptionally { e ->
+                logger.error("[SCT]: Error fetching bazaar price for collections '{}': {}", collections, e.message)
+                null
+            }
     }
 
     private fun requestHelper(collection: String) =
-        ApiManager.request(
+        ApiManager.requestAsync(
             "bazaar",
             listOf(
                 "Authorization" to "Bearer ${TokenManager.token}",

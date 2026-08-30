@@ -19,7 +19,8 @@ import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration.Companion.minutes
 
 object ApiManager {
-    const val API_URL = "https://api.skyblockcollections.com/v3"
+    const val API_URL = "https://api.skyblockcollections.com/v2"
+//    const val API_URL = "http://localhost:8080/v3"
     const val AGENT_BASE = "SCT"
 
     private val logger: Logger = LogManager.getLogger(ApiManager::class.java)
@@ -36,19 +37,23 @@ object ApiManager {
     private var lastTokenRequest = 0L
 
     // Same logic as SkyblockPv
-    fun authenticateMojang(notify: Boolean = false) {
+    fun authenticateMojang(notify: Boolean = false): CompletableFuture<String?> {
         serverId = UUID.randomUUID().toString()
         val profile = PlayerData.profileId
         val accessToken = PlayerData.accessToken
 
-        try {
-            session.joinServer(profile, accessToken, serverId)
-            logger.info("[SCT]: Registered session with Mojang")
-
-            TokenManager.fetchAndStoreToken(notify)
-        } catch (e: Exception) {
-            logger.error("[SCT]: Failed to authenticate with Mojang servers: ${e.message}", e)
-        }
+        return CompletableFuture
+            .supplyAsync {
+                session.joinServer(profile, accessToken, serverId)
+                logger.info("[SCT]: Registered session with Mojang")
+            }
+            .thenCompose {
+                TokenManager.fetchAndStoreToken(notify)
+            }
+            .exceptionally { e ->
+                logger.error("[SCT]: Failed to authenticate with Mojang servers: ${e.message}", e)
+                null
+            }
     }
 
     // tell the backend this player is no longer online
@@ -112,9 +117,9 @@ object ApiManager {
     fun invalidateSession(
         path: String,
         headers: List<Pair<String, String>> = emptyList()
-    ): HttpResponse<String> {
+    ) {
         val request = buildRequest(path, "POST", headers)
-        return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
+        HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
     }
 
     private fun buildRequest(
@@ -140,8 +145,8 @@ object ApiManager {
         return builder.build()
     }
 
-    fun checkServer(path: String): CompletableFuture<Boolean> {
-        val request = HttpRequest.newBuilder(URI.create("$API_URL/$path"))
+    fun checkServer(): CompletableFuture<Boolean> {
+        val request = HttpRequest.newBuilder(URI.create("$API_URL/status"))
             .timeout(Duration.ofSeconds(3))
             .header("User-Agent", agent)
             .HEAD()

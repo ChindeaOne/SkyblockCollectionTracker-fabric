@@ -14,24 +14,25 @@ object FetchNpcPrices {
     var hasNpcPrice: Boolean = false
 
     fun fetchPrices() {
-        try {
-            val response = ApiManager.request("npc", listOf())
-            
-            if (response.statusCode() == 200) {
-                val prices = Gson().fromJson<Map<String, Int>>(
-                    response.body(),
-                    object : TypeToken<Map<String, Int>>() {}.type
-                )
+        ApiManager.requestAsync("npc", listOf())
+            .thenAccept { response ->
+                if (response.statusCode() == 200) {
+                    val prices = Gson().fromJson<Map<String, Int>>(
+                        response.body(),
+                        object : TypeToken<Map<String, Int>>() {}.type
+                    )
 
-                NpcPrices.collectionPrices.putAll(prices)
-                hasNpcPrice = true
-                logger.info("[SCT]: Successfully received the npc prices.")
+                    NpcPrices.collectionPrices.putAll(prices)
+                    hasNpcPrice = true
+                    logger.info("[SCT]: Successfully received the npc prices.")
 
-            } else {
-                logger.error("[SCT]: Failed to fetch NPC prices. HTTP {}", response.statusCode())
+                } else {
+                    logger.error("[SCT]: Failed to fetch NPC prices. HTTP {}", response.statusCode())
+                }
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error while receiving the npc prices", e)
-        }
+            .exceptionally { e ->
+                logger.error("[SCT]: Error while receiving the npc prices", e)
+                null
+            }
     }
 }

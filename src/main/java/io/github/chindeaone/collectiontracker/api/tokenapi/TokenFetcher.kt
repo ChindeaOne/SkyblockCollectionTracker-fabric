@@ -6,17 +6,18 @@ import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 
 object TokenFetcher {
 
     private val logger: Logger = LogManager.getLogger(TokenFetcher::class.java)
 
-    fun fetchToken(notify: Boolean): String? {
+    fun fetchToken(notify: Boolean): CompletableFuture<String?> {
         return try {
             val serverId = ApiManager.serverId
             if (serverId == null) {
                 logger.error("[SCT]: Mojang authentication was not completed.")
-                return null
+                return CompletableFuture.completedFuture(null)
             }
 
             val headers = listOf(
@@ -25,27 +26,34 @@ object TokenFetcher {
                 "X-SERVER-ID" to serverId
             )
 
-            val response = ApiManager.request("token", headers)
+            ApiManager.requestAsync("token", headers)
+                .thenApply { response ->
+                    if (response.statusCode() != 200) {
+                        logger.error("[SCT]: Failed to fetch token, response code: {}", response.statusCode())
 
-            if (response.statusCode() != 200) {
-                logger.error("[SCT]: Failed to fetch token, response code: {}", response.statusCode())
-                if (notify) {
-                    sendMessage("§cFailed to fetch token.", true)
+                        if (notify) {
+                            sendMessage("§cFailed to fetch token.", true)
+                        }
+
+                        null
+                    } else {
+                        val json = JsonParser.parseString(response.body()).asJsonObject
+
+                        logger.info("[SCT]: Successfully fetched token")
+                        if (notify) {
+                            sendMessage("§aSuccessfully fetched a new token.", true)
+                        }
+
+                        json["token"].asString
+                    }
                 }
-
-                null
-            } else {
-                val json = JsonParser.parseString(response.body()).asJsonObject
-                logger.info("[SCT]: Successfully fetched token")
-                if (notify) {
-                    sendMessage("§aSuccessfully fetched a new token.", true)
+                .exceptionally { e ->
+                    logger.error("[SCT]: Failed to fetch token", e)
+                    null
                 }
-
-                json["token"].asString
-            }
         } catch (e: Exception) {
             logger.error("[SCT]: Failed to fetch token", e)
-            return null
+            return CompletableFuture.completedFuture(null)
         }
     }
 }

@@ -9,7 +9,6 @@ import io.github.chindeaone.collectiontracker.utils.CommissionUtils
 import io.github.chindeaone.collectiontracker.utils.ConfigStateUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
-import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
@@ -117,7 +116,6 @@ object ModLoader: ModInitializer {
 
             // Call every onTick here
             SkyblockCollectionTracker.onClientTick(client)
-            ServerUtils.onClientTick(client)
             Hypixel.onClientTick(client)
             CommissionUtils.onClientTick(client)
             TabData.onClientTick(client)

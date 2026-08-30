@@ -13,19 +13,20 @@ object FetchWaypoints {
     var hasWaypoints: Boolean = false
 
     fun fetchWaypoints() {
-        try {
-            val response = ApiManager.request("waypoints", listOf())
-
-            if (response.statusCode() == 200) {
-                val json = JsonParser.parseString(response.body()).asJsonObject
-                WaypointsUtils.setWaypoints(json)
-                hasWaypoints = true
-                logger.info("[SCT]: Successfully fetched waypoints.")
-            } else {
-                logger.error("[SCT]: Failed to fetch waypoints. Server responded with code: {}", response.statusCode())
+        ApiManager.requestAsync("waypoints", listOf())
+            .thenAccept { response ->
+                if (response.statusCode() == 200) {
+                    val json = JsonParser.parseString(response.body()).asJsonObject
+                    WaypointsUtils.setWaypoints(json)
+                    hasWaypoints = true
+                    logger.info("[SCT]: Successfully fetched waypoints.")
+                } else {
+                    logger.error("[SCT]: Failed to fetch waypoints. Server responded with code: {}", response.statusCode())
+                }
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: An error occurred while fetching waypoints: ", e)
-        }
+            .exceptionally { e ->
+                logger.error("[SCT]: An error occurred while fetching waypoints: ", e)
+                null
+            }
     }
 }

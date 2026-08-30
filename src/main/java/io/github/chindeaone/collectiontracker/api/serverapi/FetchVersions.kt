@@ -14,20 +14,21 @@ object FetchVersions {
     var hasVersions = false
 
     fun fetchVersions() {
-        try {
-            val response = ApiManager.request("versions", listOf())
+        ApiManager.requestAsync("versions", listOf())
+            .thenAccept { response ->
+                if (response.statusCode() == 200) {
+                    val jsonObject = JsonParser.parseString(response.body()).asJsonObject
+                    VersionUtils.parseVersions(jsonObject)
 
-            if (response.statusCode() == 200) {
-                val jsonObject = JsonParser.parseString(response.body()).asJsonObject
-                VersionUtils.parseVersions(jsonObject)
-
-                hasVersions = true
-                logger.info("[SCT]: Successfully fetched versions data.")
-            } else {
-                logger.error("[SCT]: Failed to fetch versions data. Server responded with code: {}", response.statusCode())
+                    hasVersions = true
+                    logger.info("[SCT]: Successfully fetched versions data.")
+                } else {
+                    logger.error("[SCT]: Failed to fetch versions data. Server responded with code: {}", response.statusCode())
+                }
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Exception occurred while fetching versions data.", e)
-        }
+            .exceptionally { e ->
+                logger.error("[SCT]: Exception occurred while fetching versions data.", e)
+                null
+            }
     }
 }

@@ -14,28 +14,28 @@ object FetchCollectionList {
     var hasCollectionList: Boolean = false
 
     fun fetchCollectionList() {
-        try {
-            val response = ApiManager.request("collections", listOf())
+        ApiManager.requestAsync("collections", listOf())
+            .thenAccept { response ->
+                if (response.statusCode() == 200) {
+                    val json = JsonParser.parseString(response.body()).asJsonObject
 
-            if (response.statusCode() == 200) {
-                val json = JsonParser.parseString(response.body()).asJsonObject
-
-                for ((category, itemsArray) in json.entrySet()) {
-                    val items = LinkedHashSet<String>()
-                    for (item in itemsArray.asJsonArray) {
-                        items.add(item.asString)
+                    for ((category, itemsArray) in json.entrySet()) {
+                        val items = LinkedHashSet<String>()
+                        for (item in itemsArray.asJsonArray) {
+                            items.add(item.asString)
+                        }
+                        CollectionsManager.collections[category] = items
                     }
-                    CollectionsManager.collections[category] = items
+
+                    hasCollectionList = true
+                    logger.info("[SCT]: Successfully received the collection list.")
+                } else {
+                    logger.error("[SCT]: Failed to fetch collection list. HTTP {}", response.statusCode())
                 }
-
-                hasCollectionList = true
-                logger.info("[SCT]: Successfully received the collection list.")
-            } else {
-                logger.error("[SCT]: Failed to fetch collection list. HTTP {}", response.statusCode())
             }
-
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error while receiving the collection list", e)
-        }
+            .exceptionally { e ->
+                logger.error("[SCT]: Error while receiving the collection list", e)
+                null
+            }
     }
 }
