@@ -1,61 +1,52 @@
-package io.github.chindeaone.collectiontracker.utils;
+package io.github.chindeaone.collectiontracker.utils
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
 
-import java.util.Locale;
+import java.util.Locale
 
-public class NumbersUtils {
+object NumbersUtils {
 
-    private static final String[] UNITS = {"", "k", "M", "B", "T"};
-
-    /**
-     * Compactly formats a long value using units (k, M, B, T).
-     * For values < 1000 returns a plain integer string, otherwise returns with 2 decimals and unit suffix.
-     */
-    public static String formatNumber(long number) {
-        if (number == 0) return "0";
+    private val UNITS = arrayOf("", "k", "M", "B", "T")
+    
+    fun formatNumber(number: Long): String {
+        if (number == 0L) return "0"
 
         if (ConfigAccess.isExplicitValues()) {
-            // Add commas for thousands separators
-            return String.format(Locale.US, "%,d", number);
+            return String.format(Locale.US, "%,d", number)
         }
 
         if (number < 1000) {
-            return String.format(Locale.US, "%d", number);
+            return String.format(Locale.US, "%d", number)
         }
 
-        double compactNumber = (double) number;
-        int index = 0;
-        while (compactNumber >= 1000.0 && index < UNITS.length - 1) {
-            compactNumber /= 1000.0;
-            index++;
+        var num = number.toFloat()
+        var index = 0
+        while (num >= 1000.0 && index < UNITS.size - 1) {
+            num /= 1000.0f
+            index++
         }
 
-        return String.format(Locale.US, "%.2f%s", compactNumber, UNITS[index]);
+        return String.format(Locale.US, "%.2f%s", num, UNITS[index])
     }
-
-    /**
-     * Compactly formats a float value using units (k, M, B, T).
-     * For values < 1000 returns a plain integer string, otherwise returns with 2 decimals and unit suffix.
-     */
-    public static String formatFloat(float number) {
-        if (number == 0) return "0";
+    
+    fun formatFloat(number: Float): String {
+        if (number == 0f) return "0"
 
         if (ConfigAccess.isExplicitValues()) {
-            return String.format(Locale.US, "%,.2f", number);
+            return String.format(Locale.US, "%,.2f", number)
         }
 
         if (number < 1000) {
-            return String.format(Locale.US, "%.2f", number);
+            return String.format(Locale.US, "%.2f", number)
         }
 
-        double compactNumber = number;
-        int index = 0;
-        while (compactNumber >= 1000.0 && index < UNITS.length - 1) {
-            compactNumber /= 1000.0;
-            index++;
+        var num = number
+        var index = 0
+        while (num >= 1000.0 && index < UNITS.size - 1) {
+            num /= 1000.0f
+            index++
         }
 
-        return String.format(Locale.US, "%.2f%s", compactNumber, UNITS[index]);
+        return String.format(Locale.US, "%.2f%s", num, UNITS[index])
     }
 }

@@ -1,59 +1,57 @@
-package io.github.chindeaone.collectiontracker.commands;
+package io.github.chindeaone.collectiontracker.commands
 
-import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher;
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher;
-import io.github.chindeaone.collectiontracker.utils.SkillUtils;
-import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher
+import io.github.chindeaone.collectiontracker.utils.SkillUtils
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 
-import java.util.concurrent.CompletableFuture;
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.isTracking
 
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.isTracking;
+object SkillTracker {
 
-public class SkillTracker {
+    @JvmStatic var skillName = ""
+    private val logger: Logger = LogManager.getLogger(SkillTracker::class.java)
 
-    public static String skillName = "";
-
-    public static Logger logger = LogManager.getLogger(SkillTracker.class);
-
-    public static void startTracking(String skill) {
+    fun startTracking(skill: String) {
         try {
-            if (!HypixelUtils.isOnSkyblock()) {
-                ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true);
-                return;
+            if (!HypixelUtils.isOnSkyblock) {
+                ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true)
+                return
             }
 
             try {
                 if (isTracking) {
-                    ChatUtils.sendMessage("§cAlready tracking a skill.", true);
-                    return;
+                    ChatUtils.sendMessage("§cAlready tracking a skill.", true)
+                    return
                 }
 
-                skillName = skill;
+                skillName = skill
                 if (!SkillUtils.isValidSkill(skillName)) {
-                    ChatUtils.sendMessage("§4" + skillName + " skill is not a real skill!", true);
-                    return;
+                    ChatUtils.sendMessage("§4$skillName skill is not a real skill!", true)
+                    return
                 }
 
                 // Fetch skill data and leaderboard data asynchronously
                 CompletableFuture.runAsync(SkillApiFetcher::fetchSkillsData)
-                        .thenRunAsync(() -> SkillFetcher.fetchSkillLeaderboardData(skillName))
-                        .thenRunAsync(() -> {
+                        .thenRunAsync { SkillFetcher.fetchSkillLeaderboardData(skillName) }
+                        .thenRunAsync {
                             if (ConfigAccess.isTamingTrackingEnabled()) {
-                                SkillFetcher.fetchSkillLeaderboardData("Taming");
+                                SkillFetcher.fetchSkillLeaderboardData("Taming")
                             }
-                        })
-                        .thenRun(SkillTrackingHandler::startTracking);
-            } catch (Exception e) {
-                logger.error("An error occurred while starting skill tracking: ", e);
-                ChatUtils.sendMessage("§cAn error occurred while starting skill tracking. Please try again later.", true);
+                        }
+                        .thenRun(SkillTrackingHandler::startTracking)
+            } catch (e: Exception) {
+                logger.error("An error occurred while starting skill tracking: ", e)
+                ChatUtils.sendMessage("§cAn error occurred while starting skill tracking. Please try again later.", true)
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (e: Exception) {
+            logger.error("An unexpected error occurred: ", e)
         }
     }
 }
