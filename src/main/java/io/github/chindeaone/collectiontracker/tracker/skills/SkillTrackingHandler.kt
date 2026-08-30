@@ -1,237 +1,244 @@
-package io.github.chindeaone.collectiontracker.tracker.skills;
+package io.github.chindeaone.collectiontracker.tracker.skills
 
-import io.github.chindeaone.collectiontracker.commands.SkillTracker;
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.gui.OverlayManager;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import io.github.chindeaone.collectiontracker.utils.Hypixel;
-import io.github.chindeaone.collectiontracker.utils.SkillUtils;
-import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.github.chindeaone.collectiontracker.commands.SkillTracker
+import io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
+import io.github.chindeaone.collectiontracker.gui.OverlayManager.setSkillOverlayRendering
+import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearAllCache
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.clearCache
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduleSkillFetch
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduler
+import io.github.chindeaone.collectiontracker.utils.Hypixel.server
+import io.github.chindeaone.collectiontracker.utils.SkillUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+object SkillTrackingHandler {
+    private val logger: Logger = LogManager.getLogger(SkillTrackingHandler::class.java)
 
-import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduler;
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates.afk;
+    @JvmField
+    @Volatile
+    var isTracking: Boolean = false
+    var isPaused: Boolean = false
+    var leaderboardTrackingInitialized: Boolean = false
 
-public class SkillTrackingHandler {
+    var startTime: Long = 0
+    private var lastTime: Long = 0
+    private var lastTrackedTime: Long = 0
+    private val TRACKING_INTERVAL = TimeUnit.SECONDS.toMillis(10) // 10 seconds
 
-    private static final Logger logger = LogManager.getLogger(SkillTrackingHandler.class);
+    private const val RESETS = 10
+    private var restartCount = 0
+    private var firstRestartTime: Long = 0
 
-    public static boolean isTracking = false;
-    public static boolean isPaused = false;
-    public static boolean leaderboardTrackingInitialized = false;
+    var isSkillMaxed: Boolean = false
 
-    public static long startTime;
-    private static long lastTime;
-    private static long lastTrackedTime = 0;
-    private static final long TRACKING_INTERVAL = TimeUnit.SECONDS.toMillis(10); // 10 seconds
-
-    private static final int allowedHourlyRestarts = 10;
-    private static int restartCount = 0;
-    private static long firstRestartTime;
-
-    public static boolean isSkillMaxed = false;
-
-    public static void startTracking() {
-        long now = System.currentTimeMillis();
+    fun startTracking() {
+        val now = System.currentTimeMillis()
 
         if (now - lastTrackedTime < TRACKING_INTERVAL) {
-            ChatUtils.sendMessage("§cPlease wait a few seconds before tracking another skill!", true);
-            return;
+            sendMessage("§cPlease wait a few seconds before tracking another skill!", true)
+            return
         } else {
-            ChatUtils.sendMessage("§aTracking " + skillName + " skill.", true);
+            sendMessage("§aTracking $skillName skill.", true)
         }
 
-        if (scheduler == null || scheduler.isShutdown()) {
-            scheduler = Executors.newSingleThreadScheduledExecutor();
+        if (scheduler == null || scheduler!!.isShutdown) {
+            scheduler = Executors.newSingleThreadScheduledExecutor()
         }
 
-        initTracking(now);
-        OverlayManager.setSkillOverlayRendering(true);
+        initTracking(now)
+        setSkillOverlayRendering(true)
 
-        isSkillMaxed = Boolean.TRUE.equals(SkillUtils.isSkillMaxed(skillName));
-        Integer skillLevel = SkillUtils.getSkillLevel(skillName);
-        Double skillXp = SkillUtils.getSkillValue(skillName);
+        isSkillMaxed = SkillUtils.isSkillMaxed(skillName) == true
+        val skillLevel = SkillUtils.getSkillLevel(skillName)
+        val skillXp = SkillUtils.getSkillValue(skillName)
 
-        SkillTrackingRates.initTracking(skillLevel != null ? skillLevel : 0, skillXp != null ? skillXp.longValue() : 0L);
-        SkillTrackingRates.updateSkillLeaderboardStats();
-        if (ConfigAccess.isTamingTrackingEnabled()) {
-            SkillTrackingRates.updateTamingLeaderboardStats();
+        SkillTrackingRates.initTracking(
+            skillLevel ?: 0,
+            skillXp?.toLong() ?: 0L
+        )
+        SkillTrackingRates.updateSkillLeaderboardStats()
+        if (isTamingTrackingEnabled()) {
+            SkillTrackingRates.updateTamingLeaderboardStats()
         }
 
-        if (!isSkillMaxed || ConfigAccess.isTamingTrackingEnabled()) {
+        if (!isSkillMaxed || isTamingTrackingEnabled()) {
             // Track only via API
-            SkillFetcher.scheduleSkillFetch(isSkillMaxed, skillXp != null ? skillXp.longValue() : 0L, skillName);
+            scheduleSkillFetch(isSkillMaxed, skillXp?.toLong() ?: 0L, skillName)
         }
-        logger.info("[SCT]: Started tracking skill: {}", skillName);
+        logger.info("[SCT]: Started tracking skill: {}", skillName)
     }
 
-    public static void onSkillGain(long value, String skillName) {
-        if (!isTracking || !SkillTracker.skillName.equals(skillName) || !isSkillMaxed) return;
-        SkillTrackingRates.calculateSkillRates(value);
+    fun onSkillGain(value: Long, skillName: String?) {
+        if (!isTracking || (SkillTracker.skillName != skillName) || !isSkillMaxed) return
+        SkillTrackingRates.calculateSkillRates(value)
     }
 
-    private static void initTracking(long now) {
-        lastTrackedTime = now;
+    private fun initTracking(now: Long) {
+        lastTrackedTime = now
 
-        isTracking = true;
-        isPaused = false;
-        leaderboardTrackingInitialized = ConfigAccess.isSkillLeaderboardEnabled();
+        isTracking = true
+        isPaused = false
+        leaderboardTrackingInitialized = isSkillLeaderboardEnabled()
 
-        startTime = now;
-        lastTime = 0;
+        startTime = now
+        lastTime = 0
     }
 
-    public static void pauseTracking() {
-        if (checkTracking()) return;
+    fun pauseTracking() {
+        if (checkTracking()) return
         if (isPaused) {
-            ChatUtils.sendMessage("§cSkill tracking is already paused.", true);
-            logger.warn("[SCT]: Skills tracking is already paused.");
-            return;
+            sendMessage("§cSkill tracking is already paused.", true)
+            logger.warn("[SCT]: Skills tracking is already paused.")
+            return
         }
-        isPaused = true;
-        lastTime = (System.currentTimeMillis() - startTime) / 1000;
-        ChatUtils.sendMessage("§7Paused tracking " + skillName.toLowerCase() + " skill.", true);
-        logger.info("[SCT]: Pausing tracking skill: {}", skillName);
+        isPaused = true
+        lastTime = (System.currentTimeMillis() - startTime) / 1000
+        sendMessage("§7Paused tracking " + skillName.lowercase() + " skill.", true)
+        logger.info("[SCT]: Pausing tracking skill: {}", skillName)
     }
 
-    public static void resumeTracking() {
-        if (checkTracking()) return;
+    fun resumeTracking() {
+        if (checkTracking()) return
         if (!isPaused) {
-            ChatUtils.sendMessage("§cSkill tracking is not paused.", true);
-            logger.warn("[SCT]: Skills tracking is not paused.");
-            return;
+            sendMessage("§cSkill tracking is not paused.", true)
+            logger.warn("[SCT]: Skills tracking is not paused.")
+            return
         }
-        isPaused = false;
-        startTime = System.currentTimeMillis();
-        ChatUtils.sendMessage("§7Resumed tracking " + skillName.toLowerCase() + " skill.", true);
-        logger.info("[SCT]: Resuming tracking skill: {}", skillName);
+        isPaused = false
+        startTime = System.currentTimeMillis()
+        sendMessage("§7Resumed tracking " + skillName.lowercase() + " skill.", true)
+        logger.info("[SCT]: Resuming tracking skill: {}", skillName)
     }
 
-    public static void stopTracking() {
-        if (!isTracking) return;
+    @JvmStatic
+    fun stopTracking() {
+        if (!isTracking) return
 
-        if (!Hypixel.getServer()) {
-            logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
-        } else if (afk) {
-            ChatUtils.sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true);
-            logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down");
-            } else {
-                ChatUtils.sendMessage("§cAPI server is down. Stopping the skill tracker.", true);
-                logger.info("[SCT]: Skill tracking stopped because the API server is down.");
-            }
+        if (!server) {
+            logger.info("[SCT]: Tracking stopped because player disconnected from the server.")
+        } else if (SkillTrackingRates.afk) {
+            sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true)
+            logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down")
+        } else {
+            sendMessage("§cAPI server is down. Stopping the skill tracker.", true)
+            logger.info("[SCT]: Skill tracking stopped because the API server is down.")
+        }
 
-        resetTrackingData(false);
+        resetTrackingData(false)
     }
 
-    public static void stopTrackingManual() {
-        if (checkTracking()) return;
+    fun stopTrackingManual() {
+        if (checkTracking()) return
 
-        resetTrackingData(false);
+        resetTrackingData(false)
 
-        ChatUtils.sendMessage("§cStopped tracking " + skillName.toLowerCase() + " skill!", true);
-        logger.info("[SCT]: Stopped tracking skill: {}", skillName);
+        sendMessage("§cStopped tracking " + skillName.lowercase() + " skill!", true)
+        logger.info("[SCT]: Stopped tracking skill: {}", skillName)
     }
 
-    private static void resetTrackingData(boolean restart) {
+    private fun resetTrackingData(restart: Boolean) {
         if (scheduler != null) {
-            if (!scheduler.isShutdown()) {
-                scheduler.shutdown();
+            if (!scheduler!!.isShutdown) {
+                scheduler!!.shutdown()
             }
             try {
-                if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                    scheduler.shutdownNow();
+                if (!scheduler!!.awaitTermination(1, TimeUnit.SECONDS)) {
+                    scheduler!!.shutdownNow()
                 }
-            } catch (InterruptedException e) {
-                scheduler.shutdownNow();
-                Thread.currentThread().interrupt();
+            } catch (_: InterruptedException) {
+                scheduler!!.shutdownNow()
+                Thread.currentThread().interrupt()
             }
         }
 
-        isTracking = false;
-        isPaused = false;
-        leaderboardTrackingInitialized = false;
+        isTracking = false
+        isPaused = false
+        leaderboardTrackingInitialized = false
 
-        startTime = 0;
-        lastTime = 0;
+        startTime = 0
+        lastTime = 0
 
-        long now = System.currentTimeMillis();
-        if (!restart) {
-            lastTrackedTime = now;
-        } else lastTrackedTime = now - TRACKING_INTERVAL;
+        val now = System.currentTimeMillis()
+        lastTrackedTime = if (!restart) {
+            now
+        } else now - TRACKING_INTERVAL
 
-        isSkillMaxed = false;
-        OverlayManager.setSkillOverlayRendering(false);
+        isSkillMaxed = false
+        setSkillOverlayRendering(false)
 
-        SkillFetcher.clearCache();
-        DataFetcher.clearAllCache();
-        SkillTrackingRates.resetSession();
+        clearCache()
+        clearAllCache()
+        SkillTrackingRates.resetSession()
     }
 
-    private static boolean checkTracking() {
+    private fun checkTracking(): Boolean {
         if (!isTracking) {
-            ChatUtils.sendMessage("§cNo skill is being tracked currently!", true);
-            logger.warn("[SCT]: No skill is being tracked currently.");
-            return true;
+            sendMessage("§cNo skill is being tracked currently!", true)
+            logger.warn("[SCT]: No skill is being tracked currently.")
+            return true
         }
-        return false;
+        return false
     }
 
-    public static void restartTracking() {
-        if (checkTracking()) return;
+    fun restartTracking() {
+        if (checkTracking()) return
 
         if (restartCount == 0) {
-            firstRestartTime = System.currentTimeMillis();
+            firstRestartTime = System.currentTimeMillis()
         } else {
-            long elapsedTime = System.currentTimeMillis() - firstRestartTime;
+            val elapsedTime = System.currentTimeMillis() - firstRestartTime
             if (elapsedTime >= TimeUnit.HOURS.toMillis(1)) {
-                restartCount = 0;
-                firstRestartTime = System.currentTimeMillis();
+                restartCount = 0
+                firstRestartTime = System.currentTimeMillis()
             }
         }
 
-        if (restartCount >= allowedHourlyRestarts) {
-            ChatUtils.sendMessage("§cHourly restart limit reached. Please wait before restarting again.", true);
-            logger.warn("[SCT]: Hourly restart limit reached for skill tracking.");
-            return;
+        if (restartCount >= RESETS) {
+            sendMessage("§cHourly restart limit reached. Please wait before restarting again.", true)
+            logger.warn("[SCT]: Hourly restart limit reached for skill tracking.")
+            return
         }
 
-        restartCount++;
-        resetTrackingData(true);
-        startTracking();
+        restartCount++
+        resetTrackingData(true)
+        startTracking()
     }
 
-    public static long getUptimeInSeconds() {
-        if (startTime == 0) {
-            return 0;
+    @JvmStatic
+    val uptimeInSeconds: Long
+        get() {
+            if (startTime == 0L) {
+                return 0
+            }
+
+            return if (isPaused) {
+                lastTime
+            } else {
+                lastTime + (System.currentTimeMillis() - startTime) / 1000
+            }
         }
 
-        if (isPaused) {
-            return lastTime;
-        } else {
-            return lastTime + (System.currentTimeMillis() - startTime) / 1000;
+    @JvmStatic
+    val uptime: String
+        get() {
+            if (startTime == 0L) return "00:00:00"
+
+            val uptime: Long = if (isPaused) {
+                lastTime
+            } else {
+                lastTime + (System.currentTimeMillis() - startTime) / 1000
+            }
+
+            val hours = uptime / 3600
+            val minutes = (uptime % 3600) / 60
+            val seconds = uptime % 60
+
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds)
         }
-    }
-
-    public static String getUptime() {
-        if (startTime == 0) return "00:00:00";
-
-        long uptime;
-
-        if (isPaused) {
-            uptime = lastTime;
-        } else {
-            uptime = lastTime + (System.currentTimeMillis() - startTime) / 1000;
-        }
-
-        long hours = uptime / 3600;
-        long minutes = (uptime % 3600) / 60;
-        long seconds = uptime % 60;
-
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
 }

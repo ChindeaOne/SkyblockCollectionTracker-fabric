@@ -19,6 +19,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.
 import io.github.chindeaone.collectiontracker.utils.StringUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import java.util.List;
+import java.util.Objects;
 
 import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
@@ -86,11 +87,11 @@ public class TextUtils {
         if (LeaderboardManager.isEmpty() || playerCurrentRank == 1) return null;
 
         if (ConfigAccess.isCustomPositionEnabled()) {
-            if (etaToNextRank == null || etaToNextRank.isEmpty()) return "ETA to Custom Position: Calculating...";
+            if (etaToNextRank == null || Objects.requireNonNull(etaToNextRank).isEmpty()) return "ETA to Custom Position: Calculating...";
             return "ETA to Custom Position: " + etaToNextRank;
         }
 
-        if (etaToNextRank == null || etaToNextRank.isEmpty()) return "ETA: Calculating...";
+        if (etaToNextRank == null || Objects.requireNonNull(etaToNextRank).isEmpty()) return "ETA: Calculating...";
         return "ETA: " + etaToNextRank;
     }
 
@@ -390,7 +391,7 @@ public class TextUtils {
 
     public static void updateMultiTrackingLines(List<String> list, List<String> expanded, boolean showPrefixes) {
         list.clear();
-        for (String coll : CollectionTracker.collectionList) {
+        for (String coll : CollectionTracker.getCollectionList()) {
             if ("gemstone".equals(coll)) {
                 boolean mainExpanded = expanded.contains("gemstone") && ConfigAccess.getTrackingOptions() != COLLECTION;
                 boolean showingCollection = ConfigAccess.getTrackingOptions() == COLLECTION;
@@ -640,7 +641,7 @@ public class TextUtils {
         boolean isUsingBazaar = ConfigAccess.isUsingBazaar();
         if (isUsingBazaar) {
             list.add("§a[Bazaar Prices]");
-            if (CollectionTracker.collectionList.contains("gemstone") || GemstonesManager.checkIfGemstone(collection)) {
+            if (CollectionTracker.getCollectionList().contains("gemstone") || GemstonesManager.checkIfGemstone(collection)) {
                 list.add("§e[" + ConfigAccess.getGemstoneVariant() + "]");
             }
             if ("enchanted".equals(collectionType) || CollectionsManager.multiCollectionTypes.containsValue("enchanted")) {
@@ -704,7 +705,7 @@ public class TextUtils {
 
     private static void handleMultiLeaderboard(List<String> list) {
         if (ConfigAccess.isCollectionLeaderboardEnabled()) {
-            List<String> tracked = CollectionTracker.collectionList;
+            List<String> tracked = CollectionTracker.getCollectionList();
             if (tracked.size() == 1 && tracked.contains("gemstone")) {
                 addIfNotNull(list, "");
                 addIfNotNull(list, handleMultiNextPosition());

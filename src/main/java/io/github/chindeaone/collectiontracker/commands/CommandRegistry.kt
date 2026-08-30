@@ -7,7 +7,6 @@ import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
-import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardConfig
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.gui.GuiManager
@@ -252,20 +251,20 @@ object CommandRegistry {
         .then(ClientCommands.literal("cw")
             // sct cw -> shows player's coleweight
             .executes {
-                ColeweightUtils.getColeweight(PlayerData.playerName, false)
+                ColeweightUtils.getColeweight(PlayerData.playerName)
                 1
             }
             // sct cw find <player> -> shows specified player(or local player)'s coleweight
             .then(ClientCommands.literal("find")
                 .executes {
-                    ColeweightUtils.getColeweight(PlayerData.playerName, false)
+                    ColeweightUtils.getColeweight(PlayerData.playerName)
                     1
                 }
                 .then(ClientCommands.argument("player", StringArgumentType.string())
                     .suggests(PLAYER_SUGGESTIONS)
                     .executes {
                         val playerName = StringArgumentType.getString(it, "player").trim()
-                        ColeweightUtils.getColeweight(playerName, false)
+                        ColeweightUtils.getColeweight(playerName)
                         1
                     }
                 )
@@ -727,17 +726,6 @@ object CommandRegistry {
     }
 
     private val CUSTOM_GOAL_POSITION_SUGGESTIONS: SuggestionProvider<FabricClientCommandSource> = { context, builder ->
-        val remaining = builder.remaining
-        val completedName = getCompletedGoalName(remaining)
-
-        if (completedName != null) {
-            builder.buildFuture()
-        }
-
-        COLLECTION_AND_SKILL_SUGGESTIONS.getSuggestions(context, builder)
-    }
-
-    private val CUSTOM_GOAL_AMOUNT_SUGGESTIONS: SuggestionProvider<FabricClientCommandSource> = { context, builder ->
         val remaining = builder.remaining
         val completedName = getCompletedGoalName(remaining)
 

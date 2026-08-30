@@ -1,282 +1,387 @@
-package io.github.chindeaone.collectiontracker.tracker.collection;
+package io.github.chindeaone.collectiontracker.tracker.collection
 
-import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
-import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices;
-import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices;
-import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
-import io.github.chindeaone.collectiontracker.utils.StringUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
+import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
+import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCollectionLeaderboardEnabled
+import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getNextRankEntry
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPlayerRank
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPreviousRankEntry
+import io.github.chindeaone.collectiontracker.utils.StringUtils.formatETA
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import kotlin.concurrent.Volatile
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
-import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
-import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.getUptimeInSeconds;
-
-public class TrackingRates {
-
-    public static final Logger logger = LogManager.getLogger(TrackingRates.class);
+object TrackingRates {
+    val logger: Logger = LogManager.getLogger(TrackingRates::class.java)
 
     // Collection tracking data
-    public static volatile long collectionAmount;
-    public static volatile long collectionPerHour;
-    public static volatile long collectionMade;
-    public static volatile long collectionSinceLast;
-    public static volatile long sessionStartCollection = -1L;
-    public static volatile long lastCollectionTime = -1L;
+    @JvmField
+    @Volatile
+    var collectionAmount: Long = 0
+
+    @JvmField
+    @Volatile
+    var collectionPerHour: Long = 0
+
+    @JvmField
+    @Volatile
+    var collectionMade: Long = 0
+
+    @JvmField
+    @Volatile
+    var collectionSinceLast: Long = 0
+
+    @Volatile
+    var sessionStartCollection: Long = -1L
+
+    @JvmField
+    @Volatile
+    var lastCollectionTime: Long = -1L
 
     // Sacks tracking data
-    public static volatile long lastApiCollection = -1L;
-    public static volatile long sacksCollectionGained = 0L;
+    @Volatile
+    var lastApiCollection: Long = -1L
+
+    @Volatile
+    var sacksCollectionGained: Long = 0L
 
     // Highest and lowest rates
-    public static volatile long highestCollectionPerHour = 0;
-    public static volatile long lowestCollectionPerHour = Long.MAX_VALUE;
+    @Volatile
+    var highestCollectionPerHour: Long = 0
+
+    @Volatile
+    var lowestCollectionPerHour: Long = Long.MAX_VALUE
 
     // Money tracking data
     // NPC
-    public static volatile long moneyPerHourNPC;
+    @Volatile
+    @JvmField
+    var moneyPerHourNPC: Long = 0
+
     // Highest and lowest rates
-    public static volatile long highestRatePerHourNPC = 0;
-    public static volatile long lowestRatePerHourNPC = Long.MAX_VALUE;
+    @Volatile
+    var highestRatePerHourNPC: Long = 0
+
+    @Volatile
+    var lowestRatePerHourNPC: Long = Long.MAX_VALUE
 
     // Bazaar
-    public static Map<String, Long> moneyMade = new ConcurrentHashMap<>();
-    public static Map<String, Long> moneyPerHourBazaar = new ConcurrentHashMap<>();
+    @JvmField
+    @Volatile
+    var moneyMade: MutableMap<String, Long> = mutableMapOf()
+
+    @Volatile
+    @JvmField
+    var moneyPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
+
     // Highest and lowest rates
-    public static Map<String, Long> lowestRatesPerHourBazaar = new ConcurrentHashMap<>();
-    public static Map<String, Long> highestRatesPerHourBazaar = new ConcurrentHashMap<>();
+    @Volatile
+    var lowestRatesPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
+
+    @Volatile
+    var highestRatesPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
 
     // Leaderboard tracking data
-    public static volatile int playerCurrentRank = -1;
-    public static volatile String nextRankUsername = null;
-    public static volatile long nextRankAmount = -1L;
-    public static volatile String etaToNextRank = null;
-    public static volatile long collectionTillNextRank = -1L;
-    public static volatile boolean isNextWiped = false;
-    public static volatile String previousRankUsername = null;
-    public static volatile long previousRankAmount = -1L;
-    public static volatile long collectionAbovePreviousRankAmount = -1L;
-    public static volatile boolean isPreviousWiped = false;
+    @JvmField
+    @Volatile
+    var playerCurrentRank: Int = -1
 
-    public static void setCollection(long value) {
-        long now = System.currentTimeMillis();
-        lastApiCollection = value;
+    @JvmField
+    @Volatile
+    var nextRankUsername: String? = null
+
+    @JvmField
+    @Volatile
+    var nextRankAmount: Long = -1L
+
+    @JvmField
+    @Volatile
+    var etaToNextRank: String? = null
+
+    @JvmField
+    @Volatile
+    var collectionTillNextRank: Long = -1L
+
+    @JvmField
+    @Volatile
+    var isNextWiped: Boolean = false
+
+    @JvmField
+    @Volatile
+    var previousRankUsername: String? = null
+
+    @JvmField
+    @Volatile
+    var previousRankAmount: Long = -1L
+
+    @JvmField
+    @Volatile
+    var collectionAbovePreviousRankAmount: Long = -1L
+
+    @JvmField
+    @Volatile
+    var isPreviousWiped: Boolean = false
+
+    fun setCollection(value: Long) {
+        val now = System.currentTimeMillis()
+        lastApiCollection = value
         if (sessionStartCollection == -1L) {
-            sessionStartCollection = value;
-            TrackingHandler.initTracking(now);
+            sessionStartCollection = value
+            TrackingHandler.initTracking(now)
         }
-        collectionAmount = value;
-        lastCollectionTime = now;
+        collectionAmount = value
+        lastCollectionTime = now
 
-        updateValues(collectionAmount, 0);
+        updateValues(collectionAmount, 0)
     }
 
-    public static synchronized void calculateRates(long value) {
+    @Synchronized
+    fun calculateRates(value: Long) {
         // 'value' here is what you gained from sacks since last check
-        sacksCollectionGained += value; // update sacks gained
-        long currentCollection = lastApiCollection + sacksCollectionGained; // increase current collection
-        updateValues(currentCollection, value);
+        sacksCollectionGained += value // update sacks gained
+        val currentCollection = lastApiCollection + sacksCollectionGained // increase current collection
+        updateValues(currentCollection, value)
     }
 
-    public static void updateCollection(long value) {
+    fun updateCollection(value: Long) {
         // 'value' here is the current collection amount fetched from the API
-        long gainedSinceLast = value - lastApiCollection;
-        lastApiCollection = value; // update last API collection
-        updateValues(value, gainedSinceLast);
+        val gainedSinceLast = value - lastApiCollection
+        lastApiCollection = value // update last API collection
+        updateValues(value, gainedSinceLast)
     }
 
-    public static void updateLeaderboardStats() {
-        playerCurrentRank = LeaderboardManager.getPlayerRank();
+    fun updateLeaderboardStats() {
+        playerCurrentRank = getPlayerRank()
 
-        LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntry();
+        val nextEntry = getNextRankEntry()
         if (nextEntry != null) {
-            nextRankUsername = nextEntry.username();
-            nextRankAmount = nextEntry.amount();
-            collectionTillNextRank = nextRankAmount - collectionAmount;
-            isNextWiped = nextEntry.wiped();
+            nextRankUsername = nextEntry.username
+            nextRankAmount = nextEntry.amount
+            collectionTillNextRank = nextRankAmount - collectionAmount
+            isNextWiped = nextEntry.wiped
 
             if (collectionPerHour > 0) {
-                long seconds = (long) (collectionTillNextRank / (collectionPerHour / 3600.0));
-                etaToNextRank = StringUtils.formatETA(seconds);
+                val seconds = (collectionTillNextRank / (collectionPerHour / 3600.0)).toLong()
+                etaToNextRank = formatETA(seconds)
             } else {
-                etaToNextRank = null;
+                etaToNextRank = null
             }
         } else {
-            nextRankUsername = null;
-            nextRankAmount = -1L;
-            collectionTillNextRank = -1L;
-            etaToNextRank = null;
-            isNextWiped = false;
+            nextRankUsername = null
+            nextRankAmount = -1L
+            collectionTillNextRank = -1L
+            etaToNextRank = null
+            isNextWiped = false
         }
 
-        LeaderboardEntry previousEntry = LeaderboardManager.getPreviousRankEntry();
+        val previousEntry = getPreviousRankEntry()
         if (previousEntry != null) {
-            previousRankUsername = previousEntry.username();
-            previousRankAmount = previousEntry.amount();
-            collectionAbovePreviousRankAmount = collectionAmount - previousRankAmount;
-            isPreviousWiped = previousEntry.wiped();
+            previousRankUsername = previousEntry.username
+            previousRankAmount = previousEntry.amount
+            collectionAbovePreviousRankAmount = collectionAmount - previousRankAmount
+            isPreviousWiped = previousEntry.wiped
         } else {
-            previousRankUsername = null;
-            previousRankAmount = -1L;
-            collectionAbovePreviousRankAmount = -1L;
-            isPreviousWiped = false;
+            previousRankUsername = null
+            previousRankAmount = -1L
+            collectionAbovePreviousRankAmount = -1L
+            isPreviousWiped = false
         }
     }
 
-    private static void updateValues(long currentCollection, long collectionSinceLastVal) {
-        collectionSinceLast = collectionSinceLastVal;
+    private fun updateValues(currentCollection: Long, collectionSinceLastVal: Long) {
+        collectionSinceLast = collectionSinceLastVal
 
         if (collectionSinceLastVal > 0) {
-            logger.info("[SCT]: Current collection for '{}' (using sacks) is {}", collection, currentCollection);
-            logger.info("[SCT]: Change in collection detected (using sacks). Old collection: '{}'. New collection: '{}'", currentCollection - collectionSinceLastVal, currentCollection);
-            lastCollectionTime = System.currentTimeMillis();
-            logger.info("[SCT]: Collection since last check is {}.", collectionSinceLast);
+            logger.info("[SCT]: Current collection for '{}' (using sacks) is {}", collection, currentCollection)
+            logger.info(
+                "[SCT]: Change in collection detected (using sacks). Old collection: '{}'. New collection: '{}'",
+                currentCollection - collectionSinceLastVal,
+                currentCollection
+            )
+            lastCollectionTime = System.currentTimeMillis()
+            logger.info("[SCT]: Collection since last check is {}.", collectionSinceLast)
         }
 
-        long uptime = getUptimeInSeconds();
-        long collectedSinceStart = currentCollection - sessionStartCollection;
+        val uptime = TrackingHandler.uptimeInSeconds
+        val collectedSinceStart = currentCollection - sessionStartCollection
 
-        int priceNPC = NpcPrices.getNpcPrice(collection);
-        moneyMade.put("NPC", uptime > 0 ? (long) Math.floor(priceNPC * (double) collectedSinceStart) : 0L);
+        val priceNPC = NpcPrices.getNpcPrice(collection)
+        moneyMade["NPC"] = if (uptime > 0) floor(priceNPC * collectedSinceStart.toDouble()).toLong() else 0L
 
         if (BazaarCollectionsManager.hasBazaarData) {
-            updateBazaarMaps(collectedSinceStart, uptime);
+            updateBazaarMaps(collectedSinceStart, uptime)
         }
 
         // Update values
-        collectionAmount = currentCollection;
-        collectionPerHour = uptime > 0 ? (long) Math.floor(collectedSinceStart / (uptime / 3600.0)) : 0;
-        collectionMade = collectedSinceStart;
-        moneyPerHourNPC = uptime > 0 ? (long) Math.floor(priceNPC * collectedSinceStart / (uptime / 3600.0)) : 0;
+        collectionAmount = currentCollection
+        collectionPerHour = if (uptime > 0) floor(collectedSinceStart / (uptime / 3600.0)).toLong() else 0
+        collectionMade = collectedSinceStart
+        moneyPerHourNPC = if (uptime > 0) floor(priceNPC * collectedSinceStart / (uptime / 3600.0)).toLong() else 0
 
         // Update highest and lowest rates
         if (collectionPerHour > highestCollectionPerHour && collectionPerHour > 0) {
-            highestCollectionPerHour = collectionPerHour;
+            highestCollectionPerHour = collectionPerHour
         }
-        if (collectionPerHour < lowestCollectionPerHour && collectionPerHour > 0) {
-            lowestCollectionPerHour = collectionPerHour;
+        if (collectionPerHour in 1..<lowestCollectionPerHour) {
+            lowestCollectionPerHour = collectionPerHour
         }
 
         if (moneyPerHourNPC > highestRatePerHourNPC && moneyPerHourNPC > 0) {
-            highestRatePerHourNPC = moneyPerHourNPC;
+            highestRatePerHourNPC = moneyPerHourNPC
         }
-        if (moneyPerHourNPC < lowestRatePerHourNPC && moneyPerHourNPC > 0) {
-            lowestRatePerHourNPC = moneyPerHourNPC;
+        if (moneyPerHourNPC in 1..<lowestRatePerHourNPC) {
+            lowestRatePerHourNPC = moneyPerHourNPC
         }
 
-        fillBazaarExtremesFromCurrent(); // Ensure extremes are initialized
+        fillBazaarExtremesFromCurrent() // Ensure extremes are initialized
 
         // Trigger tracking overlay update
         if (!CollectionOverlay.trackingDirty) {
-            if (!isTrackingDataReady()) ChatUtils.sendMessage("§cWarning! Some maps have not been fully initialized. You have the option to restart the tracker or wait for the next collection update.", true);
-            CollectionOverlay.trackingDirty = true;
+            if (!isTrackingDataReady) sendMessage(
+                "§cWarning! Some maps have not been fully initialized. You have the option to restart the tracker or wait for the next collection update.",
+                true
+            )
+            CollectionOverlay.trackingDirty = true
         }
 
-        if (ConfigAccess.isCollectionLeaderboardEnabled()) updateLeaderboardStats();
+        if (isCollectionLeaderboardEnabled()) updateLeaderboardStats()
     }
 
-    private static void updateBazaarMaps(long collectedSinceStart, long uptime) {
-        switch (collectionType) {
-            case "normal" -> {
+    private fun updateBazaarMaps(collectedSinceStart: Long, uptime: Long) {
+        when (CollectionsManager.collectionType) {
+            "normal" -> {
                 // Instant Buy
-                long buyComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.normalInstantBuy * ((double) collectedSinceStart / 160) / (uptime / 3600.0)) : 0;
-                moneyPerHourBazaar.put(collectionType + "_INSTANT_BUY", buyComputed);
-                updateBazaarExtremes(collectionType + "_INSTANT_BUY", buyComputed);
-                moneyMade.put(collectionType + "_INSTANT_BUY", uptime > 0 ? (long) Math.floor(BazaarPrices.normalInstantBuy * collectedSinceStart) : 0);
+                val buyComputed =
+                    if (uptime > 0) floor(BazaarPrices.normalInstantBuy * (collectedSinceStart.toDouble() / 160) / (uptime / 3600.0)).toLong() else 0
+                moneyPerHourBazaar[CollectionsManager.collectionType + "_INSTANT_BUY"] = buyComputed
+                updateBazaarExtremes(CollectionsManager.collectionType + "_INSTANT_BUY", buyComputed)
+                moneyMade[CollectionsManager.collectionType + "_INSTANT_BUY"] = if (uptime > 0) floor((BazaarPrices.normalInstantBuy * collectedSinceStart).toDouble()).toLong() else 0
 
                 // Instant Sell
-                long sellComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.normalInstantSell * ((double) collectedSinceStart / 160) / (uptime / 3600.0)) : 0;
-                moneyPerHourBazaar.put(collectionType + "_INSTANT_SELL", sellComputed);
-                updateBazaarExtremes(collectionType + "_INSTANT_SELL", sellComputed);
-                moneyMade.put(collectionType + "_INSTANT_SELL", uptime > 0 ? (long) Math.floor(BazaarPrices.normalInstantSell * collectedSinceStart) : 0);
+                val sellComputed =
+                    if (uptime > 0) floor(BazaarPrices.normalInstantSell * (collectedSinceStart.toDouble() / 160) / (uptime / 3600.0)).toLong() else 0
+                moneyPerHourBazaar[CollectionsManager.collectionType + "_INSTANT_SELL"] = sellComputed
+                updateBazaarExtremes(CollectionsManager.collectionType + "_INSTANT_SELL", sellComputed)
+                moneyMade[CollectionsManager.collectionType + "_INSTANT_SELL"] = if (uptime > 0) floor((BazaarPrices.normalInstantSell * collectedSinceStart).toDouble()).toLong() else 0
             }
-            case "enchanted" -> {
-                double enchantedDivisor = BazaarCollectionsManager.enchantedRecipe.isEmpty() ? 1.0 : BazaarCollectionsManager.enchantedRecipe.values().iterator().next();
+
+            "enchanted" -> {
+                val enchantedDivisor =
+                    if (BazaarCollectionsManager.enchantedRecipe.isEmpty()) 1.0 else BazaarCollectionsManager.enchantedRecipe.values.iterator()
+                        .next().toDouble()
                 // Enchanted version - Buy
-                long enchantedBuyComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.enchantedInstantBuy * ((double) collectedSinceStart / enchantedDivisor) / (uptime / 3600.0)) : 0;
-                moneyPerHourBazaar.put("Enchanted version_INSTANT_BUY", enchantedBuyComputed);
-                updateBazaarExtremes("Enchanted version_INSTANT_BUY", enchantedBuyComputed);
-                moneyMade.put("Enchanted version_INSTANT_BUY", uptime > 0 ? (long) Math.floor(BazaarPrices.enchantedInstantBuy * ((double) collectedSinceStart / enchantedDivisor)) : 0);
+                val enchantedBuyComputed =
+                    if (uptime > 0) floor(BazaarPrices.enchantedInstantBuy * (collectedSinceStart.toDouble() / enchantedDivisor) / (uptime / 3600.0)).toLong() else 0
+                moneyPerHourBazaar["Enchanted version_INSTANT_BUY"] = enchantedBuyComputed
+                updateBazaarExtremes("Enchanted version_INSTANT_BUY", enchantedBuyComputed)
+                moneyMade["Enchanted version_INSTANT_BUY"] = if (uptime > 0) floor(BazaarPrices.enchantedInstantBuy * (collectedSinceStart.toDouble() / enchantedDivisor)).toLong() else 0
 
                 // Enchanted version - Sell
-                long enchantedSellComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.enchantedInstantSell * ((double) collectedSinceStart / enchantedDivisor) / (uptime / 3600.0)) : 0;
-                moneyPerHourBazaar.put("Enchanted version_INSTANT_SELL", enchantedSellComputed);
-                updateBazaarExtremes("Enchanted version_INSTANT_SELL", enchantedSellComputed);
-                moneyMade.put("Enchanted version_INSTANT_SELL", uptime > 0 ? (long) Math.floor(BazaarPrices.enchantedInstantSell * ((double) collectedSinceStart / enchantedDivisor)) : 0);
+                val enchantedSellComputed =
+                    if (uptime > 0) floor(BazaarPrices.enchantedInstantSell * (collectedSinceStart.toDouble() / enchantedDivisor) / (uptime / 3600.0)).toLong() else 0
+                moneyPerHourBazaar["Enchanted version_INSTANT_SELL"] = enchantedSellComputed
+                updateBazaarExtremes("Enchanted version_INSTANT_SELL", enchantedSellComputed)
+                moneyMade["Enchanted version_INSTANT_SELL"] = if (uptime > 0) floor(BazaarPrices.enchantedInstantSell * (collectedSinceStart.toDouble() / enchantedDivisor)).toLong() else 0
 
                 // Super Enchanted version
-                if (!(BazaarPrices.superEnchantedInstantBuy == 0.0f)) {
-                    double superDivisor = BazaarCollectionsManager.superEnchantedRecipe.isEmpty() ? 1.0 : BazaarCollectionsManager.superEnchantedRecipe.values().iterator().next();
+                if (BazaarPrices.superEnchantedInstantBuy != 0.0f) {
+                    val superDivisor =
+                        if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) 1.0 else BazaarCollectionsManager.superEnchantedRecipe.values.iterator()
+                            .next().toDouble()
                     // Buy
-                    long superBuyComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.superEnchantedInstantBuy * ((double) collectedSinceStart / superDivisor) / (uptime / 3600.0)) : 0;
-                    moneyPerHourBazaar.put("Super Enchanted version_INSTANT_BUY", superBuyComputed);
-                    updateBazaarExtremes("Super Enchanted version_INSTANT_BUY", superBuyComputed);
-                    moneyMade.put("Super Enchanted version_INSTANT_BUY", uptime > 0 ? (long) Math.floor(BazaarPrices.superEnchantedInstantBuy * ((double) collectedSinceStart / superDivisor)) : 0);
+                    val superBuyComputed =
+                        if (uptime > 0) floor(BazaarPrices.superEnchantedInstantBuy * (collectedSinceStart.toDouble() / superDivisor) / (uptime / 3600.0)).toLong() else 0
+                    moneyPerHourBazaar["Super Enchanted version_INSTANT_BUY"] = superBuyComputed
+                    updateBazaarExtremes("Super Enchanted version_INSTANT_BUY", superBuyComputed)
+                    moneyMade["Super Enchanted version_INSTANT_BUY"] = if (uptime > 0) floor(BazaarPrices.superEnchantedInstantBuy * (collectedSinceStart.toDouble() / superDivisor)).toLong() else 0
 
                     // Sell
-                    long superSellComputed = uptime > 0 ? (long) Math.floor(BazaarPrices.superEnchantedInstantSell * ((double) collectedSinceStart / superDivisor) / (uptime / 3600.0)) : 0;
-                    moneyPerHourBazaar.put("Super Enchanted version_INSTANT_SELL", superSellComputed);
-                    updateBazaarExtremes("Super Enchanted version_INSTANT_SELL", superSellComputed);
-                    moneyMade.put("Super Enchanted version_INSTANT_SELL", uptime > 0 ? (long) Math.floor(BazaarPrices.superEnchantedInstantSell * ((double) collectedSinceStart / superDivisor)) : 0);
+                    val superSellComputed =
+                        if (uptime > 0) floor(BazaarPrices.superEnchantedInstantSell * (collectedSinceStart.toDouble() / superDivisor) / (uptime / 3600.0)).toLong() else 0
+                    moneyPerHourBazaar["Super Enchanted version_INSTANT_SELL"] = superSellComputed
+                    updateBazaarExtremes("Super Enchanted version_INSTANT_SELL", superSellComputed)
+                    moneyMade["Super Enchanted version_INSTANT_SELL"] = if (uptime > 0) floor(BazaarPrices.superEnchantedInstantSell * (collectedSinceStart.toDouble() / superDivisor)).toLong() else 0
                 }
             }
-            case "gemstone" -> {
-                for (String key : GemstonePrices.gemstoneInstantSellPrices.keySet()) {
+
+            "gemstone" -> {
+                for (key in GemstonePrices.gemstoneInstantSellPrices.keys) {
                     // Buy
-                    float buyPrice = GemstonePrices.getInstantBuyPrice(key);
-                    long buyComputed = uptime > 0 ? (long) Math.floor(buyPrice * ((double) collectedSinceStart / GemstonePrices.recipes.get(key)) / (uptime / 3600.0)) : 0;
-                    moneyPerHourBazaar.put(key + "_INSTANT_BUY", buyComputed);
-                    updateBazaarExtremes(key + "_INSTANT_BUY", buyComputed);
-                    moneyMade.put(key + "_INSTANT_BUY", uptime > 0 ? (long) Math.floor(buyPrice * ((double) collectedSinceStart / GemstonePrices.recipes.get(key))) : 0);
+                    val buyPrice = GemstonePrices.getInstantBuyPrice(key)
+                    val buyComputed = if (uptime > 0) floor(
+                        buyPrice * (collectedSinceStart.toDouble() / GemstonePrices.recipes[key]!!) / (uptime / 3600.0)
+                    ).toLong() else 0
+                    moneyPerHourBazaar[key + "_INSTANT_BUY"] = buyComputed
+                    updateBazaarExtremes(key + "_INSTANT_BUY", buyComputed)
+                    moneyMade[key + "_INSTANT_BUY"] = if (uptime > 0) floor(
+                        buyPrice * (collectedSinceStart.toDouble() / GemstonePrices.recipes[key]!!)
+                    ).toLong() else 0
 
                     // Sell
-                    float sellPrice = GemstonePrices.getInstantSellPrice(key);
-                    long sellComputed = uptime > 0 ? (long) Math.floor(sellPrice * ((double) collectedSinceStart / GemstonePrices.recipes.get(key)) / (uptime / 3600.0)) : 0;
-                    moneyPerHourBazaar.put(key + "_INSTANT_SELL", sellComputed);
-                    updateBazaarExtremes(key + "_INSTANT_SELL", sellComputed);
-                    moneyMade.put(key + "_INSTANT_SELL", uptime > 0 ? (long) Math.floor(sellPrice * ((double) collectedSinceStart / GemstonePrices.recipes.get(key))) : 0);
+                    val sellPrice = GemstonePrices.getInstantSellPrice(key)
+                    val sellComputed = if (uptime > 0) floor(
+                        sellPrice * (collectedSinceStart.toDouble() / GemstonePrices.recipes[key]!!) / (uptime / 3600.0)
+                    ).toLong() else 0
+                    moneyPerHourBazaar[key + "_INSTANT_SELL"] = sellComputed
+                    updateBazaarExtremes(key + "_INSTANT_SELL", sellComputed)
+                    moneyMade[key + "_INSTANT_SELL"] = if (uptime > 0) floor(
+                        sellPrice * (collectedSinceStart.toDouble() / GemstonePrices.recipes[key]!!)
+                    ).toLong() else 0
                 }
             }
         }
     }
 
 
-    private static void fillBazaarExtremesFromCurrent() {
-        // Only initialize if both extremes maps are empty and there's data to copy
+    private fun fillBazaarExtremesFromCurrent() {
+        // Only initialize if both extreme maps are empty and there's data to copy
         if (!moneyPerHourBazaar.isEmpty() && lowestRatesPerHourBazaar.isEmpty() && highestRatesPerHourBazaar.isEmpty()) {
-            for (Map.Entry<String, Long> e : moneyPerHourBazaar.entrySet()) {
-                String key = e.getKey();
-                Long val = e.getValue();
+            for (e in moneyPerHourBazaar.entries) {
+                val key = e.key
+                val `val`: Long = e.value
                 // skip unwanted values
-                if (val <= 0L || key == null) continue;
-                long v = val;
-                lowestRatesPerHourBazaar.putIfAbsent(key, v);
-                highestRatesPerHourBazaar.putIfAbsent(key, v);
+                if (`val` <= 0L) continue
+                lowestRatesPerHourBazaar.putIfAbsent(key, `val`)
+                highestRatesPerHourBazaar.putIfAbsent(key, `val`)
             }
         }
     }
 
-    private static void updateBazaarExtremes(String key, long value) {
-        if (key == null || value <= 0L) return;
+    private fun updateBazaarExtremes(key: String?, value: Long) {
+        if (key == null || value <= 0L) return
 
-        lowestRatesPerHourBazaar.compute(key, (_, old) -> (old == null) ? value : Math.min(old, value));
+        lowestRatesPerHourBazaar.compute(key) { `_`: String?, old: Long? ->
+            if (old == null) value else min(
+                old,
+                value
+            )
+        }
 
-        highestRatesPerHourBazaar.compute(key, (_, old) -> (old == null) ? value : Math.max(old, value));
+        highestRatesPerHourBazaar.compute(key) { `_`: String?, old: Long? ->
+            if (old == null) value else max(
+                old,
+                value
+            )
+        }
     }
 
-    private static boolean isTrackingDataReady() {
-        if (moneyMade.isEmpty()) return false;
+    private val isTrackingDataReady: Boolean
+        get() {
+            if (moneyMade.isEmpty()) return false
 
-        // NPC data should always be present
-        if (!moneyMade.containsKey("NPC")) return false;
+            // NPC data should always be present
+            if (!moneyMade.containsKey("NPC")) return false
 
-        // If Bazaar enabled, make sure at least one entry is present
-        return !BazaarCollectionsManager.hasBazaarData || !moneyPerHourBazaar.isEmpty();
-    }
+            // If Bazaar enabled, make sure at least one entry is present
+            return !BazaarCollectionsManager.hasBazaarData || !moneyPerHourBazaar.isEmpty()
+        }
 }

@@ -7,7 +7,8 @@ import java.util.Locale
 object NumbersUtils {
 
     private val UNITS = arrayOf("", "k", "M", "B", "T")
-    
+
+    @JvmStatic
     fun formatNumber(number: Long): String {
         if (number == 0L) return "0"
 
@@ -28,7 +29,8 @@ object NumbersUtils {
 
         return String.format(Locale.US, "%.2f%s", num, UNITS[index])
     }
-    
+
+    @JvmStatic
     fun formatFloat(number: Float): String {
         if (number == 0f) return "0"
 

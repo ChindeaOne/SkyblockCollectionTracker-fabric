@@ -46,7 +46,7 @@ object MultiDataFetcher {
                         Minecraft.getInstance().execute {
                             Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
                                 CustomCollectionScreen(CollectionTracker.collectionList) {
-                                    CollectionsManager.multiCollectionSource.clear()
+                                    CollectionsManager.resetMultiCollections()
                                 }
                             )
                         }

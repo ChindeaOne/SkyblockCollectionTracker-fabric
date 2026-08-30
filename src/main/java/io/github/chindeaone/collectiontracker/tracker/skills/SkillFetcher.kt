@@ -1,158 +1,185 @@
-package io.github.chindeaone.collectiontracker.tracker.skills;
+package io.github.chindeaone.collectiontracker.tracker.skills
 
-import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher;
-import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher;
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.utils.PlayerData;
-import io.github.chindeaone.collectiontracker.utils.ServerUtils;
-import io.github.chindeaone.collectiontracker.utils.SkillUtils;
-import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
-import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardEntry;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.google.gson.JsonParser
+import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher.fetchCollectionLeaderboard
+import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher.fetchSkillsData
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isIncludeWipedProfilesEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardEntry
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager
+import io.github.chindeaone.collectiontracker.utils.PlayerData.playerName
+import io.github.chindeaone.collectiontracker.utils.PlayerData.playerUUID
+import io.github.chindeaone.collectiontracker.utils.ServerUtils.serverStatus
+import io.github.chindeaone.collectiontracker.utils.SkillUtils
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.Consumer
+import java.util.function.Function
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+object SkillFetcher {
+    private val logger: Logger = LogManager.getLogger(SkillFetcher::class.java)
 
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.isPaused;
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.isTracking;
+    private val cacheTimestamps: MutableMap<CacheKey, Long> = ConcurrentHashMap<CacheKey, Long>()
+    private val leaderboardCacheTimestamps: MutableMap<String, Long> = ConcurrentHashMap<String, Long>()
+    private val skillLeaderboardFetchInProgress: MutableMap<String, AtomicBoolean> = ConcurrentHashMap<String, AtomicBoolean>()
+    private const val CACHE_LIFESPAN_MS = 180000L // default 3 minutes
+    private const val LEADERBOARD_CACHE_LIFESPAN_MS = 3600000L // 1 hour
 
-public class SkillFetcher {
+    @JvmStatic
+    var scheduler: ScheduledExecutorService? = null
 
-    public static final Logger logger = LogManager.getLogger(SkillFetcher.class);
-    private static final Map<CacheKey, Long> cacheTimestamps = new ConcurrentHashMap<>();
-    private static final Map<String, Long> leaderboardCacheTimestamps = new ConcurrentHashMap<>();
-    private static final Map<String, AtomicBoolean> skillLeaderboardFetchInProgress = new ConcurrentHashMap<>();
-    private static final long CACHE_LIFESPAN_MS = 180_000L; // default 3 minutes
-    private static final long LEADERBOARD_CACHE_LIFESPAN_MS = 3_600_000L; // 1 hour
-    public static ScheduledExecutorService scheduler;
-
-    public static void scheduleSkillFetch(boolean isSkillMaxed, long value, String skillName) {
-        int period = 200; // 200 seconds (3 minutes 20 seconds)
+    @JvmStatic
+    fun scheduleSkillFetch(isSkillMaxed: Boolean, value: Long, skillName: String) {
+        val period = 200 // 200 seconds (3 minutes 20 seconds)
 
         // initial delay of 200s because data is already fetched when tracking starts
-        scheduler.scheduleAtFixedRate(() -> fetchSkillData(skillName, isSkillMaxed),200, period, TimeUnit.SECONDS);
+        scheduler!!.scheduleAtFixedRate(
+            { fetchSkillData(skillName, isSkillMaxed) },
+            200,
+            period.toLong(),
+            TimeUnit.SECONDS
+        )
         // because of that, manual call is needed
-        if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(value); // only if skill isn't maxed, as maxed skills use chat messages to track
-        SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().longValue());
-        logger.info("[SCT]: Skill data fetching scheduled to run every {} seconds", period);
+        if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(value) // only if skill isn't maxed, as maxed skills use chat messages to track
+
+        SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().toLong())
+        logger.info("[SCT]: Skill data fetching scheduled to run every {} seconds", period)
     }
 
-    private static void fetchSkillData(String skillName, boolean isSkillMaxed) {
+    private fun fetchSkillData(skillName: String, isSkillMaxed: Boolean) {
         try {
-            if (!ServerUtils.getServerStatus()) {
-                logger.warn("[SCT]: API server not online. Stopping the skill tracker.");
-                SkillTrackingHandler.stopTracking();
-                return;
+            if (!serverStatus) {
+                logger.warn("[SCT]: API server not online. Stopping the skill tracker.")
+                SkillTrackingHandler.stopTracking()
+                return
             }
 
-            if (!isTracking) return;
-            if (isPaused) return;
+            if (!SkillTrackingHandler.isTracking) return
+            if (SkillTrackingHandler.isPaused) return
 
 
-            getData(PlayerData.getPlayerUUID(), skillName); // fetch data for the tracked skill
+            getData(playerUUID, skillName) // fetch data for the tracked skill
 
             // Skill leaderboard fetching
-            fetchSkillLeaderboardData(skillName);
-            if (ConfigAccess.isTamingTrackingEnabled()) {
-                fetchSkillLeaderboardData("Taming");
+            fetchSkillLeaderboardData(skillName)
+            if (isTamingTrackingEnabled()) {
+                fetchSkillLeaderboardData("Taming")
             }
 
-            Double skillXp = SkillUtils.getSkillValue(skillName); // get the XP of the tracked skill again here
+            val skillXp = SkillUtils.getSkillValue(skillName) // get the XP of the tracked skill again here
 
-            if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(skillXp != null ? skillXp.longValue() : 0L); // only if skill isn't maxed, as maxed skills use chat messages to track
-            SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().longValue());
-        } catch (Exception e) {
-            logger.error("[SCT]: Error while fetching data from the Hypixel API", e);
+            if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(skillXp?.toLong() ?: 0L) // only if skill isn't maxed, as maxed skills use chat messages to track
+
+            SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().toLong())
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error while fetching data from the Hypixel API", e)
         }
     }
 
-    public static void fetchSkillLeaderboardData(String skillName) {
-        if (skillName == null || skillName.isEmpty()) return;
-        if (!ConfigAccess.isSkillLeaderboardEnabled()) return;
+    fun fetchSkillLeaderboardData(skillName: String) {
+        if (skillName.isEmpty()) return
+        if (!isSkillLeaderboardEnabled()) return
 
-        AtomicBoolean inProgress = skillLeaderboardFetchInProgress.computeIfAbsent(skillName.toLowerCase(), _ -> new AtomicBoolean(false));
-        if (!inProgress.compareAndSet(false, true)) return;
+        val inProgress =
+            skillLeaderboardFetchInProgress.computeIfAbsent(skillName.lowercase(Locale.getDefault())) { `_`: String? ->
+                AtomicBoolean(false)
+            }
+        if (!inProgress.compareAndSet(false, true)) return
 
         try {
-            Long lastFetched = leaderboardCacheTimestamps.get(skillName.toLowerCase());
+            val lastFetched = leaderboardCacheTimestamps[skillName.lowercase(Locale.getDefault())]
             if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
-                return;
+                return
             }
-            logger.info("[SCT]: Fetching leaderboard data for skill: {}", skillName);
+            logger.info("[SCT]: Fetching leaderboard data for skill: {}", skillName)
 
-            EliteApiFetcher.fetchCollectionLeaderboard(skillName.toLowerCase()).thenAccept( jsonData -> {
+            fetchCollectionLeaderboard(skillName.lowercase(Locale.getDefault())).thenAccept(Consumer { jsonData: String? ->
                 if (jsonData == null) {
-                    logger.error("[SCT]: Failed to fetch leaderboard data for skill {} from the Elite API", skillName);
-                    return;
+                    logger.error("[SCT]: Failed to fetch leaderboard data for skill {} from the Elite API", skillName)
+                    return@Consumer
                 }
+                val jsonObject = JsonParser.parseString(jsonData).getAsJsonObject()
+                val entriesArray = jsonObject.getAsJsonArray("entries")
+                val entries: MutableList<LeaderboardEntry> = ArrayList<LeaderboardEntry>(entriesArray.size())
 
-                JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
-                JsonArray entriesArray = jsonObject.getAsJsonArray("entries");
-                List<LeaderboardEntry> entries = new ArrayList<>(entriesArray.size());
+                for (i in 0..<entriesArray.size()) {
+                    val entryObject = entriesArray.get(i).getAsJsonObject()
+                    val username = entryObject.get("username").asString
+                    if (username.equals(playerName, ignoreCase = true)) continue
 
-                for (int i = 0; i < entriesArray.size(); i++) {
-                    JsonObject entryObject = entriesArray.get(i).getAsJsonObject();
-                    String username = entryObject.get("username").getAsString();
-                    if (username.equalsIgnoreCase(PlayerData.getPlayerName())) continue;
-
-                    entries.add(new LeaderboardEntry(
+                    entries.add(
+                        LeaderboardEntry(
                             username,
-                            entryObject.get("rank").getAsInt(),
-                            entryObject.get("amount").getAsLong(),
-                            ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").getAsBoolean()
-                    ));
+                            entryObject.get("rank").asInt,
+                            entryObject.get("amount").asLong,
+                            isIncludeWipedProfilesEnabled() && entryObject.get("wiped").asBoolean
+                        )
+                    )
                 }
 
-                LeaderboardManager.setSkillLeaderboard(skillName, entries);
-                leaderboardCacheTimestamps.put(skillName.toLowerCase(), System.currentTimeMillis());
-                logger.info("[SCT]: Leaderboard data successfully fetched and updated for skill: {}", skillName);
-            }).exceptionally(ex -> {
-                logger.error("[SCT]: Exception occurred while fetching leaderboard data for skill {}: {}", skillName, ex.getMessage(), ex);
-                return null;
-            });
-        } catch (Exception e) {
-            logger.error("[SCT]: Error fetching skill leaderboard data for {}: {}", skillName, e.getMessage(), e);
+                LeaderboardManager.setSkillLeaderboard(skillName, entries)
+                leaderboardCacheTimestamps[skillName.lowercase()] = System.currentTimeMillis()
+                logger.info("[SCT]: Leaderboard data successfully fetched and updated for skill: {}", skillName)
+            }).exceptionally(Function { ex: Throwable? ->
+                logger.error(
+                    "[SCT]: Exception occurred while fetching leaderboard data for skill {}: {}",
+                    skillName,
+                    ex!!.message,
+                    ex
+                )
+                null
+            })
+        } catch (e: Exception) {
+            logger.error("[SCT]: Error fetching skill leaderboard data for {}: {}", skillName, e.message, e)
         } finally {
-            inProgress.set(false);
+            inProgress.set(false)
         }
     }
 
-    private static void getData(String playerUUID, String skill) {
-        CacheKey cacheKey = new CacheKey(playerUUID, skill);
-        long now = System.currentTimeMillis();
-        Long lastFetched = cacheTimestamps.get(cacheKey);
+    private fun getData(playerUUID: String, skill: String) {
+        val cacheKey = CacheKey(playerUUID, skill)
+        val now = System.currentTimeMillis()
+        val lastFetched = cacheTimestamps[cacheKey]
 
         if (lastFetched != null && (now - lastFetched) < CACHE_LIFESPAN_MS) {
-            long elapsed = System.currentTimeMillis() - lastFetched;
-            logger.info("[SCT]: Using cached data for player {} skill {} (last fetched {} ms ago).", playerUUID, skill, elapsed);
+            val elapsed = System.currentTimeMillis() - lastFetched
+            logger.info(
+                "[SCT]: Using cached data for player {} skill {} (last fetched {} ms ago).",
+                playerUUID,
+                skill,
+                elapsed
+            )
         }
 
         if (lastFetched != null) {
-            long elapsed = now - lastFetched;
-            logger.info("[SCT]: Cache expired for player: {} and skill: {} (last fetched {} ms ago). Fetching new data.", playerUUID, skill, elapsed);
+            val elapsed = now - lastFetched
+            logger.info(
+                "[SCT]: Cache expired for player: {} and skill: {} (last fetched {} ms ago). Fetching new data.",
+                playerUUID,
+                skill,
+                elapsed
+            )
         } else {
-            logger.info("[SCT]: No cache present for player: {} and skill: {}. Fetching data.", playerUUID, skill);
+            logger.info("[SCT]: No cache present for player: {} and skill: {}. Fetching data.", playerUUID, skill)
         }
 
-        SkillApiFetcher.fetchSkillsData();
-        cacheTimestamps.put(cacheKey, now);
+        fetchSkillsData()
+        cacheTimestamps[cacheKey] = now
     }
 
-    public static void clearCache() {
-        cacheTimestamps.clear();
-        leaderboardCacheTimestamps.clear();
-        skillLeaderboardFetchInProgress.clear();
-        logger.info("[SCT]: All skill data caches have been cleared.");
+    @JvmStatic
+    fun clearCache() {
+        cacheTimestamps.clear()
+        leaderboardCacheTimestamps.clear()
+        skillLeaderboardFetchInProgress.clear()
+        logger.info("[SCT]: All skill data caches have been cleared.")
     }
 
-    private record CacheKey(String uuid, String skill) { }
+    private data class CacheKey(val uuid: String, val skill: String)
 }

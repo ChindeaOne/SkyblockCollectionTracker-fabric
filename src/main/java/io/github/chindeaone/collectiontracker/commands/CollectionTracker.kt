@@ -19,11 +19,13 @@ import java.util.concurrent.ScheduledFuture
 
 object CollectionTracker {
 
-    @JvmStatic var collection = ""
-    @JvmStatic var collectionList: MutableList<String> = mutableListOf()
-    @JvmStatic var isApiTracking = false
-    @JvmStatic var scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
-    @JvmStatic var trackingTask: ScheduledFuture<*>? = null
+    @JvmField
+    var collection = ""
+    @JvmStatic
+    var collectionList: MutableList<String> = mutableListOf()
+    var isApiTracking = false
+    var scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+    var trackingTask: ScheduledFuture<*>? = null
 
     private val logger: Logger = LogManager.getLogger(CollectionTracker::class.java)
 
@@ -176,7 +178,6 @@ object CollectionTracker {
         }
     }
 
-    @JvmStatic
     fun cancelScheduledTask() {
         if (trackingTask != null && !trackingTask!!.isCancelled) {
             trackingTask!!.cancel(true)

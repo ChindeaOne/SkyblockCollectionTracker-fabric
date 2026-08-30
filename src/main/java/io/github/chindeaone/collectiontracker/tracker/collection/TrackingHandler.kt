@@ -1,427 +1,564 @@
-package io.github.chindeaone.collectiontracker.tracker.collection;
+package io.github.chindeaone.collectiontracker.tracker.collection
 
-import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
-import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
-import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices;
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
-import io.github.chindeaone.collectiontracker.config.categories.Bazaar.BazaarType;
-import io.github.chindeaone.collectiontracker.gui.OverlayManager;
-import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import io.github.chindeaone.collectiontracker.utils.Hypixel;
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
-import net.minecraft.network.chat.Component;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarPriceType
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarType
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getGemstoneVariant
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isApiTrackingEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCollectionLeaderboardEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTrackingRatesAtEndOfSession
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isUsingBazaar
+import io.github.chindeaone.collectiontracker.config.categories.Bazaar
+import io.github.chindeaone.collectiontracker.gui.OverlayManager.setTrackingOverlayRendering
+import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
+import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearAllCache
+import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearCollectionCache
+import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.fetchData
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.highestCollectionPerHour
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.highestRatePerHourNPC
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lowestCollectionPerHour
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lowestRatePerHourNPC
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lowestRatesPerHourBazaar
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.highestRatesPerHourBazaar
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionMade
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionPerHour
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.moneyMade
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.moneyPerHourBazaar
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.moneyPerHourNPC
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.nextRankAmount
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.nextRankUsername
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.playerCurrentRank
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.etaToNextRank
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lastApiCollection
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.sacksCollectionGained
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.sessionStartCollection
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lastCollectionTime
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionTillNextRank
+import io.github.chindeaone.collectiontracker.utils.Hypixel.server
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
+import net.minecraft.network.chat.Component
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.Volatile
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
+object TrackingHandler {
+    private val logger: Logger = LogManager.getLogger(TrackingHandler::class.java)
+    val COOLDOWN_MILLIS: Long = TimeUnit.SECONDS.toMillis(10) // 10-second cooldown
 
-import static io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType;
-import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.*;
-import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
-import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
+    @JvmField
+    @Volatile
+    var isTracking: Boolean = false
+    var isPaused: Boolean = false
+    var leaderboardTrackingInitialized: Boolean = false
 
-public class TrackingHandler {
+    var startTime: Long = 0
+    private var lastTime: Long = 0
+    var lastTrackTime: Long = 0
 
-    private static final Logger logger = LogManager.getLogger(TrackingHandler.class);
-    public static final long COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10); // 10-second cooldown
+    private const val RESETS = 10
+    private var restartCount = 0
+    private var firstRestartTime: Long = 0
 
-    public static volatile boolean isTracking = false;
-    public static boolean isPaused = false;
-    public static boolean leaderboardTrackingInitialized = false;
+    fun startTracking() {
+        logger.info("[SCT]: Tracking started for collection: {}", collection)
 
-    public static long startTime;
-    private static long lastTime;
-    public static long lastTrackTime = 0;
-
-    private static final int allowedHourlyRestarts = 10;
-    private static int restartCount = 0;
-    private static long firstRestartTime;
-
-    public static void startTracking() {
-        logger.info("[SCT]: Tracking started for collection: {}", collection);
-
-        OverlayManager.setTrackingOverlayRendering(true);
+        setTrackingOverlayRendering(true)
 
         // Always do initial fetch
-        DataFetcher.fetchData(true);
+        fetchData(true)
 
         // Schedule API fetching
-        isApiTracking = ConfigAccess.isApiTrackingEnabled();
+        CollectionTracker.isApiTracking = isApiTrackingEnabled()
 
-        if (isApiTracking) {
-            trackingTask = scheduler.scheduleWithFixedDelay(() -> DataFetcher.fetchData(false), 5, 5, TimeUnit.MINUTES);
+        if (CollectionTracker.isApiTracking) {
+            trackingTask = scheduler.scheduleWithFixedDelay({ fetchData(false) }, 5, 5, TimeUnit.MINUTES)
         }
     }
 
-    public static void initTracking(long now) {
-        lastTrackTime = now;
+    fun initTracking(now: Long) {
+        lastTrackTime = now
 
-        isTracking = true;
-        isPaused = false;
-        leaderboardTrackingInitialized = ConfigAccess.isCollectionLeaderboardEnabled();
+        isTracking = true
+        isPaused = false
+        leaderboardTrackingInitialized = isCollectionLeaderboardEnabled()
 
-        startTime = now;
-        lastTime = 0;
+        startTime = now
+        lastTime = 0
 
-        if (collectionType == null) {
-            logger.error("[SCT]: Collection type is null for collection: {}", collection);
+        if (CollectionsManager.collectionType == null) {
+            logger.error("[SCT]: Collection type is null for collection: {}", collection)
         }
     }
 
-    public static void stopTrackingManual() {
+    fun stopTrackingManual() {
         if (isTracking) {
-            ChatUtils.sendMessage("§cStopped tracking!", true);
+            sendMessage("§cStopped tracking!", true)
 
-            resetTrackingData(false);
+            resetTrackingData(false)
 
-            logger.info("[SCT]: Tracking stopped.");
+            logger.info("[SCT]: Tracking stopped.")
         } else {
-            ChatUtils.sendMessage("§cNo tracking active!", true);
-            logger.warn("[SCT]: Attempted to stop tracking manually, but no tracking is active.");
+            sendMessage("§cNo tracking active!", true)
+            logger.warn("[SCT]: Attempted to stop tracking manually, but no tracking is active.")
         }
     }
 
-    public static void stopTracking() {
+    fun stopTracking() {
         if (isTracking) {
-
-            if (!Hypixel.getServer()) {
-                logger.info("[SCT]: Tracking stopped because player disconnected from the server.");
+            if (!server) {
+                logger.info("[SCT]: Tracking stopped because player disconnected from the server.")
             } else {
-                ChatUtils.sendMessage("§cAPI server is down. Stopping the tracker.", true);
-                logger.info("[SCT]: Tracking stopped because the API server is down.");
+                sendMessage("§cAPI server is down. Stopping the tracker.", true)
+                logger.info("[SCT]: Tracking stopped because the API server is down.")
             }
 
-            resetTrackingData(false);
+            resetTrackingData(false)
         } else {
-            logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.");
+            logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.")
         }
     }
 
-    public static void restartTracking() {
+    fun restartTracking() {
         if (!isTracking) {
-            ChatUtils.sendMessage("§cNo tracking active to restart!", true);
-            logger.warn("[SCT]: Attempted to restart tracking, but no tracking is active.");
-            return;
+            sendMessage("§cNo tracking active to restart!", true)
+            logger.warn("[SCT]: Attempted to restart tracking, but no tracking is active.")
+            return
         }
 
         if (restartCount == 0) {
-            firstRestartTime = System.currentTimeMillis();
+            firstRestartTime = System.currentTimeMillis()
         } else {
-            long elapsedTime = System.currentTimeMillis() - firstRestartTime;
+            val elapsedTime = System.currentTimeMillis() - firstRestartTime
             if (elapsedTime >= TimeUnit.HOURS.toMillis(1)) {
-                restartCount = 0;
-                firstRestartTime = System.currentTimeMillis();
+                restartCount = 0
+                firstRestartTime = System.currentTimeMillis()
             }
         }
 
-        if (restartCount >= allowedHourlyRestarts) {
-            ChatUtils.sendMessage("§cHourly restart limit reached! Cannot restart tracking.", true);
-            logger.warn("[SCT]: Hourly restart limit reached. Cannot restart tracking.");
-            return;
+        if (restartCount >= RESETS) {
+            sendMessage("§cHourly restart limit reached! Cannot restart tracking.", true)
+            logger.warn("[SCT]: Hourly restart limit reached. Cannot restart tracking.")
+            return
         }
 
-        restartCount++;
-        resetTrackingData(true);
-        startTracking();
+        restartCount++
+        resetTrackingData(true)
+        startTracking()
     }
 
-    private static void resetTrackingData(boolean restart) {
-        if (ConfigAccess.isShowTrackingRatesAtEndOfSession()) sendRates();
+    private fun resetTrackingData(restart: Boolean) {
+        if (isShowTrackingRatesAtEndOfSession()) sendRates()
 
-        resetVariables();
+        resetVariables()
         // Clear cached data
         if (restart) {
-            DataFetcher.clearCollectionCache();
+            clearCollectionCache()
         } else {
-            DataFetcher.clearAllCache();
+            clearAllCache()
         }
 
         // Reset uptime
-        long now = System.currentTimeMillis();
+        val now = System.currentTimeMillis()
         if (!restart) {
-            lastTrackTime = now;
-            clearFetchedData();
-        }
-        else lastTrackTime = now - COOLDOWN_MILLIS;
+            lastTrackTime = now
+            clearFetchedData()
+        } else lastTrackTime = now - COOLDOWN_MILLIS
 
-        OverlayManager.setTrackingOverlayRendering(false);
-        CollectionOverlay.trackingDirty = false;
+        setTrackingOverlayRendering(false)
+        CollectionOverlay.trackingDirty = false
     }
 
-    private static void clearFetchedData() {
-        CollectionsManager.resetCollections();
-        BazaarCollectionsManager.resetBazaarData();
+    private fun clearFetchedData() {
+        CollectionsManager.resetCollections()
+        BazaarCollectionsManager.resetBazaarData()
     }
 
-    private static void resetVariables() {
-        isTracking = false;
-        isPaused = false;
-        leaderboardTrackingInitialized = false;
-        startTime = 0;
-        lastTime = 0;
+    private fun resetVariables() {
+        isTracking = false
+        isPaused = false
+        leaderboardTrackingInitialized = false
+        startTime = 0
+        lastTime = 0
 
         if (trackingTask != null) {
-            trackingTask.cancel(false);
-            trackingTask = null;
+            trackingTask!!.cancel(false)
+            trackingTask = null
         }
 
         // Reset collection tracking
-        lastApiCollection = -1L;
-        sacksCollectionGained = 0L;
-        sessionStartCollection = -1L;
-        lastCollectionTime = -1L;
+        lastApiCollection = -1L
+        sacksCollectionGained = 0L
+        sessionStartCollection = -1L
+        lastCollectionTime = -1L
 
         // Clear profit map
-        moneyPerHourBazaar.clear();
-        moneyMade.clear();
+        moneyPerHourBazaar.clear()
+        moneyMade.clear()
 
         // Reset highest/lowest rates
-        resetLowestHighestRates();
+        resetLowestHighestRates()
 
         // Reset leaderboard tracking
-        playerCurrentRank = -1;
-        nextRankUsername = null;
-        nextRankAmount = -1L;
-        etaToNextRank = null;
-        collectionTillNextRank = -1L;
+        playerCurrentRank = -1
+        nextRankUsername = null
+        nextRankAmount = -1L
+        etaToNextRank = null
+        collectionTillNextRank = -1L
     }
 
-    private static void resetLowestHighestRates() {
-        highestCollectionPerHour = 0;
-        lowestCollectionPerHour = Long.MAX_VALUE;
-        highestRatePerHourNPC = 0;
-        lowestRatePerHourNPC = Long.MAX_VALUE;
-        lowestRatesPerHourBazaar.clear();
-        highestRatesPerHourBazaar.clear();
+    private fun resetLowestHighestRates() {
+        highestCollectionPerHour = 0
+        lowestCollectionPerHour = Long.MAX_VALUE
+        highestRatePerHourNPC = 0
+        lowestRatePerHourNPC = Long.MAX_VALUE
+        lowestRatesPerHourBazaar.clear()
+        highestRatesPerHourBazaar.clear()
     }
 
-    public static void pauseTracking() {
+    fun pauseTracking() {
         if (isTracking) {
             if (isPaused) {
-                ChatUtils.sendMessage("§cTracking is already paused!", true);
-                logger.warn("[SCT]: Attempted to pause tracking, but tracking is already paused.");
-                return;
+                sendMessage("§cTracking is already paused!", true)
+                logger.warn("[SCT]: Attempted to pause tracking, but tracking is already paused.")
+                return
             }
-            isPaused = true;
-            lastTime += (System.currentTimeMillis() - startTime) / 1000;
-            ChatUtils.sendMessage("§7Tracking paused.", true);
-            logger.info("[SCT]: Tracking paused.");
+            isPaused = true
+            lastTime += (System.currentTimeMillis() - startTime) / 1000
+            sendMessage("§7Tracking paused.", true)
+            logger.info("[SCT]: Tracking paused.")
         } else {
-            ChatUtils.sendMessage("§cNo tracking active!", true);
-            logger.warn("[SCT]: Attempted to pause tracking, but no tracking is active.");
+            sendMessage("§cNo tracking active!", true)
+            logger.warn("[SCT]: Attempted to pause tracking, but no tracking is active.")
         }
     }
 
-    public static void resumeTracking() {
+    fun resumeTracking() {
         if (!isTracking) {
-            ChatUtils.sendMessage("§cNo tracking active!", true);
-            logger.warn("[SCT]: Attempted to resume tracking, but no tracking is active.");
-            return;
+            sendMessage("§cNo tracking active!", true)
+            logger.warn("[SCT]: Attempted to resume tracking, but no tracking is active.")
+            return
         }
 
         if (isPaused) {
-            ChatUtils.sendMessage("§7Resuming tracking.", true);
-            logger.info("[SCT]: Resuming tracking.");
-            startTime = System.currentTimeMillis();
-            isPaused = false;
+            sendMessage("§7Resuming tracking.", true)
+            logger.info("[SCT]: Resuming tracking.")
+            startTime = System.currentTimeMillis()
+            isPaused = false
         } else {
-            ChatUtils.sendMessage("§cTracking is already active!", true);
-            logger.warn("[SCT]: Attempted to resume tracking, but tracking is already active.");
+            sendMessage("§cTracking is already active!", true)
+            logger.warn("[SCT]: Attempted to resume tracking, but tracking is already active.")
         }
     }
 
-    public static void resumeRiftTracking() {
+    fun resumeRiftTracking() {
         if (!isTracking) {
-            return;
+            return
         }
 
         if (!CollectionsManager.isRiftCollection(collection)) {
-            logger.warn("[SCT]: Attempted to resume Rift tracking, but current collection is not a Rift collection.");
-            return;
+            logger.warn("[SCT]: Attempted to resume Rift tracking, but current collection is not a Rift collection.")
+            return
         }
 
-        if (!isPaused) return;
+        if (!isPaused) return
 
-        startTime = System.currentTimeMillis();
-        isPaused = false;
+        startTime = System.currentTimeMillis()
+        isPaused = false
 
-        ChatUtils.sendMessage("§7Resuming tracking after rejoining The Rift.", true);
-        logger.info("[SCT]: Resuming tracking after rejoining The Rift.");
+        sendMessage("§7Resuming tracking after rejoining The Rift.", true)
+        logger.info("[SCT]: Resuming tracking after rejoining The Rift.")
     }
 
-    public static void pauseRiftTracking() {
+    fun pauseRiftTracking() {
         if (!isTracking) {
-            return;
+            return
         }
 
         if (!CollectionsManager.isRiftCollection(collection)) {
-            logger.warn("[SCT]: Attempted to pause Rift tracking, but current collection is not a Rift collection.");
-            return;
+            logger.warn("[SCT]: Attempted to pause Rift tracking, but current collection is not a Rift collection.")
+            return
         }
 
-        if (isPaused) return;
+        if (isPaused) return
 
-        lastTime += (System.currentTimeMillis() - startTime) / 1000;
-        isPaused = true;
+        lastTime += (System.currentTimeMillis() - startTime) / 1000
+        isPaused = true
 
-        ChatUtils.sendMessage("§7Pausing tracking before leaving The Rift.", true);
-        logger.info("[SCT]: Pausing tracking before leaving The Rift.");
+        sendMessage("§7Pausing tracking before leaving The Rift.", true)
+        logger.info("[SCT]: Pausing tracking before leaving The Rift.")
     }
 
-    private static void sendRates() {
-        assert collection != null;
-        String collectionDisplay = TextUtils.formatCollectionName(collection);
+    private fun sendRates() {
+        val collectionDisplay = TextUtils.formatCollectionName(collection)
 
-        List<Component> lines = new ArrayList<>();
-        lines.add(Component.literal(String.format("   §aCollection tracked: §f%s", collectionDisplay)));
-        lines.add(Component.literal(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour))));
+        val lines: MutableList<Component> = mutableListOf()
+        lines.add(Component.literal(String.format("   §aCollection tracked: §f%s", collectionDisplay)))
+        lines.add(
+            Component.literal(
+                String.format(
+                    "   §b%s Made: §f%s   §bRate: §f%s/h",
+                    collectionDisplay,
+                    formatNumber(collectionMade),
+                    formatNumber(collectionPerHour)
+                )
+            )
+        )
 
-        boolean useBazaar = ConfigAccess.isUsingBazaar();
-        BazaarType bazaarType = ConfigAccess.getBazaarType();
+        val useBazaar = isUsingBazaar()
+        val bazaarType = getBazaarType()
 
         if (!useBazaar) {
-            long npcMoney = moneyMade.get("NPC");
+            val npcMoney: Long = moneyMade["NPC"] ?: 0L
             if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                lines.add(Component.literal(String.format("   §6Motes: §f$%s   §6Rate: §f%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC))));
-            } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC))));
+                lines.add(
+                    Component.literal(
+                        String.format(
+                            "   §6Motes: §f$%s   §6Rate: §f%s/h",
+                            formatNumber(npcMoney),
+                            formatNumber(moneyPerHourNPC)
+                        )
+                    )
+                )
+            } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
+                Component.literal(
+                    String.format(
+                        "   §6Money (NPC): §f$%s   §6Rate: §f$%s/h",
+                        formatNumber(npcMoney),
+                        formatNumber(moneyPerHourNPC)
+                    )
+                )
+            )
         } else {
-            String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
-            switch (collectionType) {
-                case "normal" -> {
-                    long bazMoney = moneyMade.getOrDefault(collectionType + suffix, 0L);
-                    long bazRate = moneyPerHourBazaar.getOrDefault(collectionType + suffix, 0L);
-                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate))));
+            val suffix =
+                if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
+            when (CollectionsManager.collectionType) {
+                "normal" -> {
+                    val bazMoney = moneyMade.getOrDefault(CollectionsManager.collectionType + suffix, 0L)
+                    val bazRate = moneyPerHourBazaar.getOrDefault(CollectionsManager.collectionType + suffix, 0L)
+                    lines.add(
+                        Component.literal(
+                            String.format(
+                                "   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h",
+                                formatNumber(bazMoney),
+                                formatNumber(bazRate)
+                            )
+                        )
+                    )
                 }
-                case "enchanted" -> {
-                    String key = bazaarType.equals(BazaarType.ENCHANTED_VERSION)
-                            ? "Enchanted version" : "Super Enchanted version";
-                    long money = moneyMade.getOrDefault(key + suffix, 0L);
-                    long rate = moneyPerHourBazaar.getOrDefault(key + suffix, 0L);
-                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate))));
+
+                "enchanted" -> {
+                    val key = if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION)
+                        "Enchanted version"
+                    else
+                        "Super Enchanted version"
+                    val money = moneyMade.getOrDefault(key + suffix, 0L)
+                    val rate = moneyPerHourBazaar.getOrDefault(key + suffix, 0L)
+                    lines.add(
+                        Component.literal(
+                            String.format(
+                                "   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h",
+                                formatNumber(money),
+                                formatNumber(rate)
+                            )
+                        )
+                    )
                 }
-                case "gemstone" -> {
-                    String variant = ConfigAccess.getGemstoneVariant().toString();
-                    long gMoney = moneyMade.getOrDefault(variant + suffix, 0L);
-                    long gRate = moneyPerHourBazaar.getOrDefault(variant + suffix, 0L);
-                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate))));
+
+                "gemstone" -> {
+                    val variant: String = getGemstoneVariant().toString()
+                    val gMoney = moneyMade.getOrDefault(variant + suffix, 0L)
+                    val gRate = moneyPerHourBazaar.getOrDefault(variant + suffix, 0L)
+                    lines.add(
+                        Component.literal(
+                            String.format(
+                                "   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h",
+                                formatNumber(gMoney),
+                                formatNumber(gRate)
+                            )
+                        )
+                    )
                 }
             }
         }
 
-        lines.add(Component.literal(String.format("   §7Elapsed time: §f%s", getUptimeInWords())));
+        lines.add(
+            Component.literal(
+                String.format(
+                    "   §7Elapsed time: §f%s",
+                    uptimeInWords
+                )
+            )
+        )
 
         // If no collection update, skip best/worst rates
-        if (collectionMade == 0) {
-            ChatUtils.sendSummary("§e§lTracking Summary", lines);
-            return;
+        if (collectionMade == 0L) {
+            ChatUtils.sendSummary("§e§lTracking Summary", lines)
+            return
         }
 
-        lines.add(Component.empty());
-        lines.add(Component.literal("   §eBest/Worst Rates:"));
-        lines.add(Component.empty());
+        lines.add(Component.empty())
+        lines.add(Component.literal("   §eBest/Worst Rates:"))
+        lines.add(Component.empty())
 
         // Collection extremes
         if (highestCollectionPerHour > 0) {
-            lines.add(Component.literal(String.format("   §6Best collection rate: §f%s coll/h", formatNumber(highestCollectionPerHour))));
+            lines.add(
+                Component.literal(
+                    String.format(
+                        "   §6Best collection rate: §f%s coll/h",
+                        formatNumber(highestCollectionPerHour)
+                    )
+                )
+            )
         }
         if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Long.MAX_VALUE) {
-            lines.add(Component.literal(String.format("   §6Worst collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour))));
+            lines.add(
+                Component.literal(
+                    String.format(
+                        "   §6Worst collection rate: §f%s coll/h",
+                        formatNumber(lowestCollectionPerHour)
+                    )
+                )
+            )
         }
 
         if (!useBazaar) {
             // NPC money extremes
             if (highestRatePerHourNPC > 0) {
                 if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(Component.literal(String.format("   §6Best motes rate: §f%s/h", formatNumber(highestRatePerHourNPC))));
-                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal(String.format("   §6Best NPC money rate: §f$%s/h", formatNumber(highestRatePerHourNPC))));
+                    lines.add(
+                        Component.literal(
+                            String.format(
+                                "   §6Best motes rate: §f%s/h",
+                                formatNumber(highestRatePerHourNPC)
+                            )
+                        )
+                    )
+                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
+                    Component.literal(
+                        String.format(
+                            "   §6Best NPC money rate: §f$%s/h",
+                            formatNumber(highestRatePerHourNPC)
+                        )
+                    )
+                )
             }
             if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
                 if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(Component.literal(String.format("   §6Worst motes rate: §f%s/h", formatNumber(lowestRatePerHourNPC))));
-                } else if(NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal(String.format("   §6Worst NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC))));
+                    lines.add(
+                        Component.literal(
+                            String.format(
+                                "   §6Worst motes rate: §f%s/h",
+                                formatNumber(lowestRatePerHourNPC)
+                            )
+                        )
+                    )
+                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
+                    Component.literal(
+                        String.format(
+                            "   §6Worst NPC money rate: §f$%s/h",
+                            formatNumber(lowestRatePerHourNPC)
+                        )
+                    )
+                )
             }
         } else {
             // Bazaar extremes per variant
             if (!moneyPerHourBazaar.isEmpty()) {
-                String suffix = ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ? "_INSTANT_BUY" : "_INSTANT_SELL";
-                switch (collectionType) {
-                    case "normal" -> {
-                        long low = lowestRatesPerHourBazaar.getOrDefault("normal" + suffix, 0L);
-                        long high = highestRatesPerHourBazaar.getOrDefault("normal" + suffix, 0L);
+                val suffix =
+                    if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
+                when (CollectionsManager.collectionType) {
+                    "normal" -> {
+                        val low = lowestRatesPerHourBazaar.getOrDefault("normal$suffix", 0L)
+                        val high = highestRatesPerHourBazaar.getOrDefault("normal$suffix", 0L)
 
-                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))));
-                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))));
+                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))))
+                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))))
                     }
-                    case "enchanted" -> {
-                        String key = bazaarType.equals(BazaarType.ENCHANTED_VERSION)
-                                ? "Enchanted version" : "Super Enchanted version";
-                        long low = lowestRatesPerHourBazaar.getOrDefault(key + suffix, 0L);
-                        long high = highestRatesPerHourBazaar.getOrDefault(key + suffix, 0L);
 
-                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))));
-                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))));
+                    "enchanted" -> {
+                        val key = if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION)
+                            "Enchanted version"
+                        else
+                            "Super Enchanted version"
+                        val low = lowestRatesPerHourBazaar.getOrDefault(key + suffix, 0L)
+                        val high = highestRatesPerHourBazaar.getOrDefault(key + suffix, 0L)
+
+                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))))
+                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))))
                     }
-                    case "gemstone" -> {
-                        String variant = ConfigAccess.getGemstoneVariant().toString();
-                        long low = lowestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L);
-                        long high = highestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L);
 
-                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))));
-                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))));
+                    "gemstone" -> {
+                        val variant: String = getGemstoneVariant().toString()
+                        val low = lowestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L)
+                        val high = highestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L)
+
+                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))))
+                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))))
                     }
                 }
             }
         }
-        ChatUtils.sendSummary("§e§lTracking Summary", lines);
+        ChatUtils.sendSummary("§e§lTracking Summary", lines)
     }
 
-    public static long getUptimeInSeconds() {
-        if (startTime == 0) {
-            return 0;
+    val uptimeInSeconds: Long
+        get() {
+            if (startTime == 0L) {
+                return 0
+            }
+
+            return if (isPaused) {
+                lastTime
+            } else {
+                lastTime + (System.currentTimeMillis() - startTime) / 1000
+            }
         }
 
-        if (isPaused) {
-            return lastTime;
-        } else {
-            return lastTime + (System.currentTimeMillis() - startTime) / 1000;
-        }
-    }
+    val uptimeInWords: String
+        get() {
+            if (startTime == 0L) return "0 seconds"
 
-    public static String getUptimeInWords() {
-        if (startTime == 0) return "0 seconds";
+            val uptime =
+                lastTime + (System.currentTimeMillis() - startTime) / 1000
 
-        long uptime = lastTime + (System.currentTimeMillis() - startTime) / 1000;
+            val hours = uptime / 3600
+            val minutes = (uptime % 3600) / 60
+            val seconds = uptime % 60
 
-        long hours = uptime / 3600;
-        long minutes = (uptime % 3600) / 60;
-        long seconds = uptime % 60;
-
-        return hours > 0
-            ? String.format("%d hours, %d minutes, %d seconds", hours, minutes, seconds)
-            : minutes > 0
-                ? String.format("%d minutes, %d seconds", minutes, seconds)
-                : String.format("%d seconds", seconds);
-    }
-
-    public static String getUptime() {
-        if (startTime == 0) return "00:00:00";
-
-        long uptime;
-
-        if (isPaused) {
-            uptime = lastTime;
-        } else {
-            uptime = lastTime + (System.currentTimeMillis() - startTime) / 1000;
+            return if (hours > 0) String.format("%d hours, %d minutes, %d seconds", hours, minutes, seconds) else
+                if (minutes > 0) String.format(
+                    "%d minutes, %d seconds",
+                    minutes,
+                    seconds
+                ) else String.format("%d seconds", seconds)
         }
 
-        long hours = uptime / 3600;
-        long minutes = (uptime % 3600) / 60;
-        long seconds = uptime % 60;
+    @JvmStatic
+    val uptime: String
+        get() {
+            if (startTime == 0L) return "00:00:00"
 
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
+            val uptime: Long = if (isPaused) {
+                lastTime
+            } else {
+                lastTime + (System.currentTimeMillis() - startTime) / 1000
+            }
+
+            val hours = uptime / 3600
+            val minutes = (uptime % 3600) / 60
+            val seconds = uptime % 60
+
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        }
 }

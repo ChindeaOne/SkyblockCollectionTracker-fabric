@@ -100,7 +100,7 @@ object ConfigStateUtils {
             ConfigHelper.disableSkillLeaderboardTracking()
         }
 
-        if (ConfigAccess.isTamingTrackingEnabled() && SkillTrackingHandler.getUptimeInSeconds() > 1 && SkillTrackingRates.tamingXp == 0L) {
+        if (ConfigAccess.isTamingTrackingEnabled() && SkillTrackingHandler.uptimeInSeconds > 1 && SkillTrackingRates.tamingXp == 0L) {
             sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true)
             ConfigHelper.disableTamingTracking()
         }

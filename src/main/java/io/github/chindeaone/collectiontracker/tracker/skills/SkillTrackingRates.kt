@@ -1,235 +1,311 @@
-package io.github.chindeaone.collectiontracker.tracker.skills;
+package io.github.chindeaone.collectiontracker.tracker.skills
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.utils.SkillUtils;
-import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager;
-import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardEntry;
-import io.github.chindeaone.collectiontracker.utils.StringUtils;
+import io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getNextRankEntryForSkill
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPlayerRank
+import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPreviousRankEntryForSkill
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.stopTracking
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.uptimeInSeconds
+import io.github.chindeaone.collectiontracker.utils.SkillUtils
+import io.github.chindeaone.collectiontracker.utils.StringUtils.formatETA
+import kotlin.concurrent.Volatile
+import kotlin.math.floor
 
-import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.getUptimeInSeconds;
+object SkillTrackingRates {
+    @JvmField
+    @Volatile
+    var skillLevel: Int = 0 // session start level and api level
 
-public class SkillTrackingRates {
+    @Volatile
+    var skillXp: Long = 0 // session start xp and api xp
 
-    public static volatile int skillLevel; // session start level and api level
-    public static volatile long skillXp; // session start xp and api xp
-    public static volatile long totalSkillXp;
+    @JvmField
+    @Volatile
+    var totalSkillXp: Long = 0
 
-    public static volatile long skillXpGained = 0L;
-    public static volatile long skillPerHour = 0L;
-    private static long lastXpGained = 0L;
+    @JvmField
+    @Volatile
+    var skillXpGained: Long = 0L
 
-    public static volatile int tamingLevel; // session start level and api level
-    public static volatile long tamingXp; // session start xp and api xp
+    @JvmField
+    @Volatile
+    var skillPerHour: Long = 0L
+    private var lastXpGained = 0L
 
-    public static volatile long tamingXpGained = 0L;
-    public static volatile long tamingPerHour = 0L;
-    private static long lastTamingXpGained = 0L;
+    @JvmField
+    var tamingLevel: Int = 0 // session start level and api level
 
-    public static boolean afk = false;
-    private static int skillUnchangedStreak = 0;
-    private static int tamingUnchangedStreak = 0;
-    private static final int THRESHOLD = 2; // Number of checks before considering AFK
+    @JvmField
+    @Volatile
+    var tamingXp: Long = 0 // session start xp and api xp
+
+    @JvmField
+    @Volatile
+    var tamingXpGained: Long = 0L
+
+    @JvmField
+    @Volatile
+    var tamingPerHour: Long = 0L
+    private var lastTamingXpGained = 0L
+
+    var afk: Boolean = false
+    private var skillUnchangedStreak = 0
+    private var tamingUnchangedStreak = 0
+    private const val THRESHOLD = 2 // Number of checks before considering AFK
 
     // Skill Leaderboard tracking data
-    public static volatile int skillCurrentRank = -1;
-    public static volatile String skillNextRankUsername = null;
-    public static volatile long skillNextRankAmount = -1L;
-    public static volatile long skillTillNextRank = -1L;
-    public static volatile String skillEtaToNextRank = null;
-    public static volatile boolean isNextSkillWiped = false;
-    public static volatile String skillPreviousRankUsername = null;
-    public static volatile long skillPreviousRankAmount = -1L;
-    public static volatile long skillAbovePreviousRankAmount = -1L;
-    public static volatile boolean isPreviousSkillWiped = false;
+    @JvmField
+    @Volatile
+    var skillCurrentRank: Int = -1
+
+    @JvmField
+    @Volatile
+    var skillNextRankUsername: String? = null
+
+    @JvmField
+    @Volatile
+    var skillNextRankAmount: Long = -1L
+
+    @JvmField
+    @Volatile
+    var skillTillNextRank: Long = -1L
+
+    @JvmField
+    @Volatile
+    var skillEtaToNextRank: String? = null
+
+    @Volatile
+    var isNextSkillWiped: Boolean = false
+
+    @Volatile
+    var skillPreviousRankUsername: String? = null
+
+    @Volatile
+    var skillPreviousRankAmount: Long = -1L
+
+    @Volatile
+    var skillAbovePreviousRankAmount: Long = -1L
+
+    @Volatile
+    var isPreviousSkillWiped: Boolean = false
 
     // Taming Leaderboard tracking data
-    public static volatile int tamingCurrentRank = -1;
-    public static volatile String tamingNextRankUsername = null;
-    public static volatile long tamingNextRankAmount = -1L;
-    public static volatile long tamingTillNextRank = -1L;
-    public static volatile String tamingEtaToNextRank = null;
-    public static volatile boolean isNextTamingWiped = false;
-    public static volatile String tamingPreviousRankUsername = null;
-    public static volatile long tamingPreviousRankAmount = -1L;
-    public static volatile long tamingAbovePreviousRankAmount = -1L;
-    public static volatile boolean isPreviousTamingWiped = false;
+    @JvmField
+    @Volatile
+    var tamingCurrentRank: Int = -1
 
-    public static void initTracking(int level, long xp) {
-        skillLevel = level;
-        skillXp = xp;
-        totalSkillXp = xp;
+    @JvmField
+    @Volatile
+    var tamingNextRankUsername: String? = null
 
-        if (ConfigAccess.isTamingTrackingEnabled()) {
-            tamingLevel = SkillUtils.getTamingLevel();
-            tamingXp = SkillUtils.getTamingValue().longValue();
+    @JvmField
+    @Volatile
+    var tamingNextRankAmount: Long = -1L
+
+    @JvmField
+    @Volatile
+    var tamingTillNextRank: Long = -1L
+
+    @JvmField
+    @Volatile
+    var tamingEtaToNextRank: String? = null
+
+    @JvmField
+    @Volatile
+    var isNextTamingWiped: Boolean = false
+
+    @Volatile
+    var tamingPreviousRankUsername: String? = null
+
+    @Volatile
+    var tamingPreviousRankAmount: Long = -1L
+
+    @Volatile
+    var tamingAbovePreviousRankAmount: Long = -1L
+
+    @Volatile
+    var isPreviousTamingWiped: Boolean = false
+
+    fun initTracking(level: Int, xp: Long) {
+        skillLevel = level
+        skillXp = xp
+        totalSkillXp = xp
+
+        if (isTamingTrackingEnabled()) {
+            tamingLevel = SkillUtils.getTamingLevel()
+            tamingXp = SkillUtils.getTamingValue().toLong()
         }
     }
 
-    public static synchronized void calculateSkillRates(long value) {
-        skillXpGained = value - (skillXp - (SkillTrackingHandler.isSkillMaxed ? SkillUtils.getMaxXpForSkill(skillName) : 0L)); // total gained since tracking started
+    @Synchronized
+    fun calculateSkillRates(value: Long) {
+        skillXpGained =
+            value - (skillXp - (if (SkillTrackingHandler.isSkillMaxed) SkillUtils.getMaxXpForSkill(skillName) else 0L)) // total gained since tracking started
 
         // AFK detection (API calls only)
         if (!SkillTrackingHandler.isSkillMaxed) {
             if (lastXpGained != skillXpGained) {
-                lastXpGained = skillXpGained;
-                skillUnchangedStreak = 0;
-                afk = false;
+                lastXpGained = skillXpGained
+                skillUnchangedStreak = 0
+                afk = false
             } else {
-                skillUnchangedStreak++;
+                skillUnchangedStreak++
                 if (skillUnchangedStreak >= THRESHOLD) {
-                    afk = true;
-                    SkillTrackingHandler.stopTracking();
-                    return;
+                    afk = true
+                    stopTracking()
+                    return
                 }
             }
         }
-        long uptime = getUptimeInSeconds();
-        skillPerHour = uptime > 0 ? (long) Math.floor(skillXpGained / (uptime / 3600.0)) : 0;
-        totalSkillXp = skillXp + skillXpGained;
+        val uptime = uptimeInSeconds
+        skillPerHour = if (uptime > 0) floor(skillXpGained / (uptime / 3600.0)).toLong() else 0
+        totalSkillXp = skillXp + skillXpGained
 
-        updateSkillLeaderboardStats();
-        updateSkillEta();
+        updateSkillLeaderboardStats()
+        updateSkillEta()
     }
 
-    public static synchronized void calculateTamingRates(long value) {
-        tamingXpGained = value - tamingXp; // total gained since tracking started
+    @Synchronized
+    fun calculateTamingRates(value: Long) {
+        tamingXpGained = value - tamingXp // total gained since tracking started
 
         // AFK detection (API calls only)
         if (lastTamingXpGained != tamingXpGained) {
-            lastTamingXpGained = tamingXpGained;
-            tamingUnchangedStreak = 0;
-            afk = false;
+            lastTamingXpGained = tamingXpGained
+            tamingUnchangedStreak = 0
+            afk = false
         } else {
-            tamingUnchangedStreak++;
+            tamingUnchangedStreak++
             if (tamingUnchangedStreak >= THRESHOLD) {
-                afk = true;
-                SkillTrackingHandler.stopTracking();
-                return;
+                afk = true
+                stopTracking()
+                return
             }
         }
 
-        long uptime = getUptimeInSeconds();
-        tamingPerHour = uptime > 0 ? (long) Math.floor(tamingXpGained / (uptime / 3600.0)) : 0;
+        val uptime = uptimeInSeconds
+        tamingPerHour = if (uptime > 0) floor(tamingXpGained / (uptime / 3600.0)).toLong() else 0
 
-        updateTamingLeaderboardStats();
-        updateTamingEta();
+        updateTamingLeaderboardStats()
+        updateTamingEta()
     }
 
-    public static void updateSkillLeaderboardStats() {
-        if (!ConfigAccess.isSkillLeaderboardEnabled()) return;
+    fun updateSkillLeaderboardStats() {
+        if (!isSkillLeaderboardEnabled()) return
 
-        skillCurrentRank = LeaderboardManager.getPlayerRank(skillName, totalSkillXp);
+        skillCurrentRank = getPlayerRank(skillName, totalSkillXp)
 
-        LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntryForSkill(skillName, totalSkillXp);
+        val nextEntry = getNextRankEntryForSkill(skillName, totalSkillXp)
         if (nextEntry != null) {
-            skillNextRankUsername = nextEntry.username();
-            skillNextRankAmount = nextEntry.amount();
-            skillTillNextRank = skillNextRankAmount - totalSkillXp;
-            updateSkillEta();
-            isNextSkillWiped = nextEntry.wiped();
+            skillNextRankUsername = nextEntry.username
+            skillNextRankAmount = nextEntry.amount
+            skillTillNextRank = skillNextRankAmount - totalSkillXp
+            updateSkillEta()
+            isNextSkillWiped = nextEntry.wiped
         } else {
-            skillNextRankUsername = null;
-            skillNextRankAmount = -1L;
-            skillTillNextRank = -1L;
-            skillEtaToNextRank = null;
-            isNextSkillWiped = false;
+            skillNextRankUsername = null
+            skillNextRankAmount = -1L
+            skillTillNextRank = -1L
+            skillEtaToNextRank = null
+            isNextSkillWiped = false
         }
 
-        LeaderboardEntry previousEntry = LeaderboardManager.getPreviousRankEntryForSkill(skillName, totalSkillXp);
+        val previousEntry = getPreviousRankEntryForSkill(skillName, totalSkillXp)
         if (previousEntry != null) {
-            skillPreviousRankUsername = previousEntry.username();
-            skillPreviousRankAmount = previousEntry.amount();
-            skillAbovePreviousRankAmount = totalSkillXp - skillPreviousRankAmount;
-            isPreviousSkillWiped = previousEntry.wiped();
+            skillPreviousRankUsername = previousEntry.username
+            skillPreviousRankAmount = previousEntry.amount
+            skillAbovePreviousRankAmount = totalSkillXp - skillPreviousRankAmount
+            isPreviousSkillWiped = previousEntry.wiped
         } else {
-            skillPreviousRankUsername = null;
-            skillPreviousRankAmount = -1L;
-            skillAbovePreviousRankAmount = -1L;
-            isPreviousSkillWiped = false;
+            skillPreviousRankUsername = null
+            skillPreviousRankAmount = -1L
+            skillAbovePreviousRankAmount = -1L
+            isPreviousSkillWiped = false
         }
     }
 
-    public static void updateTamingLeaderboardStats() {
-        if (!ConfigAccess.isSkillLeaderboardEnabled() || !ConfigAccess.isTamingTrackingEnabled()) return;
+    fun updateTamingLeaderboardStats() {
+        if (!isSkillLeaderboardEnabled() || !isTamingTrackingEnabled()) return
 
-        tamingCurrentRank = LeaderboardManager.getPlayerRank("Taming", tamingXp + tamingXpGained);
+        tamingCurrentRank = getPlayerRank("Taming", tamingXp + tamingXpGained)
 
-        LeaderboardEntry nextEntry = LeaderboardManager.getNextRankEntryForSkill("Taming", tamingXp + tamingXpGained);
+        val nextEntry = getNextRankEntryForSkill("Taming", tamingXp + tamingXpGained)
         if (nextEntry != null) {
-            tamingNextRankUsername = nextEntry.username();
-            tamingNextRankAmount = nextEntry.amount();
-            tamingTillNextRank = tamingNextRankAmount - (tamingXp + tamingXpGained);
-            updateTamingEta();
-            isNextTamingWiped = nextEntry.wiped();
+            tamingNextRankUsername = nextEntry.username
+            tamingNextRankAmount = nextEntry.amount
+            tamingTillNextRank = tamingNextRankAmount - (tamingXp + tamingXpGained)
+            updateTamingEta()
+            isNextTamingWiped = nextEntry.wiped
         } else {
-            tamingNextRankUsername = null;
-            tamingNextRankAmount = -1L;
-            tamingTillNextRank = -1L;
-            tamingEtaToNextRank = null;
-            isNextTamingWiped = false;
+            tamingNextRankUsername = null
+            tamingNextRankAmount = -1L
+            tamingTillNextRank = -1L
+            tamingEtaToNextRank = null
+            isNextTamingWiped = false
         }
 
-        LeaderboardEntry previousEntry = LeaderboardManager.getPreviousRankEntryForSkill("Taming", tamingXp + tamingXpGained);
+        val previousEntry = getPreviousRankEntryForSkill("Taming", tamingXp + tamingXpGained)
         if (previousEntry != null) {
-            tamingPreviousRankUsername = previousEntry.username();
-            tamingPreviousRankAmount = previousEntry.amount();
-            tamingAbovePreviousRankAmount = (tamingXp + tamingXpGained) - tamingPreviousRankAmount;
-            isPreviousTamingWiped = previousEntry.wiped();
+            tamingPreviousRankUsername = previousEntry.username
+            tamingPreviousRankAmount = previousEntry.amount
+            tamingAbovePreviousRankAmount = (tamingXp + tamingXpGained) - tamingPreviousRankAmount
+            isPreviousTamingWiped = previousEntry.wiped
         } else {
-            tamingPreviousRankUsername = null;
-            tamingPreviousRankAmount = -1L;
-            tamingAbovePreviousRankAmount = -1L;
-            isPreviousTamingWiped = false;
+            tamingPreviousRankUsername = null
+            tamingPreviousRankAmount = -1L
+            tamingAbovePreviousRankAmount = -1L
+            isPreviousTamingWiped = false
         }
     }
 
-    public static void updateSkillEta() {
+    fun updateSkillEta() {
         if (skillPerHour > 0 && skillTillNextRank > 0) {
-            long seconds = (long) (skillTillNextRank / (skillPerHour / 3600.0));
-            skillEtaToNextRank = StringUtils.formatETA(seconds);
+            val seconds = (skillTillNextRank / (skillPerHour / 3600.0)).toLong()
+            skillEtaToNextRank = formatETA(seconds)
         } else {
-            skillEtaToNextRank = null;
+            skillEtaToNextRank = null
         }
     }
 
-    public static void updateTamingEta() {
+    fun updateTamingEta() {
         if (tamingPerHour > 0 && tamingTillNextRank > 0) {
-            long seconds = (long) (tamingTillNextRank / (tamingPerHour / 3600.0));
-            tamingEtaToNextRank = StringUtils.formatETA(seconds);
+            val seconds = (tamingTillNextRank / (tamingPerHour / 3600.0)).toLong()
+            tamingEtaToNextRank = formatETA(seconds)
         } else {
-            tamingEtaToNextRank = null;
+            tamingEtaToNextRank = null
         }
     }
 
-    public static void resetSession() {
-        skillLevel = 0;
-        skillXp = 0L;
-        totalSkillXp = 0L;
-        skillXpGained = 0L;
-        skillPerHour = 0L;
+    fun resetSession() {
+        skillLevel = 0
+        skillXp = 0L
+        totalSkillXp = 0L
+        skillXpGained = 0L
+        skillPerHour = 0L
 
-        tamingLevel = 0;
-        tamingXp = 0L;
-        tamingXpGained = 0L;
-        tamingPerHour = 0L;
+        tamingLevel = 0
+        tamingXp = 0L
+        tamingXpGained = 0L
+        tamingPerHour = 0L
 
-        lastXpGained = 0L;
-        lastTamingXpGained = 0L;
-        afk = false;
-        skillUnchangedStreak = 0;
-        tamingUnchangedStreak = 0;
+        lastXpGained = 0L
+        lastTamingXpGained = 0L
+        afk = false
+        skillUnchangedStreak = 0
+        tamingUnchangedStreak = 0
 
-        skillCurrentRank = -1;
-        skillNextRankUsername = null;
-        skillNextRankAmount = -1L;
-        skillTillNextRank = -1L;
-        skillEtaToNextRank = null;
+        skillCurrentRank = -1
+        skillNextRankUsername = null
+        skillNextRankAmount = -1L
+        skillTillNextRank = -1L
+        skillEtaToNextRank = null
 
-        tamingCurrentRank = -1;
-        tamingNextRankUsername = null;
-        tamingNextRankAmount = -1L;
-        tamingTillNextRank = -1L;
-        tamingEtaToNextRank = null;
+        tamingCurrentRank = -1
+        tamingNextRankUsername = null
+        tamingNextRankAmount = -1L
+        tamingTillNextRank = -1L
+        tamingEtaToNextRank = null
     }
 }

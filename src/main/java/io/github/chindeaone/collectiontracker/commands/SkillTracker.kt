@@ -15,7 +15,8 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 
 object SkillTracker {
 
-    @JvmStatic var skillName = ""
+    @JvmField
+    var skillName = ""
     private val logger: Logger = LogManager.getLogger(SkillTracker::class.java)
 
     fun startTracking(skill: String) {

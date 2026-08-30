@@ -159,7 +159,7 @@ object MultiTrackingHandler  {
         leaderboardTrackingInitialized = false
 
         if (trackingTask != null) {
-            trackingTask.cancel(false)
+            trackingTask!!.cancel(false)
             trackingTask = null
         }
 

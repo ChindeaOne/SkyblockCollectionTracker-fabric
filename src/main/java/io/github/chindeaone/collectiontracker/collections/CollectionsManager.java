@@ -49,13 +49,13 @@ public class CollectionsManager {
     public static boolean hasAnyRiftCollection() {
         Set<String> riftCollections = collections.getOrDefault("Rift", Collections.emptySet());
 
-        return CollectionTracker.collectionList.stream().anyMatch(riftCollections::contains);
+        return CollectionTracker.getCollectionList().stream().anyMatch(riftCollections::contains);
     }
 
     public static boolean hasAllRiftCollections() {
         Set<String> riftCollections = collections.getOrDefault("Rift", Collections.emptySet());
 
-        return riftCollections.containsAll(CollectionTracker.collectionList);
+        return riftCollections.containsAll(CollectionTracker.getCollectionList());
     }
 
     public static void resetCollections() {

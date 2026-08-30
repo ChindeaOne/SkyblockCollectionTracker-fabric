@@ -1,257 +1,265 @@
-package io.github.chindeaone.collectiontracker.tracker.collection;
+package io.github.chindeaone.collectiontracker.tracker.collection
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+object LeaderboardManager {
+    @Volatile
+    private var currentLeaderboard = mutableListOf<LeaderboardEntry>()
+    @Volatile
+    private var skillLeaderboards = mutableMapOf<String, List<LeaderboardEntry>>()
 
-public class LeaderboardManager {
-    private static volatile List<LeaderboardEntry> currentLeaderboard = List.of();
-    private static final Map<String, List<LeaderboardEntry>> skillLeaderboards = new ConcurrentHashMap<>();
-
-    public static void set(List<LeaderboardEntry> entries) {
-        currentLeaderboard = entries;
+    @JvmStatic
+    fun set(entries: MutableList<LeaderboardEntry>) {
+        currentLeaderboard = entries
     }
 
-    public static void setSkillLeaderboard(String skill, List<LeaderboardEntry> entries) {
-        if (skill == null || entries == null) return;
-        skillLeaderboards.put(skill.toLowerCase(), entries);
+    @JvmStatic
+    fun setSkillLeaderboard(skill: String, entries: MutableList<LeaderboardEntry>) {
+        skillLeaderboards[skill.lowercase()] = entries
     }
 
-    private static LeaderboardEntry getPlayerEntryRaw(long amount) {
-        List<LeaderboardEntry> lb = currentLeaderboard;
+    private fun getPlayerEntryRaw(amount: Long): LeaderboardEntry? {
+        val lb = currentLeaderboard
         if (lb.isEmpty()) {
-            return null;
+            return null
         }
 
-        int index = findBinaryIndex(lb, amount);
-        if (index < lb.size()) {
-            return lb.get(index);
+        val index = findBinaryIndex(lb, amount)
+        if (index < lb.size) {
+            return lb[index]
         }
 
-        return null;
+        return null
     }
 
-    public static int getPlayerRank(long amount) {
-        List<LeaderboardEntry> lb = currentLeaderboard;
+    fun getPlayerRank(amount: Long): Int {
+        val lb = currentLeaderboard
         if (lb.isEmpty()) {
-            return -1;
+            return -1
         }
 
-        return findBinaryIndex(lb, amount) + 1;
+        return findBinaryIndex(lb, amount) + 1
     }
 
-    public static LeaderboardEntry getPlayerEntry(String skill, long amount) {
-        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
-        if (lb.isEmpty()) return null;
+    fun getPlayerEntry(skill: String, amount: Long): LeaderboardEntry? {
+        val lb = skillLeaderboards.getOrDefault(skill.lowercase(), listOf())
+        if (lb.isEmpty()) return null
 
-        int index = findBinaryIndex(lb, amount);
-        return index < lb.size() ? lb.get(index) : null;
+        val index = findBinaryIndex(lb, amount)
+        return if (index < lb.size) lb[index] else null
     }
 
-    public static int getPlayerRank(String skill, long amount) {
-        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
+    @JvmStatic
+    fun getPlayerRank(skill: String, amount: Long): Int {
+        val lb = skillLeaderboards.getOrDefault(skill.lowercase(), listOf())
         if (lb.isEmpty()) {
-            return -1;
+            return -1
         }
 
-        return findBinaryIndex(lb, amount) + 1;
+        return findBinaryIndex(lb, amount) + 1
     }
 
-    private static LeaderboardEntry getNextRankEntryRaw(long amount) {
-        List<LeaderboardEntry> lb = currentLeaderboard;
+    private fun getNextRankEntryRaw(amount: Long): LeaderboardEntry? {
+        val lb = currentLeaderboard
         if (lb.isEmpty()) {
-            return null;
+            return null
         }
 
-        int index = findBinaryIndex(lb, amount);
-
+        val index = findBinaryIndex(lb, amount)
         if (index > 0) {
-            return lb.get(index - 1);
+            return lb[index - 1]
         }
 
-        return null;
+        return null
     }
 
-    private static LeaderboardEntry getPreviousRankEntryRaw(long amount) {
-        List<LeaderboardEntry> lb = currentLeaderboard;
+    private fun getPreviousRankEntryRaw(amount: Long): LeaderboardEntry? {
+        val lb = currentLeaderboard
         if (lb.isEmpty()) {
-            return null;
+            return null
         }
 
-        int index = findBinaryIndex(lb, amount);
-
-        if (index < lb.size() - 1) {
-            return lb.get(index + 1);
+        val index = findBinaryIndex(lb, amount)
+        if (index < lb.size - 1) {
+            return lb[index + 1]
         }
 
-        return null;
+        return null
     }
 
-    private static LeaderboardEntry getNextRankEntryRaw(String skill, long amount) {
-        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
+    private fun getNextRankEntryRaw(skill: String, amount: Long): LeaderboardEntry? {
+        val lb = skillLeaderboards.getOrDefault(skill.lowercase(), listOf())
         if (lb.isEmpty()) {
-            return null;
+            return null
         }
 
-        int index = findBinaryIndex(lb, amount);
-
-
+        val index = findBinaryIndex(lb, amount)
         if (index > 0) {
-            return lb.get(index - 1);
+            return lb[index - 1]
         }
 
-        return null;
+        return null
     }
 
-    private static LeaderboardEntry getPreviousRankEntryRaw(String skill, long amount) {
-        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
+    private fun  getPreviousRankEntryRaw(skill: String, amount: Long): LeaderboardEntry? {
+        val lb = skillLeaderboards.getOrDefault(skill.lowercase(), listOf())
         if (lb.isEmpty()) {
-            return null;
+            return null
         }
 
-        int index = findBinaryIndex(lb, amount);
-
-        if (index < lb.size() - 1) {
-            return lb.get(index + 1);
+        val index = findBinaryIndex(lb, amount)
+        if (index < lb.size - 1) {
+            return lb[index + 1]
         }
 
-        return null;
+        return null
     }
 
-    public static LeaderboardEntry getNextRankEntry(long amount) {
-        List<LeaderboardEntry> lb = currentLeaderboard;
+    fun getNextRankEntry(amount: Long): LeaderboardEntry? {
+        val lb = currentLeaderboard
         if (lb.isEmpty()) {
-            return null;
+            return null
         }
 
         // Custom position
         if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
-            Integer position = ConfigAccess.getCustomPositionEntry("gemstone");
+            val position = ConfigAccess.getCustomPositionEntry("gemstone")
 
             if (position != null) {
-                LeaderboardEntry playerEntry = getPlayerEntryRaw(amount);
+                val playerEntry = getPlayerEntryRaw(amount)
                 // default if player already passed the goal position
-                if (playerEntry != null && playerEntry.rank() < position) {
-                    return getNextRankEntryRaw(amount);
+                if (playerEntry != null && playerEntry.rank < position) {
+                    return getNextRankEntryRaw(amount)
                 }
-                return getEntryAtPosition(position);
+                return getEntryAtPosition(position)
             }
         }
 
         // Default
-        return getNextRankEntryRaw(amount);
+        return getNextRankEntryRaw(amount)
     }
 
-    public static LeaderboardEntry getNextRankEntry(String skill, long amount) {
-        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
-        if (lb.isEmpty()) return null;
-
-        // Custom position
-        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
-            Integer position = ConfigAccess.getCustomPositionEntry(skill);
-
-            if (position != null) {
-                LeaderboardEntry playerEntry = getPlayerEntry(skill, amount);
-                // default if player already passed the goal position
-                if (playerEntry != null && playerEntry.rank() < position) {
-                    return getNextRankEntryRaw(skill, amount);
-                }
-                return getSkillEntryAtPosition(skill, position);
-            }
-        }
-
-        // Default
-        return getNextRankEntryRaw(skill, amount);
-    }
-
-    public static LeaderboardEntry getPreviousRankEntry(String skill, long amount) {
-        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
-        if (lb.isEmpty()) return null;
-
-        return getPreviousRankEntryRaw(skill, amount);
-    }
-
-    public static LeaderboardEntry getPreviousRankEntry(long amount) {
-        List<LeaderboardEntry> lb = currentLeaderboard;
+    fun getNextRankEntry(skill: String, amount: Long): LeaderboardEntry? {
+        val lb = skillLeaderboards.getOrDefault(skill.lowercase(), listOf())
         if (lb.isEmpty()) {
-            return null;
+            return null
         }
 
-        return getPreviousRankEntryRaw(amount);
-    }
-
-    public static int getPlayerRank() {
-        return getPlayerRank(TrackingRates.collectionAmount);
-    }
-
-    public static LeaderboardEntry getNextRankEntry() {
         // Custom position
         if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
-            Integer position = ConfigAccess.getCustomPositionEntry(CollectionTracker.collection);
+            val position = ConfigAccess.getCustomPositionEntry(skill)
 
             if (position != null) {
-                LeaderboardEntry playerEntry = getPlayerEntryRaw(TrackingRates.collectionAmount);
+                val playerEntry = getPlayerEntry(skill, amount)
                 // default if player already passed the goal position
-                if (playerEntry != null && playerEntry.rank() < position) {
-                    return getNextRankEntryRaw(TrackingRates.collectionAmount);
+                if (playerEntry != null && playerEntry.rank < position) {
+                    return getNextRankEntryRaw(skill, amount)
                 }
-                return getEntryAtPosition(position);
+                return getSkillEntryAtPosition(skill, position)
             }
         }
 
         // Default
-        return getNextRankEntryRaw(TrackingRates.collectionAmount);
+        return getNextRankEntryRaw(skill, amount)
     }
 
-    public static LeaderboardEntry getPreviousRankEntry() {
-        return getPreviousRankEntryRaw(TrackingRates.collectionAmount);
-    }
-
-    public static LeaderboardEntry getEntryAtPosition(int position) {
-        List<LeaderboardEntry> lb = currentLeaderboard;
-
-        if (lb.isEmpty() || position < 1 || position > lb.size()) {
-            return null;
+    fun getPreviousRankEntry(skill: String, amount: Long): LeaderboardEntry? {
+        val lb = skillLeaderboards.getOrDefault(skill.lowercase(), listOf())
+        if (lb.isEmpty()) {
+            return null
         }
-        return lb.get(position - 1);
+
+        return getPreviousRankEntryRaw(skill, amount)
     }
 
-    public static LeaderboardEntry getNextRankEntryForSkill(String skill, long skillXp) {
-        return getNextRankEntry(skill, skillXp);
-    }
-
-    public static LeaderboardEntry getPreviousRankEntryForSkill(String skill, long skillXp) {
-        return getPreviousRankEntry(skill, skillXp);
-    }
-
-    public static LeaderboardEntry getSkillEntryAtPosition(String skill, int position) {
-        List<LeaderboardEntry> lb = skillLeaderboards.getOrDefault(skill.toLowerCase(), List.of());
-        if (lb.isEmpty() || position < 1 || position > lb.size()) {
-            return null;
+    fun getPreviousRankEntry(amount: Long): LeaderboardEntry? {
+        val lb = currentLeaderboard
+        if (lb.isEmpty()) {
+            return null
         }
-        return lb.get(position - 1);
+
+        return getPreviousRankEntryRaw(amount)
     }
 
-    public static int findBinaryIndex(List<LeaderboardEntry> lb, long targetAmount) {
-        int index = Collections.binarySearch(lb, new LeaderboardEntry("", 0, targetAmount, ConfigAccess.isIncludeWipedProfilesEnabled()),
-                (a, b) -> Long.compare(b.amount(), a.amount()));
+    @JvmStatic
+    fun getPlayerRank(): Int {
+        return getPlayerRank(TrackingRates.collectionAmount)
+    }
+
+    @JvmStatic
+    fun getNextRankEntry(): LeaderboardEntry? {
+        // Custom position
+        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
+            val position = ConfigAccess.getCustomPositionEntry(CollectionTracker.collection)
+
+            if (position != null) {
+                val playerEntry = getPlayerEntryRaw(TrackingRates.collectionAmount)
+                // default if player already passed the goal position
+                if (playerEntry != null && playerEntry.rank < position) {
+                    return getNextRankEntryRaw(TrackingRates.collectionAmount)
+                }
+                return getEntryAtPosition(position)
+            }
+        }
+
+        // Default
+        return getNextRankEntryRaw(TrackingRates.collectionAmount)
+    }
+
+    @JvmStatic
+    fun getPreviousRankEntry(): LeaderboardEntry? {
+        return getPreviousRankEntryRaw(TrackingRates.collectionAmount)
+    }
+
+    fun getEntryAtPosition(position: Int): LeaderboardEntry? {
+        val lb = currentLeaderboard
+
+        if (lb.isEmpty() || position < 1 || position > lb.size) {
+            return null
+        }
+        return lb[position - 1]
+    }
+
+    @JvmStatic
+    fun getNextRankEntryForSkill(skill: String, skillXp: Long): LeaderboardEntry? {
+        return getNextRankEntry(skill, skillXp)
+    }
+
+    @JvmStatic
+    fun getPreviousRankEntryForSkill(skill: String, skillXp: Long): LeaderboardEntry? {
+        return getPreviousRankEntry(skill, skillXp)
+    }
+
+    fun getSkillEntryAtPosition(skill: String, position: Int): LeaderboardEntry? {
+        val lb = skillLeaderboards.getOrDefault(skill.lowercase(), listOf())
+        if (lb.isEmpty() || position < 1 || position > lb.size) {
+            return null
+        }
+        return lb[position - 1]
+    }
+
+    fun findBinaryIndex(lb: List<LeaderboardEntry>, targetAmount: Long): Int {
+        var index = lb.binarySearch(
+            LeaderboardEntry("", 0, targetAmount, ConfigAccess.isIncludeWipedProfilesEnabled()),
+            { a, b -> b.amount.compareTo(a.amount) })
 
         if (index < 0) {
-            index = -index - 1;
+            index = -index - 1
         }
-        return index;
+        return index
     }
 
-    public static void clear() {
-        currentLeaderboard = List.of();
-        skillLeaderboards.clear();
+    @JvmStatic
+    fun clear() {
+        currentLeaderboard = mutableListOf()
+        skillLeaderboards.clear()
     }
 
-    public static boolean isEmpty() {
-        return currentLeaderboard.isEmpty();
+    @JvmStatic
+    fun isEmpty(): Boolean {
+        return currentLeaderboard.isEmpty()
     }
 }
+
+data class LeaderboardEntry(var username: String, var rank: Int, var amount: Long, var wiped: Boolean)
