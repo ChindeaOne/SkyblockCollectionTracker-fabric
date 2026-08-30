@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.commands;
 
 import io.github.chindeaone.collectiontracker.api.bazaarapi.FetchBazaarPrice;
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager;
-import io.github.chindeaone.collectiontracker.collections.GemstonesManager;
 import io.github.chindeaone.collectiontracker.config.ConfigHelper;
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher;
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
@@ -55,11 +54,6 @@ public class CollectionTracker {
                 }
 
                 collection = coll.toLowerCase();
-                // Remove general gemstone from normal tracking
-                if (collection.equals("gemstone")) {
-                    ChatUtils.sendMessage("§cThe `gemstone` collection isn't supported for normal tracking anymore. Use `/sct track-multi gemstone` instead!", true);
-                    return;
-                }
 
                 if (!CollectionsManager.isValidCollection(collection)) {
                     ChatUtils.sendMessage("§4" + collection + " collection is not supported! Use `/sct collections` to see all supported collections.", true);
@@ -140,10 +134,6 @@ public class CollectionTracker {
                 List <String> validCollections = new LinkedList<>();
                 for (String coll : list) {
                     coll = coll.toLowerCase().trim();
-                    if (GemstonesManager.checkIfGemstone(coll)) {
-                        ChatUtils.sendMessage("§cIndividual gemstones aren't supported. Please use `/sct track-multi gemstone`!", true);
-                        return;
-                    }
                     if (CollectionsManager.isCollection(coll)) {
                         CollectionsManager.multiCollectionSource.add("collection");
                     } else CollectionsManager.multiCollectionSource.add("sacks");
