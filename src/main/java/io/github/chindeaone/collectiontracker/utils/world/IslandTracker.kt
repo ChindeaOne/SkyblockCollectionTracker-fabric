@@ -2,32 +2,36 @@ package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+
 import io.github.chindeaone.collectiontracker.utils.tab.TabWidget
 
 object IslandTracker {
 
+    private var currentIsland: String? = null
+
     @JvmStatic var currentMiningIsland: String? = null
         private set
 
-    @JvmStatic var currentForagingIsland: String? = null
+    @JvmStatic
+    var currentForagingIsland: String? = null
         private set
 
     var currentFarmingIsland: String? = null
         private set
 
-    @JvmStatic var isInPark: Boolean = false
+    var isInPark: Boolean = false
         private set
 
-    @JvmStatic var isInMoongladeMarsh: Boolean = false
+    var isInMoongladeMarsh: Boolean = false
         private set
 
-    var currentIsland: String? = null
+    var isInRift: Boolean = false
         private set
 
-    @JvmStatic var isInRift: Boolean = false
-        private set
+    private var wasReset: Boolean = false
 
-    fun update() {
+    fun onTabUpdate() {
         val areaWidget = TabWidget.AREA
         if (!areaWidget.isPresent) {
             reset()
@@ -52,8 +56,10 @@ object IslandTracker {
         currentMiningIsland = MiningMapping.miningAreas.firstOrNull { name ->
             island.equals(name, ignoreCase = true)
         }
+        WaypointsUtils.enableRoutes()
+        onMineshaftEnter()
 
-        currentForagingIsland = ForagingMapping.foragingIslands.firstOrNull { name ->
+        currentForagingIsland = ForagingMapping.foragingAreas.firstOrNull { name ->
             island.equals(name, ignoreCase = true)
         }
         isInPark = currentForagingIsland == "The Park"
@@ -64,6 +70,18 @@ object IslandTracker {
         }
 
         updateRiftIsland(island)
+    }
+
+    fun isMiningIsland(): Boolean {
+        return MiningMapping.miningIslands.find { name ->
+            currentMiningIsland?.equals(name, ignoreCase = true) == true
+        } != null
+    }
+
+    fun isForagingIsland(): Boolean {
+        return ForagingMapping.foragingIslands.find { name ->
+            currentForagingIsland?.equals(name, ignoreCase = true) == true
+        } != null
     }
 
     private fun updateRiftIsland(island: String) {
@@ -78,10 +96,23 @@ object IslandTracker {
         MultiTrackingHandler.resumeMultiRiftTracking()
     }
 
+    private fun onMineshaftEnter() {
+        if (currentMiningIsland == "Mineshaft") {
+            if (!wasReset) {
+                ChatListener.resetPickaxeAbilities()
+                wasReset = true
+            }
+        } else {
+            wasReset = false
+        }
+    }
+
     fun reset() {
         currentIsland = null
         currentMiningIsland = null
         currentForagingIsland = null
+        currentFarmingIsland = null
+        isInPark = false
         isInMoongladeMarsh = false
         isInRift = false
     }

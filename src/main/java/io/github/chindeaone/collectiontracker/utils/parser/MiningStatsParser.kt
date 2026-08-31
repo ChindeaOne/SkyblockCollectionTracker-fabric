@@ -5,7 +5,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortune
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortuneValue
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
+import io.github.chindeaone.collectiontracker.utils.tab.StatsWidget
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
@@ -16,7 +16,6 @@ object MiningStatsParser {
     var lastDisplayedSpecificFortuneValue = 0
 
     private var cachedLines: List<String> = emptyList()
-
     private val NON_DIGIT = Regex("[^0-9]+")
 
     fun onClientTick() {
@@ -25,21 +24,26 @@ object MiningStatsParser {
             return
         }
 
-        cachedLines = parse(MiningStatsWidget.rawStats, BlockWatcher.miningBlockType)
+        cachedLines = parse(StatsWidget.rawStats)
     }
 
-    @JvmStatic
     fun getLines(): List<String> = cachedLines
 
     fun clear() {
         cachedLines = emptyList()
+        lastDisplayedSpecificFortuneValue = 0
+        lastDisplayedSpecificFortune = ""
     }
 
-    private fun parse(raw: List<String>, blockType: String): List<String> {
+    private fun parse(raw: List<String>): List<String> {
         val formatted = mutableListOf<String>()
         if (raw.isEmpty()) return formatted
 
-        val ctx = MiningContext(blockType)
+        if (ConfigAccess.isMiningStatsOverlayEnabled() && ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly() && !IslandTracker.isMiningIsland()) {
+            return formatted
+        }
+
+        val ctx = MiningContext(BlockWatcher.miningBlockType)
 
         // stat map
         val statsMap = mapOf(
@@ -55,7 +59,11 @@ object MiningStatsParser {
         for (line in raw) {
             when {
                 line.contains("Mining Speed") -> addMiningSpeedPerks(line, ctx)
-                line.contains("Fortune") -> processFortuneLine(line, ctx)
+                line.contains("Mining Fortune") ||
+                        line.contains("Ore Fortune") ||
+                        line.contains("Gemstone Fortune") ||
+                        line.contains("Dwarven Metal Fortune") ||
+                        line.contains("Block Fortune") -> processFortuneLine(line, ctx)
                 else -> {
                     statsMap.forEach { (key, stat) ->
                         if (line.contains(key)) {
@@ -102,7 +110,6 @@ object MiningStatsParser {
         }
 
         if (!ctx.shouldShowSpecificFortune()) return
-        ctx.specificFortuneName = ctx.getFortuneLabel()
 
         val match = when (ctx.blockType) {
             "dwarven_metals" -> line.contains("Dwarven Metal Fortune")
@@ -114,6 +121,7 @@ object MiningStatsParser {
 
         if (match) {
             ctx.specificFortune = value
+            ctx.specificFortuneName = ctx.getFortuneLabel()
 
             // Update last displayed specific fortune
             lastDisplayedSpecificFortune = ctx.specificFortuneName
@@ -161,14 +169,14 @@ private class MiningContext(
     var specificFortune = 0
     var specificFortuneName = ""
 
-    val speed = Stat("Mining Speed", "\uE015", "§6")
-    val miningSpread = Stat("Mining Spread", "\uE016", "§e")
-    val gemstoneSpread = Stat("Gemstone Spread", "\uE00F", "§e")
-    val pristine = Stat("Pristine", "\uE01C", "§5")
-    val wisdom = Stat("Mining Wisdom", "\u262F", "§3")
-    val cold = Stat("Cold Resistance", "\uE006", "§b")
-    val heat = Stat("Heat Resistance", "\u2668", "§c")
-    val breakingPower = Stat("Breaking Power", "\u24C5", "§2")
+    val speed = MiningStat("Mining Speed", "\uE015", "§6")
+    val miningSpread = MiningStat("Mining Spread", "\uE016", "§e")
+    val gemstoneSpread = MiningStat("Gemstone Spread", "\uE00F", "§e")
+    val pristine = MiningStat("Pristine", "\uE01C", "§5")
+    val wisdom = MiningStat("Mining Wisdom", "\u262F", "§3")
+    val cold = MiningStat("Cold Resistance", "\uE006", "§b")
+    val heat = MiningStat("Heat Resistance", "\u2668", "§c")
+    val breakingPower = MiningStat("Breaking Power", "\u24C5", "§2")
 
     fun shouldShowSpecificFortune(): Boolean {
         return allowSpecificFortune
@@ -198,11 +206,12 @@ private class MiningContext(
         val symbol = "\uE053"
         val color = getFortuneColor()
         val total = globalFortune + specificFortune
+        if (total == 0) return ""
+
         val showDetailed = ConfigAccess.isShowDetailedMiningFortune()
 
         // Show specific fortune if available
         if (!specificFortuneName.isEmpty()) {
-            if (total == 0) return "" // Don't show if total is 0
             var base = "§a$specificFortuneName: §6$symbol$total"
             if (showDetailed && specificFortune != 0) {
                 base += " §7(§6$globalFortune §7+ $color$specificFortune§7)"
@@ -211,7 +220,6 @@ private class MiningContext(
         }
         // Fallback to last displayed specific fortune
         if (!lastDisplayedSpecificFortune.isEmpty()) {
-            if (total == 0) return "" // Don't show if total is 0
             var base = "§a$lastDisplayedSpecificFortune: §6$symbol$total"
             if (showDetailed && lastDisplayedSpecificFortuneValue != 0) {
                 base += " §7(§6$globalFortune §7+ $color$lastDisplayedSpecificFortuneValue§7)"
@@ -228,7 +236,7 @@ private class MiningContext(
     }
 }
 
-private class Stat(
+private class MiningStat(
     val label: String,
     var symbol: String,
     val valueColor: String

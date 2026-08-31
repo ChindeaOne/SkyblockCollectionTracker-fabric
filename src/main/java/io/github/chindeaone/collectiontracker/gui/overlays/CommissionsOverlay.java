@@ -33,7 +33,7 @@ public class CommissionsOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isCommissionsEnabled() && HypixelUtils.isOnSkyblock();
+        return ConfigAccess.isCommissionsOverlayEnabled() && HypixelUtils.isOnSkyblock();
     }
 
     @Override

@@ -11,11 +11,13 @@ object MiningMapping {
         "Gold Mine",
         "Deep Caverns",
         // other areas where you can mine
+        "Hub",
         "The End",
         "Crimson Isle",
         "Spider's Den",
         "The Farming Islands",
-        "Jerry's Workshop"
+        "Jerry's Workshop",
+        "Torrhus Canyon", // i guess for anthills
     )
 
     // Mining specific islands
@@ -46,7 +48,6 @@ object MiningMapping {
         "Breaking Power"
     )
 
-    @JvmStatic
     val miningBlocksPerArea: Map<String, Set<String>> = mapOf(
         "ores" to setOf(
             "Dwarven Mines",
@@ -55,6 +56,7 @@ object MiningMapping {
             "Gold Mine",
             "Deep Caverns",
             "Crimson Isle", // for quartz and sulphur
+            "Hub"
         ),
         "pure_ores" to setOf(
             "Dwarven Mines",
@@ -70,7 +72,9 @@ object MiningMapping {
             "Crimson Isle", // for red sand, mycelium, netherrack, glowstone
             "Spider's Den", // for gravel
             "Jerry's Workshop", // for ice
-            "The Farming Islands" // for sand
+            "The Farming Islands", // for sand
+            "Hub",
+            "Torrhus Canyon" // for anthills
         ),
         "dwarven_metals" to setOf(
             "Dwarven Mines",
@@ -118,7 +122,8 @@ object MiningMapping {
             "minecraft:mycelium",
             "minecraft:gravel",
             "minecraft:sand",
-            "minecraft:ice"
+            "minecraft:ice",
+            "minecraft:pointed_dripstone", // anthills
         ),
         "dwarven_metals" to setOf(
             "minecraft:prismarine", // mithril

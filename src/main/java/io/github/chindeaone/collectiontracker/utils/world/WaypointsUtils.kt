@@ -2,6 +2,9 @@ package io.github.chindeaone.collectiontracker.utils.world
 
 import com.google.gson.JsonObject
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentMiningIsland
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.Vec3
@@ -11,6 +14,10 @@ object WaypointsUtils {
     private val waypointCategories = mutableMapOf<String, List<Pair<String, BlockPos>>>()
     var currentCategory: String? = null
     var currentIndex = 0
+
+    private var lastMineshaftEnabled = false
+    private var lastMetalEnabled = false
+    private var lastOresEnabled = false
 
     enum class MineshaftTypes {
         TOPA_1,
@@ -48,7 +55,6 @@ object WaypointsUtils {
         OPAL_C;
     }
 
-    @JvmStatic
     fun setWaypoints(data: JsonObject) {
         waypointCategories.clear()
         data.keySet().forEach { categoryName ->
@@ -85,6 +91,46 @@ object WaypointsUtils {
             if (shouldCycle && currentIndex >= list.size) {
                 currentIndex = 0
             }
+        }
+    }
+
+    fun enableRoutes() {
+        if (currentMiningIsland == "Dwarven Mines") {
+            val routes = listOf(
+                Triple(ConfigAccess.isMineshaftSpawnRoutesEnabled(), lastMineshaftEnabled, ConfigHelper::setMineshaftSpawnRoutesEnabled),
+                Triple(ConfigAccess.isDwarvenMetalRoutesEnabled(), lastMetalEnabled, ConfigHelper::setDwarvenMetalRoutesEnabled),
+                Triple(ConfigAccess.isPureOresRoutesEnabled(), lastOresEnabled, ConfigHelper::setPureOresRoutesEnabled)
+            )
+
+            val selectedIndex = routes.indexOfFirst { it.first && !it.second }
+
+            if (selectedIndex != -1) {
+                val otherEnabled = routes.indices.any { it != selectedIndex && routes[it].second }
+                if (otherEnabled) {
+                    ChatUtils.sendMessage("§cCannot enable another route. Disable the current one first.", true)
+                    routes[selectedIndex].third(false)
+                }
+            }
+
+            lastMineshaftEnabled = ConfigAccess.isMineshaftSpawnRoutesEnabled()
+            lastMetalEnabled = ConfigAccess.isDwarvenMetalRoutesEnabled()
+            lastOresEnabled = ConfigAccess.isPureOresRoutesEnabled()
+
+            val category = when {
+                lastMineshaftEnabled -> ConfigAccess.getMineshaftSpawnRoutes().type
+                lastMetalEnabled -> ConfigAccess.getDwarvenMetalRoutes().type
+                lastOresEnabled -> ConfigAccess.getPureOresRoutes().type
+                else -> null
+            }
+
+            if (category != null) {
+                selectCategory(category)
+            } else {
+                currentCategory = null
+                reset()
+            }
+        } else if (currentMiningIsland != "Mineshaft") {
+            currentCategory = null
         }
     }
 

@@ -17,8 +17,6 @@ object CommissionWidget {
         private set
     private var ignoredStates = mutableListOf<List<ActiveCommission>>()
 
-    private var firstInfoSeenTime: Long = 0L
-
     fun updateCommission(index: Int, newValue: String) {
         val updated = CommissionParser.parseCommission(newValue) ?: return
         if (commissions.getOrNull(index) == updated) return
@@ -61,8 +59,8 @@ object CommissionWidget {
         RenderUtils.showTitle(component, 1500)
     }
 
-    fun onTabWidgetsUpdate() {
-        if (!ConfigAccess.isCommissionsEnabled()) {
+    fun onTabUpdate() {
+        if (!ConfigAccess.isCommissionsOverlayEnabled()) {
             commissions.clear()
             return
         }
@@ -78,30 +76,17 @@ object CommissionWidget {
         }
 
         val widget = TabWidget.COMMISSIONS
-
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible
-            if (!TabWidget.INFO.isPresent) {
-                firstInfoSeenTime = 0L
-                return
-            }
+            if (!TabWidget.INFO.isPresent) return
+
             val now = System.currentTimeMillis()
-
-            if (firstInfoSeenTime == 0L) {
-                firstInfoSeenTime = now
-            }
-
-            if (now - firstInfoSeenTime < 5_000L) {
-                return // Wait for the 5s buffer
-            }
+            if (now - TabData.lastWorldSwitch < 10_000L) return // 10s buffer
 
             // disable the overlay if the widget is not found
-            ChatUtils.sendMessage("§cWarning: Commissions widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the commissions overlay config in your mod.", true)
-            ConfigHelper.disableCommissions()
+            disableOverlay()
             return
         }
-
-        firstInfoSeenTime = 0L
 
         val currentRaw = TabData.parseWidgetData(widget.lines) ?: return
 
@@ -115,5 +100,12 @@ object CommissionWidget {
         }
 
         commissions = parsed.toMutableList()
+    }
+
+    private fun disableOverlay() {
+        if (ConfigAccess.isCommissionsOverlayEnabled()) {
+            ConfigHelper.disableCommissions()
+            ChatUtils.sendMessage("§cWarning: Commissions widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the commissions overlay config in your mod.", true)
+        }
     }
 }

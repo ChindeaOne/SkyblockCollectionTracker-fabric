@@ -280,7 +280,7 @@ object CommissionUtils {
 
     private fun isCommissionScreen(screen: AbstractContainerScreen<*>): Boolean {
         if (!HypixelUtils.isOnSkyblock) return false
-        if (!ConfigAccess.isCommissionsEnabled()) return false
+        if (!ConfigAccess.isCommissionsOverlayEnabled()) return false
         return screen.title.string.contains("Commissions", ignoreCase = true)
     }
 

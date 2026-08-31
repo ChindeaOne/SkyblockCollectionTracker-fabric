@@ -6,7 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
-import io.github.chindeaone.collectiontracker.utils.tab.ForagingStatsWidget;
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -64,7 +64,7 @@ public class BeekeeperOverlay extends AbstractOverlay{
     private List<String> getBeekeeperLines() {
         beekeeperOverlayLines.clear();
 
-        if (ConfigAccess.isBeekeeperInForagingIslandsOnly() && ForagingStatsWidget.getCurrentForagingIsland() == null) return Collections.emptyList();
+        if (ConfigAccess.isBeekeeperInForagingIslandsOnly() && IslandTracker.getCurrentForagingIsland() == null) return Collections.emptyList();
 
         beekeeperOverlayLines.add("§6Beekeeper: " + ChatListener.getCurrentBeekeeperBuff());
         beekeeperOverlayLines.add(TextUtils.updateTimer());

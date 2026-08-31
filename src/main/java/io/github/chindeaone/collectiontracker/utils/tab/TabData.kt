@@ -15,30 +15,33 @@ object TabData {
 
     private var tabCache: List<String> = emptyList()
     private var world: ClientLevel? = null
+    var lastWorldSwitch: Long = 0L
 
     private val TAB_COMPARATOR = compareBy<PlayerInfo>(
         { it.team?.name ?: "" }, { it.profile.name }
-        )
+    )
 
     fun onClientTick(client: Minecraft) {
+        if (!HypixelUtils.isOnSkyblock) return
+        if (ModLoader.clientTicks % 4L != 0L) return
+
         val currentWorld = client.level
         if (currentWorld == null) {
             world = null
             return
         }
 
-        if (ModLoader.clientTicks % 4L != 0L) return
-
         if (world != currentWorld) {
             world = currentWorld
             IslandTracker.reset()
             DeployableParser.reset()
             WaypointsUtils.reset()
+            StatsWidget.clearStats()
+            lastWorldSwitch = System.currentTimeMillis()
         }
 
-        if (!HypixelUtils.isOnSkyblock) return
-        if (!ConfigAccess.isMiningStatsEnabled() &&
-            !ConfigAccess.isCommissionsEnabled() &&
+        if (!ConfigAccess.isMiningStatsOverlayEnabled() &&
+            !ConfigAccess.isCommissionsOverlayEnabled() &&
             !ConfigAccess.isForagingStatsOverlayEnabled() &&
             !ConfigAccess.isSkyMallEnabled() &&
             !ConfigAccess.isLotteryEnabled() &&
@@ -57,10 +60,9 @@ object TabData {
         tabCache = newTab
         TabWidget.update(tabCache)
 
-        IslandTracker.update()
-        CommissionWidget.onTabWidgetsUpdate()
-        MiningStatsWidget.onTabWidgetsUpdate()
-        ForagingStatsWidget.onTabWidgetsUpdate()
+        IslandTracker.onTabUpdate()
+        CommissionWidget.onTabUpdate()
+        StatsWidget.onTabUpdate()
     }
 
     private fun readTab(): List<String>? {

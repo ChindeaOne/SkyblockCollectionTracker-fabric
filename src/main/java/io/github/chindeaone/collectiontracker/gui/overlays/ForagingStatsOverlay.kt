@@ -1,77 +1,50 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.tab.ForagingStatsWidget;
-import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher;
-import io.github.chindeaone.collectiontracker.utils.world.ForagingMapping;
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getForagingStatsPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isForagingStatsOverlayEnabled
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isOnSkyblock
+import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderStrings
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import kotlin.math.max
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class ForagingStatsOverlay : AbstractOverlay() {
+    private val position = getForagingStatsPosition()
 
-public class ForagingStatsOverlay extends AbstractOverlay{
-
-    private final Position position = ConfigAccess.getForagingStatsPosition();
-    private final List<String> formattedForagingStats = new ArrayList<>();
-
-    @Override
-    public String overlayLabel() {
-        return "Foraging Stats";
+    override fun overlayLabel(): String {
+        return "Foraging Stats"
     }
 
-    @Override public Position position() {
-        return position;
+    override fun position(): Position {
+        return position
     }
 
-    @Override
-    public boolean isEnabled() {
-        return ConfigAccess.isForagingStatsOverlayEnabled() && HypixelUtils.isOnSkyblock();
+    override fun isEnabled(): Boolean {
+        return isForagingStatsOverlayEnabled() && isOnSkyblock
     }
 
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        List<String> lines = getForagingLines();
+    override fun render(context: GuiGraphicsExtractor) {
+        if (!isEnabled) return
+        val lines = ForagingStatsParser.getLines()
 
-        if (lines.isEmpty()) return;
+        if (lines.isEmpty()) return
 
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderStrings(context, lines)
-        );
+        drawOverlayFrame(context, position) { renderStrings(context, lines) }
     }
 
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getForagingLines();
-        if (lines.isEmpty()) return;
+    override fun updateDimensions() {
+        if (!isEnabled) return
+        val lines = ForagingStatsParser.getLines()
+        if (lines.isEmpty()) return
 
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
+        val fr = Minecraft.getInstance().font
+        var maxW = 0
+        for (l in lines) maxW = max(maxW, fr.width(l))
+        val h = fr.lineHeight * lines.size
 
-        position.setDimensions(maxW, h);
-    }
-
-    private List<String> getForagingLines() {
-        if (ConfigAccess.foragingStatsOverlayInForagingIslandsOnly() && !ForagingMapping.getForagingIslands().contains(IslandTracker.getCurrentForagingIsland())) return Collections.emptyList();
-
-        List<String> raw = ForagingStatsWidget.getRawStats();
-        List<String> rawBeacon = ForagingStatsWidget.getRawBeaconStats();
-        String rawStarbornTemple = ForagingStatsWidget.getRawStarbornTempleStats();
-        if (raw.isEmpty()) return Collections.emptyList();
-
-        formattedForagingStats.clear();
-        formattedForagingStats.addAll(ForagingStatsParser.parse(raw, rawBeacon, rawStarbornTemple, BlockWatcher.getForagingBlockType()));
-        return formattedForagingStats;
+        position.setDimensions(maxW, h)
     }
 }

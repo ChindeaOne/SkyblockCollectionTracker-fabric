@@ -23,7 +23,6 @@ object StringUtils {
         return formatted.toString()
     }
 
-    @JvmStatic
     fun normalizeText(s: String) = s
         .removeColor()
         .replace("\\p{C}+".toRegex(), " ")
@@ -31,7 +30,6 @@ object StringUtils {
         .trim()
         .lowercase()
 
-    @JvmStatic
     fun formatETA(seconds: Long): String {
         if (seconds < 0) return "0s"
         val days = seconds / 86400

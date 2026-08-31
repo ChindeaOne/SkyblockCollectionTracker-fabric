@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getMiningStatsPosition
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isMiningStatsEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isMiningStatsOverlayEnabled
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isOnSkyblock
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
@@ -23,7 +23,7 @@ class MiningStatsOverlay : AbstractOverlay() {
     }
 
     override fun isEnabled(): Boolean {
-        return isMiningStatsEnabled() && isOnSkyblock
+        return isMiningStatsOverlayEnabled() && isOnSkyblock
     }
 
     override fun render(context: GuiGraphicsExtractor) {
