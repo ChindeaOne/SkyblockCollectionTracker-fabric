@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
@@ -18,7 +19,8 @@ object ScoreboardUtils {
     var location: String = ""
     var lastLocation: String = ""
     var mineshaftType: String = ""
-    @JvmStatic
+
+    var heatValue: Int = 0
     var coldValue: Int = 0
 
     var checkTime: Boolean = true
@@ -27,6 +29,7 @@ object ScoreboardUtils {
 
     fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
+        if (ModLoader.clientTicks % 4L != 0L) return
 
         val world = client.level ?: return
         val scoreboard = world.scoreboard
@@ -53,6 +56,7 @@ object ScoreboardUtils {
         checkSkyblockTime(rawLines)
         checkLocation(rawLines)
         checkIfMineshaft(rawLines)
+        getHeatValue(rawLines)
         getColdValue(rawLines)
     }
 
@@ -169,12 +173,21 @@ object ScoreboardUtils {
         coldValue = cold ?: 0
     }
 
-    @JvmStatic
+    private fun getHeatValue(rawLines: List<String>) {
+        if (!isHeatStatRelevant()) return
+
+        val heat = rawLines.firstNotNullOfOrNull { line ->
+            val match = Regex("""Heat:\s*(-?\d+)""").find(line)
+            match?.groupValues[1]?.toIntOrNull()
+        }
+
+        heatValue = heat ?: 0
+    }
+
     fun isColdStatRelevant(): Boolean {
         return location == "Glacite Tunnels" || location == "Glacite Mineshafts" || location == "Great Glacite Lake" || location == "Dwarven Base Camp" || location == "Grandpa Wolf's Cave"
     }
 
-    @JvmStatic
     fun isHeatStatRelevant(): Boolean {
         return location == "Magma Fields"
     }

@@ -1,250 +1,271 @@
-package io.github.chindeaone.collectiontracker.utils.parser;
+package io.github.chindeaone.collectiontracker.utils.parser
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils;
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
-import io.github.chindeaone.collectiontracker.utils.world.MiningMapping;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
+import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortune
+import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortuneValue
+import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget
+import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
+import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+object MiningStatsParser {
 
-public class MiningStatsParser {
+    var lastDisplayedSpecificFortune = ""
+    var lastDisplayedSpecificFortuneValue = 0
 
-    private static String lastDisplayedSpecificFortune = "";
-    private static int lastDisplayedSpecificFortuneValue = 0;
+    private var cachedLines: List<String> = emptyList()
 
-    private MiningStatsParser() {}
+    private val NON_DIGIT = Regex("[^0-9]+")
 
-    public static List<String> parse(List<String> raw, String blockType) {
-        List<String> formatted = new ArrayList<>();
-        if (raw == null || raw.isEmpty()) return formatted;
+    fun onClientTick() {
+        if (!HypixelUtils.isOnSkyblock) {
+            clear()
+            return
+        }
 
-        MiningContext ctx = new MiningContext(blockType);
+        cachedLines = parse(MiningStatsWidget.rawStats, BlockWatcher.miningBlockType)
+    }
 
-        for (String line : raw) {
-            if (line.contains("Mining Speed")) {
-                addMiningSpeedPerks(line, ctx);
-                continue;
-            }
+    @JvmStatic
+    fun getLines(): List<String> = cachedLines
 
-            if (line.contains("Fortune")) {
-                processFortuneLine(line, ctx);
-                continue;
-            }
+    fun clear() {
+        cachedLines = emptyList()
+    }
 
-            if (line.contains("Mining Spread")) {
-                ctx.miningSpread.parse(line);
-            } else if (line.contains("Gemstone Spread")) {
-                ctx.gemstoneSpread.parse(line);
-            } else if (line.contains("Pristine")) {
-                ctx.pristine.parse(line);
-            } else if (line.contains("Mining Wisdom")) {
-                ctx.wisdom.parse(line);
-            } else if (line.contains("Cold Resistance")) {
-                ctx.cold.parse(line);
-            } else if (line.contains("Heat Resistance")) {
-                ctx.heat.parse(line);
-            } else if (line.contains("Breaking Power")) {
-                ctx.breakingPower.parse(line);
+    private fun parse(raw: List<String>, blockType: String): List<String> {
+        val formatted = mutableListOf<String>()
+        if (raw.isEmpty()) return formatted
+
+        val ctx = MiningContext(blockType)
+
+        // stat map
+        val statsMap = mapOf(
+            "Mining Spread" to ctx.miningSpread,
+            "Gemstone Spread" to ctx.gemstoneSpread,
+            "Pristine" to ctx.pristine,
+            "Mining Wisdom" to ctx.wisdom,
+            "Cold Resistance" to ctx.cold,
+            "Heat Resistance" to ctx.heat,
+            "Breaking Power" to ctx.breakingPower
+        )
+
+        for (line in raw) {
+            when {
+                line.contains("Mining Speed") -> addMiningSpeedPerks(line, ctx)
+                line.contains("Fortune") -> processFortuneLine(line, ctx)
+                else -> {
+                    statsMap.forEach { (key, stat) ->
+                        if (line.contains(key)) {
+                            stat.parse(line)
+                        }
+                    }
+                }
             }
         }
 
-        if (!"0".equals(ctx.speed.value)) formatted.add(ctx.formatTotalSpeed());
-        formatted.add(ctx.formatTotalFortune());
+        formatted.addIfNotEmpty(ctx.formatTotalSpeed())
+        formatted.addIfNotEmpty(ctx.formatTotalFortune())
 
         if (ctx.isGemstone) {
-            if (!"0".equals(ctx.gemstoneSpread.value)) formatted.add(ctx.gemstoneSpread.format());
-            if (!"0".equals(ctx.pristine.value)) formatted.add(ctx.pristine.format());
+            formatted.addIfNotEmpty(ctx.gemstoneSpread.format())
+            formatted.addIfNotEmpty(ctx.pristine.format())
         } else {
-            if (!"0".equals(ctx.miningSpread.value)) formatted.add(ctx.miningSpread.format());
+            formatted.addIfNotEmpty(ctx.miningSpread.format())
         }
 
-        if (!"0".equals(ctx.wisdom.value)) formatted.add(ctx.wisdom.format());
-        if (!"0".equals(ctx.cold.value) && ScoreboardUtils.isColdStatRelevant()) formatted.add(ctx.cold.format());
-        if (!"0".equals(ctx.heat.value) && ScoreboardUtils.isHeatStatRelevant()) formatted.add(ctx.heat.format());
-        if (!"0".equals(ctx.breakingPower.value)) formatted.add(ctx.breakingPower.format());
+        formatted.addIfNotEmpty(ctx.wisdom.format())
+        formatted.addIfNotEmpty(ctx.cold.format())
+        formatted.addIfNotEmpty(ctx.heat.format())
+        formatted.addIfNotEmpty(ctx.breakingPower.format())
 
-        return formatted;
+        return formatted
     }
 
-    private static int extractFortune(String line) {
+    private fun extractFortune(line: String): Int {
         try {
-            String digits = line.replaceAll("[^0-9]", "");
-            return digits.isEmpty() ? 0 : Integer.parseInt(digits);
-        } catch (NumberFormatException e) {
-            return 0;
+            val digits = line.replace(NON_DIGIT, "")
+            return if (digits.isEmpty()) 0 else digits.toInt()
+        } catch (_: NumberFormatException) {
+            return 0
         }
     }
 
-    private static void processFortuneLine(String line, MiningContext ctx) {
-        int value = extractFortune(line);
+    private fun processFortuneLine(line: String, ctx: MiningContext) {
+        val value = extractFortune(line)
 
         if (line.contains("Mining Fortune")) {
-            ctx.globalFortune = value;
-            return;
+            ctx.globalFortune = value
+            return
         }
 
-        if (!ctx.shouldShowSpecificFortune()) return;
-        ctx.specificFortuneName = ctx.getFortuneLabel();
+        if (!ctx.shouldShowSpecificFortune()) return
+        ctx.specificFortuneName = ctx.getFortuneLabel()
 
-        boolean match = switch (ctx.blockType) {
-            case "dwarven_metals" -> line.contains("Dwarven Metal Fortune");
-            case "pure_ores", "ores" -> line.contains("Ore Fortune");
-            case "gemstones" -> line.contains("Gemstone Fortune");
-            case "blocks" -> line.contains("Block Fortune");
-            default -> false;
-        };
+        val match = when (ctx.blockType) {
+            "dwarven_metals" -> line.contains("Dwarven Metal Fortune")
+            "pure_ores", "ores" -> line.contains("Ore Fortune")
+            "gemstones" -> line.contains("Gemstone Fortune")
+            "blocks" -> line.contains("Block Fortune")
+            else -> false
+        }
 
         if (match) {
-            ctx.specificFortune = value;
+            ctx.specificFortune = value
 
             // Update last displayed specific fortune
-            lastDisplayedSpecificFortune = ctx.specificFortuneName;
-            lastDisplayedSpecificFortuneValue = ctx.specificFortune;
+            lastDisplayedSpecificFortune = ctx.specificFortuneName
+            lastDisplayedSpecificFortuneValue = ctx.specificFortune
         }
     }
+    private fun addMiningSpeedPerks(line: String, ctx: MiningContext) {
+        val value = extractMiningSpeed(line)
 
-    private static void addMiningSpeedPerks(String line, MiningContext ctx) {
-        int value = extractMiningSpeed(line);
+        val professional = ConfigAccess.getProfessionalMS()
+        val strongArm = ConfigAccess.getStrongArmMS()
 
-        int professional = ConfigAccess.getProfessionalMS();
-        int strongArm = ConfigAccess.getStrongArmMS();
+        val total = when (ctx.blockType) {
+            "dwarven_metals" -> value + strongArm
+            "gemstones" -> value + professional
+            else -> value
+        }
 
-        int total = switch (ctx.blockType) {
-            case "dwarven_metals" -> value + strongArm;
-            case "gemstones" -> value + professional;
-            default -> value;
-        };
-
-        ctx.speed.value = String.valueOf(total);
+        ctx.speed.value = total.toString()
     }
 
-    private static int extractMiningSpeed(String line) {
+    private fun extractMiningSpeed(line: String): Int {
         try {
-            String digits = line.replaceAll("[^0-9]", "");
-            return digits.isEmpty() ? 0 : Integer.parseInt(digits);
-        } catch (NumberFormatException e) {
-            return 0;
+            val digits = line.replace(NON_DIGIT, "")
+            return if (digits.isEmpty()) 0 else digits.toInt()
+        } catch (_: NumberFormatException) {
+            return 0
         }
     }
 
-    private static class MiningContext {
-        final String blockType;
-        final String island;
-        final boolean isGemstone;
-        final boolean allowSpecificFortune;
+    private fun MutableList<String>.addIfNotEmpty(value: String) {
+        if (value.isNotEmpty()) add(value)
+    }
+}
 
-        int globalFortune = 0;
-        int specificFortune = 0;
-        String specificFortuneName = "";
+private class MiningContext(
+    val blockType: String,
+) {
+    val island: String? = IslandTracker.currentMiningIsland
+    val isGemstone: Boolean = "gemstones" == blockType
+    val allowedIslands: Set<String>? = MiningMapping.miningBlocksPerArea[blockType]
+    val allowSpecificFortune: Boolean = allowedIslands != null && island != null && allowedIslands.contains(island)
 
-        Stat speed = new Stat("Mining Speed", "\uE015", "§6");
-        Stat miningSpread = new Stat("Mining Spread", "\uE016", "§e");
-        Stat gemstoneSpread = new Stat("Gemstone Spread", "\uE00F", "§e");
-        Stat pristine = new Stat("Pristine", "\uE01C", "§5");
-        Stat wisdom = new Stat("Mining Wisdom", "☯", "§3");
-        Stat cold = new Stat("Cold Resistance", "\uE006", "§b");
-        Stat heat = new Stat("Heat Resistance", "♨", "§c");
-        Stat breakingPower = new Stat("Breaking Power", "Ⓟ", "§2");
+    var globalFortune = 0
+    var specificFortune = 0
+    var specificFortuneName = ""
 
-        MiningContext(String blockType) {
-            this.blockType = blockType;
-            this.island = IslandTracker.getCurrentMiningIsland();
-            this.isGemstone = "gemstones".equals(blockType);
+    val speed = Stat("Mining Speed", "\uE015", "§6")
+    val miningSpread = Stat("Mining Spread", "\uE016", "§e")
+    val gemstoneSpread = Stat("Gemstone Spread", "\uE00F", "§e")
+    val pristine = Stat("Pristine", "\uE01C", "§5")
+    val wisdom = Stat("Mining Wisdom", "\u262F", "§3")
+    val cold = Stat("Cold Resistance", "\uE006", "§b")
+    val heat = Stat("Heat Resistance", "\u2668", "§c")
+    val breakingPower = Stat("Breaking Power", "\u24C5", "§2")
 
-            Set<String> allowed = MiningMapping.getMiningBlocksPerArea().get(blockType);
-            this.allowSpecificFortune = allowed != null && island != null && allowed.contains(island);
+    fun shouldShowSpecificFortune(): Boolean {
+        return allowSpecificFortune
+    }
+
+    fun getFortuneLabel(): String {
+        return when (blockType) {
+            "dwarven_metals" -> "Dwarven Metal Fortune"
+            "pure_ores", "ores" -> "Ore Fortune"
+            "gemstones" -> "Gemstone Fortune"
+            "blocks" -> "Block Fortune"
+            else -> ""
         }
+    }
 
-        boolean shouldShowSpecificFortune() {
-            return allowSpecificFortune;
+    fun getFortuneColor(): String {
+        return when (blockType) {
+            "dwarven_metals" -> "§a" // Green
+            "pure_ores", "ores" -> "§e" // Yellow
+            "gemstones" -> "§d" // Light Purple
+            "blocks" -> "§8" // Dark Gray
+            else -> "" // No color
         }
+    }
 
-        String getFortuneLabel() {
-            return switch (blockType) {
-                case "dwarven_metals" -> "Dwarven Metal Fortune";
-                case "pure_ores", "ores" -> "Ore Fortune";
-                case "gemstones" -> "Gemstone Fortune";
-                case "blocks" -> "Block Fortune";
-                default -> "";
-            };
-        }
+    fun formatTotalFortune(): String {
+        val symbol = "\uE053"
+        val color = getFortuneColor()
+        val total = globalFortune + specificFortune
+        val showDetailed = ConfigAccess.isShowDetailedMiningFortune()
 
-        String getFortuneColor() {
-            return switch (blockType) {
-                case "dwarven_metals" -> "§a"; // Green
-                case "pure_ores", "ores" -> "§e"; // Yellow
-                case "gemstones" -> "§d"; // Light Purple
-                case "blocks" -> "§8"; // Dark Gray
-                default -> ""; // No color
-            };
-        }
-
-        String formatTotalFortune() {
-            String symbol = "\uE053";
-            String color = getFortuneColor();
-            int total = globalFortune + specificFortune;
-            boolean showDetailed = ConfigAccess.isShowDetailedMiningFortune();
-
-            // Show specific fortune if available
-            if (!specificFortuneName.isEmpty()) {
-                if (total == 0) return ""; // Don't show if total is 0
-                String base = "§a" + specificFortuneName + ": §6" + symbol + total;
-                if (showDetailed && specificFortune != 0) {
-                    base += " §7(§6" + globalFortune + " §7+ " + color + specificFortune + "§7)";
-                }
-                return base;
+        // Show specific fortune if available
+        if (!specificFortuneName.isEmpty()) {
+            if (total == 0) return "" // Don't show if total is 0
+            var base = "§a$specificFortuneName: §6$symbol$total"
+            if (showDetailed && specificFortune != 0) {
+                base += " §7(§6$globalFortune §7+ $color$specificFortune§7)"
             }
-            // Fallback to last displayed specific fortune
-            if (!lastDisplayedSpecificFortune.isEmpty()) {
-                if (total == 0) return ""; // Don't show if total is 0
-                String base = "§a" + lastDisplayedSpecificFortune + ": §6" + symbol + total;
-                if (showDetailed && lastDisplayedSpecificFortuneValue != 0) {
-                    base += " §7(§6" + globalFortune + " §7+ " + color + lastDisplayedSpecificFortuneValue + "§7)";
-                }
-                return base;
+            return base
+        }
+        // Fallback to last displayed specific fortune
+        if (!lastDisplayedSpecificFortune.isEmpty()) {
+            if (total == 0) return "" // Don't show if total is 0
+            var base = "§a$lastDisplayedSpecificFortune: §6$symbol$total"
+            if (showDetailed && lastDisplayedSpecificFortuneValue != 0) {
+                base += " §7(§6$globalFortune §7+ $color$lastDisplayedSpecificFortuneValue§7)"
             }
-
-            // Fallback to mining fortune
-            return "§aMining Fortune: §6" + symbol + total;
+            return base
         }
 
-        String formatTotalSpeed() {
-            return speed.format();
+        // Fallback to mining fortune
+        return "§aMining Fortune: §6$symbol$total"
+    }
+
+    fun formatTotalSpeed(): String {
+        return speed.format()
+    }
+}
+
+private class Stat(
+    val label: String,
+    var symbol: String,
+    val valueColor: String
+) {
+    var value: String = "0"
+
+    fun parse(line: String) {
+        val content = line.substringAfter(label).trim().removePrefix(":")
+
+        val match = Regex("""^(.*?)\s*([+-]?[\d,.]+)$""").find(content)
+
+        if (match != null) {
+            val extractedSymbol = match.groupValues[1].trim()
+            if (extractedSymbol.isNotEmpty()) {
+                this.symbol = extractedSymbol
+            }
+            this.value = match.groupValues[2]
+        }
+    }
+
+    fun format(): String {
+        if (value == "0") return ""
+        // for cold
+        if (label == "Cold Resistance" && !ScoreboardUtils.isColdStatRelevant()) return ""
+
+        if (label == "Cold Resistance") {
+            val coldValue = ScoreboardUtils.coldValue
+            if (coldValue != 0) return "§a$label: $valueColor$symbol$value/$valueColor$coldValue"
+        }
+        // for heat
+        if (label == "Heat Resistance" && !ScoreboardUtils.isHeatStatRelevant()) return ""
+
+        if (label == "Heat Resistance") {
+            val heatValue = ScoreboardUtils.heatValue
+            if (heatValue != 0) return "§a$label: $valueColor$symbol$value/$valueColor$heatValue"
         }
 
-        private static class Stat {
-            String label;
-            String symbol;
-            String value = "0";
-            String valueColor;
-
-            Stat(String label, String defaultSymbol, String valueColor) {
-                this.label = label;
-                this.symbol = defaultSymbol;
-                this.valueColor = valueColor;
-            }
-
-            void parse(String line) {
-                Matcher symbolMatcher = Pattern.compile("(\\D)\\d").matcher(line);
-                if (symbolMatcher.find()) {
-                    this.symbol = symbolMatcher.group(1).trim();
-                }
-                this.value = line.replaceAll(".*" + Pattern.quote(this.symbol), "").trim();
-            }
-
-            String format() {
-                // for cold
-                if (label.equals("Cold Resistance")) {
-                    int coldValue = ScoreboardUtils.getColdValue();
-                    if (coldValue != 0) return "§a" + label + ": " + valueColor + symbol + value + "/" + valueColor + coldValue;
-                }
-
-                return "§a" + label + ": " + valueColor + symbol + value;
-            }
-        }
+        return "§a$label: $valueColor$symbol$value"
     }
 }

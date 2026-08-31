@@ -13,6 +13,7 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
+import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
 import io.github.chindeaone.collectiontracker.utils.tab.TabData
 import io.github.chindeaone.collectiontracker.utils.world.BlockOutline
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
@@ -125,6 +126,7 @@ object ModLoader: ModInitializer {
             InventoryListener.onClientTick(client)
             ConfigStateUtils.onClientTick()
             ContainerParser.onClientTick(client)
+            MiningStatsParser.onClientTick()
         }
     }
 }

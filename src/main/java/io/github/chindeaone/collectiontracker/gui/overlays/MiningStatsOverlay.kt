@@ -1,76 +1,51 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.tab.MiningStatsWidget;
-import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher;
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
-import io.github.chindeaone.collectiontracker.utils.world.MiningMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getMiningStatsPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isMiningStatsEnabled
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isOnSkyblock
+import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderStrings
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import kotlin.math.max
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class MiningStatsOverlay : AbstractOverlay() {
+    private val position = getMiningStatsPosition()
 
-public class MiningStatsOverlay extends AbstractOverlay{
-
-    private final Position position = ConfigAccess.getMiningStatsPosition();
-    private final List<String> formattedMiningStats = new ArrayList<>();
-
-    @Override
-    public String overlayLabel() {
-        return "Mining Stats";
+    override fun overlayLabel(): String {
+        return "Mining Stats"
     }
 
-    @Override
-    public Position position() {
-        return position;
+    override fun position(): Position {
+        return position
     }
 
-    @Override
-    public boolean isEnabled() {
-        return ConfigAccess.isMiningStatsEnabled() && HypixelUtils.isOnSkyblock();
+    override fun isEnabled(): Boolean {
+        return isMiningStatsEnabled() && isOnSkyblock
     }
 
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        List<String> lines = getMiningLines();
+    override fun render(context: GuiGraphicsExtractor) {
+        if (!isEnabled) return
+        val lines = MiningStatsParser.getLines()
 
-        if (lines.isEmpty()) return;
+        if (lines.isEmpty()) return
 
-        RenderUtils.drawOverlayFrame(context, position, () ->
-            RenderUtils.renderStrings(context, lines)
-        );
+        drawOverlayFrame(context, position) { renderStrings(context, lines) }
+
     }
 
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getMiningLines();
-        if (lines.isEmpty()) return;
+    override fun updateDimensions() {
+        if (!isEnabled) return
+        val lines = MiningStatsParser.getLines()
+        if (lines.isEmpty()) return
 
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
+        val fr = Minecraft.getInstance().font
+        var maxW = 0
+        for (l in lines) maxW = max(maxW, fr.width(l))
+        val h = fr.lineHeight * lines.size
 
-        position.setDimensions(maxW, h);
-    }
-
-    private List<String> getMiningLines() {
-        if (ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly() && !MiningMapping.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
-
-        List<String> raw = MiningStatsWidget.getRawStats();
-        if (raw.isEmpty()) return Collections.emptyList();
-
-        formattedMiningStats.clear();
-        formattedMiningStats.addAll(MiningStatsParser.parse(raw, BlockWatcher.getMiningBlockType()));
-        return formattedMiningStats;
+        position.setDimensions(maxW, h)
     }
 }

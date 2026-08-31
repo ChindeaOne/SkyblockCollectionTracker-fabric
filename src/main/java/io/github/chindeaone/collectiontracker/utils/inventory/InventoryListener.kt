@@ -29,6 +29,8 @@ object InventoryListener {
 
     fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
+        if (ModLoader.clientTicks % 4L != 0L) return
+
         if (/*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) {
             lastInventoryState.clear()
             slotMatchHits.clear()
@@ -51,8 +53,6 @@ object InventoryListener {
 
         if (isTrackingPaused || isMultiTrackingPaused || !IslandTracker.isInRift) return
         if (ConfigAccess.isApiTrackingEnabled()) return
-
-        if (ModLoader.clientTicks % 4L != 0L) return
 
         val player = client.player ?: return
         val inventory = player.inventory

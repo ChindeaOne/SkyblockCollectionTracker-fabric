@@ -1,9 +1,11 @@
 package io.github.chindeaone.collectiontracker.utils.tab
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
@@ -14,7 +16,6 @@ object MiningStatsWidget {
     @JvmStatic
     var rawStats: List<String> = emptyList()
 
-    private var nextAllowedTime: Long = 0L
     private var firstInfoSeenTime: Long = 0L
     private var wasReset: Boolean = false
 
@@ -23,11 +24,10 @@ object MiningStatsWidget {
     private var lastOresEnabled = false
 
     fun onTabWidgetsUpdate() {
-        val now = System.currentTimeMillis()
-        if (now < nextAllowedTime) return
-
         val currentMiningIsland = IslandTracker.currentMiningIsland
-        if (currentMiningIsland == null) {
+
+        if (currentMiningIsland == null && isMiningStatsOverlayInMiningIslandsOnly()) {
+            MiningStatsParser.clear()
             rawStats = emptyList()
             lastStats = null
             return
@@ -81,6 +81,7 @@ object MiningStatsWidget {
         }
 
         if (!ConfigAccess.isMiningStatsEnabled()) {
+            MiningStatsParser.clear()
             rawStats = emptyList()
             lastStats = null
             return
@@ -89,6 +90,8 @@ object MiningStatsWidget {
         val widget = TabWidget.STATS
         if (!widget.isPresent) {
             // avoid spamming messages when tab widgets are not visible
+            val now = System.currentTimeMillis()
+
             if (!TabWidget.INFO.isPresent) {
                 firstInfoSeenTime = 0L
                 return
