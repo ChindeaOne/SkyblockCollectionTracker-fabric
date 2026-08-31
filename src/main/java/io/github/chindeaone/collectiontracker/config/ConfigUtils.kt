@@ -117,6 +117,7 @@ val refinedCacaoTime: Long get() = temporaryBuffsConfig.refinedCacaoTime
 val filetTime: Long get() = temporaryBuffsConfig.filetTime
 val pristinePotatoTime: Long get() = temporaryBuffsConfig.pristinePotatoTime
 val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
+val fiestaFlaskTime: Long get() = temporaryBuffsConfig.fiestaFlaskTime
 
 // Coleweight Config Accessors
 val coleweightConfig: ColeweightConfig get() = miningConfig.coleweightConfig
@@ -298,7 +299,7 @@ object ConfigAccess {
     fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionConfig.showTrackingRatesAtEndOfSession
 
     @JvmStatic
-    fun isCommissionsEnabled(): Boolean = enableCommissionsOverlay
+    fun isCommissionsOverlayEnabled(): Boolean = enableCommissionsOverlay
 
     fun isCompletionTitleEnabled(): Boolean = completionTitle
 
@@ -309,10 +310,8 @@ object ConfigAccess {
 
     fun isCommissionsKeybindsEnabled(): Boolean = keybindConfig.enableCommissionsKeybinds
 
-    @JvmStatic
-    fun isMiningStatsEnabled(): Boolean = enableMiningStatsOverlay
+    fun isMiningStatsOverlayEnabled(): Boolean = enableMiningStatsOverlay
 
-    @JvmStatic
     fun isMiningStatsOverlayInMiningIslandsOnly(): Boolean = miningStatsOverlayInMiningIslandsOnly
 
     @JvmStatic
@@ -355,22 +354,16 @@ object ConfigAccess {
 
     fun getCustomFWColor(): ChromaColour = customFWColor
 
-    @JvmStatic
     fun isShowDetailedMiningFortune(): Boolean = showDetailedMiningFortune
 
-    @JvmStatic
     fun getProfessionalMS(): Int = professionalMS
 
-    @JvmStatic
     fun getStrongArmMS(): Int = strongArmMS
 
-    @JvmStatic
     fun isForagingStatsOverlayEnabled(): Boolean = enableForagingStatsOverlay
 
-    @JvmStatic
-    fun foragingStatsOverlayInForagingIslandsOnly(): Boolean = foragingStatsOverlayInForagingIslandsOnly
+    fun isForagingStatsOverlayInForagingIslandsOnly(): Boolean = foragingStatsOverlayInForagingIslandsOnly
 
-    @JvmStatic
     fun isShowDetailedForagingFortune(): Boolean = showDetailedForagingFortune
 
     fun getCotmLevel(): Int = cotmLevel
@@ -502,6 +495,8 @@ object ConfigAccess {
     fun getPristinePotatoTime(): Long = pristinePotatoTime
 
     fun getPowderPumpkinTime(): Long = powderPumpkinTime
+
+    fun getFiestaFlaskTime(): Long = fiestaFlaskTime
 
     fun isHeatmapEnabled(): Boolean = enableHeatmap
 
@@ -774,11 +769,12 @@ object ConfigHelper {
         axeAbilityConfig.abilityNameAxe = name
     }
 
-    fun setDuration(refined: Long = -1, filet: Long = -1, potato: Long = -1, pumpkin: Long = -1) {
+    fun setDuration(refined: Long = -1, filet: Long = -1, potato: Long = -1, pumpkin: Long = -1, fiesta: Long = -1) {
         if (refined != -1L) temporaryBuffsConfig.refinedCacaoTime = refined
         if (filet != -1L) temporaryBuffsConfig.filetTime = filet
         if (potato != -1L) temporaryBuffsConfig.pristinePotatoTime = potato
         if (pumpkin != -1L) temporaryBuffsConfig.powderPumpkinTime = pumpkin
+        if (fiesta != -1L) temporaryBuffsConfig.fiestaFlaskTime = fiesta
     }
 
     fun setProfessionalMS(ms: Int) {

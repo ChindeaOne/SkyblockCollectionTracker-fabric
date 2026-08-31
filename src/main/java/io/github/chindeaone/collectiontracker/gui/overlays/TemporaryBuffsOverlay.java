@@ -44,9 +44,7 @@ public class TemporaryBuffsOverlay extends AbstractOverlay{
 
         if (lines.isEmpty()) return;
 
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderStrings(context, lines)
-        );
+        RenderUtils.drawOverlayFrame(context, position, () -> RenderUtils.renderStrings(context, lines));
     }
 
     @Override
@@ -73,7 +71,8 @@ public class TemporaryBuffsOverlay extends AbstractOverlay{
         processBuff("§6Refined Dark Cacao Truffle", TemporaryBuffsParser.getRefinedCacaoTime(), now);
         processBuff("§9Filet O' Fortune", TemporaryBuffsParser.getFiletTime(), now);
         processBuff("§5Chilled Pristine Potato", TemporaryBuffsParser.getPristinePotatoTime(), now);
-        processBuff("§aPowder Pumpkin", TemporaryBuffsParser.getPowderPumpkinTime(), now);
+        processBuff("§aPowder Pie", TemporaryBuffsParser.getPowderPumpkinTime(), now);
+        processBuff("§6Fiesta Flask", TemporaryBuffsParser.getFiestaFlaskTime(), now);
 
         return tempBuffLines;
     }

@@ -36,4 +36,6 @@ public class TemporaryBuffsConfig {
     public long pristinePotatoTime = 0L;
     @Expose
     public long powderPumpkinTime = 0L;
+    @Expose
+    public long fiestaFlaskTime = 0L;
 }

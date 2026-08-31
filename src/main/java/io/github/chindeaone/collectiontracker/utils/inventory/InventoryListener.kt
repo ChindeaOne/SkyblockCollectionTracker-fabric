@@ -27,6 +27,8 @@ object InventoryListener {
     private val lastInventoryState = mutableMapOf<Int, Int>()
     private val lastItemNames = mutableMapOf<Int, String>()
 
+    private var pendingConsumable: HandItemState? = null
+
     fun onClientTick(client: Minecraft) {
         if (!HypixelUtils.isOnSkyblock) return
         if (ModLoader.clientTicks % 4L != 0L) return
@@ -37,6 +39,8 @@ object InventoryListener {
             slotSkipMap.clear()
             return
         }
+
+        checkIfConsumableConsumed(client)
 
         val isTracking = TrackingHandler.isTracking
         val isMultiTracking = MultiTrackingHandler.isMultiTracking
@@ -162,8 +166,15 @@ object InventoryListener {
             return InteractionResult.PASS
         }
 
-        val itemName = lines.firstOrNull()
-        TemporaryBuffsParser.resetConsumable(itemName)
+        lines.firstOrNull()?.let {
+            pendingConsumable = HandItemState(
+                hand = hand,
+                itemName = it,
+                count = stack.count,
+                slot = player.inventory.selected,
+                timestamp = System.currentTimeMillis()
+            )
+        }
 
         return InteractionResult.PASS
     }
@@ -177,4 +188,31 @@ object InventoryListener {
             "half-eaten carrot" -> 8 // suppose max threshold
             else -> 1
         }
+
+    private fun checkIfConsumableConsumed(client: Minecraft) =
+        pendingConsumable?.let { pending ->
+            val now = System.currentTimeMillis()
+
+            if (now - pending.timestamp > 1000L) {
+                pendingConsumable = null
+                return@let
+            }
+
+            val player = client.player ?: return@let
+            val currentStack = player.inventory.getItem(pending.slot)
+
+            if (currentStack.isEmpty || currentStack.count < pending.count) {
+                TemporaryBuffsParser.resetConsumable(pending.itemName)
+                pendingConsumable = null
+            }
+        }
+
+
+    private data class HandItemState(
+        val hand: InteractionHand,
+        val itemName: String,
+        val count: Int,
+        val slot: Int,
+        val timestamp: Long
+    )
 }

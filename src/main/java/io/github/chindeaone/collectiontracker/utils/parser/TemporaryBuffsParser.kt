@@ -12,6 +12,7 @@ object TemporaryBuffsParser {
     @JvmStatic var filetTime: Long = 0L
     @JvmStatic var pristinePotatoTime: Long = 0L
     @JvmStatic var powderPumpkinTime: Long = 0L
+    @JvmStatic var fiestaFlaskTime: Long = 0L
 
     fun loadDurations() {
         val now = System.currentTimeMillis()
@@ -19,6 +20,7 @@ object TemporaryBuffsParser {
         filetTime = now + ConfigAccess.getFiletTime()
         pristinePotatoTime = now + ConfigAccess.getPristinePotatoTime()
         powderPumpkinTime = now + ConfigAccess.getPowderPumpkinTime()
+        fiestaFlaskTime = now + ConfigAccess.getFiestaFlaskTime()
     }
 
     fun saveDurations() {
@@ -27,7 +29,8 @@ object TemporaryBuffsParser {
             refined = (refinedCacaoTime - now).coerceAtLeast(0L),
             filet = (filetTime - now).coerceAtLeast(0L),
             potato = (pristinePotatoTime - now).coerceAtLeast(0L),
-            pumpkin = (powderPumpkinTime - now).coerceAtLeast(0L)
+            pumpkin = (powderPumpkinTime - now).coerceAtLeast(0L),
+            fiesta = (fiestaFlaskTime - now).coerceAtLeast(0L)
         )
     }
 
@@ -47,9 +50,13 @@ object TemporaryBuffsParser {
                 ConfigHelper.setDuration(potato = HOUR)
                 pristinePotatoTime = now + HOUR
             }
-            "powder pumpkin" -> {
+            "powder pie" -> {
                 ConfigHelper.setDuration(pumpkin = HOUR)
                 powderPumpkinTime = now + HOUR
+            }
+            "fiesta flask" -> {
+                ConfigHelper.setDuration(fiesta = HOUR)
+                fiestaFlaskTime = now + HOUR
             }
         }
     }
