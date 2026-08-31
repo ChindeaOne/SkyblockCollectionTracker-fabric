@@ -4,8 +4,7 @@ object FarmingMapping {
 
     val farmingAreas = listOf(
         "Hub",
-        "The Barn",
-        "Mushroom Desert",
+        "The Farming Islands",
         "Garden"
     )
 }
