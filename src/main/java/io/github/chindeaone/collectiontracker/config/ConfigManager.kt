@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import com.google.gson.Gson
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -198,6 +199,8 @@ class ConfigManager {
 
     @Synchronized
     fun save(auto: Boolean = false) {
+        if (!HypixelUtils.isOnSkyblock) return
+
         TemporaryBuffsParser.saveDurations()
         lastSaveTime = System.currentTimeMillis()
         val config = config ?: error("[SCT]: Cannot save null config.")
