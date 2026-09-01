@@ -199,7 +199,7 @@ class ConfigManager {
 
     @Synchronized
     fun save(auto: Boolean = false) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
 
         TemporaryBuffsParser.saveDurations()
         lastSaveTime = System.currentTimeMillis()

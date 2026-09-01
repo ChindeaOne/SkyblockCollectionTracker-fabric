@@ -36,7 +36,7 @@ public class MultiCollectionOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return MultiTrackingHandler.isMultiTracking() && HypixelUtils.isOnSkyblock();
+        return MultiTrackingHandler.isMultiTracking() && HypixelUtils.isInSkyblock();
     }
 
     @Override

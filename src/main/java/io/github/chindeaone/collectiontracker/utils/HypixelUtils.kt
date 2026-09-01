@@ -9,5 +9,5 @@ object HypixelUtils {
     val isInHypixel get() = HypixelServer && Minecraft.getInstance().player != null
 
     @JvmStatic
-    val isOnSkyblock get() = isInHypixel && Hypixel.skyblock
+    val isInSkyblock get() = isInHypixel && Hypixel.skyblock
 }

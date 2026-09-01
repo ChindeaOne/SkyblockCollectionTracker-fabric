@@ -19,7 +19,7 @@ public class TitleOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return HypixelUtils.isOnSkyblock();
+        return HypixelUtils.isInSkyblock();
     }
 
     @Override

@@ -36,7 +36,7 @@ public class CollectionOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return TrackingHandler.isTracking && HypixelUtils.isOnSkyblock();
+        return TrackingHandler.isTracking && HypixelUtils.isInSkyblock();
     }
 
     @Override

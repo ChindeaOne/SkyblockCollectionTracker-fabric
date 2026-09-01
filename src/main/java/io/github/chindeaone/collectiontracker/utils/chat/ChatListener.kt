@@ -73,7 +73,7 @@ object ChatListener {
         private set
 
     fun onChatMessage(message: Component) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
 
         val text = message.string
         val cleanText = text.removeColor()
@@ -110,7 +110,7 @@ object ChatListener {
 
     @JvmStatic
     fun skillListener(text: String) {
-        if (!SkillTrackingHandler.isTracking || !HypixelUtils.isOnSkyblock) return
+        if (!SkillTrackingHandler.isTracking || !HypixelUtils.isInSkyblock) return
         val cleanText = text.removeColor()
 
         val match = Patterns.SKILL.find(cleanText)
@@ -253,7 +253,7 @@ object ChatListener {
 
     @JvmStatic
     fun dailyPerksUpdate(message: Component): Boolean {
-        if (!HypixelUtils.isOnSkyblock) return false
+        if (!HypixelUtils.isInSkyblock) return false
 
         val remaining = nextBuffTime - System.currentTimeMillis()
         if ((remaining > 60_000L && remaining < 19 * 60_000L) && ScoreboardUtils.checkTime) {
@@ -481,7 +481,7 @@ object ChatListener {
     }
 
     fun coleweightHandle(message: Component): Component {
-        if (!HypixelUtils.isOnSkyblock || !ConfigAccess.isColeweightRankingInChat()) return message
+        if (!HypixelUtils.isInSkyblock || !ConfigAccess.isColeweightRankingInChat()) return message
 
         if (ConfigAccess.isOnlyOnMiningIslands()) {
             if (!MiningMapping.miningIslands.contains(IslandTracker.currentMiningIsland)) return message
@@ -500,7 +500,7 @@ object ChatListener {
     }
 
     fun farmingweightHandle(message: Component): Component {
-        if (!HypixelUtils.isOnSkyblock || !ConfigAccess.isFarmingweightRankingInChat()) return message
+        if (!HypixelUtils.isInSkyblock || !ConfigAccess.isFarmingweightRankingInChat()) return message
 
         if (ConfigAccess.isOnlyOnFarmingIslands()) {
             if (!FarmingMapping.farmingAreas.contains(IslandTracker.currentFarmingIsland)) return message

@@ -34,7 +34,7 @@ public class TimerOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return !hasEnded && HypixelUtils.isOnSkyblock();
+        return !hasEnded && HypixelUtils.isInSkyblock();
     }
 
     @Override

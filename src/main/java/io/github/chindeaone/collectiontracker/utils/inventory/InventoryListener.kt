@@ -30,7 +30,7 @@ object InventoryListener {
     private var pendingConsumable: HandItemState? = null
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
         if (ModLoader.clientTicks % 4L != 0L) return
 
         if (/*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) {
@@ -148,7 +148,7 @@ object InventoryListener {
 
     @Suppress("SameReturnValue")
     fun checkHandItem(player: Player, hand: InteractionHand): InteractionResult {
-        if (!HypixelUtils.isOnSkyblock) return InteractionResult.PASS
+        if (!HypixelUtils.isInSkyblock) return InteractionResult.PASS
 
         val stack = player.getItemInHand(hand)
         if (stack.isEmpty) return InteractionResult.PASS

@@ -32,7 +32,7 @@ public class LotteryOverlay extends AbstractOverlay {
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isLotteryEnabled() && HypixelUtils.isOnSkyblock();
+        return ConfigAccess.isLotteryEnabled() && HypixelUtils.isInSkyblock();
     }
 
     @Override

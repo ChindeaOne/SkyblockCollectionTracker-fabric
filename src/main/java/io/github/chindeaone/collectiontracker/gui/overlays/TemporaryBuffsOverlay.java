@@ -34,7 +34,7 @@ public class TemporaryBuffsOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isTempBuffTrackerEnabled() && HypixelUtils.isOnSkyblock();
+        return ConfigAccess.isTempBuffTrackerEnabled() && HypixelUtils.isInSkyblock();
     }
 
     @Override

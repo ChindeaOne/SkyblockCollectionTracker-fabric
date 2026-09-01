@@ -31,7 +31,7 @@ object ContainerParser {
     private var currentHotxType: HotxScreenType? = null
 
     fun onScreenChanged(screen: Screen?) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
 
         currentCommissionScreen = null
         detachListener()
@@ -56,7 +56,7 @@ object ContainerParser {
     }
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
 
         val screen = currentHotxScreen ?: return
 

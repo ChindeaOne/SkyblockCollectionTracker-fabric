@@ -116,7 +116,7 @@ object CommissionUtils {
     }
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
 
         val screen = ContainerParser.currentCommissionScreen ?: return
 
@@ -279,7 +279,7 @@ object CommissionUtils {
     }
 
     private fun isCommissionScreen(screen: AbstractContainerScreen<*>): Boolean {
-        if (!HypixelUtils.isOnSkyblock) return false
+        if (!HypixelUtils.isInSkyblock) return false
         if (!ConfigAccess.isCommissionsOverlayEnabled()) return false
         return screen.title.string.contains("Commissions", ignoreCase = true)
     }

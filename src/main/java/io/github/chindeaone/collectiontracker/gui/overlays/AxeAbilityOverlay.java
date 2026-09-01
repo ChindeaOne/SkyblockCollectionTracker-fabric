@@ -36,7 +36,7 @@ public class AxeAbilityOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isAxeAbilityDisplayed() && HypixelUtils.isOnSkyblock();
+        return ConfigAccess.isAxeAbilityDisplayed() && HypixelUtils.isInSkyblock();
     }
 
     @Override

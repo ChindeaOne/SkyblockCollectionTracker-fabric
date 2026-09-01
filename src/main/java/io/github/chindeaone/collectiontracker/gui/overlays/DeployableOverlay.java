@@ -29,7 +29,7 @@ public class DeployableOverlay extends AbstractOverlay {
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isDeployableEnabled() && HypixelUtils.isOnSkyblock();
+        return ConfigAccess.isDeployableEnabled() && HypixelUtils.isInSkyblock();
     }
 
     @Override

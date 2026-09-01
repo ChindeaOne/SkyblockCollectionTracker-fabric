@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getMiningStatsPosition
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isMiningStatsOverlayEnabled
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isOnSkyblock
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isInSkyblock
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderStrings
@@ -23,7 +23,7 @@ class MiningStatsOverlay : AbstractOverlay() {
     }
 
     override fun isEnabled(): Boolean {
-        return isMiningStatsOverlayEnabled() && isOnSkyblock
+        return isMiningStatsOverlayEnabled() && isInSkyblock
     }
 
     override fun render(context: GuiGraphicsExtractor) {

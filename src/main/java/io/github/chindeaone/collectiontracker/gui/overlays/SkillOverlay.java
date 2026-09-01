@@ -59,7 +59,7 @@ public class SkillOverlay extends AbstractOverlay {
 
     @Override
     public boolean isEnabled() {
-        return SkillTrackingHandler.isTracking && HypixelUtils.isOnSkyblock();
+        return SkillTrackingHandler.isTracking && HypixelUtils.isInSkyblock();
     }
 
     @Override

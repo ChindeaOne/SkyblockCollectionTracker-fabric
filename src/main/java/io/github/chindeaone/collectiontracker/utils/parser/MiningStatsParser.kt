@@ -19,7 +19,7 @@ object MiningStatsParser {
     private val NON_DIGIT = Regex("[^0-9]+")
 
     fun onClientTick() {
-        if (!HypixelUtils.isOnSkyblock) {
+        if (!HypixelUtils.isInSkyblock) {
             clear()
             return
         }

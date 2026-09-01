@@ -37,7 +37,7 @@ public class PickaxeAbilityOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isPickaxeAbilityDisplayed() && HypixelUtils.isOnSkyblock();
+        return ConfigAccess.isPickaxeAbilityDisplayed() && HypixelUtils.isInSkyblock();
     }
 
     @Override

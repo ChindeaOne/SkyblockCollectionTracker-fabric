@@ -31,7 +31,7 @@ object DwarvenHeatmap {
     )
 
     fun render (context: LevelRenderContext) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
         if (!ConfigAccess.isHeatmapEnabled() || IslandTracker.currentMiningIsland != "Dwarven Mines") return
 
         val camera = context.levelState().cameraRenderState

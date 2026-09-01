@@ -31,7 +31,7 @@ object CollectionTracker {
 
     fun startTracking(coll: String) {
         try {
-            if (!HypixelUtils.isOnSkyblock) {
+            if (!HypixelUtils.isInSkyblock) {
                 ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true)
                 return
             }
@@ -100,7 +100,7 @@ object CollectionTracker {
 
     fun startMultiTracking(list: MutableList<String>) {
         try {
-            if (!HypixelUtils.isOnSkyblock) {
+            if (!HypixelUtils.isInSkyblock) {
                 ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true)
                 return
             }

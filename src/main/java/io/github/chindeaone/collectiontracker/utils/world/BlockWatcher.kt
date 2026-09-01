@@ -23,7 +23,7 @@ object BlockWatcher {
 
     // Check the block the player is looking at
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
         val hitResult = client.hitResult
 
         (hitResult as? BlockHitResult)?.let { blockHit ->

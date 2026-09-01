@@ -21,7 +21,7 @@ object SkillTracker {
 
     fun startTracking(skill: String) {
         try {
-            if (!HypixelUtils.isOnSkyblock) {
+            if (!HypixelUtils.isInSkyblock) {
                 ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true)
                 return
             }

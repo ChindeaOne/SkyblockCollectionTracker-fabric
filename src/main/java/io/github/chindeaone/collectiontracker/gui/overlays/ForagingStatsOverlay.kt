@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getForagingStatsPosition
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isForagingStatsOverlayEnabled
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isOnSkyblock
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isInSkyblock
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderStrings
@@ -23,7 +23,7 @@ class ForagingStatsOverlay : AbstractOverlay() {
     }
 
     override fun isEnabled(): Boolean {
-        return isForagingStatsOverlayEnabled() && isOnSkyblock
+        return isForagingStatsOverlayEnabled() && isInSkyblock
     }
 
     override fun render(context: GuiGraphicsExtractor) {

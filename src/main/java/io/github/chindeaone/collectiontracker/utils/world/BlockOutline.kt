@@ -26,7 +26,7 @@ import java.awt.Color
 object BlockOutline {
 
     fun renderWaypoint(context: LevelRenderContext) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
         if (!FetchWaypoints.hasWaypoints) return
 
         val currentIsland = IslandTracker.currentMiningIsland

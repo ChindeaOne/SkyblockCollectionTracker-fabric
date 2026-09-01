@@ -33,7 +33,7 @@ public class SkyMallOverlay extends AbstractOverlay {
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isSkyMallEnabled() && HypixelUtils.isOnSkyblock();
+        return ConfigAccess.isSkyMallEnabled() && HypixelUtils.isInSkyblock();
     }
 
     @Override

@@ -33,7 +33,7 @@ public class StopwatchOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return stopwatchRunning  && HypixelUtils.isOnSkyblock();
+        return stopwatchRunning  && HypixelUtils.isInSkyblock();
     }
 
     @Override

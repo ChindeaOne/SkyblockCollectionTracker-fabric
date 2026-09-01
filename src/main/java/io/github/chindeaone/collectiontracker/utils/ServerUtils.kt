@@ -31,7 +31,7 @@ object ServerUtils {
     }
 
     private fun checkServerStatusPeriodically() {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
         logger.info("[SCT]: Checking server status...")
 
         ApiManager.checkServer()
@@ -57,7 +57,7 @@ object ServerUtils {
     }
 
     private fun checkIfDataWasFetched() {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
         if (hasData()) return
 
         Hypixel.fetchData()

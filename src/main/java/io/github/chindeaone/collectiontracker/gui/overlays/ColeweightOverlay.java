@@ -34,7 +34,7 @@ public class ColeweightOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return ColeweightTrackingHandler.isTracking && HypixelUtils.isOnSkyblock();
+        return ColeweightTrackingHandler.isTracking && HypixelUtils.isInSkyblock();
     }
 
     @Override

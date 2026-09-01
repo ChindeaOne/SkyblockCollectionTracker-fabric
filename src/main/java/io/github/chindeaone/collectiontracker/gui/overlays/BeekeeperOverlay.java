@@ -32,7 +32,7 @@ public class BeekeeperOverlay extends AbstractOverlay{
 
     @Override
     public boolean isEnabled() {
-        return ConfigAccess.isBeekeeperEnabled() && HypixelUtils.isOnSkyblock();
+        return ConfigAccess.isBeekeeperEnabled() && HypixelUtils.isInSkyblock();
     }
 
     @Override

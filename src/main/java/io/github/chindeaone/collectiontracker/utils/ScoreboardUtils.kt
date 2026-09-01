@@ -28,7 +28,7 @@ object ScoreboardUtils {
     private var lastMinutesSinceMidnight = -1
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
         if (ModLoader.clientTicks % 4L != 0L) return
 
         val world = client.level ?: return

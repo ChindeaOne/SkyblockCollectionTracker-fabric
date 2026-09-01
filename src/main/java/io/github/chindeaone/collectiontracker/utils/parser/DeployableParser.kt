@@ -35,7 +35,7 @@ object DeployableParser {
     private var trackedEntity: ArmorStand? = null
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isOnSkyblock) return
+        if (!HypixelUtils.isInSkyblock) return
         val level = client.level ?: return
         val player = client.player ?: return
 

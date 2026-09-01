@@ -22,7 +22,7 @@ public class EntityRendererMixin {
             at = @At("RETURN")
     )
     private Component addRankToNameTag(Component original, @Local(argsOnly = true, name = "entity") Entity entity) {
-        if (!HypixelUtils.isOnSkyblock()) return original;
+        if (!HypixelUtils.isInSkyblock()) return original;
         if (!(entity instanceof Player player)) return original;
 
         String playerName = player.getName().getString();
