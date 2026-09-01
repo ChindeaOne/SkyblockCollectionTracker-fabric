@@ -1,34 +1,27 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isInSkyblock
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawActiveTitle
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
-public class TitleOverlay extends AbstractOverlay{
-
-    @Override
-    public String overlayLabel() {
-        return "Global Title";
+class TitleOverlay : AbstractOverlay() {
+    override fun overlayLabel(): String {
+        return "Global Title"
     }
 
-    @Override
-    public Position position() {
-        return null;
+    override fun position(): Position? {
+        return null
     }
 
-    @Override
-    public boolean isEnabled() {
-        return HypixelUtils.isInSkyblock();
+    override fun isEnabled(): Boolean {
+        return isInSkyblock
     }
 
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        RenderUtils.drawActiveTitle(context);
+    override fun render(context: GuiGraphicsExtractor) {
+        if (!isEnabled) return
+        drawActiveTitle(context)
     }
 
-    @Override
-    public void updateDimensions() {
-    }
+    override fun updateDimensions() {}
 }

@@ -1,135 +1,112 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.network.chat.Component;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightTimerPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTimerTitle
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isInSkyblock
+import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderStrings
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.network.chat.Component
+import kotlin.math.max
 
-import java.util.ArrayList;
-import java.util.List;
+class TimerOverlay : AbstractOverlay() {
+    private val position = getColeweightTimerPosition()
+    private val timerLines: MutableList<String> = ArrayList<String>()
+    private var coleweightTimerEnd: Long = 0
+    private var remainingTime: Long = 0
+    private var isPaused = false
+    private var hasEnded = true
 
-public class TimerOverlay extends AbstractOverlay{
-
-    private final Position position = ConfigAccess.getColeweightTimerPosition();
-    private final List<String> timerLines = new ArrayList<>();
-    private long coleweightTimerEnd = 0;
-    private long remainingTime = 0;
-    private boolean isPaused = false;
-    private boolean hasEnded = true;
-
-    @Override
-    public String overlayLabel() {
-        return "Timer Overlay";
+    override fun overlayLabel(): String {
+        return "Timer Overlay"
     }
 
-    @Override
-    public Position position() {
-        return position;
+    override fun position(): Position {
+        return position
     }
 
-    @Override
-    public boolean isEnabled() {
-        return !hasEnded && HypixelUtils.isInSkyblock();
+    override fun isEnabled(): Boolean {
+        return !hasEnded && isInSkyblock
     }
 
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
+    override fun render(context: GuiGraphicsExtractor) {
+        if (!isEnabled) return
 
-        List<String> lines = getTimerLines();
-        if (lines.isEmpty()) return;
+        val lines = getTimerLines()
+        if (lines.isEmpty()) return
 
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderStrings(context, lines));
+        drawOverlayFrame(context, position) { renderStrings(context, lines) }
     }
 
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getTimerLines();
-        if (lines.isEmpty()) return;
+    override fun updateDimensions() {
+        if (!isEnabled) return
+        val lines = getTimerLines()
+        if (lines.isEmpty()) return
 
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
+        val fr = Minecraft.getInstance().font
+        var maxW = 0
+        for (l in lines) maxW = max(maxW, fr.width(l))
+        val h = fr.lineHeight * lines.size
 
-        position.setDimensions(maxW, h);
+        position.setDimensions(maxW, h)
     }
 
-    public void setTimer(int duration) {
-        if (duration == 0) {
-            ChatUtils.sendMessage("§cTimer cancelled!", true);
-            hasEnded = true;
-            isPaused = false;
-            return;
+    fun setTimer(duration: Long) {
+        if (duration == 0L) {
+            sendMessage("§cTimer cancelled!", true)
+            hasEnded = true
+            isPaused = false
+            return
         }
-        sendCompleteTime(duration);
-        coleweightTimerEnd = System.currentTimeMillis() + duration * 1000L;
-        isPaused = false;
-        hasEnded = false;
+        coleweightTimerEnd = System.currentTimeMillis() + duration * 1000L
+        isPaused = false
+        hasEnded = false
+
+        sendMessage("§aTimer set for ${StringUtils.formatTimeIntoText(duration)}!", true)
     }
 
-    public void pauseTimer() {
+    fun pauseTimer() {
         if (hasEnded) {
-            ChatUtils.sendMessage("§cTimer has already ended!", true);
-            return;
+            sendMessage("§cTimer has already ended!", true)
+            return
         }
         if (!isPaused && coleweightTimerEnd > System.currentTimeMillis()) {
-            remainingTime = coleweightTimerEnd - System.currentTimeMillis();
-            isPaused = true;
-            ChatUtils.sendMessage("§eTimer paused!", true);
+            remainingTime = coleweightTimerEnd - System.currentTimeMillis()
+            isPaused = true
+            sendMessage("§eTimer paused!", true)
         } else {
-            coleweightTimerEnd = System.currentTimeMillis() + remainingTime;
-            isPaused = false;
-            ChatUtils.sendMessage("§aTimer resumed!", true);
+            coleweightTimerEnd = System.currentTimeMillis() + remainingTime
+            isPaused = false
+            sendMessage("§aTimer resumed!", true)
         }
     }
 
-    private List<String> getTimerLines() {
-        timerLines.clear();
-        if (hasEnded) return timerLines;
+    private fun getTimerLines(): MutableList<String> {
+        timerLines.clear()
+        if (hasEnded) return timerLines
 
-        long now = System.currentTimeMillis();
-        long remaining = isPaused? remainingTime : coleweightTimerEnd - now;
+        val now = System.currentTimeMillis()
+        val remaining = (if (isPaused) remainingTime else coleweightTimerEnd - now) / 1000
 
-        if (remaining > 1000) {
-            int hours = (int) (remaining / 3600000);
-            int minutes = (int) ((remaining % 3600000) / 60000);
-            int seconds = (int) ((remaining % 60000) / 1000);
-            String pauseTarget = isPaused ? "§7 (Paused)" : "";
-
-            String timeFormat;
-            if (hours > 0) {
-                timeFormat = String.format("%d:%02d:%02d", hours, minutes, seconds);
-            } else if (minutes > 0) {
-                timeFormat = String.format("%d:%02d", minutes, seconds);
-            } else {
-                timeFormat = String.format("%ds", seconds);
-            }
-            timerLines.add("§bTimer: §e" + timeFormat + pauseTarget);
+        if (remaining > 0) {
+            val pauseTarget = if (isPaused) "§7 (Paused)" else ""
+            val timeFormat = StringUtils.formatCompactTime(remaining)
+            timerLines.add("§bTimer: §e$timeFormat$pauseTarget")
         } else {
-            if (ConfigAccess.isShowTimerTitle()) {
-                String title = "§6[§3§kd§6] §b§lTimer Finished! §6[§3§kd§6]";
-                RenderUtils.showTitle(Component.literal(title), ConfigAccess.getTitleDisplayTimer());
+            if (isShowTimerTitle()) {
+                val title = "§6[§3§kd§6] §b§lTimer Finished! §6[§3§kd§6]"
+                showTitle(Component.literal(title), getTitleDisplayTimer())
             }
-            ChatUtils.sendMessage("§cTimer finished!", true);
-            hasEnded = true;
+            sendMessage("§cTimer finished!", true)
+            hasEnded = true
         }
 
-        return timerLines;
-    }
-
-    private void sendCompleteTime(int duration) {
-        int hours = duration / 3600;
-        int minutes = (duration % 3600) / 60;
-        int seconds = duration % 60;
-
-        ChatUtils.sendMessage("§aTimer set for " + (hours > 1 ? hours + " hours " : (hours > 0) ? hours + " hour " : "") + (minutes > 1 ? minutes + " minutes " : (minutes > 0) ? minutes + " minute " : "") + (seconds > 1 ? seconds + " seconds " : (seconds > 0) ? seconds + " second " : "") + "!", true);
+        return timerLines
     }
 }

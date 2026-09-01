@@ -14,6 +14,7 @@ import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
 import io.github.chindeaone.collectiontracker.utils.PlayerData
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatCollectionName
@@ -25,29 +26,22 @@ import java.util.concurrent.TimeUnit
 object MultiTrackingHandler  {
 
     private val logger: Logger = LogManager.getLogger(MultiTrackingHandler::class.java)
-    @JvmStatic
     val COOLDOWN_MILLIS: Long = TimeUnit.SECONDS.toMillis(10) // 10-second cooldown
 
     @Volatile
     @JvmStatic
     var isMultiTracking = false
-    @JvmStatic
     var isMultiPaused = false
-    @JvmStatic
     var leaderboardTrackingInitialized = false
 
-    @JvmStatic
     var multiStartTime: Long = 0
-    @JvmStatic
     var multiLastTime: Long = 0
-    @JvmStatic
     var multiLastTrackTime: Long = 0
 
     private const val RESETS: Int = 10
     private var multiRestartCount: Int = 0
     private var multiFirstRestartTime: Long = 0
 
-    @JvmStatic
     fun startMultiTracking() {
         logger.info("[SCT]: Starting multi tracking for player ${PlayerData.playerName}")
 
@@ -72,7 +66,6 @@ object MultiTrackingHandler  {
         leaderboardTrackingInitialized = ConfigAccess.isCollectionLeaderboardEnabled()
     }
 
-    @JvmStatic
     fun stopMultiTrackingManual() {
         if (isMultiTracking) {
             sendMultiRates()
@@ -87,7 +80,6 @@ object MultiTrackingHandler  {
         }
     }
 
-    @JvmStatic
     fun stopMultiTracking() {
         if (isMultiTracking) {
             if (!server) {
@@ -103,7 +95,6 @@ object MultiTrackingHandler  {
         }
     }
 
-    @JvmStatic
     fun restartMultiTracking() {
         if (!isMultiTracking) {
             sendMessage("§cNo multi-tracking active to restart!", true)
@@ -181,7 +172,6 @@ object MultiTrackingHandler  {
         MultiTrackingRates.seenGemstones.clear()
     }
 
-    @JvmStatic
     fun pauseMultiTracking() {
         if (!isMultiTracking) {
             sendMessage("§cNo multi-tracking active!", true)
@@ -200,7 +190,6 @@ object MultiTrackingHandler  {
 
     }
 
-    @JvmStatic
     fun resumeMultiTracking() {
         if (!isMultiTracking) {
             sendMessage("§cNo multi-tracking active!", true)
@@ -258,55 +247,37 @@ object MultiTrackingHandler  {
         logger.info("[SCT]: Pausing multi tracking before leaving The Rift.")
     }
 
-    fun getMultiUptimeInSeconds(): Long {
-        if (multiStartTime == 0L) {
-            return 0
+    val multiUptimeInSeconds: Long
+        get() {
+            if (multiStartTime == 0L) {
+                return 0
+            }
+
+            return if (isMultiPaused) {
+                multiLastTime
+            } else {
+                multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
+            }
         }
 
-        return if (isMultiPaused) {
-            multiLastTime
-        } else {
-            multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
+    private val multiUptimeInWords: String
+        get() {
+            val uptime: Long = multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
+            return StringUtils.formatTimeIntoText(uptime)
         }
-    }
-
-    private fun getMultiUptimeInWords(): String {
-        if (multiStartTime == 0L) return "0 seconds"
-
-        val uptime: Long = multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
-
-        val hours = uptime / 3600
-        val minutes = (uptime % 3600) / 60
-        val seconds = uptime % 60
-
-        return when {
-            hours == 1L -> "$hours hour $minutes minutes $seconds seconds"
-            hours > 0 -> "$hours hours $minutes minutes $seconds seconds"
-            minutes == 1L -> "$minutes minute $seconds seconds"
-            minutes > 1 -> "$minutes minutes $seconds seconds"
-            seconds == 1L -> "$seconds second"
-            else -> "$seconds seconds"
-        }
-    }
 
     @JvmStatic
-    fun getMultiUptime(): String {
-        if (multiStartTime == 0L) return "00:00:00"
+    val multiUptime: String
+        get() {
+            val uptime: Long = if (isMultiPaused) {
+                multiLastTime
+            } else {
+                multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
+            }
 
-        val uptime: Long = if (isMultiPaused) {
-            multiLastTime
-        } else {
-            multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
+            return StringUtils.formatTime(uptime)
         }
 
-        val hours = uptime / 3600
-        val minutes = (uptime % 3600) / 60
-        val seconds = uptime % 60
-
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
-    @JvmStatic
     fun sendMultiRates() {
         if (!ConfigAccess.isMultiTrackingSummaryEnabled()) return
 
@@ -509,7 +480,8 @@ object MultiTrackingHandler  {
         }
 
         lines.add(Component.empty())
-        lines.add(Component.literal("   §7Elapsed time: §f${getMultiUptimeInWords()}"))
+        lines.add(Component.literal("   §7Elapsed time: §f${multiUptimeInWords}"))
 
         ChatUtils.sendSummary("§e§lMulti-Tracking Summary", lines)
-    }}
+    }
+}

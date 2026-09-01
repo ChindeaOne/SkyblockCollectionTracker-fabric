@@ -25,12 +25,10 @@ object OverlayManager {
         overlays[label]?.isRenderingAllowed = allowed
     }
 
-    @JvmStatic
     fun setTrackingOverlayRendering(allowed: Boolean) = setOverlayRendering(CollectionOverlay().overlayLabel(), allowed)
 
     fun setMultiTrackingOverlayRendering(allowed: Boolean) = setOverlayRendering(MultiCollectionOverlay().overlayLabel(), allowed)
 
-    @JvmStatic
     fun setSkillOverlayRendering(allowed: Boolean) = setOverlayRendering(SkillOverlay().overlayLabel(), allowed)
 
     fun setColeweightOverlayRendering(allowed: Boolean) = setOverlayRendering(ColeweightOverlay().overlayLabel(), allowed)
@@ -63,10 +61,8 @@ object OverlayManager {
         return label == CollectionOverlay().overlayLabel() || label == MultiCollectionOverlay().overlayLabel()
     }
 
-    @JvmStatic
     fun getTimerOverlay(): TimerOverlay? = overlays.values.filterIsInstance<TimerOverlay>().firstOrNull()
 
-    @JvmStatic
     fun getStopwatchOverlay(): StopwatchOverlay? = overlays.values.filterIsInstance<StopwatchOverlay>().firstOrNull()
 }
 

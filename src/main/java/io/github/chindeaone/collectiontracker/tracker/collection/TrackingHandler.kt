@@ -42,6 +42,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.l
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionTillNextRank
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
@@ -514,10 +515,6 @@ object TrackingHandler {
 
     val uptimeInSeconds: Long
         get() {
-            if (startTime == 0L) {
-                return 0
-            }
-
             return if (isPaused) {
                 lastTime
             } else {
@@ -525,40 +522,20 @@ object TrackingHandler {
             }
         }
 
-    val uptimeInWords: String
+    private val uptimeInWords: String
         get() {
-            if (startTime == 0L) return "0 seconds"
-
-            val uptime =
-                lastTime + (System.currentTimeMillis() - startTime) / 1000
-
-            val hours = uptime / 3600
-            val minutes = (uptime % 3600) / 60
-            val seconds = uptime % 60
-
-            return if (hours > 0) String.format("%d hours, %d minutes, %d seconds", hours, minutes, seconds) else
-                if (minutes > 0) String.format(
-                    "%d minutes, %d seconds",
-                    minutes,
-                    seconds
-                ) else String.format("%d seconds", seconds)
+            val uptime = lastTime + (System.currentTimeMillis() - startTime) / 1000
+            return StringUtils.formatTimeIntoText(uptime)
         }
 
     @JvmStatic
     val uptime: String
         get() {
-            if (startTime == 0L) return "00:00:00"
-
-            val uptime: Long = if (isPaused) {
+            val uptime = if (isPaused) {
                 lastTime
             } else {
                 lastTime + (System.currentTimeMillis() - startTime) / 1000
             }
-
-            val hours = uptime / 3600
-            val minutes = (uptime % 3600) / 60
-            val seconds = uptime % 60
-
-            return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            return StringUtils.formatTime(uptime)
         }
 }

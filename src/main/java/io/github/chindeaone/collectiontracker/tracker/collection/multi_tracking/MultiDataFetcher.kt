@@ -70,6 +70,12 @@ object MultiDataFetcher {
                     collectionCache[cacheKey] = map
                     cacheTimestamps[cacheKey] = System.currentTimeMillis()
 
+                    if (isInitialFetch) {
+                        MultiTrackingRates.setCollections(map)
+                    } else {
+                        MultiTrackingRates.updateCollections(map)
+                    }
+
                     logger.info("[SCT]: Data successfully fetched for collections: {}", CollectionTracker.collectionList)
                 }.exceptionally { e ->
                     logger.error("[SCT]: An error occurred while fetching multi collection data from the Hypixel API: ${e.message}")

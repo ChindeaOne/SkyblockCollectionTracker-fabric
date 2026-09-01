@@ -669,9 +669,7 @@ public class TextUtils {
             return "§aTime left: §cSoon";
         }
 
-        long minutes = timeLeft / 60;
-        long seconds = timeLeft % 60;
-        return String.format("§aTime left: %02d:%02d", minutes, seconds);
+        return String.format("§aTime left: %s", StringUtils.INSTANCE.formatTime(timeLeft));
     }
 
     public static String formatCollectionName(String collection) {

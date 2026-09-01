@@ -62,7 +62,6 @@ object ColorUtils {
     val skillColors: MutableMap<String, Int> = HashMap()
     val collectionColors: MutableMap<String, Int> = HashMap()
 
-    @JvmStatic
     fun setupColors(json: JsonObject) {
         parseColorMap(json, "skills")?.let { values ->
             synchronized(skillColors) {
@@ -178,7 +177,6 @@ object ColorUtils {
         return Component.literal(collection).withColor(collectionColors[collection] ?: Colors.WHITE.color)
     }
 
-    @JvmStatic
     fun coloredText(color: String): Component {
         return Component.literal(color).withColor(TextColor.fromRgb(Color.decode(color).rgb).value)
     }

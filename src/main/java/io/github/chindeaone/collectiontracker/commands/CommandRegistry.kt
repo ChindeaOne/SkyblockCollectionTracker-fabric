@@ -766,11 +766,11 @@ object CommandRegistry {
                 .maxByOrNull { it.length }
     }
 
-    private fun parseToSeconds(input: String): Int {
-        val regex = "(\\d+)([hms])".toRegex()
+    private fun parseToSeconds(input: String): Long {
+        val regex = "(\\d+)([dhms])".toRegex()
         val input = input.lowercase().replace(" ", "")
 
-        var seconds = 0
+        var seconds = 0L
         var found = false
 
         for (match in regex.findAll(input)) {
@@ -779,6 +779,7 @@ object CommandRegistry {
             val unit = unitString[0]
 
             when (unit) {
+                'd' -> seconds += value * 86400
                 'h' -> seconds += value * 3600
                 'm' -> seconds += value * 60
                 's' -> seconds += value
@@ -786,7 +787,7 @@ object CommandRegistry {
             found = true
         }
 
-        if (!found) return input.trim().toIntOrNull() ?: -1
+        if (!found) return input.trim().toLongOrNull() ?: -1
 
         return seconds
     }

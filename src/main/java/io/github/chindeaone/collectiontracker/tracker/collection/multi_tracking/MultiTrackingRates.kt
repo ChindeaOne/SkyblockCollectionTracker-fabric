@@ -117,7 +117,7 @@ object MultiTrackingRates {
     }
 
     private fun updateValues(coll: String, currentCollection: Long, sinceLast: Long) {
-        val uptime = MultiTrackingHandler.getMultiUptimeInSeconds()
+        val uptime = MultiTrackingHandler.multiUptimeInSeconds
         val now = System.currentTimeMillis()
 
         collectionSinceLast[coll] = sinceLast

@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.gui.overlays.ColeweightOverlay
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightDataFetcher.scheduler
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.afk
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -17,8 +18,6 @@ object ColeweightTrackingHandler {
 
     @JvmField
     var isTracking = false
-
-    @JvmField
     var isPaused = false
 
     private const val RESETS: Int = 10
@@ -30,7 +29,6 @@ object ColeweightTrackingHandler {
     private var lastTrackedTime: Long = 0
     private val COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10)
 
-    @JvmStatic
     fun startTracking() {
         val now = System.currentTimeMillis()
 
@@ -58,7 +56,6 @@ object ColeweightTrackingHandler {
         isPaused = false
     }
 
-    @JvmStatic
     fun stopTrackingManual() {
         if (!scheduler.isShutdown) {
             sendMessage("§cStopping Coleweight tracking!", true)
@@ -72,7 +69,6 @@ object ColeweightTrackingHandler {
         }
     }
 
-    @JvmStatic
     fun stopTracking() {
         if (!isTracking) return
         if (!scheduler.isShutdown) {
@@ -93,7 +89,6 @@ object ColeweightTrackingHandler {
         }
     }
 
-    @JvmStatic
     fun restartTracking() {
         if (!isTracking) {
             sendMessage("§cNo active Coleweight tracking session to restart!", true)
@@ -154,7 +149,6 @@ object ColeweightTrackingHandler {
         ColeweightTrackingRates.reset()
     }
 
-    @JvmStatic
     fun pauseTracking() {
         if (!scheduler.isShutdown) {
             if (isPaused) {
@@ -172,7 +166,6 @@ object ColeweightTrackingHandler {
         }
     }
 
-    @JvmStatic
     fun resumeTracking() {
         if (scheduler.isShutdown && !isTracking) {
             sendMessage("§cNo Coleweight tracking active!", true)
@@ -198,10 +191,6 @@ object ColeweightTrackingHandler {
     }
 
     fun getUptimeInSeconds(): Long {
-        if (startTime == 0L) {
-            return 0
-        }
-
         return if (isPaused) {
             lastTime
         } else {
@@ -210,19 +199,13 @@ object ColeweightTrackingHandler {
     }
 
     @JvmStatic
-    fun getUptime(): String {
-        if (startTime == 0L) return "00:00:00"
-
-        val uptime: Long = if (isPaused) {
-            lastTime
-        } else {
-            lastTime + (System.currentTimeMillis() - startTime) / 1000
+    val uptime: String
+        get() {
+            val uptime: Long = if (isPaused) {
+                lastTime
+            } else {
+                lastTime + (System.currentTimeMillis() - startTime) / 1000
+            }
+            return StringUtils.formatTime(uptime)
         }
-
-        val hours = uptime / 3600
-        val minutes = (uptime % 3600) / 60
-        val seconds = uptime % 60
-
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
-    }
 }

@@ -45,6 +45,65 @@ object StringUtils {
         }
     }
 
+    fun formatTime(seconds: Long): String {
+        if (seconds <= 0) return "00:00"
+
+        val days = seconds / 86400
+        val hours = (seconds % 86400) / 3600
+        val minutes = (seconds % 3600) / 60
+        val secs = seconds % 60
+
+        return when {
+            days > 0 -> String.format("%02d:%02d:%02d:%02d", days, hours, minutes, secs)
+            hours > 0 -> String.format("%02d:%02d:%02d", hours, minutes, secs)
+            else -> String.format("%02d:%02d", minutes, secs)
+        }
+    }
+
+    fun formatCompactTime(seconds: Long): String {
+        if (seconds <= 0) return "0s"
+
+        val days = seconds / 86400
+        val hours = (seconds % 86400) / 3600
+        val minutes = (seconds % 3600) / 60
+        val secs = seconds % 60
+
+        val parts = buildList {
+            if (days > 0) add("${days}d")
+            if (hours > 0) add("${hours}h")
+            if (minutes > 0) add("${minutes}m")
+            if (secs > 0 ) add("${secs}s")
+        }
+
+        return parts.ifEmpty { listOf("0s") }.joinToString(" ")
+    }
+
+    fun formatTimeIntoText(seconds: Long): String {
+        if (seconds <= 0) return "0 seconds"
+
+        val days = seconds / 86400
+        val hours = (seconds % 86400) / 3600
+        val minutes = (seconds % 3600) / 60
+        val secs = seconds % 60
+
+        val parts = buildList {
+            if (days > 0) add(formatUnit(days, "day"))
+            if (hours > 0) add(formatUnit(hours, "hour"))
+            if (minutes > 0) add(formatUnit(minutes, "minute"))
+            if (secs > 0 ) add(formatUnit(secs, "second"))
+        }
+
+        return parts.joinToString(", ")
+    }
+
+    private fun formatUnit(amount: Long, unit: String): String {
+        return when {
+            amount > 1L -> "$amount ${unit}s"
+            amount == 1L -> "$amount $unit"
+            else -> "$amount $unit"
+        }
+    }
+
     // Method taken from Skyhanni
     @JvmStatic
     fun CharSequence.removeColor(keepFormatting: Boolean = false): String {

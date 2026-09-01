@@ -23,14 +23,12 @@ object ColeweightTrackingRates {
     var lastColeweightTime = -1L
         private set
 
-    @JvmStatic
     var afk = false
 
     private var startColeweight = -1f
     private var unchangedStreak = 0
     private const val THRESHOLD = 2
 
-    @JvmStatic
     fun calculateRates(currentValue: Float) {
         if (startColeweight == -1f) {
             startColeweight = currentValue
@@ -67,7 +65,6 @@ object ColeweightTrackingRates {
         if (!ColeweightOverlay.trackingDirty) ColeweightOverlay.trackingDirty = true
     }
 
-    @JvmStatic
     fun reset() {
         coleweightAmount = 0f
         coleweightGained = 0f

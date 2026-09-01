@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.tracker.commissions
 
-import java.util.concurrent.TimeUnit
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 
 object CommissionsTracker {
     private var completedCount = 0
@@ -24,26 +24,13 @@ object CommissionsTracker {
 
         lastUpdate = now
 
-        if (startTime == 0L) {
-            cachedPerHour = 0.0
-            cachedUptime = "00:00:00"
-            return
-        }
-
         val durationMs = now - startTime
         if (durationMs > 0) {
             val hours = durationMs.toDouble() / (1000.0 * 60.0 * 60.0)
             cachedPerHour = completedCount / hours
         }
 
-        cachedUptime = formatDuration(durationMs)
-    }
-
-    private fun formatDuration(millis: Long): String {
-        val hours = TimeUnit.MILLISECONDS.toHours(millis)
-        val minutes = (TimeUnit.MILLISECONDS.toMinutes(millis) % 60)
-        val seconds = (TimeUnit.MILLISECONDS.toSeconds(millis) % 60)
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        cachedUptime = StringUtils.formatTime(durationMs)
     }
 
     @JvmStatic
