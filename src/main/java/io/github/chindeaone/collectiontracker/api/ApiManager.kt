@@ -19,8 +19,7 @@ import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration.Companion.minutes
 
 object ApiManager {
-    const val API_URL = "https://api.skyblockcollections.com/v2"
-//    const val API_URL = "http://localhost:8080/v3"
+    const val API_URL = "https://api.skyblockcollections.com/v3"
     const val AGENT_BASE = "SCT"
 
     private val logger: Logger = LogManager.getLogger(ApiManager::class.java)
