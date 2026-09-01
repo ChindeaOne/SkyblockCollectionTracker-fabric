@@ -30,7 +30,7 @@ object CommissionsTracker {
             cachedPerHour = completedCount / hours
         }
 
-        cachedUptime = StringUtils.formatTime(durationMs)
+        cachedUptime = StringUtils.formatTime(durationMs / 1000L)
     }
 
     @JvmStatic
