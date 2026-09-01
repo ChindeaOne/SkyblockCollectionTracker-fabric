@@ -11,13 +11,14 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.net.http.HttpResponse
+import java.util.concurrent.CompletableFuture
 
 object SkillApiFetcher {
 
     private val logger: Logger = LogManager.getLogger(SkillApiFetcher::class.java)
 
-    fun fetchSkillsData() {
-        ApiManager.requestAsync("skills", headers())
+    fun fetchSkillsData(): CompletableFuture<Void> {
+        return ApiManager.requestAsync("skills", headers())
             .thenAccept { response ->
                 when (response.statusCode()) {
                     200 -> processSkillsResponse(response)

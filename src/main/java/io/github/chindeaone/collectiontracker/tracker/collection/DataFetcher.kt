@@ -133,51 +133,57 @@ object DataFetcher {
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    fun fetchLeaderboardData(targetCollection: String) {
-        if (targetCollection.isEmpty()) return
-        if (!ConfigAccess.isCollectionLeaderboardEnabled()) return
-        if (!leaderboardFetchInProgress.compareAndSet(expectedValue = false, newValue = true)) return
+    fun fetchLeaderboardData(targetCollection: String): CompletableFuture<Void> {
+        if (targetCollection.isEmpty()) return CompletableFuture.completedFuture(null)
+        if (!ConfigAccess.isCollectionLeaderboardEnabled()) return CompletableFuture.completedFuture(null)
+        if (!leaderboardFetchInProgress.compareAndSet(expectedValue = false, newValue = true)) return CompletableFuture.completedFuture(null)
 
-        try {
+        return try {
             val lastFetched = leaderboardCacheTimestamps[targetCollection]
             if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
-                return
-            }
-            logger.info("[SCT]: Fetching leaderboard data for collection: {}", targetCollection)
+                leaderboardFetchInProgress.store(false)
+                return CompletableFuture.completedFuture(null)
+            } else {
+                logger.info("[SCT]: Fetching leaderboard data for collection: {}", targetCollection)
 
-            EliteApiFetcher.fetchCollectionLeaderboard(targetCollection).thenAccept { jsonData ->
-                if (jsonData == null) {
-                    logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API")
-                    ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true)
-                    return@thenAccept
+                EliteApiFetcher.fetchCollectionLeaderboard(targetCollection).thenAccept { jsonData ->
+                    if (jsonData == null) {
+                        logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API")
+                        ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true)
+                        return@thenAccept
+                    }
+
+                    val jsonObject = JsonParser.parseString(jsonData).getAsJsonObject()
+                    val entriesArray = jsonObject.getAsJsonArray("entries")
+                    val entries = ArrayList<LeaderboardEntry>(entriesArray.size())
+
+                    for (i in 0 until entriesArray.size()) {
+                        val entryObject = entriesArray.get(i).getAsJsonObject()
+                        if (entryObject.get("username").asString.equals(PlayerData.playerName, ignoreCase = true)) continue
+
+                        entries.add(
+                            LeaderboardEntry(
+                                entryObject.get("username").asString,
+                                entryObject.get("rank").asInt,
+                                entryObject.get("amount").asLong,
+                                ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").asBoolean
+                            )
+                        )
+                    }
+                    LeaderboardManager.set(entries)
+                    leaderboardCacheTimestamps[targetCollection] = System.currentTimeMillis()
+                    logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", targetCollection)
+                }.exceptionally { throwable ->
+                    logger.error("[SCT]: Error fetching leaderboard data: {}", throwable.message, throwable)
+                    null
+                }.whenComplete { _, _ ->
+                    leaderboardFetchInProgress.store(false)
                 }
-
-                val jsonObject = JsonParser.parseString(jsonData).getAsJsonObject()
-                val entriesArray = jsonObject.getAsJsonArray("entries")
-                val entries = ArrayList<LeaderboardEntry>(entriesArray.size())
-
-                for (i in 0 until entriesArray.size()) {
-                    val entryObject = entriesArray.get(i).getAsJsonObject()
-                    if (entryObject.get("username").asString.equals(PlayerData.playerName, ignoreCase = true)) continue
-
-                    entries.add(LeaderboardEntry(
-                            entryObject.get("username").asString,
-                            entryObject.get("rank").asInt,
-                            entryObject.get("amount").asLong,
-                            ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").asBoolean
-                    ))
-                }
-                LeaderboardManager.set(entries)
-                leaderboardCacheTimestamps[targetCollection] = System.currentTimeMillis()
-                logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", targetCollection)
-            }.exceptionally { throwable ->
-                logger.error("[SCT]: Error fetching leaderboard data: {}", throwable.message, throwable)
-                return@exceptionally null
             }
         } catch (e: Exception) {
             logger.error("[SCT]: Error fetching leaderboard data: {}", e.message, e)
-        } finally {
             leaderboardFetchInProgress.store(false)
+            CompletableFuture.failedFuture(e)
         }
     }
 }

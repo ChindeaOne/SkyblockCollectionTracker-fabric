@@ -12,15 +12,15 @@ import io.github.chindeaone.collectiontracker.utils.PlayerData.playerName
 import io.github.chindeaone.collectiontracker.utils.PlayerData.playerUUID
 import io.github.chindeaone.collectiontracker.utils.ServerUtils.serverStatus
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.function.Consumer
-import java.util.function.Function
 
 object SkillFetcher {
     private val logger: Logger = LogManager.getLogger(SkillFetcher::class.java)
@@ -79,63 +79,60 @@ object SkillFetcher {
         }
     }
 
-    fun fetchSkillLeaderboardData(skillName: String) {
-        if (skillName.isEmpty()) return
-        if (!isSkillLeaderboardEnabled()) return
+    fun fetchSkillLeaderboardData(skillName: String): CompletableFuture<Void> {
+        if (skillName.isEmpty()) return CompletableFuture.completedFuture(null)
+        if (!isSkillLeaderboardEnabled()) return CompletableFuture.completedFuture(null)
 
-        val inProgress =
-            skillLeaderboardFetchInProgress.computeIfAbsent(skillName.lowercase(Locale.getDefault())) { `_`: String? ->
-                AtomicBoolean(false)
-            }
-        if (!inProgress.compareAndSet(false, true)) return
+        val inProgress = skillLeaderboardFetchInProgress.computeIfAbsent(skillName.lowercase()) { `_`: String? -> AtomicBoolean(false) }
+        if (!inProgress.compareAndSet(false, true)) return CompletableFuture.completedFuture(null)
 
-        try {
-            val lastFetched = leaderboardCacheTimestamps[skillName.lowercase(Locale.getDefault())]
+        return try {
+            val lastFetched = leaderboardCacheTimestamps[skillName.lowercase()]
             if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
-                return
-            }
-            logger.info("[SCT]: Fetching leaderboard data for skill: {}", skillName)
+                inProgress.set(false)
+                return CompletableFuture.completedFuture(null)
+            } else {
+                logger.info("[SCT]: Fetching leaderboard data for skill: {}", skillName)
 
-            fetchCollectionLeaderboard(skillName.lowercase(Locale.getDefault())).thenAccept(Consumer { jsonData: String? ->
-                if (jsonData == null) {
-                    logger.error("[SCT]: Failed to fetch leaderboard data for skill {} from the Elite API", skillName)
-                    return@Consumer
-                }
-                val jsonObject = JsonParser.parseString(jsonData).getAsJsonObject()
-                val entriesArray = jsonObject.getAsJsonArray("entries")
-                val entries: MutableList<LeaderboardEntry> = ArrayList<LeaderboardEntry>(entriesArray.size())
+                fetchCollectionLeaderboard(skillName.lowercase()).thenAccept { jsonData: String? ->
+                    if (jsonData == null) {
+                        logger.error("[SCT]: Failed to fetch leaderboard data for skill {} from the Elite API", skillName)
+                        ChatUtils.sendMessage("§c[SCT] Failed to fetch leaderboard data for $skillName.", true)
+                        return@thenAccept
+                    }
+                    val jsonObject = JsonParser.parseString(jsonData).getAsJsonObject()
+                    val entriesArray = jsonObject.getAsJsonArray("entries")
+                    val entries: MutableList<LeaderboardEntry> = ArrayList<LeaderboardEntry>(entriesArray.size())
 
-                for (i in 0..<entriesArray.size()) {
-                    val entryObject = entriesArray.get(i).getAsJsonObject()
-                    val username = entryObject.get("username").asString
-                    if (username.equals(playerName, ignoreCase = true)) continue
+                    for (i in 0..<entriesArray.size()) {
+                        val entryObject = entriesArray.get(i).getAsJsonObject()
+                        val username = entryObject.get("username").asString
+                        if (username.equals(playerName, ignoreCase = true)) continue
 
-                    entries.add(
-                        LeaderboardEntry(
-                            username,
-                            entryObject.get("rank").asInt,
-                            entryObject.get("amount").asLong,
-                            isIncludeWipedProfilesEnabled() && entryObject.get("wiped").asBoolean
+                        entries.add(
+                            LeaderboardEntry(
+                                username,
+                                entryObject.get("rank").asInt,
+                                entryObject.get("amount").asLong,
+                                isIncludeWipedProfilesEnabled() && entryObject.get("wiped").asBoolean
+                            )
                         )
-                    )
-                }
+                    }
 
-                LeaderboardManager.setSkillLeaderboard(skillName, entries)
-                leaderboardCacheTimestamps[skillName.lowercase()] = System.currentTimeMillis()
-                logger.info("[SCT]: Leaderboard data successfully fetched and updated for skill: {}", skillName)
-            }).exceptionally(Function { ex: Throwable? ->
-                logger.error(
-                    "[SCT]: Exception occurred while fetching leaderboard data for skill {}: {}",
-                    skillName,
-                    ex!!.message,
-                    ex
-                )
-                null
-            })
+                    LeaderboardManager.setSkillLeaderboard(skillName, entries)
+                    leaderboardCacheTimestamps[skillName.lowercase()] = System.currentTimeMillis()
+                    logger.info("[SCT]: Leaderboard data successfully fetched and updated for skill: {}", skillName)
+                }.exceptionally { ex: Throwable? ->
+                    logger.error("[SCT]: Exception occurred while fetching leaderboard data for skill {}: {}", skillName, ex!!.message, ex)
+                    null
+                }.whenComplete { _, _ ->
+                    inProgress.set(false)
+                }
+            }
         } catch (e: Exception) {
             logger.error("[SCT]: Error fetching skill leaderboard data for {}: {}", skillName, e.message, e)
-        } finally {
             inProgress.set(false)
+            CompletableFuture.completedFuture(null)
         }
     }
 

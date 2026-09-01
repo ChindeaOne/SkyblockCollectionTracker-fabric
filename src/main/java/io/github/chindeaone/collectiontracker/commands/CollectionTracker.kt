@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -87,7 +88,7 @@ object CollectionTracker {
 
                 // Fetch bazaar data and leaderboard data asynchronously
                 FetchBazaarPrice.fetchData(collection)
-                        .thenRunAsync { DataFetcher.fetchLeaderboardData(collection) }
+                        .thenCompose { DataFetcher.fetchLeaderboardData(collection) }
                         .thenRun(TrackingHandler::startTracking)
             } catch (e: Exception) {
                 ChatUtils.sendMessage("§cAn error occurred while processing the command.", true)
@@ -162,11 +163,11 @@ object CollectionTracker {
 
                 // Fetch bazaar data asynchronously
                 FetchBazaarPrice.fetchData(collectionList)
-                        .thenRunAsync {
+                        .thenCompose {
                             if (collectionList.size == 1 && collectionList.contains("gemstone")) {
                                 val collection = "gemstone"
                                 DataFetcher.fetchLeaderboardData(collection)
-                            }
+                            } else CompletableFuture.completedFuture(null)
                         }
                         .thenRun(MultiTrackingHandler::startMultiTracking)
             } catch (e: Exception) {

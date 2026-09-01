@@ -39,12 +39,11 @@ object SkillTracker {
                 }
 
                 // Fetch skill data and leaderboard data asynchronously
-                CompletableFuture.runAsync(SkillApiFetcher::fetchSkillsData)
-                        .thenRunAsync { SkillFetcher.fetchSkillLeaderboardData(skillName) }
-                        .thenRunAsync {
-                            if (ConfigAccess.isTamingTrackingEnabled()) {
-                                SkillFetcher.fetchSkillLeaderboardData("Taming")
-                            }
+                SkillApiFetcher.fetchSkillsData()
+                        .thenCompose { SkillFetcher.fetchSkillLeaderboardData(skillName) }
+                        .thenCompose {
+                            if (ConfigAccess.isTamingTrackingEnabled()) SkillFetcher.fetchSkillLeaderboardData("Taming")
+                            else CompletableFuture.completedFuture(null)
                         }
                         .thenRun(SkillTrackingHandler::startTracking)
             } catch (e: Exception) {

@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.schedu
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduler
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -210,13 +211,8 @@ object SkillTrackingHandler {
         startTracking()
     }
 
-    @JvmStatic
     val uptimeInSeconds: Long
         get() {
-            if (startTime == 0L) {
-                return 0
-            }
-
             return if (isPaused) {
                 lastTime
             } else {
@@ -227,18 +223,12 @@ object SkillTrackingHandler {
     @JvmStatic
     val uptime: String
         get() {
-            if (startTime == 0L) return "00:00:00"
-
             val uptime: Long = if (isPaused) {
                 lastTime
             } else {
                 lastTime + (System.currentTimeMillis() - startTime) / 1000
             }
 
-            val hours = uptime / 3600
-            val minutes = (uptime % 3600) / 60
-            val seconds = uptime % 60
-
-            return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            return StringUtils.formatTime(uptime)
         }
 }

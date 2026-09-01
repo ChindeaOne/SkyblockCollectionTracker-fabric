@@ -148,7 +148,6 @@ object EliteApiFetcher {
             }
     }
 
-    @JvmStatic
     fun fetchCollectionLeaderboard(collection: String): CompletableFuture<String?> {
         return ApiManager.requestAsync("collection/leaderboard/${collection.replace(" ", "-")}", authHeaders(PlayerData.playerUUID, PlayerData.playerName).apply{
             remove("X-NAME")
