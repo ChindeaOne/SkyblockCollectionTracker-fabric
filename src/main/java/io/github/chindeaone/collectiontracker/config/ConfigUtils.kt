@@ -777,12 +777,16 @@ object ConfigHelper {
         if (fiesta != -1L) temporaryBuffsConfig.fiestaFlaskTime = fiesta
     }
 
-    fun setProfessionalMS(ms: Int) {
-        hotmConfig.professionalMS = ms
+    fun setProfessionalMS(level: Int) {
+        if (level == 0) {
+            hotmConfig.professionalMS = 0
+            return
+        }
+        hotmConfig.professionalMS = 50 + level * 5
     }
 
-    fun setStrongArmMS(ms: Int) {
-        hotmConfig.strongArmMS = ms
+    fun setStrongArmMS(level: Int) {
+        hotmConfig.strongArmMS = level * 5
     }
 
     fun setCotmLevel(level: Int) {

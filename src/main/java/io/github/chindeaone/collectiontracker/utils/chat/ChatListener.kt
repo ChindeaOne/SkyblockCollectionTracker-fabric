@@ -63,14 +63,10 @@ object ChatListener {
     @JvmStatic val finalAxeCooldown: Double get() = axeCooldown.remainingSeconds
     @JvmStatic val finalAxeDuration: Double get() = axeDuration.remainingSeconds
 
-    @JvmStatic var maxCooldown = 0.0
-        private set
-    @JvmStatic var maxDuration = 0.0
-        private set
-    @JvmStatic var maxAxeCooldown = 0.0
-        private set
-    @JvmStatic var maxAxeDuration = 0.0
-        private set
+    var maxCooldown = 0.0
+    var maxDuration = 0.0
+    var maxAxeCooldown = 0.0
+    var maxAxeDuration = 0.0
 
     fun onChatMessage(message: Component) {
         if (!HypixelUtils.isInSkyblock) return
@@ -85,8 +81,7 @@ object ChatListener {
         if (cleanText.contains("consumed")) consumableListener(cleanText)
         if (cleanText.contains("You have reset")) treeResetListener(cleanText)
         if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
-        if (cleanText.startsWith("Disabled")) disableTreeBuffs(cleanText)
-        if (cleanText.startsWith("Enabled") || cleanText.startsWith("You equipped")) enableTreeBuffs(cleanText)
+        if (cleanText.startsWith("You equipped")) onLoadoutChange()
         sacksListener(message, actionBar = false)
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
@@ -436,48 +431,14 @@ object ChatListener {
         CommissionWidget.completeCollectorCommission(commissionName)
     }
 
-    private fun disableTreeBuffs(text: String) {
-        when (text) {
-            "Disabled Sky Mall" -> {
-                currentSkyMallBuff = "§cDisabled"
-                ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
-                isPickaxeAbility = false
-            }
-            "Disabled Lottery" -> {
-                currentLotteryBuff = "§cDisabled"
-                ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
-            }
-            "Disabled Beekeeper" -> {
-                currentBeekeeperBuff = "§cDisabled"
-                ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
-            }
-        }
-    }
-
-    private fun enableTreeBuffs(text: String) {
-        when (text) {
-            "Enabled Sky Mall" -> {
-                currentSkyMallBuff = "§cUnknown"
-                ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
-            }
-            "Enabled Lottery" -> {
-                currentLotteryBuff = "§cUnknown"
-                ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
-            }
-            "Enabled Beekeeper" -> {
-                currentBeekeeperBuff = "§cUnknown"
-                ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
-            }
-            else -> {
-                currentSkyMallBuff = "§cUnknown"
-                currentLotteryBuff = "§cUnknown"
-                currentBeekeeperBuff = "§cUnknown"
-                ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
-                ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
-                ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
-                isPickaxeAbility = false
-            }
-        }
+    private fun onLoadoutChange() {
+        currentSkyMallBuff = "§cUnknown"
+        currentLotteryBuff = "§cUnknown"
+        currentBeekeeperBuff = "§cUnknown"
+        ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
+        ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
+        ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
+        isPickaxeAbility = false
     }
 
     fun coleweightHandle(message: Component): Component {
@@ -623,7 +584,6 @@ object ChatListener {
         }
     }
 
-    @JvmStatic
     fun resetPickaxeAbilities() {
         pickaxeDuration.reset()
         pickaxeCooldown.reset()
