@@ -15,6 +15,7 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
@@ -42,39 +43,51 @@ object DataFetcher {
             if (!isInitialFetch && !isTracking) return
 
             var collectionData = getCachedData(collection)
-
             if (collectionData == null) {
-                val jsonData = fetchDataFromApi(collection)
-                if (jsonData == null) {
-                    logger.error("[SCT]: Failed to fetch data from the Hypixel API")
+                fetchDataFromApi(collection).thenAccept { jsonData ->
+                    if (jsonData == null) {
+                        logger.error("[SCT]: Failed to fetch data from the Hypixel API")
 
-                    if (ConfigAccess.isApiTrackingEnabled()) {
-                        CollectionTracker.cancelScheduledTask()
+                        if (ConfigAccess.isApiTrackingEnabled()) {
+                            CollectionTracker.cancelScheduledTask()
+                        }
+
+                        if (isInitialFetch) {
+                            Minecraft.getInstance().execute {
+                                Minecraft.getInstance()
+                                    ./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
+                                        CustomCollectionScreen(listOf(collection)) {
+                                            CollectionsManager.resetCollections()
+                                        }
+                                    )
+                            }
+                        }
+                        return@thenAccept
                     }
+                    collectionData =
+                        JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().value.asLong
+
+                    collectionCache[collection] = collectionData
+                    cacheTimestamps[collection] = System.currentTimeMillis()
 
                     if (isInitialFetch) {
-                        Minecraft.getInstance().execute {
-                            Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
-                                CustomCollectionScreen(listOf(collection)) {
-                                    CollectionsManager.resetCollections()
-                                }
-                            )
-                        }
+                        TrackingRates.setCollection(collectionData)
+                    } else {
+                        TrackingRates.updateCollection(collectionData)
                     }
-                    return
+                    logger.info("[SCT]: Data successfully fetched for collection: {}", collection)
+                }.exceptionally { throwable ->
+                    logger.error("[SCT]: Error fetching data from the Hypixel API: {}", throwable.message, throwable)
+                    null
                 }
-                collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().value.asLong
-
-                collectionCache[collection] = collectionData
-                cacheTimestamps[collection] = System.currentTimeMillis()
-            }
-
-            if (isInitialFetch) {
-                TrackingRates.setCollection(collectionData)
             } else {
-                TrackingRates.updateCollection(collectionData)
+                if (isInitialFetch) {
+                    TrackingRates.setCollection(collectionData)
+                } else {
+                    TrackingRates.updateCollection(collectionData)
+                }
+                logger.info("[SCT]: Data successfully retrieved for collection: {}", collection)
             }
-            logger.info("[SCT]: Data successfully fetched or retrieved for collection: {}", collection)
         } catch (e: Exception) {
             logger.error("[SCT]: Error fetching data from the Hypixel API: {}", e.message, e)
         }
@@ -91,7 +104,7 @@ object DataFetcher {
         return null
     }
 
-    private fun fetchDataFromApi(collection: String): String? {
+    private fun fetchDataFromApi(collection: String): CompletableFuture<String?> {
         val lastFetched = cacheTimestamps[collection]
 
         if (lastFetched != null) {
@@ -104,7 +117,6 @@ object DataFetcher {
         return HypixelApiFetcher.fetchJsonData(collection)
     }
 
-    @JvmStatic
     fun clearCollectionCache() {
         collectionCache.clear()
         cacheTimestamps.clear()
@@ -112,7 +124,6 @@ object DataFetcher {
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    @JvmStatic
     fun clearAllCache() {
         clearCollectionCache()
         leaderboardFetchInProgress.store(false)
@@ -122,7 +133,6 @@ object DataFetcher {
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    @JvmStatic
     fun fetchLeaderboardData(targetCollection: String) {
         if (targetCollection.isEmpty()) return
         if (!ConfigAccess.isCollectionLeaderboardEnabled()) return

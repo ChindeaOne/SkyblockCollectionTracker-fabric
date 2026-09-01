@@ -207,7 +207,6 @@ object InventoryListener {
             }
         }
 
-
     private data class HandItemState(
         val hand: InteractionHand,
         val itemName: String,

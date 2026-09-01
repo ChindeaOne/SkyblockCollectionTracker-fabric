@@ -16,23 +16,18 @@ object SkillApiFetcher {
 
     private val logger: Logger = LogManager.getLogger(SkillApiFetcher::class.java)
 
-    @JvmStatic
     fun fetchSkillsData() {
-        try {            
-            val headers = mapOf(
-                "Authorization" to "Bearer ${TokenManager.token}",
-                "X-UUID" to PlayerData.playerUUID,
-            )
-
-            val response = ApiManager.request("skills", headers)
-
-            when(val status = response.statusCode()) {
-                200 -> processSkillsResponse(response)
-                else -> logger.error("[SCT]: Failed to fetch skill data. HTTP {}", status)
+        ApiManager.requestAsync("skills", headers())
+            .thenAccept { response ->
+                when (response.statusCode()) {
+                    200 -> processSkillsResponse(response)
+                    else -> logger.error("[SCT]: Failed to fetch skill data. HTTP {}", response.statusCode())
+                }
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error while receiving the skill data", e)
-        }
+            .exceptionally { e ->
+                logger.error("[SCT]: Error while receiving the skill data", e)
+                null
+            }
     }
     
     private fun processSkillsResponse(response: HttpResponse<String>) {
@@ -52,4 +47,9 @@ object SkillApiFetcher {
         SkillUtils.updateFromApi(skills)
         logger.info("[SCT]: Successfully received the skill data.")
     }
+
+    private fun headers() = mapOf(
+        "Authorization" to "Bearer ${TokenManager.token}",
+        "X-UUID" to PlayerData.playerUUID,
+    )
 }

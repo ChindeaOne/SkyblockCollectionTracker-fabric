@@ -14,7 +14,6 @@ object FetchBazaarPrice {
 
     private val logger = LogManager.getLogger(FetchBazaarPrice::class.java)
 
-    @JvmStatic
     fun fetchData(collection: String): CompletableFuture<Void> {
         return requestHelper(collection)
             .thenAccept { response ->
@@ -46,7 +45,6 @@ object FetchBazaarPrice {
             }
     }
 
-    @JvmStatic
     fun fetchData(collections: List<String>): CompletableFuture<Void> {
         return requestHelper(addGemstones(collections).joinToString(", "))
             .thenAccept { response ->

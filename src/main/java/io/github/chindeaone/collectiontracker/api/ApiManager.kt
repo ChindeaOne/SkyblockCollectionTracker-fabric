@@ -73,7 +73,6 @@ object ApiManager {
     }
 
     // manual fetch
-    @JvmStatic
     fun fetchToken() {
         if (TokenManager.token != null) {
             sendMessage("§cToken already exists.", true)
@@ -88,14 +87,6 @@ object ApiManager {
         lastTokenRequest = now
 
         CompletableFuture.runAsync { authenticateMojang(true) }
-    }
-
-    fun request(
-        path: String,
-        headers: Map<String, String> = emptyMap()
-    ): HttpResponse<String> {
-        val request = buildRequest(path, "GET", headers)
-        return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
     }
 
     fun requestAsync(

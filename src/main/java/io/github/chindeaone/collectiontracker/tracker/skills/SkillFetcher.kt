@@ -31,25 +31,22 @@ object SkillFetcher {
     private const val CACHE_LIFESPAN_MS = 180000L // default 3 minutes
     private const val LEADERBOARD_CACHE_LIFESPAN_MS = 3600000L // 1 hour
 
-    @JvmStatic
     var scheduler: ScheduledExecutorService? = null
 
-    @JvmStatic
     fun scheduleSkillFetch(isSkillMaxed: Boolean, value: Long, skillName: String) {
-        val period = 200 // 200 seconds (3 minutes 20 seconds)
 
-        // initial delay of 200s because data is already fetched when tracking starts
+        // initial delay of 5 mins because data is already fetched when tracking starts
         scheduler!!.scheduleAtFixedRate(
             { fetchSkillData(skillName, isSkillMaxed) },
-            200,
-            period.toLong(),
-            TimeUnit.SECONDS
+            5,
+            5,
+            TimeUnit.MINUTES
         )
         // because of that, manual call is needed
         if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(value) // only if skill isn't maxed, as maxed skills use chat messages to track
 
         SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().toLong())
-        logger.info("[SCT]: Skill data fetching scheduled to run every {} seconds", period)
+        logger.info("[SCT]: Skill data fetching scheduled to run every 5 minutes")
     }
 
     private fun fetchSkillData(skillName: String, isSkillMaxed: Boolean) {
@@ -173,7 +170,6 @@ object SkillFetcher {
         cacheTimestamps[cacheKey] = now
     }
 
-    @JvmStatic
     fun clearCache() {
         cacheTimestamps.clear()
         leaderboardCacheTimestamps.clear()

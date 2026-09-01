@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 object MultiDataFetcher {
@@ -32,50 +33,55 @@ object MultiDataFetcher {
             if (!isInitialFetch && !isMultiTracking) return
 
             var map = getCachedData()
-
             if (map == null) {
-                val data = fetchDataFromApi()
-                if (data == null) {
-                    logger.error("[SCT]: Failed to fetch multi collection data from the Hypixel API.")
+                fetchDataFromApi().thenAccept { data ->
+                    if (data == null) {
+                        logger.error("[SCT]: Failed to fetch multi collection data from the Hypixel API.")
 
-                    if (ConfigAccess.isApiTrackingEnabled()) {
-                        CollectionTracker.cancelScheduledTask()
-                    }
-
-                    if (isInitialFetch) {
-                        Minecraft.getInstance().execute {
-                            Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
-                                CustomCollectionScreen(CollectionTracker.collectionList) {
-                                    CollectionsManager.resetMultiCollections()
-                                }
-                            )
+                        if (ConfigAccess.isApiTrackingEnabled()) {
+                            CollectionTracker.cancelScheduledTask()
                         }
+
+                        if (isInitialFetch) {
+                            Minecraft.getInstance().execute {
+                                Minecraft.getInstance()
+                                    ./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
+                                        CustomCollectionScreen(CollectionTracker.collectionList) {
+                                            CollectionsManager.resetMultiCollections()
+                                        }
+                                    )
+                            }
+                        }
+                        return@thenAccept
                     }
-                    return
+
+                    val jsonData = JsonParser.parseString(data).asJsonObject
+                    val newMap = mutableMapOf<String, Long>()
+
+                    for (entry in jsonData.entrySet()) {
+                        val collectionName = entry.key
+                        val collectionValue = entry.value.asLong
+                        newMap[collectionName] = collectionValue
+                    }
+                    map = newMap
+
+                    val collectionList = CollectionTracker.collectionList
+                    val cacheKey = CacheKey(collectionList)
+                    collectionCache[cacheKey] = map
+                    cacheTimestamps[cacheKey] = System.currentTimeMillis()
+
+                    logger.info("[SCT]: Data successfully fetched for collections: {}", CollectionTracker.collectionList)
+                }.exceptionally { e ->
+                    logger.error("[SCT]: An error occurred while fetching multi collection data from the Hypixel API: ${e.message}")
+                    null
                 }
-
-                val jsonData = JsonParser.parseString(data).asJsonObject
-                val newMap = mutableMapOf<String, Long>()
-
-                for (entry in jsonData.entrySet()) {
-                    val collectionName = entry.key
-                    val collectionValue = entry.value.asLong
-                    newMap[collectionName] = collectionValue
-                }
-                map = newMap
-
-                val collectionList = CollectionTracker.collectionList
-                val cacheKey = CacheKey(collectionList)
-                collectionCache[cacheKey] = map
-                cacheTimestamps[cacheKey] = System.currentTimeMillis()
-            }
-
-            logger.info("[SCT]: Data successfully fetched or retrieved for player with and collections: {}", CollectionTracker.collectionList)
-
-            if (isInitialFetch) {
-                MultiTrackingRates.setCollections(map)
             } else {
-                MultiTrackingRates.updateCollections(map)
+                if (isInitialFetch) {
+                    MultiTrackingRates.setCollections(map)
+                } else {
+                    MultiTrackingRates.updateCollections(map)
+                }
+                logger.info("[SCT]: Data successfully retrieved for collections: {}", CollectionTracker.collectionList)
             }
         } catch (e: Exception) {
             logger.error("[SCT]: Error fetching data from the Hypixel API: ${e.message}")
@@ -96,7 +102,7 @@ object MultiDataFetcher {
         return null
     }
 
-    private fun fetchDataFromApi(): String? {
+    private fun fetchDataFromApi(): CompletableFuture<String?> {
         val collectionList = CollectionTracker.collectionList
 
         val cacheKey = CacheKey(collectionList)
