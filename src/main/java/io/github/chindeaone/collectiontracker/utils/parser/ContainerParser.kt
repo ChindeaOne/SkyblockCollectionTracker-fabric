@@ -116,14 +116,24 @@ object ContainerParser {
         }
 
         findPerksStack(screen, "Professional")?.let { stack ->
-            val level = getTooltips(stack, client).getOrNull(1)?.split(" ")?.getOrNull(1)?.toIntOrNull() ?: return@let
+            val level = getTooltips(stack, client)
+                .getOrNull(1)?.split(" ")
+                ?.getOrNull(1)?.split("/")
+                ?.getOrNull(0)?.toIntOrNull()
+                ?: return@let
+
             if (level != ConfigAccess.getProfessionalMS()) {
                 ConfigHelper.setProfessionalMS(level)
             }
         }
 
         findPerksStack(screen, "Strong Arm")?.let { stack ->
-            val level = getTooltips(stack, client).getOrNull(1)?.split(" ")?.getOrNull(1)?.toIntOrNull() ?: return@let
+            val level = getTooltips(stack, client)
+                .getOrNull(1)?.split(" ")
+                ?.getOrNull(1)?.split("/")
+                ?.getOrNull(0)?.toIntOrNull()
+                ?: return@let
+
             if (level != ConfigAccess.getStrongArmMS()) {
                 ConfigHelper.setStrongArmMS(level)
             }
