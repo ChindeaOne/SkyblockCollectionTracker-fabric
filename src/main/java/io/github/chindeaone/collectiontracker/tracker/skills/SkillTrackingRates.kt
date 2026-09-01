@@ -9,7 +9,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardMana
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.stopTracking
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.uptimeInSeconds
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
-import io.github.chindeaone.collectiontracker.utils.StringUtils.formatETA
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import kotlin.concurrent.Volatile
 import kotlin.math.floor
 
@@ -263,7 +263,7 @@ object SkillTrackingRates {
     fun updateSkillEta() {
         if (skillPerHour > 0 && skillTillNextRank > 0) {
             val seconds = (skillTillNextRank / (skillPerHour / 3600.0)).toLong()
-            skillEtaToNextRank = formatETA(seconds)
+            skillEtaToNextRank = StringUtils.formatCompactTime(seconds)
         } else {
             skillEtaToNextRank = null
         }
@@ -272,7 +272,7 @@ object SkillTrackingRates {
     fun updateTamingEta() {
         if (tamingPerHour > 0 && tamingTillNextRank > 0) {
             val seconds = (tamingTillNextRank / (tamingPerHour / 3600.0)).toLong()
-            tamingEtaToNextRank = formatETA(seconds)
+            tamingEtaToNextRank = StringUtils.formatCompactTime(seconds)
         } else {
             tamingEtaToNextRank = null
         }

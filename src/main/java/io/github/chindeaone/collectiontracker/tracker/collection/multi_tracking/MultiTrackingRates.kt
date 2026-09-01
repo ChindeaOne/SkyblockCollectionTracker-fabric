@@ -98,7 +98,6 @@ object MultiTrackingRates {
         }
     }
 
-    @JvmStatic
     fun calculateMultiRates(gains: Map<String, Long>) {
         for ((coll, amount) in gains) {
             val isGemstone = GemstonesManager.checkIfGemstone(coll)
@@ -156,7 +155,6 @@ object MultiTrackingRates {
         updateMultiLeaderboardStats()
     }
 
-    @JvmStatic
     fun updateMultiLeaderboardStats() {
         if (!ConfigAccess.isCollectionLeaderboardEnabled() ||
             CollectionTracker.collectionList.size != 1 ||
@@ -175,7 +173,7 @@ object MultiTrackingRates {
             val currentRate = collectionPerHour["gemstone"] ?: 0L
             if (currentRate > 0) {
                 val seconds = (collectionTillNextRank / (currentRate / 3600.0)).toLong()
-                etaToNextRank = StringUtils.formatETA(seconds)
+                etaToNextRank = StringUtils.formatCompactTime(seconds)
             } else {
                 etaToNextRank = null
             }

@@ -11,7 +11,7 @@ import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getNextRankEntry
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPlayerRank
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPreviousRankEntry
-import io.github.chindeaone.collectiontracker.utils.StringUtils.formatETA
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -171,7 +171,7 @@ object TrackingRates {
 
             if (collectionPerHour > 0) {
                 val seconds = (collectionTillNextRank / (collectionPerHour / 3600.0)).toLong()
-                etaToNextRank = formatETA(seconds)
+                etaToNextRank = StringUtils.formatCompactTime(seconds)
             } else {
                 etaToNextRank = null
             }

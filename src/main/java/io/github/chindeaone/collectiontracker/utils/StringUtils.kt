@@ -30,21 +30,6 @@ object StringUtils {
         .trim()
         .lowercase()
 
-    fun formatETA(seconds: Long): String {
-        if (seconds < 0) return "0s"
-        val days = seconds / 86400
-        val hours = (seconds % 86400) / 3600
-        val minutes = (seconds % 3600) / 60
-        val secs = seconds % 60
-
-        return when {
-            days > 0 -> String.format("%dd %dh", days, hours)
-            hours > 0 -> String.format("%dh %dm", hours, minutes)
-            minutes > 0 -> String.format("%dm %ds", minutes, secs)
-            else -> String.format("%ds", secs)
-        }
-    }
-
     fun formatTime(seconds: Long): String {
         if (seconds <= 0) return "00:00"
 
