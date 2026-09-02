@@ -1,8 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils.tab
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.config.ConfigHelper
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
 import io.github.chindeaone.collectiontracker.utils.world.ForagingMapping
@@ -20,23 +17,7 @@ object StatsWidget {
     private var lastStarbornTempleStats: List<String>? = null
 
     fun onTabUpdate() {
-        if (!isAnyOverlayEnabled()) {
-            clearStats()
-            return
-        }
-
         val widget = TabWidget.STATS
-        if (!widget.isPresent) {
-            if (!TabWidget.INFO.isPresent) return
-
-            val now = System.currentTimeMillis()
-            if (now - TabData.lastWorldSwitch < 10_000L) return
-
-            if (isAnyOverlayEnabled()) {
-                disableOverlays()
-            }
-            return
-        }
 
         if (IslandTracker.currentMiningIsland == null && IslandTracker.currentForagingIsland == null) {
             clearStats()
@@ -78,15 +59,6 @@ object StatsWidget {
         rawStarbornTempleStats = currentStarbornTempleRaw.toString()
         lastStarbornTempleStats = currentStarbornTempleRaw
     }
-
-    private fun disableOverlays() {
-        if (ConfigAccess.isForagingStatsOverlayEnabled()) ConfigHelper.disableForagingStats()
-        if (ConfigAccess.isMiningStatsOverlayEnabled()) ConfigHelper.disableMiningStats()
-
-        ChatUtils.sendMessage("§cWarning: Stats widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the stats overlay config in your mod.", true)
-    }
-
-    private fun isAnyOverlayEnabled() = ConfigAccess.isMiningStatsOverlayEnabled() || ConfigAccess.isForagingStatsOverlayEnabled()
 
     fun clearStats() {
         rawStats = emptyList()

@@ -45,7 +45,6 @@ import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
 import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -300,7 +299,7 @@ object TrackingHandler {
     }
 
     private fun sendRates() {
-        val collectionDisplay = TextUtils.formatCollectionName(collection)
+        val collectionDisplay = StringUtils.formatCollectionName(collection)
 
         val lines: MutableList<Component> = mutableListOf()
         lines.add(Component.literal(String.format("   §aCollection tracked: §f%s", collectionDisplay)))
