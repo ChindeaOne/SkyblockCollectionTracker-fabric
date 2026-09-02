@@ -1,73 +1,23 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBeekeeperPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isBeekeeperEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isBeekeeperInForagingIslandsOnly
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentBeekeeperBuff
+import io.github.chindeaone.collectiontracker.utils.world.ForagingMapping.foragingIslands
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentForagingIsland
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class BeekeeperOverlay : AbstractRotatingPerksOverlay() {
+    override val overlayLabel: String = "Beekeeper"
 
-public class BeekeeperOverlay extends AbstractOverlay{
+    override val position: Position get() = getBeekeeperPosition()
 
-    private final Position position = ConfigAccess.getBeekeeperPosition();
-    private final List<String> beekeeperOverlayLines = new ArrayList<>();
+    override val isEnabled: Boolean get() = isBeekeeperEnabled()
 
-    @Override
-    public String overlayLabel() {
-        return "Beekeeper";
-    }
+    override val buffPrefix get() = "§6Beekeeper"
 
-    @Override
-    public Position position() {
-        return position;
-    }
+    override val currentBuff: String get() = currentBeekeeperBuff
 
-    @Override
-    public boolean isEnabled() {
-        return ConfigAccess.isBeekeeperEnabled() && HypixelUtils.isInSkyblock();
-    }
-
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        List<String> lines = getBeekeeperLines();
-
-        if (lines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderStrings(context, lines)
-        );
-    }
-
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getBeekeeperLines();
-        if (lines.isEmpty()) return;
-
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
-    }
-
-    private List<String> getBeekeeperLines() {
-        beekeeperOverlayLines.clear();
-
-        if (ConfigAccess.isBeekeeperInForagingIslandsOnly() && IslandTracker.getCurrentForagingIsland() == null) return Collections.emptyList();
-
-        beekeeperOverlayLines.add("§6Beekeeper: " + ChatListener.getCurrentBeekeeperBuff());
-        beekeeperOverlayLines.add(TextUtils.updateTimer());
-        return beekeeperOverlayLines;
-    }
+    override val isIslandAllowed: Boolean get() = !isBeekeeperInForagingIslandsOnly() || foragingIslands.contains(currentForagingIsland)
 }

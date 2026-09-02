@@ -1,74 +1,23 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
-import io.github.chindeaone.collectiontracker.utils.world.MiningMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getSkyMallPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkyMallEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkyMallInMiningIslandsOnly
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentSkyMallBuff
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentMiningIsland
+import io.github.chindeaone.collectiontracker.utils.world.MiningMapping.miningIslands
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class SkyMallOverlay : AbstractRotatingPerksOverlay() {
+    override val overlayLabel: String = "Sky Mall"
 
-public class SkyMallOverlay extends AbstractOverlay {
+    override val position: Position get() = getSkyMallPosition()
 
-    private final Position position = ConfigAccess.getSkyMallPosition();
-    private final List<String> skyMallOverlayLines = new ArrayList<>();
+    override val isEnabled: Boolean get() = isSkyMallEnabled()
 
-    @Override
-    public String overlayLabel() {
-        return "Sky Mall";
-    }
+    override val buffPrefix get() = "§bSky Mall"
 
-    @Override
-    public Position position() {
-        return position;
-    }
+    override val currentBuff: String get() = currentSkyMallBuff
 
-    @Override
-    public boolean isEnabled() {
-        return ConfigAccess.isSkyMallEnabled() && HypixelUtils.isInSkyblock();
-    }
-
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        List<String> lines = getSkyMallLines();
-
-        if (lines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderStrings(context, lines)
-        );
-    }
-
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getSkyMallLines();
-        if (lines.isEmpty()) return;
-
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
-    }
-
-    private List<String> getSkyMallLines() {
-        skyMallOverlayLines.clear();
-
-        if (ConfigAccess.isSkyMallInMiningIslandsOnly() && !MiningMapping.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
-
-        skyMallOverlayLines.add("§bSky Mall: " + ChatListener.getCurrentSkyMallBuff());
-        skyMallOverlayLines.add(TextUtils.updateTimer());
-        return skyMallOverlayLines;
-    }
+    override val isIslandAllowed: Boolean get() = !isSkyMallInMiningIslandsOnly() || miningIslands.contains(currentMiningIsland)
 }

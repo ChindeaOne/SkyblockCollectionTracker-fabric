@@ -1,142 +1,119 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightStopwatchPosition
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 
-import java.util.ArrayList;
-import java.util.List;
+class StopwatchOverlay : AbstractOverlay() {
+    private var cachedLines: List<String> = emptyList()
 
-public class StopwatchOverlay extends AbstractOverlay{
+    private var stopwatchStart = 0L
+    private var stopwatchElapsed = 0L
+    private var stopwatchRunning = false
+    private var stopwatchPaused = false
 
-    private final Position position = ConfigAccess.getColeweightStopwatchPosition();
-    private final List<String> stopwatchLines = new ArrayList<>();
-    private long stopwatchStart = 0L;
-    private long stopwatchElapsed = 0L;
-    private boolean stopwatchRunning = false;
-    private boolean stopwatchPaused = false;
+    private var lastElapsedSeconds: Long = -1L
+    private var lastPaused: Boolean = false
+    private var lastRunning: Boolean = false
 
-    @Override
-    public String overlayLabel() {
-        return "Stopwatch Overlay";
+    override val overlayLabel: String = "Stopwatch Overlay"
+
+    override val position: Position get() = getColeweightStopwatchPosition()
+
+    override val isEnabled: Boolean get() = stopwatchRunning
+
+    override fun updateDimensions() {
+        if (!isEnabled) return
+        updateLinesIfNeeded()
+
+        super.updateDimensions()
     }
 
-    @Override
-    public Position position() {
-        return position;
-    }
+    override val lines: List<String>
+        get() {
+            updateLinesIfNeeded()
+            return cachedLines
+        }
 
-    @Override
-    public boolean isEnabled() {
-        return stopwatchRunning  && HypixelUtils.isInSkyblock();
-    }
-
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-
-        List<String> lines = getStopwatchLines();
-        if (lines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderStrings(context, lines));
-    }
-
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getStopwatchLines();
-        if (lines.isEmpty()) return;
-
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
-    }
-
-    public void startStopwatch() {
+    fun startStopwatch() {
         if (stopwatchRunning && !stopwatchPaused) {
-            ChatUtils.sendMessage("§cStopwatch is already running!", true);
-            return;
+            sendMessage("§cStopwatch is already running!", true)
+            return
         }
 
-        stopwatchStart = System.currentTimeMillis();
-        stopwatchElapsed = 0L;
-        stopwatchRunning = true;
-        stopwatchPaused = false;
+        stopwatchStart = System.currentTimeMillis()
+        stopwatchElapsed = 0L
+        stopwatchRunning = true
+        stopwatchPaused = false
+        lastElapsedSeconds = -1L
 
-        ChatUtils.sendMessage("§aStopwatch started!", true);
+        sendMessage("§aStopwatch started!", true)
     }
 
-    public void stopStopwatch() {
+    fun stopStopwatch() {
         if (!stopwatchRunning) {
-            ChatUtils.sendMessage("§cStopwatch is not running!", true);
-            return;
+            sendMessage("§cStopwatch is not running!", true)
+            return
         }
 
-        long elapsed = stopwatchPaused
-                ? stopwatchElapsed
-                : stopwatchElapsed + (System.currentTimeMillis() - stopwatchStart);
+        val elapsed = if (stopwatchPaused)
+            stopwatchElapsed
+        else
+            stopwatchElapsed + (System.currentTimeMillis() - stopwatchStart)
 
-        ChatUtils.sendMessage("§cStopwatch stopped at §e" + formatStopwatchTime(elapsed) + "§c!", true);
+        sendMessage("§cStopwatch stopped at §e" + StringUtils.formatCompactTime(elapsed / 1000L) + "§c!", true)
 
-        stopwatchStart = 0L;
-        stopwatchElapsed = 0L;
-        stopwatchRunning = false;
-        stopwatchPaused = false;
+        stopwatchStart = 0L
+        stopwatchElapsed = 0L
+        stopwatchRunning = false
+        stopwatchPaused = false
+        cachedLines = emptyList()
     }
 
-    public void pauseStopwatch() {
+    fun pauseStopwatch() {
         if (!stopwatchRunning) {
-            ChatUtils.sendMessage("§cStopwatch is not running!", true);
-            return;
+            sendMessage("§cStopwatch is not running!", true)
+            return
         }
 
         if (!stopwatchPaused) {
-            stopwatchElapsed += System.currentTimeMillis() - stopwatchStart;
-            stopwatchPaused = true;
-            ChatUtils.sendMessage("§eStopwatch paused!", true);
+            stopwatchElapsed += System.currentTimeMillis() - stopwatchStart
+            stopwatchPaused = true
+            lastElapsedSeconds = -1L
+            sendMessage("§eStopwatch paused!", true)
         } else {
-            stopwatchStart = System.currentTimeMillis();
-            stopwatchPaused = false;
-            ChatUtils.sendMessage("§aStopwatch resumed!", true);
+            stopwatchStart = System.currentTimeMillis()
+            stopwatchPaused = false
+            lastElapsedSeconds = -1L
+            sendMessage("§aStopwatch resumed!", true)
         }
     }
 
-    private List<String> getStopwatchLines() {
-        stopwatchLines.clear();
-
-        if (!stopwatchRunning) return stopwatchLines;
-
-        long elapsed = stopwatchPaused
-                ? stopwatchElapsed
-                : stopwatchElapsed + (System.currentTimeMillis() - stopwatchStart);
-
-        String pauseText = stopwatchPaused ? "§7 (Paused)" : "";
-
-        stopwatchLines.add("§bStopwatch: §e" + formatStopwatchTime(elapsed) + pauseText);
-
-        return stopwatchLines;
-    }
-
-    private String formatStopwatchTime(long elapsedMillis) {
-        int hours = (int) (elapsedMillis / 3600000);
-        int minutes = (int) ((elapsedMillis % 3600000) / 60000);
-        int seconds = (int) ((elapsedMillis % 60000) / 1000);
-
-        if (hours > 0) {
-            return String.format("%d:%02d:%02d", hours, minutes, seconds);
-        } else if (minutes > 0) {
-            return String.format("%d:%02d", minutes, seconds);
-        } else {
-            return String.format("%ds", seconds);
+    private fun updateLinesIfNeeded() {
+        if (!stopwatchRunning || !isEnabled) {
+            if (cachedLines.isNotEmpty()) {
+                cachedLines = emptyList()
+            }
+            return
         }
+
+        val elapsed = if (stopwatchPaused)
+            stopwatchElapsed
+        else
+            stopwatchElapsed + (System.currentTimeMillis() - stopwatchStart)
+
+        val elapsedSeconds = elapsed / 1000L
+
+        if (cachedLines.isNotEmpty() && elapsedSeconds == lastElapsedSeconds && stopwatchPaused == lastPaused && stopwatchRunning == lastRunning) return
+
+        lastElapsedSeconds = elapsedSeconds
+        lastPaused = stopwatchPaused
+        lastRunning = stopwatchRunning
+
+        val pauseText = if (stopwatchPaused) "§7 (Paused)" else ""
+        val newLines = listOf("§bStopwatch: §e" + StringUtils.formatCompactTime(elapsedSeconds) + pauseText)
+
+        cachedLines = newLines
     }
 }

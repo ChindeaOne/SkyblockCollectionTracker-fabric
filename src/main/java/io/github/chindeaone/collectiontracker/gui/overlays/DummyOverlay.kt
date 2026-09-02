@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
-import org.jetbrains.annotations.NotNull
 
 class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(Component.literal("Dummy Overlay")) {
 
@@ -21,7 +20,7 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
         Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(oldScreen)
     }
 
-    override fun extractRenderState(@NotNull context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (!OverlayManager.isInEditorMode()) {
             return
         }
@@ -33,10 +32,11 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
         var hovered: AbstractOverlay? = null
         // Draw all dummies
         for (overlay in OverlayManager.all()) {
-            if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
+            if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel) continue
             overlay.updateDimensions()
+            if (overlay.position.width == 0 && overlay.position.height == 0) continue
 
-            RenderUtils.drawDummyFrame(context, overlay.position(), overlay.overlayLabel())
+            RenderUtils.drawDummyFrame(context, overlay.position, overlay.overlayLabel)
 
             if (overlay.isHovered(mouseX.toDouble(), mouseY.toDouble())) {
                 hovered = overlay
@@ -45,10 +45,10 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
         // Update dragging positions
         dragging?.let {
             it.updateDimensions()
-            it.position().setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY)
+            it.position.setPosition(mouseX - dragOffsetX, mouseY - dragOffsetY)
         }
 
-        RenderUtils.drawEditorHudText(context, hovered?.position())
+        RenderUtils.drawEditorHudText(context, hovered?.position)
     }
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
@@ -57,9 +57,9 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
         if (verticalAmount == 0.0) return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
 
         for (overlay in OverlayManager.all()) {
-            if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
+            if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel) continue
 
-            val pos = overlay.position()
+            val pos = overlay.position
             if (overlay.isHovered(mouseX, mouseY)) {
                 val scaleChange = 0.05f
                 val next = pos.scale + (if (verticalAmount > 0) scaleChange else -scaleChange)
@@ -78,17 +78,17 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
         for (overlay in OverlayManager.all()) {
             when (event.button()) {
                 0 -> {
-                    if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
+                    if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel) continue
 
                     if (overlay.isHovered(mx, my)) {
                         dragging = overlay
-                        dragOffsetX = (mx - overlay.position().x).toInt()
-                        dragOffsetY = (my - overlay.position().y).toInt()
+                        dragOffsetX = (mx - overlay.position.x).toInt()
+                        dragOffsetY = (my - overlay.position.y).toInt()
                         return true
                     }
                 }
                 1 -> {
-                    if (!overlay.isEnabled || overlay.overlayLabel() == "Global Title") continue
+                    if (!overlay.isEnabled || overlay.overlayLabel == "Global Title") continue
 
                     if (overlay.isHovered(mx, my)) {
                         OverlayManager.setGlobalRendering(true)
@@ -97,10 +97,10 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
                     }
                 }
                 2 -> {
-                    if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel()) continue
+                    if (!overlay.isEnabled || "Global Title" == overlay.overlayLabel) continue
 
                     if (overlay.isHovered(mx, my)) {
-                        overlay.position().setScaling(1.0f)
+                        overlay.position.setScaling(1.0f)
                         return true
                     }
                 }

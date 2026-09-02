@@ -1,149 +1,233 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.ConfigHelper;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.commands.SkillTracker
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getSkillPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigHelper.disableTamingTracking
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderSkillStringsWithTaming
+import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
-import java.util.ArrayList;
-import java.util.List;
+class SkillOverlay : AbstractOverlay() {
+    private var cachedLines: List<String> = emptyList()
+    private var cachedSkillLines: List<String> = emptyList()
+    private var cachedTamingLines: List<String> = emptyList()
 
-import static io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName;
-import static io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates.*;
-import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
-import static io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatNumberOrPlaceholder;
+    private var lastUptime: String = ""
+    private var lastSkillName: String = ""
+    private var lastSkillLevel: Int = -1
+    private var lastTotalSkillXp: Long = -1L
+    private var lastSkillXpGained: Long = -1L
+    private var lastSkillPerHour: Long = -1L
+    private var lastSkillRank: Int = -1
+    private var lastSkillNextUser: String? = null
+    private var lastSkillNextAmount: Long = -1L
+    private var lastSkillTillNext: Long = -1L
+    private var lastSkillEta: String? = null
 
-public class SkillOverlay extends AbstractOverlay {
+    private var lastWithTaming: Boolean = false
+    private var lastTamingLevel: Int = -1
+    private var lastTamingTotalXp: Long = -1L
+    private var lastTamingXpGained: Long = -1L
+    private var lastTamingPerHour: Long = -1L
+    private var lastTamingRank: Int = -1
+    private var lastTamingNextUser: String? = null
+    private var lastTamingNextAmount: Long = -1L
+    private var lastTamingTillNext: Long = -1L
+    private var lastTamingEta: String? = null
+    private var lastLeaderboard: Boolean = false
 
-    private final Position position = ConfigAccess.getSkillPosition();
-    private final List<String> skillOverlayLines = new ArrayList<>();
-    private final List<String> tamingOverlayLines = new ArrayList<>();
-    private boolean renderingAllowed  = true;
+    override val overlayLabel: String = "Skill Tracker"
 
-    private void addLeaderboardLines(List<String> list, int rank, String nextUser, long nextAmount, long tillNext, String eta) {
-        if (!ConfigAccess.isSkillLeaderboardEnabled()) return;
+    override val position: Position get() = getSkillPosition()
 
-        list.add("");
+    override val isEnabled: Boolean get() = SkillTrackingHandler.isTracking
 
-        if (rank == 1) return;
+    override fun render(context: GuiGraphicsExtractor) {
+        if (!isEnabled) return
+
+        updateLinesIfNeeded()
+        if (cachedSkillLines.isEmpty()) return
+
+        drawOverlayFrame(context, position) {
+            renderSkillStringsWithTaming(
+                context,
+                cachedSkillLines,
+                cachedTamingLines,
+                isTamingTrackingEnabled() && SkillTracker.skillName != "Taming"
+            )
+        }
+    }
+
+    override fun updateDimensions() {
+        if (!isEnabled) return
+        updateLinesIfNeeded()
+
+        super.updateDimensions()
+    }
+
+    override val lines: List<String>
+        get() {
+            updateLinesIfNeeded()
+            return cachedLines
+        }
+
+    private fun updateLinesIfNeeded() {
+        if (!isEnabled) {
+            if (cachedLines.isNotEmpty()) {
+                cachedLines = emptyList()
+                cachedSkillLines = emptyList()
+                cachedTamingLines = emptyList()
+            }
+            return
+        }
+
+        val currentUptime = SkillTrackingHandler.uptime
+        val currentSkill = SkillTracker.skillName
+        val currentSkillLvl = SkillTrackingRates.skillLevel
+        val currentTotalXp = SkillTrackingRates.totalSkillXp
+        val currentSkillGained = SkillTrackingRates.skillXpGained
+        val currentSkillPerHour = SkillTrackingRates.skillPerHour
+        val currentSkillRank = SkillTrackingRates.skillCurrentRank
+        val currentSkillNextUser = SkillTrackingRates.skillNextRankUsername
+        val currentSkillNextAmount = SkillTrackingRates.skillNextRankAmount
+        val currentSkillTillNext = SkillTrackingRates.skillTillNextRank
+        val currentSkillEta = SkillTrackingRates.skillEtaToNextRank
+
+        val withTaming = isTamingTrackingEnabled() && currentSkill != "Taming"
+        val currentTamingLvl = SkillTrackingRates.tamingLevel
+        val currentTamingTotalXp = SkillTrackingRates.tamingXp + SkillTrackingRates.tamingXpGained
+        val currentTamingGained = SkillTrackingRates.tamingXpGained
+        val currentTamingPerHour = SkillTrackingRates.tamingPerHour
+        val currentTamingRank = SkillTrackingRates.tamingCurrentRank
+        val currentTamingNextUser = SkillTrackingRates.tamingNextRankUsername
+        val currentTamingNextAmount = SkillTrackingRates.tamingNextRankAmount
+        val currentTamingTillNext = SkillTrackingRates.tamingTillNextRank
+        val currentTamingEta = SkillTrackingRates.tamingEtaToNextRank
+        val leaderboard = isSkillLeaderboardEnabled()
+
+        if (cachedLines.isNotEmpty()
+            && currentUptime == lastUptime && currentSkill == lastSkillName && currentSkillLvl == lastSkillLevel && currentTotalXp == lastTotalSkillXp
+            && currentSkillGained == lastSkillXpGained && currentSkillPerHour == lastSkillPerHour
+            && currentSkillRank == lastSkillRank && currentSkillNextUser == lastSkillNextUser && currentSkillNextAmount == lastSkillNextAmount
+            && currentSkillTillNext == lastSkillTillNext && currentSkillEta == lastSkillEta
+            && withTaming == lastWithTaming && currentTamingLvl == lastTamingLevel && currentTamingTotalXp == lastTamingTotalXp
+            && currentTamingGained == lastTamingXpGained && currentTamingPerHour == lastTamingPerHour
+            && currentTamingRank == lastTamingRank && currentTamingNextUser == lastTamingNextUser
+            && currentTamingNextAmount == lastTamingNextAmount && currentTamingTillNext == lastTamingTillNext && currentTamingEta == lastTamingEta
+            && leaderboard == lastLeaderboard
+        ) return
+
+        lastUptime = currentUptime
+        lastSkillName = currentSkill
+        lastSkillLevel = currentSkillLvl
+        lastTotalSkillXp = currentTotalXp
+        lastSkillXpGained = currentSkillGained
+        lastSkillPerHour = currentSkillPerHour
+        lastSkillRank = currentSkillRank
+        lastSkillNextUser = currentSkillNextUser
+        lastSkillNextAmount = currentSkillNextAmount
+        lastSkillTillNext = currentSkillTillNext
+        lastSkillEta = currentSkillEta
+
+        lastWithTaming = withTaming
+        lastTamingLevel = currentTamingLvl
+        lastTamingTotalXp = currentTamingTotalXp
+        lastTamingXpGained = currentTamingGained
+        lastTamingPerHour = currentTamingPerHour
+        lastTamingRank = currentTamingRank
+        lastTamingNextUser = currentTamingNextUser
+        lastTamingNextAmount = currentTamingNextAmount
+        lastTamingTillNext = currentTamingTillNext
+        lastTamingEta = currentTamingEta
+        lastLeaderboard = leaderboard
+
+        val newSkillLines = mutableListOf<String>()
+        var rankSuffix = ""
+        if (leaderboard && currentSkillRank != -1) {
+            rankSuffix = " [#$currentSkillRank]"
+        }
+        newSkillLines.add("$currentSkill Level: " + formatNumber(currentSkillLvl.toLong()) + rankSuffix)
+        newSkillLines.add("Total $currentSkill XP: " + TextUtils.formatNumberOrPlaceholder(currentTotalXp))
+        newSkillLines.add("XP (Session): " + TextUtils.formatNumberOrPlaceholder(currentSkillGained))
+        newSkillLines.add("XP/h: " + TextUtils.formatNumberOrPlaceholder(currentSkillPerHour))
+
+        addLeaderboardLines(
+            newSkillLines,
+            currentSkillRank,
+            currentSkillNextUser,
+            currentSkillNextAmount,
+            currentSkillTillNext,
+            currentSkillEta
+        )
+        newSkillLines.add("Uptime: $currentUptime")
+
+        val newTamingLines = mutableListOf<String>()
+        if (currentSkill == "Taming") {
+            disableTamingTracking()
+        } else if (withTaming) {
+            var tamingRankSuffix = ""
+            if (leaderboard && currentTamingRank != -1) {
+                tamingRankSuffix = " [#$currentTamingRank]"
+            }
+            newTamingLines.add("Taming Level: " + formatNumber(currentTamingLvl.toLong()) + tamingRankSuffix)
+            newTamingLines.add("Total Taming XP: " + TextUtils.formatNumberOrPlaceholder(currentTamingTotalXp))
+            newTamingLines.add("XP (Session): " + TextUtils.formatNumberOrPlaceholder(currentTamingGained))
+            newTamingLines.add("XP/h: " + TextUtils.formatNumberOrPlaceholder(currentTamingPerHour))
+
+            addLeaderboardLines(
+                newTamingLines,
+                currentTamingRank,
+                currentTamingNextUser,
+                currentTamingNextAmount,
+                currentTamingTillNext,
+                currentTamingEta
+            )
+        }
+
+        cachedSkillLines = newSkillLines
+        cachedTamingLines = newTamingLines
+
+        val combined = mutableListOf<String>()
+        combined.addAll(newSkillLines)
+        if (withTaming && newTamingLines.isNotEmpty()) {
+            combined.add("")
+            combined.addAll(newTamingLines)
+        }
+        cachedLines = combined
+    }
+
+    private fun addLeaderboardLines(
+        list: MutableList<String>,
+        rank: Int,
+        nextUser: String?,
+        nextAmount: Long,
+        tillNext: Long,
+        eta: String?
+    ) {
+        if (!isSkillLeaderboardEnabled()) return
+        if (rank == 1) return
+
+        list.add("")
 
         if (nextUser != null) {
-            list.add(String.format("Next Position (%s): %s", nextUser, formatNumber(nextAmount)));
-            list.add("Till Next Position: " + formatNumber(tillNext));
-            if (eta != null && !eta.isEmpty()) {
-                list.add("ETA: " + eta);
+            list.add(String.format("Next Position (%s): %s", nextUser, formatNumber(nextAmount)))
+            list.add("Till Next Position: " + formatNumber(tillNext))
+            if (!eta.isNullOrEmpty()) {
+                list.add("ETA: $eta")
             } else {
-                list.add("ETA: Calculating...");
+                list.add("ETA: Calculating...")
             }
         } else {
-            list.add("Next Position: Calculating...");
-            list.add("Till Next Position: Calculating...");
-            list.add("ETA: Calculating...");
+            list.add("Next Position: Calculating...")
+            list.add("Till Next Position: Calculating...")
+            list.add("ETA: Calculating...")
         }
-    }
-
-    @Override
-    public String overlayLabel() {
-        return "Skill Tracker";
-    }
-
-    @Override
-    public Position position() {
-        return position;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return SkillTrackingHandler.isTracking && HypixelUtils.isInSkyblock();
-    }
-
-    @Override
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
-    }
-
-    @Override
-    public void setRenderingAllowed(boolean allowed) {
-        renderingAllowed = allowed;
-    }
-
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-
-        List<String> mainLines = getSkillLines();
-        List<String> tamingLines = getTamingLines();
-
-        if (mainLines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderSkillStringsWithTaming(context, mainLines, tamingLines, ConfigAccess.isTamingTrackingEnabled()));
-    }
-
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getSkillLines();
-        if (lines.isEmpty()) return;
-
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    public List<String> getSkillLines() {
-        skillOverlayLines.clear();
-
-        String rankSuffix = "";
-        if (ConfigAccess.isSkillLeaderboardEnabled() && skillCurrentRank != -1) {
-            rankSuffix = " [#" + skillCurrentRank + "]";
-        }
-
-        skillOverlayLines.add(skillName + " Level: " + formatNumber(skillLevel) + rankSuffix);
-        skillOverlayLines.add("Total " + skillName + " XP: " + formatNumberOrPlaceholder(totalSkillXp));
-        skillOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(skillXpGained));
-        skillOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(skillPerHour));
-
-        addLeaderboardLines(skillOverlayLines, skillCurrentRank, skillNextRankUsername, skillNextRankAmount, skillTillNextRank, skillEtaToNextRank);
-
-        skillOverlayLines.add("Uptime: " + SkillTrackingHandler.getUptime());
-
-        return skillOverlayLines;
-    }
-
-    public List<String> getTamingLines() {
-        tamingOverlayLines.clear();
-
-        if (skillName.equals("Taming")) {
-            ConfigHelper.disableTamingTracking();
-            return tamingOverlayLines;
-        }
-
-        if (!ConfigAccess.isTamingTrackingEnabled()) {
-            return tamingOverlayLines;
-        }
-
-        String rankSuffix = "";
-        if (ConfigAccess.isSkillLeaderboardEnabled() && tamingCurrentRank != -1) {
-            rankSuffix = " [#" + tamingCurrentRank + "]";
-        }
-
-        tamingOverlayLines.add("Taming Level: " + formatNumber(tamingLevel) + rankSuffix);
-        tamingOverlayLines.add("Total Taming XP: " + formatNumberOrPlaceholder(tamingXp + tamingXpGained));
-        tamingOverlayLines.add("XP (Session): " + formatNumberOrPlaceholder(tamingXpGained));
-        tamingOverlayLines.add("XP/h: " + formatNumberOrPlaceholder(tamingPerHour));
-
-        addLeaderboardLines(tamingOverlayLines, tamingCurrentRank, tamingNextRankUsername, tamingNextRankAmount, tamingTillNextRank, tamingEtaToNextRank);
-
-        return tamingOverlayLines;
     }
 }

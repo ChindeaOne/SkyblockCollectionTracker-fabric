@@ -8,7 +8,7 @@ object OverlayManager {
     private var globalRenderingAllowed: Boolean = true
 
     fun add(overlay: AbstractOverlay) {
-        overlays[overlay.overlayLabel()] = overlay
+        overlays[overlay.overlayLabel] = overlay
     }
 
     @JvmStatic
@@ -25,13 +25,13 @@ object OverlayManager {
         overlays[label]?.isRenderingAllowed = allowed
     }
 
-    fun setTrackingOverlayRendering(allowed: Boolean) = setOverlayRendering(CollectionOverlay().overlayLabel(), allowed)
+    fun setTrackingOverlayRendering(allowed: Boolean) = setOverlayRendering(CollectionOverlay().overlayLabel, allowed)
 
-    fun setMultiTrackingOverlayRendering(allowed: Boolean) = setOverlayRendering(MultiCollectionOverlay().overlayLabel(), allowed)
+    fun setMultiTrackingOverlayRendering(allowed: Boolean) = setOverlayRendering(MultiCollectionOverlay().overlayLabel, allowed)
 
-    fun setSkillOverlayRendering(allowed: Boolean) = setOverlayRendering(SkillOverlay().overlayLabel(), allowed)
+    fun setSkillOverlayRendering(allowed: Boolean) = setOverlayRendering(SkillOverlay().overlayLabel, allowed)
 
-    fun setColeweightOverlayRendering(allowed: Boolean) = setOverlayRendering(ColeweightOverlay().overlayLabel(), allowed)
+    fun setColeweightOverlayRendering(allowed: Boolean) = setOverlayRendering(ColeweightOverlay().overlayLabel, allowed)
 
     fun overlayRegistration() {
         listOf(
@@ -57,8 +57,8 @@ object OverlayManager {
 
     @JvmStatic
     fun isCollectionOverlay(overlay: AbstractOverlay): Boolean {
-        val label = overlay.overlayLabel()
-        return label == CollectionOverlay().overlayLabel() || label == MultiCollectionOverlay().overlayLabel()
+        val label = overlay.overlayLabel
+        return label == CollectionOverlay().overlayLabel || label == MultiCollectionOverlay().overlayLabel
     }
 
     fun getTimerOverlay(): TimerOverlay? = overlays.values.filterIsInstance<TimerOverlay>().firstOrNull()

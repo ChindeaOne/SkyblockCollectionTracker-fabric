@@ -1,100 +1,106 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser;
-import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser.ActiveCommission;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget;
-import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getCommissionsPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCommissionsOverlayEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCommissionsTrackingEnabled
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker.getCommissionsPerHour
+import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker.getCompletedCount
+import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker.getUptime
+import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
+import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class CommissionsOverlay : AbstractOverlay() {
+    private var cachedLines: List<String> = emptyList()
 
-public class CommissionsOverlay extends AbstractOverlay{
+    private var lastCommissionsHash: Int = 0
+    private var lastTracking: Boolean = false
+    private var lastCompleted: Int = -1
+    private var lastPerHour: Double = -1.0
+    private var lastUptime: String = ""
 
-    private final Position position = ConfigAccess.getCommissionsPosition();
-    private final List<String> formattedCommissions = new ArrayList<>();
+    override val overlayLabel: String = "Commissions"
 
-    @Override
-    public String overlayLabel() {
-        return "Commissions";
+    override val position: Position get() = getCommissionsPosition()
+
+    override val isEnabled: Boolean get() = isCommissionsOverlayEnabled()
+
+    override fun updateDimensions() {
+        if (!isEnabled) return
+        updateLinesIfNeeded()
+
+        super.updateDimensions()
     }
 
-    @Override
-    public Position position() {
-        return position;
-    }
+    override val lines: List<String>
+        get() {
+            updateLinesIfNeeded()
+            return cachedLines
+        }
 
-    @Override
-    public boolean isEnabled() {
-        return ConfigAccess.isCommissionsOverlayEnabled() && HypixelUtils.isInSkyblock();
-    }
+    private fun updateLinesIfNeeded() {
+        if (!isEnabled) {
+            if (cachedLines.isNotEmpty()) {
+                cachedLines = emptyList()
+            }
+            return
+        }
 
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        List<String> lines = getCommissionsLines();
+        val commissions = CommissionWidget.commissions
+        if (commissions.isEmpty()) {
+            if (cachedLines.isNotEmpty()) {
+                cachedLines = emptyList()
+            }
+            return
+        }
 
-        if (lines.isEmpty()) return;
+        val commissionsHash = commissions.fold(1) { acc, c -> 31 * acc + c.formattedLine.hashCode() } // detect any change in the list
+        val isTracking = isCommissionsTrackingEnabled()
+        val completed = getCompletedCount()
+        val perHour = getCommissionsPerHour()
+        val currentUptime = getUptime()
 
-        RenderUtils.drawOverlayFrame(context, position, () ->
-            RenderUtils.renderStrings(context, lines)
-        );
-    }
+        if (cachedLines.isNotEmpty()
+            && isTracking == lastTracking
+            && completed == lastCompleted
+            && perHour == lastPerHour
+            && commissionsHash == lastCommissionsHash
+            && currentUptime == lastUptime) return
 
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getCommissionsLines();
-        if (lines.isEmpty()) return;
 
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
+        lastTracking = isTracking
+        lastCompleted = completed
+        lastPerHour = perHour
+        lastUptime = currentUptime
+        lastCommissionsHash = commissionsHash
 
-        position.setDimensions(maxW, h);
-    }
+        val newLines = mutableListOf<String>()
+        var detectedArea: CommissionParser.Area? = null
 
-    private List<String> getCommissionsLines() {
-        List<ActiveCommission> commissions = CommissionWidget.getCommissions();
-        if (commissions.isEmpty()) return Collections.emptyList();
-
-        formattedCommissions.clear();
-        CommissionParser.Area detectedArea = null;
-
-        for (ActiveCommission commission : CommissionWidget.getCommissions()) {
-            formattedCommissions.add(commission.getFormattedLine());
-
+        for (commission in commissions) {
+            newLines.add(commission.formattedLine)
             if (detectedArea == null) {
-                detectedArea = commission.getType().getArea();
+                detectedArea = commission.type.area
             }
         }
 
         if (detectedArea != null) {
-            switch (detectedArea) {
-                case DWARVEN_MINES -> formattedCommissions.addFirst("§2§l" + detectedArea.getDisplayName());
-                case CRYSTAL_HOLLOWS -> formattedCommissions.addFirst("§5§l" + detectedArea.getDisplayName());
-                case GLACITE_TUNNELS -> formattedCommissions.addFirst("§b§l" + detectedArea.getDisplayName());
+            when (detectedArea) {
+                CommissionParser.Area.DWARVEN_MINES -> newLines.addFirst("§2§l" + detectedArea.displayName)
+                CommissionParser.Area.CRYSTAL_HOLLOWS -> newLines.addFirst("§5§l" + detectedArea.displayName)
+                CommissionParser.Area.GLACITE_TUNNELS -> newLines.addFirst("§b§l" + detectedArea.displayName)
             }
         }
 
-        // Commissions tracker
-        if (ConfigAccess.isCommissionsTrackingEnabled() && CommissionsTracker.getCompletedCount() > 0) {
-            if (!formattedCommissions.isEmpty()) {
-                formattedCommissions.add("");
+        if (isTracking && completed > 0) {
+            if (newLines.isNotEmpty()) {
+                newLines.add("")
             }
-            formattedCommissions.add("§6Commissions Completed: §e" + CommissionsTracker.getCompletedCount());
-            formattedCommissions.add("§6Commissions/h: §e" + String.format("%.2f", CommissionsTracker.getCommissionsPerHour()));
-            formattedCommissions.add("§6Uptime: §e" + CommissionsTracker.getUptime());
+            newLines.add("§6Commissions Completed: §e$completed")
+            newLines.add("§6Commissions/h: §e" + String.format("%.2f", perHour))
+            newLines.add("§6Uptime: §e$currentUptime")
         }
 
-        return formattedCommissions;
+        cachedLines = newLines
     }
 }

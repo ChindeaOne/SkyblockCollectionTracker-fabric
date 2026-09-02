@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.CommissionUtils
 import io.github.chindeaone.collectiontracker.utils.ConfigStateUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
@@ -86,7 +87,8 @@ object ModLoader: ModInitializer {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, _ ->
             // Avoid rendering in editor mode
-            if(OverlayManager.isInEditorMode()) return@attachElementBefore
+            if (OverlayManager.isInEditorMode()) return@attachElementBefore
+            if (!HypixelUtils.isInSkyblock) return@attachElementBefore
 
             for (overlay in OverlayManager.all()) {
                 if (overlay.shouldRender()) {
@@ -95,6 +97,8 @@ object ModLoader: ModInitializer {
             }
         }
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
+            if (!HypixelUtils.isInSkyblock) return@register
+
             if (screen is ChatScreen) {
                 ScreenMouseEvents.allowMouseClick(screen).register { _, event ->
                     for (overlay in OverlayManager.all()) {

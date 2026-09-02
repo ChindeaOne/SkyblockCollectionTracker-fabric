@@ -1,152 +1,152 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.categories.Misc;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
-import io.github.chindeaone.collectiontracker.utils.world.MiningMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.network.chat.Component;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getPickaxeAbilityDisplayIndicator
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getPickaxeAbilityName
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getPickaxeAbilityPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isAbilityCooldownOnly
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isColeweightAbilityFormat
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isPickaxeAbilityDisplayed
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isPickaxeAbilityInMiningIslandsOnly
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowPickaxeExpiredAbilityTitle
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowPickaxeReadyAbilityTitle
+import io.github.chindeaone.collectiontracker.config.categories.Misc
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalCooldown
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalDuration
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderCooldownBar
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderCooldownCircle
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentMiningIsland
+import io.github.chindeaone.collectiontracker.utils.world.MiningMapping.miningIslands
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.network.chat.Component
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class PickaxeAbilityOverlay : AbstractOverlay() {
+    private var cachedLines: List<String> = emptyList()
+    private var lastCooldown: Double = -1.0
+    private var lastDuration: Double = -1.0
+    private var lastAbilityName: String = ""
+    private var lastColeweightFormat: Boolean = false
 
-public class PickaxeAbilityOverlay extends AbstractOverlay{
+    private var expiredTitleShown = true
+    private var readyTitleShown = true
 
-    private final Position position = ConfigAccess.getPickaxeAbilityPosition();
-    private final List<String> pickaxeAbilityOverlayLines = new ArrayList<>();
-    private boolean expiredTitleShown = true;
-    private boolean readyTitleShown = true;
+    override val overlayLabel: String = "Pickaxe Ability"
 
-    @Override
-    public String overlayLabel() {
-        return "Pickaxe Ability";
-    }
+    override val position: Position get() = getPickaxeAbilityPosition()
 
-    @Override
-    public Position position() {
-        return position;
-    }
+    override val isEnabled: Boolean get() = isPickaxeAbilityDisplayed()
 
-    @Override
-    public boolean isEnabled() {
-        return ConfigAccess.isPickaxeAbilityDisplayed() && HypixelUtils.isInSkyblock();
-    }
+    override fun render(context: GuiGraphicsExtractor) {
+        super.render(context)
 
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        List<String> lines = getPickaxeAbilityLines();
-
-        if (lines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderStrings(context, lines)
-        );
-
-        switch (ConfigAccess.getPickaxeAbilityDisplayIndicator()) {
-            case Misc.AbilityDisplayIndicator.CROSSHAIR_CIRCLE -> RenderUtils.renderCooldownCircle(context, "pickaxe");
-            case Misc.AbilityDisplayIndicator.CROSSHAIR_BAR -> RenderUtils.renderCooldownBar(context, "pickaxe");
+        when (getPickaxeAbilityDisplayIndicator()) {
+            Misc.AbilityDisplayIndicator.CROSSHAIR_CIRCLE -> renderCooldownCircle(context, "pickaxe")
+            Misc.AbilityDisplayIndicator.CROSSHAIR_BAR -> renderCooldownBar(context, "pickaxe")
+            else -> {}
         }
     }
 
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getPickaxeAbilityLines();
-        if (lines.isEmpty()) return;
+    override fun updateDimensions() {
+        if (!isEnabled) return
+        updateLinesIfNeeded()
 
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
+        super.updateDimensions()
     }
 
-    private List<String> getPickaxeAbilityLines() {
-        pickaxeAbilityOverlayLines.clear();
+    override val lines: List<String>
+        get() {
+            updateLinesIfNeeded()
+            return cachedLines
+        }
 
-        if (!ConfigAccess.isPickaxeAbilityDisplayed()) return Collections.emptyList();
-        if (ConfigAccess.isPickaxeAbilityInMiningIslandsOnly() && !MiningMapping.getMiningIslands().contains(IslandTracker.getCurrentMiningIsland())) return Collections.emptyList();
+    private fun updateLinesIfNeeded() {
+        if (!isPickaxeAbilityDisplayed() || (isPickaxeAbilityInMiningIslandsOnly() && !miningIslands.contains(currentMiningIsland))) {
+            if (cachedLines.isNotEmpty()) {
+                cachedLines = emptyList()
+            }
+            return
+        }
 
-        String abilityName = ConfigAccess.getPickaxeAbilityName();
-        String displayName = abilityName.isEmpty() ? "Unknown Ability" : abilityName;
+        val abilityName = getPickaxeAbilityName()
+        val cooldown = finalCooldown
+        val active = finalDuration
+        val isColeweight = isColeweightAbilityFormat()
 
-        double cooldown = ChatListener.getFinalCooldown();
-        double active = ChatListener.getFinalDuration();
+        if (cachedLines.isNotEmpty() && cooldown == lastCooldown && active == lastDuration && abilityName == lastAbilityName && isColeweight == lastColeweightFormat) {
+            return
+        }
+
+        lastCooldown = cooldown
+        lastDuration = active
+        lastAbilityName = abilityName
+        lastColeweightFormat = isColeweight
+
+        var displayName = abilityName.ifEmpty { "Unknown Ability" }
 
         if (active > 0) {
-            expiredTitleShown = false;
-            readyTitleShown = false;
+            expiredTitleShown = false
+            readyTitleShown = false
         }
 
-        if (ConfigAccess.isColeweightAbilityFormat()) {
-            // Title logic for Coleweight format
-            if (active == 0) {
-                if (ConfigAccess.isShowPickaxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0 && !displayName.equals("Pickobulus")) {
-                    String titleExpired = "§6[§3§kd§6] §b§l" + displayName + " §cExpired! §6[§3§kd§6]";
-                    RenderUtils.showTitle(Component.literal(titleExpired), ConfigAccess.getTitleDisplayTimer());
-                    expiredTitleShown = true;
+        val newLines = mutableListOf<String>()
+
+        if (isColeweight) {
+            if (active == 0.0) {
+                if (isShowPickaxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0 && (displayName != "Pickobulus")) {
+                    val titleExpired = "§6[§3§kd§6] §b§l$displayName §cExpired! §6[§3§kd§6]"
+                    showTitle(Component.literal(titleExpired), getTitleDisplayTimer())
+                    expiredTitleShown = true
                 }
                 if (cooldown <= 0) {
-                    if (ConfigAccess.isShowPickaxeReadyAbilityTitle() && !readyTitleShown) {
-                        String titleReady = "§6[§3§kd§6] §b§l" + displayName + " §6[§3§kd§6]";
-                        RenderUtils.showTitle(Component.literal(titleReady), ConfigAccess.getTitleDisplayTimer());
-                        readyTitleShown = true;
+                    if (isShowPickaxeReadyAbilityTitle() && !readyTitleShown) {
+                        val titleReady = "§6[§3§kd§6] §b§l$displayName §6[§3§kd§6]"
+                        showTitle(Component.literal(titleReady), getTitleDisplayTimer())
+                        readyTitleShown = true
                     }
                 } else {
-                    readyTitleShown = false;
+                    readyTitleShown = false
                 }
             }
 
-            // Lines logic for Coleweight format
-            String status;
-            if (!ConfigAccess.isAbilityCooldownOnly() && active > 0) {
-                status = "§a" + TextUtils.formatTime(active);
+            val status = if (!isAbilityCooldownOnly() && active > 0) {
+                "§a" + StringUtils.formatTimeInSeconds(active)
             } else if (cooldown > 0) {
-                status = "§c" + TextUtils.formatTime(cooldown);
+                "§c" + StringUtils.formatTimeInSeconds(cooldown)
             } else {
-                status = "§aReady!";
+                "§aReady!"
             }
-            pickaxeAbilityOverlayLines.add("§e" + displayName + " CD: " + status);
+            newLines.add("§e$displayName CD: $status")
         } else {
-            // Original Title logic
-            if (active == 0) {
-                if (ConfigAccess.isShowPickaxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0 && !displayName.equals("Pickobulus")) {
-                    RenderUtils.showTitle(Component.literal("§6" + displayName + " §cExpired!"), ConfigAccess.getTitleDisplayTimer());
-                    expiredTitleShown = true;
+            if (active == 0.0) {
+                if (isShowPickaxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0 && (displayName != "Pickobulus")) {
+                    showTitle(Component.literal("§6$displayName §cExpired!"), getTitleDisplayTimer())
+                    expiredTitleShown = true
                 }
                 if (cooldown <= 0) {
-                    if (ConfigAccess.isShowPickaxeReadyAbilityTitle() && !readyTitleShown) {
-                        RenderUtils.showTitle(Component.literal("§6" + displayName + " §aReady!"), ConfigAccess.getTitleDisplayTimer());
-                        readyTitleShown = true;
+                    if (isShowPickaxeReadyAbilityTitle() && !readyTitleShown) {
+                        showTitle(Component.literal("§6$displayName §aReady!"), getTitleDisplayTimer())
+                        readyTitleShown = true
                     }
                 } else {
-                    readyTitleShown = false;
+                    readyTitleShown = false
                 }
             }
 
-            // Original format lines
-            if (displayName.equals("Unknown Ability")) displayName = "§cUnknown Ability";
-            else displayName = "§e" + displayName;
-            pickaxeAbilityOverlayLines.add("§bPickaxe Ability: " + displayName);
+            displayName = if (displayName == "Unknown Ability") "§cUnknown Ability" else "§e$displayName"
+            newLines.add("§bPickaxe Ability: $displayName")
 
-            if (!ConfigAccess.isAbilityCooldownOnly() && active > 0) {
-                pickaxeAbilityOverlayLines.add("§aActive: " + TextUtils.formatTime(active));
+            if (!isAbilityCooldownOnly() && active > 0) {
+                newLines.add("§aActive: ${StringUtils.formatTimeInSeconds(active)}")
             } else if (cooldown > 0) {
-                pickaxeAbilityOverlayLines.add("§cCooldown: " + TextUtils.formatTime(cooldown));
+                newLines.add("§cCooldown: ${StringUtils.formatTimeInSeconds(cooldown)}")
             } else {
-                pickaxeAbilityOverlayLines.add("§aReady!");
+                newLines.add("§aReady!")
             }
         }
-        return pickaxeAbilityOverlayLines;
+
+        cachedLines = newLines
     }
 }

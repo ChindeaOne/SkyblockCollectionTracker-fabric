@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils
 
-import java.util.*
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getAbilityPrecision
+import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils.nextBuffTime
 
 object StringUtils {
 
@@ -13,7 +14,7 @@ object StringUtils {
         val formatted = java.lang.StringBuilder()
 
         for (i in words.indices) {
-            val word = words[i].lowercase(Locale.getDefault())
+            val word = words[i].lowercase()
             if (i == 0) {
                 formatted.append(word[0].uppercaseChar()).append(word.substring(1))
             } else {
@@ -81,6 +82,12 @@ object StringUtils {
         return parts.joinToString(", ")
     }
 
+    fun formatTimeInSeconds(time: Double): String {
+        val precision = getAbilityPrecision()
+        val formatString = "%." + precision + "fs"
+        return String.format(formatString, time)
+    }
+
     private fun formatUnit(amount: Long, unit: String): String {
         return when {
             amount > 1L -> "$amount ${unit}s"
@@ -89,8 +96,20 @@ object StringUtils {
         }
     }
 
+    fun updateTimer(): String {
+        val timeLeft = (nextBuffTime - System.currentTimeMillis()) / 1000
+        if (timeLeft <= 5) {
+            return "§aTime left: §cSoon"
+        }
+
+        return String.format("§aTime left: §e%s", formatTime(timeLeft))
+    }
+
+    fun formatFloatOrPlaceholder(value: Float): String {
+        return if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
+    }
+
     // Method taken from Skyhanni
-    @JvmStatic
     fun CharSequence.removeColor(keepFormatting: Boolean = false): String {
         // Glossary:
         // Formatting indicator: The '§' character indicating the beginning of a formatting sequence

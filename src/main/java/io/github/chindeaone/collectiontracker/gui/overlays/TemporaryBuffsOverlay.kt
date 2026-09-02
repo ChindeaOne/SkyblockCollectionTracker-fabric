@@ -1,113 +1,99 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.network.chat.Component;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTempBuffPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTempBuffExpiredTitle
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTempBuffTrackerEnabled
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.fiestaFlaskTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.filetTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.powderPumpkinTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.pristinePotatoTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.refinedCacaoTime
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
+import net.minecraft.network.chat.Component
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+class TemporaryBuffsOverlay : AbstractOverlay() {
+    private var cachedLines: List<String> = emptyList()
+    private val activeStates: MutableMap<String, Boolean> = mutableMapOf()
 
-public class TemporaryBuffsOverlay extends AbstractOverlay{
+    private var lastCacaoSeconds: Long = -1L
+    private var lastFiletSeconds: Long = -1L
+    private var lastPotatoSeconds: Long = -1L
+    private var lastPumpkinSeconds: Long = -1L
+    private var lastFlaskSeconds: Long = -1L
 
-    private final Position position = ConfigAccess.getTempBuffPosition();
-    private final List<String> tempBuffLines = new ArrayList<>();
-    private final Map<String, Boolean> activeStates = new HashMap<>();
+    override val overlayLabel: String = "Temporary Buffs"
 
-    @Override
-    public String overlayLabel() {
-        return "Temporary Buffs";
+    override val position: Position get() = getTempBuffPosition()
+
+    override val isEnabled: Boolean get() = isTempBuffTrackerEnabled()
+
+    override fun updateDimensions() {
+        if (!isEnabled) return
+        updateLinesIfNeeded()
+
+        super.updateDimensions()
     }
 
-    @Override
-    public Position position() {
-        return position;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return ConfigAccess.isTempBuffTrackerEnabled() && HypixelUtils.isInSkyblock();
-    }
-
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        List<String> lines = getTempBuffLines();
-
-        if (lines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () -> RenderUtils.renderStrings(context, lines));
-    }
-
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getTempBuffLines();
-        if (lines.isEmpty()) return;
-
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
-    }
-
-    private List<String> getTempBuffLines() {
-        tempBuffLines.clear();
-
-        if (!ConfigAccess.isTempBuffTrackerEnabled()) return Collections.emptyList();
-
-        long now = System.currentTimeMillis();
-
-        processBuff("§6Refined Dark Cacao Truffle", TemporaryBuffsParser.getRefinedCacaoTime(), now);
-        processBuff("§9Filet O' Fortune", TemporaryBuffsParser.getFiletTime(), now);
-        processBuff("§5Chilled Pristine Potato", TemporaryBuffsParser.getPristinePotatoTime(), now);
-        processBuff("§aPowder Pie", TemporaryBuffsParser.getPowderPumpkinTime(), now);
-        processBuff("§6Fiesta Flask", TemporaryBuffsParser.getFiestaFlaskTime(), now);
-
-        return tempBuffLines;
-    }
-
-    private void processBuff(String displayName, long expireTime, long now) {
-        boolean isActive = expireTime > now;
-        boolean wasActive = activeStates.getOrDefault(displayName, false);
-
-        if (wasActive && !isActive && ConfigAccess.isShowTempBuffExpiredTitle()) {
-            RenderUtils.showTitle(Component.literal(displayName + " §cExpired!"), ConfigAccess.getTitleDisplayTimer());
+    override val lines: List<String>
+        get() {
+            updateLinesIfNeeded()
+            return cachedLines
         }
-        activeStates.put(displayName, isActive);
+
+    private fun updateLinesIfNeeded() {
+        if (!isEnabled) {
+            if (cachedLines.isNotEmpty()) {
+                cachedLines = emptyList()
+            }
+            return
+        }
+
+        val now = System.currentTimeMillis()
+
+        val cacaoSeconds = if (refinedCacaoTime > now) (refinedCacaoTime - now) / 1000 else 0L
+        val filetSeconds = if (filetTime > now) (filetTime - now) / 1000 else 0L
+        val potatoSeconds = if (pristinePotatoTime > now) (pristinePotatoTime - now) / 1000 else 0L
+        val pumpkinSeconds = if (powderPumpkinTime > now) (powderPumpkinTime - now) / 1000 else 0L
+        val flaskSeconds = if (fiestaFlaskTime > now) (fiestaFlaskTime - now) / 1000 else 0L
+
+        if (cachedLines.isNotEmpty()
+            && cacaoSeconds == lastCacaoSeconds && filetSeconds == lastFiletSeconds
+            && potatoSeconds == lastPotatoSeconds && pumpkinSeconds == lastPumpkinSeconds
+            && flaskSeconds == lastFlaskSeconds) return
+
+        lastCacaoSeconds = cacaoSeconds
+        lastFiletSeconds = filetSeconds
+        lastPotatoSeconds = potatoSeconds
+        lastPumpkinSeconds = pumpkinSeconds
+        lastFlaskSeconds = flaskSeconds
+
+        val newLines = mutableListOf<String>()
+
+        processBuff(newLines, "§6Refined Dark Cacao Truffle", refinedCacaoTime, now)
+        processBuff(newLines, "§9Filet O' Fortune", filetTime, now)
+        processBuff(newLines, "§5Chilled Pristine Potato", pristinePotatoTime, now)
+        processBuff(newLines, "§aPowder Pie", powderPumpkinTime, now)
+        processBuff(newLines, "§6Fiesta Flask", fiestaFlaskTime, now)
+
+        cachedLines = newLines
+    }
+
+    private fun processBuff(lines: MutableList<String>, displayName: String, expireTime: Long, now: Long) {
+        val isActive = expireTime > now
+        val wasActive = activeStates.getOrDefault(displayName, false)
+
+        if (wasActive && !isActive && isShowTempBuffExpiredTitle()) {
+            showTitle(Component.literal("$displayName §cExpired!"), getTitleDisplayTimer())
+        }
+        activeStates[displayName] = isActive
 
         if (isActive) {
-            addBuffLine(displayName, expireTime, now);
+            val diff = expireTime - now
+            val formattedTime = StringUtils.formatCompactTime(diff / 1000)
+            lines.add("$displayName §e$formattedTime")
         }
-    }
-
-    private void addBuffLine(String buffName, long expireTime, long now) {
-        long diff = expireTime - now;
-        if (diff <= 0) return;
-
-        long totalSeconds = diff / 1000;
-        long minutes = totalSeconds / 60;
-        long seconds = totalSeconds % 60;
-
-        String formattedTime;
-        if (minutes >= 5) {
-            formattedTime = minutes + "m";
-        } else if (minutes >= 1) {
-            formattedTime = String.format("%dm %ds", minutes, seconds);
-        } else {
-            formattedTime = seconds + "s";
-        }
-
-        tempBuffLines.add(buffName + " §e" + formattedTime);
     }
 }

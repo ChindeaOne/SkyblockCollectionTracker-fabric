@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 import net.minecraft.client.Minecraft
@@ -23,6 +22,8 @@ object ScoreboardUtils {
     var heatValue: Int = 0
     var coldValue: Int = 0
 
+    @JvmStatic
+    var nextBuffTime: Long = 0
     var checkTime: Boolean = true
     var timeLeft: Int = 0
     private var lastMinutesSinceMidnight = -1
@@ -109,12 +110,12 @@ object ScoreboardUtils {
 
                 timeLeft = secondsLeft.roundToInt()
                 checkTime = false
-                ChatListener.nextBuffTime = System.currentTimeMillis() + (timeLeft * 1000L)
+                nextBuffTime = System.currentTimeMillis() + (timeLeft * 1000L)
             }
 
             // Detect transition to a new SkyBlock day
             if (minutesSinceMidnight == 0 && lastMinutesSinceMidnight != 0) {
-                ChatListener.nextBuffTime = System.currentTimeMillis() + 20 * 60 * 1000L
+                nextBuffTime = System.currentTimeMillis() + 20 * 60 * 1000L
             }
 
             lastMinutesSinceMidnight = minutesSinceMidnight

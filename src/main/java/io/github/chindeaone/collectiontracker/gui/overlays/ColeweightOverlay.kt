@@ -1,90 +1,82 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler;
-import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightTrackerPosition
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler.uptime
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.coleweightAmount
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.coleweightGained
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.coleweightPerHour
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.coleweightSinceLast
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.lastColeweightTime
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatFloat
+import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import kotlin.concurrent.Volatile
 
-import java.util.ArrayList;
-import java.util.List;
+class ColeweightOverlay : AbstractOverlay() {
+    private var cachedLines: List<String> = emptyList()
+    private var lastFormattedTime: String = ""
 
-import static io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatFloatOrPlaceholder;
+    override val overlayLabel: String = "Coleweight Tracker"
 
-public class ColeweightOverlay extends AbstractOverlay{
+    override val position: Position get() = getColeweightTrackerPosition()
 
-    private final Position position = ConfigAccess.getColeweightTrackerPosition();
-    private final List<String> trackerLines = new ArrayList<>();
-    public static volatile boolean trackingDirty = false;
+    override val isEnabled: Boolean get() = ColeweightTrackingHandler.isTracking
 
-    @Override
-    public String overlayLabel() {
-        return "Coleweight Tracker";
+    override fun render(context: GuiGraphicsExtractor) {
+        if (!isEnabled || !trackingDirty) return
+
+        val lines = lines
+        if (lines.isEmpty()) return
+
+        RenderUtils.drawOverlayFrame(context, position) { RenderUtils.renderColeweightStrings(context, lines) }
     }
 
-    @Override
-    public Position position() {
-        return position;
+    override fun updateDimensions() {
+        if (!isEnabled || !trackingDirty) return
+        updateLinesIfNeeded()
+
+        super.updateDimensions()
     }
 
-    @Override
-    public boolean isEnabled() {
-        return ColeweightTrackingHandler.isTracking && HypixelUtils.isInSkyblock();
-    }
-
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled() || !trackingDirty) return;
-
-        List<String> lines = getLines();
-        if (lines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderColeweightStrings(context, lines));
-    }
-
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getLines();
-        if (lines.isEmpty()) return;
-
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
-    }
-
-    public List<String> getLines() {
-        trackerLines.clear();
-
-        trackerLines.add("Coleweight: " + formatFloatOrPlaceholder(ColeweightTrackingRates.getColeweightAmount()));
-        trackerLines.add("CW (Session): " + formatFloatOrPlaceholder(ColeweightTrackingRates.getColeweightGained()));
-        trackerLines.add("CW/h: " + formatFloatOrPlaceholder(ColeweightTrackingRates.getColeweightPerHour()));
-        trackerLines.add("Since Last: " + NumbersUtils.formatFloat(ColeweightTrackingRates.getColeweightSinceLast()));
-
-        long lastUpdateTime = ColeweightTrackingRates.getLastColeweightTime();
-        if (lastUpdateTime > 0) {
-            long totalSeconds = (System.currentTimeMillis() - lastUpdateTime) / 1000;
-            String timeAgo;
-            if (totalSeconds < 60) {
-                timeAgo = totalSeconds + "s ago";
-            } else {
-                long min = totalSeconds / 60;
-                long sec = totalSeconds % 60;
-                timeAgo = String.format("%dm %ds ago", min, sec);
-            }
-            trackerLines.add("Last updated: " + timeAgo);
+    override val lines: List<String>
+        get() {
+            updateLinesIfNeeded()
+            return cachedLines
         }
-        trackerLines.add("Uptime: " + ColeweightTrackingHandler.getUptime());
 
-        return trackerLines;
+    private fun updateLinesIfNeeded() {
+        val lastUpdateTime = lastColeweightTime
+        val timeAgo = if (lastUpdateTime > 0) {
+            val totalSeconds = (System.currentTimeMillis() - lastUpdateTime) / 1000
+            StringUtils.formatCompactTime(totalSeconds)
+        } else {
+            ""
+        }
+
+        if (cachedLines.isNotEmpty() && timeAgo == lastFormattedTime) return
+
+        lastFormattedTime = timeAgo
+
+        val newLines = mutableListOf(
+            "Coleweight: ${StringUtils.formatFloatOrPlaceholder(coleweightAmount)}",
+            "CW (Session): ${StringUtils.formatFloatOrPlaceholder(coleweightGained)}",
+            "CW/h: ${StringUtils.formatFloatOrPlaceholder(coleweightPerHour)}",
+            "Since Last: ${formatFloat(coleweightSinceLast)}"
+        )
+
+        if (timeAgo.isNotEmpty()) {
+            newLines.add("Last updated: $timeAgo ago")
+        }
+        newLines.add("Uptime: $uptime")
+
+        cachedLines = newLines
+    }
+
+    companion object {
+        @Volatile
+        var trackingDirty: Boolean = false
     }
 }

@@ -1,73 +1,23 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getLotteryPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isLotteryEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isLotteryInForagingIslandsOnly
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentLotteryBuff
+import io.github.chindeaone.collectiontracker.utils.world.ForagingMapping.foragingIslands
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentForagingIsland
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class LotteryOverlay : AbstractRotatingPerksOverlay() {
+    override val overlayLabel: String = "Lottery"
 
-public class LotteryOverlay extends AbstractOverlay {
+    override val position: Position get() = getLotteryPosition()
 
-    private final Position position = ConfigAccess.getLotteryPosition();
-    private final List<String> lotteryOverlayLines = new ArrayList<>();
+    override val isEnabled: Boolean get() = isLotteryEnabled()
 
-    @Override
-    public String overlayLabel() {
-        return "Lottery";
-    }
+    override val buffPrefix get() = "§2Lottery"
 
-    @Override
-    public Position position() {
-        return position;
-    }
+    override val currentBuff: String get() = currentLotteryBuff
 
-    @Override
-    public boolean isEnabled() {
-        return ConfigAccess.isLotteryEnabled() && HypixelUtils.isInSkyblock();
-    }
-
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled()) return;
-        List<String> lines = getLotteryLines();
-
-        if (lines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () ->
-                RenderUtils.renderStrings(context, lines)
-        );
-    }
-
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-        List<String> lines = getLotteryLines();
-        if (lines.isEmpty()) return;
-
-        Font fr = Minecraft.getInstance().font;
-        int maxW = 0;
-        for (String l : lines) maxW = Math.max(maxW, fr.width(l));
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
-    }
-
-    private List<String> getLotteryLines() {
-        lotteryOverlayLines.clear();
-
-        if (ConfigAccess.isLotteryInForagingIslandsOnly() && IslandTracker.getCurrentForagingIsland() == null) return Collections.emptyList();
-
-        lotteryOverlayLines.add("§2Lottery: " + ChatListener.getCurrentLotteryBuff());
-        lotteryOverlayLines.add(TextUtils.updateTimer());
-        return  lotteryOverlayLines;
-    }
+    override val isIslandAllowed: Boolean get() = !isLotteryInForagingIslandsOnly() || foragingIslands.contains(currentForagingIsland)
 }

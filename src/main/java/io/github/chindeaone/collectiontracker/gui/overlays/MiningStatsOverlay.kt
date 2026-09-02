@@ -3,49 +3,26 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getMiningStatsPosition
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isMiningStatsOverlayEnabled
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils.isInSkyblock
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderStrings
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphicsExtractor
-import kotlin.math.max
 
 class MiningStatsOverlay : AbstractOverlay() {
-    private val position = getMiningStatsPosition()
+    private var lastLines: List<String> = emptyList()
 
-    override fun overlayLabel(): String {
-        return "Mining Stats"
-    }
+    override val overlayLabel: String = "Mining Stats"
 
-    override fun position(): Position {
-        return position
-    }
+    override val position: Position get() = getMiningStatsPosition()
 
-    override fun isEnabled(): Boolean {
-        return isMiningStatsOverlayEnabled() && isInSkyblock
-    }
-
-    override fun render(context: GuiGraphicsExtractor) {
-        if (!isEnabled) return
-        val lines = MiningStatsParser.getLines()
-
-        if (lines.isEmpty()) return
-
-        drawOverlayFrame(context, position) { renderStrings(context, lines) }
-
-    }
+    override val isEnabled: Boolean get() = isMiningStatsOverlayEnabled()
 
     override fun updateDimensions() {
         if (!isEnabled) return
-        val lines = MiningStatsParser.getLines()
-        if (lines.isEmpty()) return
 
-        val fr = Minecraft.getInstance().font
-        var maxW = 0
-        for (l in lines) maxW = max(maxW, fr.width(l))
-        val h = fr.lineHeight * lines.size
+        val lines = lines
+        if (lines === lastLines) return
 
-        position.setDimensions(maxW, h)
+        lastLines = lines
+        super.updateDimensions()
     }
+
+    override val lines: List<String> get() = MiningStatsParser.getLines()
 }

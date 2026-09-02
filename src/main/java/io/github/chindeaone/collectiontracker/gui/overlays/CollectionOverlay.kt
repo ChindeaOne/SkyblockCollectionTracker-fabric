@@ -1,170 +1,191 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess;
-import io.github.chindeaone.collectiontracker.config.ConfigHelper;
-import io.github.chindeaone.collectiontracker.config.categories.Bazaar;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils;
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.ChatScreen;
-import org.jetbrains.annotations.NotNull;
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarPriceType
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarType
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getGemstoneVariant
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTrackingPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isOverlayTextColorEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowExtraStats
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.ConfigHelper.changeBazaarPrice
+import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaar
+import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaarType
+import io.github.chindeaone.collectiontracker.config.ConfigHelper.setShowExtraStats
+import io.github.chindeaone.collectiontracker.config.categories.Bazaar
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.gui.screens.ChatScreen
+import kotlin.concurrent.Volatile
+import kotlin.math.roundToInt
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class CollectionOverlay : AbstractOverlay() {
+    private var cachedLines: List<String> = emptyList()
+    private var cachedMainLines: List<String> = emptyList()
+    private var cachedExtraLines: List<String> = emptyList()
 
-public class CollectionOverlay extends AbstractOverlay{
+    private var lastUptime: String = ""
+    private var lastIsChatOpened: Boolean = false
+    private var lastShowExtraStats: Boolean = false
+    private var lastBzType: Bazaar.BazaarType? = null
+    private var lastBzPriceType: Bazaar.BazaarPriceType? = null
+    private var lastGemVariant: Bazaar.GemstoneVariant? = null
 
-    public static volatile boolean trackingDirty = false;
-    private final Position position = ConfigAccess.getTrackingPosition();
-    public final List<String> overlayLines = new ArrayList<>();
-    public final List<String> extraOverlayLines = new ArrayList<>();
+    override val overlayLabel: String = "Collection Tracker"
 
-    @Override
-    public String overlayLabel() {
-        return "Collection Tracker";
-    }
+    override val position: Position get() = getTrackingPosition()
 
-    @Override public Position position() {
-        return position;
-    }
+    override val isEnabled: Boolean get() = TrackingHandler.isTracking
 
-    @Override
-    public boolean isEnabled() {
-        return TrackingHandler.isTracking && HypixelUtils.isInSkyblock();
-    }
+    override fun render(context: GuiGraphicsExtractor) {
+        if (!isEnabled || !trackingDirty) return
 
-    @Override
-    public void render(GuiGraphicsExtractor context) {
-        if (!isEnabled() || !trackingDirty) return;
+        updateLinesIfNeeded()
 
-        List<String> mainLines = getCollectionLines();
-        List<String> extraLines = getCollectionExtraLines();
+        if (cachedMainLines.isEmpty()) return
 
-        if (mainLines.isEmpty()) return;
-
-        RenderUtils.drawOverlayFrame(context, position, () ->
-            RenderUtils.renderTrackingStringsWithColor(context, mainLines, extraLines, ConfigAccess.isOverlayTextColorEnabled())
-        );
-    }
-
-    @Override
-    public void updateDimensions() {
-        if (!isEnabled()) return;
-
-        List<String> lines = getLines();
-        if (lines.isEmpty()) return;
-
-        Font fr = Minecraft.getInstance().font;
-
-        int maxW = 0;
-        for (String line : lines) {
-            maxW = Math.max(maxW, fr.width(line));
-        }
-
-        int h = fr.lineHeight * lines.size();
-
-        position.setDimensions(maxW, h);
-    }
-
-    @Override
-    public List<String> getLines() {
-        if (!isEnabled()) return Collections.emptyList();
-
-        List<String> combinedLines = new ArrayList<>(getCollectionLines());
-        if (ConfigAccess.isShowExtraStats()) {
-            combinedLines.add(""); // add separator line
-            combinedLines.addAll(getCollectionExtraLines());
-        }
-
-        return combinedLines;
-    }
-
-    @Override
-    public void handleLineAction(String line) {
-        switch (line) {
-            case "§e[Bazaar Prices]" -> ConfigHelper.setBazaar(true);
-            case "§e[NPC Prices]" -> ConfigHelper.setBazaar(false);
-            case "§e[Extra Stats]" -> ConfigHelper.setShowExtraStats(!ConfigAccess.isShowExtraStats());
-        }
-        if (line.contains(ConfigAccess.getGemstoneVariant().toString())) {
-            cycleGemstoneVariant();
-        }
-        if (line.contains("version")) {
-            changeEnchantedType();
-        }
-        if (line.contains("Instant")) {
-            changeBazaarPriceType();
+        RenderUtils.drawOverlayFrame(context, position) {
+            RenderUtils.renderTrackingStringsWithColor(
+                context,
+                cachedMainLines,
+                cachedExtraLines,
+                isOverlayTextColorEnabled()
+            )
         }
     }
 
-    @Override
-    public boolean isHovered(double mouseX, double mouseY) {
-        if (!isEnabled()) return false;
+    override fun updateDimensions() {
+        if (!isEnabled || !trackingDirty) return
+        updateLinesIfNeeded()
 
-        updateDimensions();
-
-        Position position = this.position();
-        if (position == null) return false;
-
-        int padding = 8;
-
-        int x = position.getX();
-        int y = position.getY();
-        float scale = position.getScale();
-
-        int width = Math.round((position.getWidth() + padding * 2) * scale);
-        int height = Math.round((position.getHeight() + padding * 2) * scale);
-
-        double x1 = x - padding * scale;
-        double y1 = y - padding * scale;
-        double x2 = x1 + width;
-        double y2 = y1 + height;
-
-        return mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
+        super.updateDimensions()
     }
 
-    private @NotNull List<String> getCollectionLines() {
-        TextUtils.updateTrackingLines(overlayLines);
-        if (overlayLines.isEmpty()) return overlayLines;
-        List<String> lines = new ArrayList<>(overlayLines);
-        lines.add("Uptime: " + TrackingHandler.getUptime());
-        if (!ConfigAccess.isShowExtraStats()) {
-            if (Minecraft.getInstance()./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ instanceof ChatScreen) {
-                TextUtils.addToggleableSettingsLines(lines);
+    override val lines: List<String>
+        get() {
+            updateLinesIfNeeded()
+            return cachedLines
+        }
+
+    private fun updateLinesIfNeeded() {
+        if (!isEnabled || !trackingDirty) {
+            if (cachedLines.isNotEmpty()) {
+                cachedLines = emptyList()
+                cachedMainLines = emptyList()
+                cachedExtraLines = emptyList()
+            }
+            return
+        }
+
+        val uptime = TrackingHandler.uptime
+        val isChatOpened = Minecraft.getInstance()./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ is ChatScreen
+        val showExtra = isShowExtraStats()
+        val bzType = getBazaarType()
+        val bzPriceType = getBazaarPriceType()
+        val gemVariant = getGemstoneVariant()
+
+        if (cachedLines.isNotEmpty() && uptime == lastUptime && isChatOpened == lastIsChatOpened
+            && showExtra == lastShowExtraStats && bzType == lastBzType && bzPriceType == lastBzPriceType
+            && gemVariant == lastGemVariant) return
+
+        lastUptime = uptime
+        lastIsChatOpened = isChatOpened
+        lastShowExtraStats = showExtra
+        lastBzType = bzType
+        lastBzPriceType = bzPriceType
+        lastGemVariant = gemVariant
+
+        val main = mutableListOf<String>()
+        TextUtils.updateTrackingLines(main)
+        if (main.isNotEmpty()) {
+            main.add("Uptime: $uptime")
+            if (!showExtra && isChatOpened) {
+                TextUtils.addToggleableSettingsLines(main)
             }
         }
-        return lines;
-    }
 
-    private @NotNull List<String> getCollectionExtraLines() {
-        if (!ConfigAccess.isShowExtraStats()) return Collections.emptyList();
-        TextUtils.updateTrackingExtraLines(extraOverlayLines);
-        if (Minecraft.getInstance()./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ instanceof ChatScreen) {
-            TextUtils.addToggleableSettingsLines(extraOverlayLines);
+        val extra = mutableListOf<String>()
+        if (showExtra) {
+            TextUtils.updateTrackingExtraLines(extra)
+            if (isChatOpened) {
+                TextUtils.addToggleableSettingsLines(extra)
+            }
         }
-        return extraOverlayLines;
+
+        cachedMainLines = main
+        cachedExtraLines = extra
+
+        val combined = mutableListOf<String>()
+        combined.addAll(main)
+        if (showExtra && extra.isNotEmpty()) {
+            combined.add("") // add separator line
+            combined.addAll(extra)
+        }
+
+        cachedLines = combined
     }
 
-    private void cycleGemstoneVariant() {
-        Bazaar.GemstoneVariant[] variants = Bazaar.GemstoneVariant.values();
-        Bazaar.GemstoneVariant current = ConfigAccess.getGemstoneVariant();
-        int nextOrdinal = (current.ordinal() + 1) % variants.length;
-        ConfigHelper.setGemstoneVariant(variants[nextOrdinal]);
+    override fun handleLineAction(line: String) {
+        when (line) {
+            "§e[Bazaar Prices]" -> setBazaar(true)
+            "§e[NPC Prices]" -> setBazaar(false)
+            "§e[Extra Stats]" -> setShowExtraStats(!isShowExtraStats())
+        }
+        if (line.contains(getGemstoneVariant().toString())) {
+            cycleGemstoneVariant()
+        }
+        if (line.contains("version")) {
+            changeEnchantedType()
+        }
+        if (line.contains("Instant")) {
+            changeBazaarPriceType()
+        }
     }
 
-    private void changeEnchantedType() {
-        ConfigHelper.setBazaarType(ConfigAccess.getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION ?
-                Bazaar.BazaarType.SUPER_ENCHANTED_VERSION : Bazaar.BazaarType.ENCHANTED_VERSION);
+    override fun isHovered(mouseX: Double, mouseY: Double): Boolean {
+        if (!isEnabled) return false
+
+        updateDimensions()
+
+        val position = this.position
+
+        val padding = 8
+
+        val x = position.x
+        val y = position.y
+        val scale = position.scale
+
+        val width = ((position.width + padding * 2) * scale).roundToInt()
+        val height = ((position.height + padding * 2) * scale).roundToInt()
+
+        val x1 = (x - padding * scale).toDouble()
+        val y1 = (y - padding * scale).toDouble()
+        val x2 = x1 + width
+        val y2 = y1 + height
+
+        return mouseX in x1..x2 && mouseY >= y1 && mouseY <= y2
     }
 
-    private void changeBazaarPriceType() {
-        ConfigHelper.changeBazaarPrice(ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY ?
-                Bazaar.BazaarPriceType.INSTANT_SELL : Bazaar.BazaarPriceType.INSTANT_BUY);
+    private fun cycleGemstoneVariant() {
+        val variants: Array<Bazaar.GemstoneVariant> = Bazaar.GemstoneVariant.entries.toTypedArray()
+        val current = getGemstoneVariant()
+        val nextOrdinal = (current.ordinal + 1) % variants.size
+        ConfigHelper.setGemstoneVariant(variants[nextOrdinal])
+    }
+
+    private fun changeEnchantedType() {
+        setBazaarType(if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) Bazaar.BazaarType.SUPER_ENCHANTED_VERSION else Bazaar.BazaarType.ENCHANTED_VERSION)
+    }
+
+    private fun changeBazaarPriceType() {
+        changeBazaarPrice(if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) Bazaar.BazaarPriceType.INSTANT_SELL else Bazaar.BazaarPriceType.INSTANT_BUY)
+    }
+
+    companion object {
+        @Volatile
+        var trackingDirty: Boolean = false
     }
 }

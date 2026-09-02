@@ -1,111 +1,119 @@
-package io.github.chindeaone.collectiontracker.gui.overlays;
+package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.gui.GuiManager;
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-
-import java.util.Collections;
-import java.util.List;
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.gui.GuiManager.getEditorInstance
+import io.github.chindeaone.collectiontracker.gui.GuiManager.openEditor
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import kotlin.math.roundToInt
 
 /**
- * A general abstract class for all overlays.
+ * A general abstract class for all overlays
  */
-public abstract class AbstractOverlay {
-    protected boolean renderingAllowed = true;
+abstract class AbstractOverlay {
+    var isRenderingAllowed: Boolean = true
 
-    public abstract String overlayLabel();
+    abstract val overlayLabel: String
 
-    public abstract Position position();
+    abstract val position: Position
 
-    public abstract boolean isEnabled();
+    open val isEnabled: Boolean get() = false
 
-    public boolean isRenderingAllowed() {
-        return renderingAllowed;
+    fun shouldRender(): Boolean {
+        val mc = Minecraft.getInstance()
+        return !mc./*? if 26.2 {*/ /*gui.hud.isHidden() */ /*?} else {*/options.hideGui /*?}*/
+                && !mc.debugEntries.isOverlayVisible
+                && isEnabled
+                && isRenderingAllowed
     }
 
-    public void setRenderingAllowed(boolean allowed) {
-        this.renderingAllowed = allowed;
+    open fun render(context: GuiGraphicsExtractor) {
+        if (!isEnabled) return
+
+        val lines = lines
+        if (lines.isEmpty()) return
+
+        RenderUtils.drawOverlayFrame(context, position) { RenderUtils.renderStrings(context, lines) }
     }
 
-    public boolean shouldRender() {
-        Minecraft mc = Minecraft.getInstance();
+    open fun updateDimensions() {
+        if (!HypixelUtils.isInSkyblock && !isEnabled) return
 
-        return /*? if 26.2 {*/ /*!mc.gui.hud.isHidden() *//*?} else {*/ !mc.options.hideGui /*?}*/
-                && !mc.debugEntries.isOverlayVisible()
-                && isEnabled()
-                && isRenderingAllowed();
+        val lines = lines
+        if (lines.isEmpty()) {
+            position.setDimensions(0, 0)
+            return
+        }
+
+        val fr = Minecraft.getInstance().font
+        var maxW = 0
+        for (l in lines) maxW = maxOf(maxW, fr.width(l))
+        val h = fr.lineHeight * lines.size
+
+        position.setDimensions(maxW, h)
     }
 
-    public abstract void render(GuiGraphicsExtractor context);
+    open val lines: List<String> get() = emptyList()
 
-    public abstract void updateDimensions();
+    open fun handleLineAction(line: String) {}
 
-    public void handleLineAction(String line) {}
+    fun handleMouseClick(mouseX: Double, mouseY: Double): Boolean {
+        if (!isEnabled || !isHovered(mouseX, mouseY)) return false
 
-    public List<String> getLines() {
-        return Collections.emptyList();
-    }
+        val lines = lines
+        if (lines.isEmpty()) return false
 
-    public boolean handleMouseClick(double mouseX, double mouseY) {
-        if (!isEnabled() || !isHovered(mouseX, mouseY)) return false;
+        val position = position
+        val x = position.x
+        val y = position.y
+        val scale = position.scale
 
-        List<String> lines = getLines();
-        if (lines.isEmpty()) return false;
+        val fr = Minecraft.getInstance().font
+        val height = (fr.lineHeight * lines.size * scale).toInt()
+        val width = (position.width * scale).toInt()
 
-        Position position = this.position();
-        int x = position.getX();
-        int y = position.getY();
-        float scale = position.getScale();
+        if (mouseX in x.toDouble()..(x + width).toDouble() && mouseY in y.toDouble()..(y + height).toDouble()) {
+            val relativeY = mouseY - y
+            val lineClicked = (relativeY / (fr.lineHeight * scale)).toInt()
 
-        Font fr = Minecraft.getInstance().font;
-        int height = (int) (fr.lineHeight * lines.size() * scale);
-        int width = (int) (position.getWidth() * scale);
-
-        if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
-            double relativeY = mouseY - y;
-            int lineClicked = (int) (relativeY / (fr.lineHeight * scale));
-
-            if (lineClicked >= 0 && lineClicked < lines.size()) {
-                handleLineAction(lines.get(lineClicked));
-                return true;
+            if (lineClicked in lines.indices) {
+                handleLineAction(lines[lineClicked])
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public boolean isHovered(double mouseX, double mouseY) {
-        Position pos = position();
-        if (pos == null) return false;
+    open fun isHovered(mouseX: Double, mouseY: Double): Boolean {
+        val pos = position
 
-        int padding = 4;
+        val padding = 4
 
-        int x = pos.getX();
-        int y = pos.getY();
-        float scale = pos.getScale();
+        val x = pos.x
+        val y = pos.y
+        val scale = pos.scale
 
-        int width = Math.round(pos.getWidth() * scale);
-        int height = Math.round(pos.getHeight() * scale);
+        val width = (pos.width * scale).roundToInt()
+        val height = (pos.height * scale).roundToInt()
 
-        double x2 = x + width;
-        double y1 = y - padding * scale;
-        double y2 = y + height + padding * scale;
+        val x2 = (x + width).toDouble()
+        val y1 = (y - padding * scale).toDouble()
+        val y2 = (y + height + padding * scale).toDouble()
 
-        return mouseX >= (double) x && mouseX <= x2 &&
-                mouseY >= y1 && mouseY <= y2;
+        return mouseX in x.toDouble()..x2 && mouseY in y1..y2
     }
 
-    public void jumpToConfig() {
-        Position pos = this.position();
+    fun jumpToConfig() {
+        val pos = position
 
-        MoulConfigEditor<?> editor = GuiManager.getEditorInstance();
-        var option = editor.getOptionFromField(pos.link);
-        if (option == null) return;
+        val editor: MoulConfigEditor<*> = getEditorInstance()
+        val option = editor.getOptionFromField(pos.link) ?: return
 
-        editor.search("");
-        if (!editor.goToOption(option)) return;
-        GuiManager.openEditor(editor);
+        editor.search("")
+        if (!editor.goToOption(option)) return
+        openEditor(editor)
     }
 }
