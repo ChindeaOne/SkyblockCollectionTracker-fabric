@@ -1,41 +1,40 @@
-package io.github.chindeaone.collectiontracker.config.categories.mining;
+package io.github.chindeaone.collectiontracker.config.categories.mining
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class SkyMallConfig {
+class SkyMallConfig {
+    @Expose
+    @ConfigOption(
+        name = "Better Sky Mall",
+        desc = "Displays current Sky Mall perks and compacts Sky Mall chat messages."
+    )
+    @ConfigEditorBoolean
+    var enableSkyMall: Boolean = false
+
+    @Expose
+    var lastSkyMallBuff: String = ""
 
     @Expose
     @ConfigOption(
-            name = "Better Sky Mall",
-            desc = "Displays current Sky Mall perks and compacts Sky Mall chat messages."
+        name = "Mining Islands Only",
+        desc = "Allows the Sky Mall overlay to be rendered only in Mining Islands."
     )
     @ConfigEditorBoolean
-    public boolean enableSkyMall = false;
-
-    @Expose
-    public String lastSkyMallBuff = "";
+    var skyMallInMiningIslandsOnly: Boolean = true
 
     @Expose
     @ConfigOption(
-            name = "Mining Islands Only",
-            desc = "Allows the Sky Mall overlay to be rendered only in Mining Islands."
+        name = "Disable Sky Mall chat messages",
+        desc = "Hides Sky Mall chat messages while displaying perks in the overlay and allowing other mods to process the messages."
     )
     @ConfigEditorBoolean
-    public boolean skyMallInMiningIslandsOnly = true;
+    var disableSkyMallChatMessages: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Disable Sky Mall chat messages",
-            desc = "Hides Sky Mall chat messages while displaying perks in the overlay and allowing other mods to process the messages."
-    )
-    @ConfigEditorBoolean
-    public boolean disableSkyMallChatMessages = false;
-
-    @Expose
-    @ConfigLink(owner = SkyMallConfig.class, field = "enableSkyMall")
-    public Position skyMallPosition = new Position(500, 50);
+    @ConfigLink(owner = SkyMallConfig::class, field = "enableSkyMall")
+    var skyMallPosition: Position = Position(500, 50)
 }

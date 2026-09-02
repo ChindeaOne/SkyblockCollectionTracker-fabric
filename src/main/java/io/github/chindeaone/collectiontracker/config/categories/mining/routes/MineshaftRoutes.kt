@@ -1,54 +1,40 @@
-package io.github.chindeaone.collectiontracker.config.categories.mining.routes;
+package io.github.chindeaone.collectiontracker.config.categories.mining.routes
 
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class MineshaftRoutes {
-
-    public enum MineshaftSpawnRoutes {
+class MineshaftRoutes {
+    @Suppress("unused")
+    enum class MineshaftSpawnRoutes(val type: String) {
         GEMSTONES("gemstone_spawn"),
         TUNGSTEN("tungsten_spawn"),
         MITHRIL("mithril_spawn");
 
-        private final String type;
-
-        MineshaftSpawnRoutes(String type) {
-            this.type = type;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        @Override
-        public String toString() {
-            return name();
+        override fun toString(): String {
+            return name
         }
     }
 
     @Expose
     @ConfigOption(
-            name = "Enable Mineshaft Routes",
-            desc = "Displays ordered waypoints for the Mineshaft type you enter.\n§eRoutes provided by Mining Cult."
+        name = "Enable Mineshaft Routes",
+        desc = "Displays ordered waypoints for the Mineshaft type you enter.\n§eRoutes provided by Mining Cult."
     )
     @ConfigEditorBoolean
-    public boolean enableMineshaftRoutes = false;
+    var enableMineshaftRoutes: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Enable Mineshaft Spawn Routes", desc = "Enables routes for spawning Mineshafts.")
+    @ConfigEditorBoolean
+    var enableMineshaftSpawnRoutes: Boolean = false
 
     @Expose
     @ConfigOption(
-            name = "Enable Mineshaft Spawn Routes",
-            desc = "Enables routes for spawning Mineshafts."
-    )
-    @ConfigEditorBoolean
-    public boolean enableMineshaftSpawnRoutes = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Mineshaft Spawn Route",
-            desc = "Select the route you want to use to spawn Mineshafts.\n§eRoutes provided by Mining Cult."
+        name = "Mineshaft Spawn Route",
+        desc = "Select the route you want to use to spawn Mineshafts.\n§eRoutes provided by Mining Cult."
     )
     @ConfigEditorDropdown
-    public MineshaftSpawnRoutes selectedMineshaftSpawnRoute = MineshaftSpawnRoutes.GEMSTONES;
+    var selectedMineshaftSpawnRoute: MineshaftSpawnRoutes = MineshaftSpawnRoutes.GEMSTONES
 }

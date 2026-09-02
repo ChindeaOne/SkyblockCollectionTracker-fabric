@@ -1,41 +1,38 @@
-package io.github.chindeaone.collectiontracker.config.categories.mining;
+package io.github.chindeaone.collectiontracker.config.categories.mining
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class TemporaryBuffsConfig {
-
+class TemporaryBuffsConfig {
     @Expose
-    @ConfigOption(
-            name = "Enable Tracker",
-            desc = "Toggles an overlay that tracks mining temporary buffs."
-    )
+    @ConfigOption(name = "Enable Tracker", desc = "Toggles an overlay that tracks mining temporary buffs.")
     @ConfigEditorBoolean
-    public boolean enableTempBuffTracker = false;
+    var enableTempBuffTracker: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Show Expired Title",
-            desc = "Shows a title when a temporary buff expires."
-    )
+    @ConfigOption(name = "Show Expired Title", desc = "Shows a title when a temporary buff expires.")
     @ConfigEditorBoolean
-    public boolean showTempBuffExpiredTitle = false;
+    var showTempBuffExpiredTitle: Boolean = false
 
     @Expose
-    @ConfigLink(owner = TemporaryBuffsConfig.class, field = "enableTempBuffTracker")
-    public Position tempBuffPosition = new Position(400, 100);
+    @ConfigLink(owner = TemporaryBuffsConfig::class, field = "enableTempBuffTracker")
+    var tempBuffPosition: Position = Position(400, 100)
 
     @Expose
-    public long refinedCacaoTime = 0L;
+    var refinedCacaoTime: Long = 0L
+
     @Expose
-    public long filetTime = 0L;
+    var filetTime: Long = 0L
+
     @Expose
-    public long pristinePotatoTime = 0L;
+    var pristinePotatoTime: Long = 0L
+
     @Expose
-    public long powderPumpkinTime = 0L;
+    var powderPumpkinTime: Long = 0L
+
     @Expose
-    public long fiestaFlaskTime = 0L;
+    var fiestaFlaskTime: Long = 0L
 }

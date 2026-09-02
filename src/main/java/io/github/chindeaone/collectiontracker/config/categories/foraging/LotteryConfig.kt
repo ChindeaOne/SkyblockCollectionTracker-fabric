@@ -1,41 +1,37 @@
-package io.github.chindeaone.collectiontracker.config.categories.foraging;
+package io.github.chindeaone.collectiontracker.config.categories.foraging
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class LotteryConfig {
+class LotteryConfig {
+    @Expose
+    @ConfigOption(name = "Better Lottery", desc = "Displays current Lottery perks and compacts Lottery chat messages.")
+    @ConfigEditorBoolean
+    var enableLottery: Boolean = false
+
+    @Expose
+    var lastLotteryBuff: String = ""
 
     @Expose
     @ConfigOption(
-            name = "Better Lottery",
-            desc = "Displays current Lottery perks and compacts Lottery chat messages."
+        name = "Foraging Islands Only",
+        desc = "Allows the Lottery overlay to be rendered only in Foraging Islands."
     )
     @ConfigEditorBoolean
-    public boolean enableLottery = false;
-
-    @Expose
-    public String lastLotteryBuff = "";
+    var lotteryInForagingIslandsOnly: Boolean = true
 
     @Expose
     @ConfigOption(
-            name = "Foraging Islands Only",
-            desc = "Allows the Lottery overlay to be rendered only in Foraging Islands."
+        name = "Disable Lottery chat messages",
+        desc = "Hides Lottery chat messages while displaying perks in the overlay and allowing other mods to process the messages."
     )
     @ConfigEditorBoolean
-    public boolean lotteryInForagingIslandsOnly = true;
+    var disableLotteryChatMessages: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Disable Lottery chat messages",
-            desc = "Hides Lottery chat messages while displaying perks in the overlay and allowing other mods to process the messages."
-    )
-    @ConfigEditorBoolean
-    public boolean disableLotteryChatMessages = false;
-
-    @Expose
-    @ConfigLink(owner = LotteryConfig.class, field = "enableLottery")
-    public Position lotteryPosition = new Position(500, 100);
+    @ConfigLink(owner = LotteryConfig::class, field = "enableLottery")
+    var lotteryPosition: Position = Position(500, 100)
 }

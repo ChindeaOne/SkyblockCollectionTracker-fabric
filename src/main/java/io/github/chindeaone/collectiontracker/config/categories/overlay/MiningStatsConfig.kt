@@ -1,36 +1,31 @@
-package io.github.chindeaone.collectiontracker.config.categories.overlay;
+package io.github.chindeaone.collectiontracker.config.categories.overlay
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.*;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class MiningStatsConfig {
-
+class MiningStatsConfig {
     @Expose
     @ConfigOption(
-            name = "Mining Stats Overlay",
-            desc = "Toggles an overlay for mining stats.\n§eYour mining stats (e.g. Mining Speed, Mining Fortune, etc.) must be §bvisible§e in the Stats widget for this to work."
+        name = "Mining Stats Overlay",
+        desc = "Toggles an overlay for mining stats.\n§eYour mining stats (e.g. Mining Speed, Mining Fortune, etc.) must be §bvisible§e in the Stats widget for this to work."
     )
     @ConfigEditorBoolean
-    public boolean enableMiningStatsOverlay = false;
+    var enableMiningStatsOverlay: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Mining Islands Only",
-            desc = "Allows the overlay to be rendered only in Mining Islands."
-    )
+    @ConfigOption(name = "Mining Islands Only", desc = "Allows the overlay to be rendered only in Mining Islands.")
     @ConfigEditorBoolean
-    public boolean miningStatsOverlayInMiningIslandsOnly = false;
+    var miningStatsOverlayInMiningIslandsOnly: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Show detailed fortune",
-            desc = "Shows the fortune breakdown in the overlay."
-    )
+    @ConfigOption(name = "Show detailed fortune", desc = "Shows the fortune breakdown in the overlay.")
     @ConfigEditorBoolean
-    public boolean showDetailedFortune = false;
+    var showDetailedFortune: Boolean = false
 
     @Expose
-    @ConfigLink(owner = MiningStatsConfig.class, field = "enableMiningStatsOverlay")
-    public Position miningStatsOverlayPosition = new Position(50, 150);
+    @ConfigLink(owner = MiningStatsConfig::class, field = "enableMiningStatsOverlay")
+    var miningStatsOverlayPosition: Position = Position(50, 150)
 }

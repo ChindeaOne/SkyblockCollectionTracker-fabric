@@ -1,59 +1,46 @@
-package io.github.chindeaone.collectiontracker.config.categories.foraging;
+package io.github.chindeaone.collectiontracker.config.categories.foraging
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.categories.Misc;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.categories.Misc
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class AxeAbilityConfig {
-
+class AxeAbilityConfig {
     @Expose
-    @ConfigOption(
-            name = "Ability Display",
-            desc = "Displays current axe ability and remaining duration while active."
-    )
+    @ConfigOption(name = "Ability Display", desc = "Displays current axe ability and remaining duration while active.")
     @ConfigEditorBoolean
-    public boolean displayAxeAbility = false;
+    var displayAxeAbility: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Ability Indicator",
-            desc = "Select a custom ability indicator."
-    )
+    @ConfigOption(name = "Ability Indicator", desc = "Select a custom ability indicator.")
     @ConfigEditorDropdown
-    public Misc.AbilityDisplayIndicator indicator = Misc.AbilityDisplayIndicator.NONE; // Default to none
+    var indicator: Misc.AbilityDisplayIndicator = Misc.AbilityDisplayIndicator.NONE // Default to none
 
     @Expose
     @ConfigOption(
-            name = "Foraging Islands Only",
-            desc = "Allows the axe ability display to be rendered only in Foraging Islands."
+        name = "Foraging Islands Only",
+        desc = "Allows the axe ability display to be rendered only in Foraging Islands."
     )
     @ConfigEditorBoolean
-    public boolean axeAbilityInForagingIslandsOnly = false;
+    var axeAbilityInForagingIslandsOnly: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Show Title",
-            desc = "Shows a title when axe ability is ready."
-    )
+    @ConfigOption(name = "Show Title", desc = "Shows a title when axe ability is ready.")
     @ConfigEditorBoolean
-    public boolean showAxeReadyAbilityTitle = true;
+    var showAxeReadyAbilityTitle: Boolean = true
 
     @Expose
-    @ConfigOption(
-            name = "Show Expired Title",
-            desc = "Shows a title when axe ability expires."
-    )
+    @ConfigOption(name = "Show Expired Title", desc = "Shows a title when axe ability expires.")
     @ConfigEditorBoolean
-    public boolean showAxeExpiredAbilityTitle = true;
+    var showAxeExpiredAbilityTitle: Boolean = true
 
     @Expose
-    public String abilityNameAxe = "";
+    var abilityNameAxe: String = ""
 
     @Expose
-    @ConfigLink(owner = AxeAbilityConfig.class, field = "displayAxeAbility")
-    public Position axeAbilityPosition = new Position(500, 200);
+    @ConfigLink(owner = AxeAbilityConfig::class, field = "displayAxeAbility")
+    var axeAbilityPosition: Position = Position(500, 200)
 }

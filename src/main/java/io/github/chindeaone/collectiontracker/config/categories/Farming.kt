@@ -1,14 +1,13 @@
-package io.github.chindeaone.collectiontracker.config.categories;
+package io.github.chindeaone.collectiontracker.config.categories
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.categories.farmingweight.FarmingweightConfig;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.categories.farmingweight.FarmingweightConfig
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class Farming {
-
+class Farming {
     @Expose
     @ConfigOption(name = "Farming Weight", desc = "")
     @Accordion
-    public FarmingweightConfig farmingweightConfig = new FarmingweightConfig();
+    var farmingweightConfig: FarmingweightConfig = FarmingweightConfig()
 }

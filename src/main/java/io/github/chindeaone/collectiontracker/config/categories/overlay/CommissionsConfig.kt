@@ -1,53 +1,40 @@
-package io.github.chindeaone.collectiontracker.config.categories.overlay;
+package io.github.chindeaone.collectiontracker.config.categories.overlay
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class CommissionsConfig {
+class CommissionsConfig {
+    @Expose
+    @ConfigOption(name = "Enable Commissions Overlay", desc = "Toggles an overlay for mining commissions.")
+    @ConfigEditorBoolean
+    var enableCommissionsOverlay: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Enable Commissions Overlay",
-            desc = "Toggles an overlay for mining commissions."
-    )
+    @ConfigOption(name = "New Commission Title", desc = "Display a title when a new commission is received.")
     @ConfigEditorBoolean
-    public boolean enableCommissionsOverlay = false;
+    var newCommissionTitle: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "New Commission Title",
-            desc = "Display a title when a new commission is received."
-    )
+    @ConfigOption(name = "Completion Notification Title", desc = "Display a title when a commission is completed.")
     @ConfigEditorBoolean
-    public boolean newCommissionTitle = false;
+    var completionTitle: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Completion Notification Title",
-            desc = "Display a title when a commission is completed."
-    )
+    @ConfigOption(name = "Enable Commissions Tracking", desc = "Toggles tracking for mining commissions.")
     @ConfigEditorBoolean
-    public boolean completionTitle = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Enable Commissions Tracking",
-            desc = "Toggles tracking for mining commissions."
-    )
-    @ConfigEditorBoolean
-    public boolean enableCommissionsTracking =  false;
+    var enableCommissionsTracking: Boolean = false
 
     @Expose
     @ConfigOption(name = "Commissions Keybinds", desc = "")
     @Accordion
-    public KeybindConfig keybindConfig = new KeybindConfig();
+    var keybindConfig: KeybindConfig = KeybindConfig()
 
     @Expose
-    @ConfigLink(owner = CommissionsConfig.class, field = "enableCommissionsOverlay")
-    public Position commissionsOverlayPosition = new Position(50, 50);
+    @ConfigLink(owner = CommissionsConfig::class, field = "enableCommissionsOverlay")
+    var commissionsOverlayPosition: Position = Position(50, 50)
 }

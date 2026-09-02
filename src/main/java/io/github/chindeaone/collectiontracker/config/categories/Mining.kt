@@ -1,48 +1,49 @@
-package io.github.chindeaone.collectiontracker.config.categories;
+package io.github.chindeaone.collectiontracker.config.categories
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightConfig;
-import io.github.chindeaone.collectiontracker.config.categories.mining.*;
-import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsConfig;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsConfig;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.Category;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployableConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.TemporaryBuffsConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsConfig
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.Category
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class Mining {
-
+class Mining {
     @Expose
     @ConfigOption(name = "Coleweight", desc = "")
     @Accordion
-    public ColeweightConfig coleweightConfig = new ColeweightConfig();
+    var coleweightConfig: ColeweightConfig = ColeweightConfig()
 
     @Expose
     @ConfigOption(name = "Commissions", desc = "")
     @Accordion
-    public CommissionsConfig commissionsConfig = new CommissionsConfig();
+    var commissionsConfig: CommissionsConfig = CommissionsConfig()
 
     @Expose
     @ConfigOption(name = "Mining Stats Overlay", desc = "")
     @Accordion
-    public MiningStatsConfig miningStatsConfig = new MiningStatsConfig();
+    var miningStatsConfig: MiningStatsConfig = MiningStatsConfig()
 
     @Expose
     @ConfigOption(name = "HotM Perks", desc = "")
     @Accordion
-    public HotmConfig hotmConfig = new HotmConfig();
+    var hotmConfig: HotmConfig = HotmConfig()
 
     @Expose
     @Category(name = "Mining Routes", desc = "")
-    public MiningRoutesConfig miningRoutesConfig = new MiningRoutesConfig();
+    var miningRoutesConfig: MiningRoutesConfig = MiningRoutesConfig()
 
     @Expose
     @ConfigOption(name = "Lantern Deployable", desc = "")
     @Accordion
-    public LanternDeployableConfig lanternDeployableConfig = new LanternDeployableConfig();
+    var lanternDeployableConfig: LanternDeployableConfig = LanternDeployableConfig()
 
     @Expose
     @ConfigOption(name = "Temporary Buffs Tracker", desc = "")
     @Accordion
-    public TemporaryBuffsConfig temporaryBuffsConfig = new TemporaryBuffsConfig();
+    var temporaryBuffsConfig: TemporaryBuffsConfig = TemporaryBuffsConfig()
 }

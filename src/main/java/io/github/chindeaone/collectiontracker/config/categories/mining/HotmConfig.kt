@@ -1,41 +1,36 @@
-package io.github.chindeaone.collectiontracker.config.categories.mining;
+package io.github.chindeaone.collectiontracker.config.categories.mining
 
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.*;
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class HotmConfig {
+class HotmConfig {
+    @Expose
+    @ConfigOption(name = "Professional Mining Speed", desc = "Input your mining speed from Professional perk.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 755f, minStep = 1f)
+    var professionalMS: Int = 0
+
+    @Expose
+    @ConfigOption(name = "Strong Arm Mining Speed", desc = "Input your mining speed from Strong Arm perk.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 505f, minStep = 1f)
+    var strongArmMS: Int = 0
 
     @Expose
     @ConfigOption(
-            name = "Professional Mining Speed",
-            desc = "Input your mining speed from Professional perk."
+        name = "Core Of The Mountain Level",
+        desc = "Input your Core Of The Mountain level.\n§eRequired for more precise pickaxe ability cooldown."
     )
-    @ConfigEditorSlider(minValue = 0, maxValue = 755, minStep = 1)
-    public int professionalMS = 0;
-
-    @Expose
-    @ConfigOption(
-            name = "Strong Arm Mining Speed",
-            desc = "Input your mining speed from Strong Arm perk."
-    )
-    @ConfigEditorSlider(minValue = 0, maxValue = 505, minStep = 1)
-    public int strongArmMS = 0;
-
-    @Expose
-    @ConfigOption(
-            name = "Core Of The Mountain Level",
-            desc = "Input your Core Of The Mountain level.\n§eRequired for more precise pickaxe ability cooldown."
-    )
-    @ConfigEditorSlider(minValue = 0, maxValue = 10, minStep = 1)
-    public int cotmLevel = 0;
+    @ConfigEditorSlider(minValue = 0f, maxValue = 10f, minStep = 1f)
+    var cotmLevel: Int = 0
 
     @Expose
     @ConfigOption(name = "Pickaxe Ability Config", desc = "")
     @Accordion
-    public PickaxeAbilityConfig pickaxeAbilityConfig = new PickaxeAbilityConfig();
+    var pickaxeAbilityConfig: PickaxeAbilityConfig = PickaxeAbilityConfig()
 
     @Expose
     @ConfigOption(name = "Sky Mall Config", desc = "")
     @Accordion
-    public SkyMallConfig skyMallConfig = new SkyMallConfig();
+    var skyMallConfig: SkyMallConfig = SkyMallConfig()
 }

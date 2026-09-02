@@ -1,25 +1,24 @@
-package io.github.chindeaone.collectiontracker.config.categories.coleweight;
+package io.github.chindeaone.collectiontracker.config.categories.coleweight
 
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class HeatmapConfig {
-
+class HeatmapConfig {
     @Expose
     @ConfigOption(
-            name = "Enable Heatmap",
-            desc = "Toggles the Heatmap for Glacite Tunnels.\n§eColor mapping: §2dark green §f> §alight green."
+        name = "Enable Heatmap",
+        desc = "Toggles the Heatmap for Glacite Tunnels.\n§eColor mapping: §2dark green §f> §alight green."
     )
     @ConfigEditorBoolean
-    public boolean enableHeatmap = false;
+    var enableHeatmap: Boolean = false
 
     @Expose
     @ConfigOption(
-            name = "Heatmap Opacity",
-            desc = "Adjust the opacity of the heatmap overlay. (0.0 - fully transparent, 1.0 - fully opaque)"
+        name = "Heatmap Opacity",
+        desc = "Adjust the opacity of the heatmap overlay. (0.0 - fully transparent, 1.0 - fully opaque)"
     )
-    @ConfigEditorSlider(minValue = 0.0f, maxValue = 1.0f, minStep = 0.1f)
-    public float heatmapOpacity = 1.0f;
+    @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.1f)
+    var heatmapOpacity: Float = 1f
 }

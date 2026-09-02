@@ -1,66 +1,59 @@
-package io.github.chindeaone.collectiontracker.config.categories.coleweight;
+package io.github.chindeaone.collectiontracker.config.categories.coleweight
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class ColeweightConfig {
+class ColeweightConfig {
+    @Expose
+    @ConfigOption(
+        name = "Coleweight Ranks in chat",
+        desc = "Enable Coleweight ranks in chat.\n§eNote: If you use Skyhanni's chat formatting, make sure you have at least §bPlayer Name §evisible!"
+    )
+    @ConfigEditorBoolean
+    var coleweightRankingInChat: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Coleweight Ranks in name tag", desc = "Displays Coleweight ranks in the name tag of players.")
+    @ConfigEditorBoolean
+    var coleweightRankInNameTag: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Mining Islands Only", desc = "Show Coleweight ranks in chat only when on the Mining Islands.")
+    @ConfigEditorBoolean
+    var onlyOnMiningIslands: Boolean = false
 
     @Expose
     @ConfigOption(
-            name = "Coleweight Ranks in chat",
-            desc = "Enable Coleweight ranks in chat.\n§eNote: If you use Skyhanni's chat formatting, make sure you have at least §bPlayer Name §evisible!"
+        name = "Coleweight ability format",
+        desc = "Changes ability display and title to use Coleweight's format."
     )
     @ConfigEditorBoolean
-    public boolean coleweightRankingInChat = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Coleweight Ranks in name tag",
-            desc = "Displays Coleweight ranks in the name tag of players."
-    )
-    @ConfigEditorBoolean
-    public boolean coleweightRankInNameTag = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Mining Islands Only",
-            desc = "Show Coleweight ranks in chat only when on the Mining Islands."
-    )
-    @ConfigEditorBoolean
-    public boolean onlyOnMiningIslands = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Coleweight ability format",
-            desc = "Changes ability display and title to use Coleweight's format."
-    )
-    @ConfigEditorBoolean
-    public boolean coleweightAbilityFormat = false;
+    var coleweightAbilityFormat: Boolean = false
 
     @Expose
     @ConfigOption(name = "Custom Coleweight Rank Color", desc = "")
     @Accordion
-    public ColeweightColorConfig coleweightColorConfig = new ColeweightColorConfig();
+    var coleweightColorConfig: ColeweightColorConfig = ColeweightColorConfig()
 
     @Expose
     @ConfigOption(name = "Dwarven Heatmap", desc = "")
     @Accordion
-    public HeatmapConfig heatmapConfig = new HeatmapConfig();
+    var heatmapConfig: HeatmapConfig = HeatmapConfig()
 
     @Expose
     @ConfigOption(name = "Precision Mining", desc = "")
     @Accordion
-    public PrecisionMiningConfig precisionMiningConfig = new PrecisionMiningConfig();
+    var precisionMiningConfig: PrecisionMiningConfig = PrecisionMiningConfig()
 
     @Expose
-    public Position coleweightTimerPosition = new Position(300, 200);
+    var coleweightTimerPosition: Position = Position(300, 200)
 
     @Expose
-    public Position coleweightStopwatchPosition = new Position(300, 250);
+    var coleweightStopwatchPosition: Position = Position(300, 250)
 
     @Expose
-    public Position coleweightTrackerPosition = new Position(400, 200);
+    var coleweightTrackerPosition: Position = Position(400, 200)
 }

@@ -1,20 +1,19 @@
-package io.github.chindeaone.collectiontracker.config.categories;
+package io.github.chindeaone.collectiontracker.config.categories
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig;
-import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsConfig;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsConfig
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class Foraging {
-
+class Foraging {
     @Expose
     @ConfigOption(name = "Foraging Stats Overlay", desc = "")
     @Accordion
-    public ForagingStatsConfig foragingStatsConfig = new ForagingStatsConfig();
+    var foragingStatsConfig: ForagingStatsConfig = ForagingStatsConfig()
 
     @Expose
     @ConfigOption(name = "HotF Perks", desc = "")
     @Accordion
-    public HotfConfig hotfConfig = new HotfConfig();
+    var hotfConfig: HotfConfig = HotfConfig()
 }

@@ -1,91 +1,66 @@
-package io.github.chindeaone.collectiontracker.config.categories;
+package io.github.chindeaone.collectiontracker.config.categories
 
-import com.google.gson.annotations.Expose;
-import io.github.chindeaone.collectiontracker.config.core.Position;
-import io.github.chindeaone.collectiontracker.gui.GuiManager;
-import io.github.notenoughupdates.moulconfig.annotations.*;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.gui.GuiManager
+import io.github.notenoughupdates.moulconfig.annotations.*
 
-public class Misc {
-
-    public enum TitleScale {
+class Misc {
+    @Suppress("unused")
+    enum class TitleScale(val scale: Float) {
         SMALL(0.5f),
         MEDIUM(1.0f),
         LARGE(2.0f),
-        HUGE(3.0f);
-
-        private final float scale;
-
-        TitleScale(float scale) {
-            this.scale = scale;
-        }
-
-        public float getScale() {
-            return scale;
-        }
+        HUGE(3.0f)
     }
 
-    public enum AbilityDisplayIndicator {
+    enum class AbilityDisplayIndicator {
         CROSSHAIR_CIRCLE,
         CROSSHAIR_BAR,
         NONE
     }
 
     @Expose
-    @ConfigOption(
-            name = "Timer precision",
-            desc = "Change how many decimals cooldown and duration will show."
-    )
-    @ConfigEditorSlider(minValue = 0, maxValue = 2, minStep = 1)
-    public int abilityPrecision = 0;
+    @ConfigOption(name = "Timer precision", desc = "Change how many decimals cooldown and duration will show.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 2f, minStep = 1f)
+    var abilityPrecision: Int = 0
+
+    @Expose
+    @ConfigOption(name = "Title Duration", desc = "How long (in seconds) will titles remain on screen.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 8f, minStep = 1f)
+    var titleDisplayTimer: Int = 3
 
     @Expose
     @ConfigOption(
-            name = "Title Duration",
-            desc = "How long (in seconds) will titles remain on screen."
-    )
-    @ConfigEditorSlider(minValue = 1, maxValue = 8, minStep = 1)
-    public int titleDisplayTimer = 3;
-
-    @Expose
-    @ConfigOption(
-            name = "Title Scale",
-            desc = "Change the scale of titles.\n§eSmall = 0.5x, Medium = 1x, Large = 2x, Huge = 3x"
+        name = "Title Scale",
+        desc = "Change the scale of titles.\n§eSmall = 0.5x, Medium = 1x, Large = 2x, Huge = 3x"
     )
     @ConfigEditorDropdown
-    public TitleScale titleScale = TitleScale.MEDIUM; // Default to MEDIUM
+    var titleScale: TitleScale = TitleScale.MEDIUM // Default to MEDIUM
 
-    @ConfigOption(
-            name = "Title Position GUI",
-            desc = "Edit the position of titles."
-    )
+    @ConfigOption(name = "Title Position GUI", desc = "Edit the position of titles.")
     @ConfigEditorButton(buttonText = "Edit")
-    @SuppressWarnings("unused")
-    public Runnable editTitlePosition = GuiManager::openGuiTitlePositionEditor;
+    @Suppress("unused")
+    var editTitlePosition: Runnable = Runnable { GuiManager.openGuiTitlePositionEditor() }
+
+    @Expose
+    @ConfigOption(name = "Ability Cooldown Only", desc = "Only display ability cooldowns.")
+    @ConfigEditorBoolean
+    var abilityCooldownOnly: Boolean = false
 
     @Expose
     @ConfigOption(
-            name = "Ability Cooldown Only",
-            desc = "Only display ability cooldowns."
+        name = "Server Lag Protection",
+        desc = "Prevents ability timers from counting down during server lag.\n§eMight desync timers if you swap lobbies a lot!"
     )
     @ConfigEditorBoolean
-    public boolean abilityCooldownOnly = false;
+    var serverLagProtection: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Server Lag Protection",
-            desc = "Prevents ability timers from counting down during server lag.\n§eMight desync timers if you swap lobbies a lot!"
-    )
+    @ConfigOption(name = "Timer Title", desc = "Shows a title when the timer ends.")
     @ConfigEditorBoolean
-    public boolean serverLagProtection = false;
+    var showTimerTitle: Boolean = false
 
     @Expose
-    @ConfigOption(
-            name = "Timer Title",
-            desc = "Shows a title when the timer ends."
-    )
-    @ConfigEditorBoolean
-    public boolean showTimerTitle = false;
-
-    @Expose
-    public Position titlePosition = new Position(0, 0);
+    var titlePosition: Position = Position(0, 0)
 }
