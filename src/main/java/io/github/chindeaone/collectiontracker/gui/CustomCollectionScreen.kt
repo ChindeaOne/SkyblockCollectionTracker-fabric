@@ -3,8 +3,8 @@ package io.github.chindeaone.collectiontracker.gui
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
+import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
@@ -32,7 +32,7 @@ class CustomCollectionScreen(
 
         collectionList.forEachIndexed { index, s ->
             val yPos = startY + (index * 20)
-            val displayName = TextUtils.formatCollectionName(s)
+            val displayName = formatCollectionName(s)
             val box = CollectionEditBox(
                 font,
                 width / 2 - 25,
@@ -58,7 +58,7 @@ class CustomCollectionScreen(
                 ChatUtils.sendMessage("§eCustom collection values set:")
 
                 values.forEach { (name, value) ->
-                    val displayName = TextUtils.formatCollectionName(name)
+                    val displayName = formatCollectionName(name)
                     val formattedValue = NumbersUtils.formatNumber(value)
                     ChatUtils.sendMessage(" §7- §f$displayName: §a$formattedValue", false)
                 }
@@ -87,7 +87,7 @@ class CustomCollectionScreen(
         )
 
         map.forEach { (name, box) ->
-            val displayName = TextUtils.formatCollectionName(name)
+            val displayName = formatCollectionName(name)
             context.text(
                 font,
                 displayName,

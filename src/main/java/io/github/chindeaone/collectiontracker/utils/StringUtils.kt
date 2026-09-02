@@ -8,7 +8,6 @@ object StringUtils {
     private val formattingChars = "kmolnrKMOLNR".toSet()
     private val colorChars = "abcdefABCDEF0123456789".toSet()
 
-    @JvmStatic
     fun formatBazaarItemName(name: String): String {
         val words = name.split("_".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val formatted = java.lang.StringBuilder()
@@ -22,6 +21,21 @@ object StringUtils {
             }
         }
         return formatted.toString()
+    }
+
+    fun formatCollectionName(collection: String): String {
+        val words = collection.split("[\\s_]+".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val formattedName = StringBuilder()
+
+        for (i in words.indices) {
+            val word = words[i]
+            if (i == 0) {
+                formattedName.append(word.substring(0, 1).uppercase()).append(word.substring(1).lowercase())
+            } else {
+                formattedName.append(" ").append(word.lowercase())
+            }
+        }
+        return formattedName.toString()
     }
 
     fun normalizeText(s: String) = s
@@ -107,6 +121,11 @@ object StringUtils {
 
     fun formatFloatOrPlaceholder(value: Float): String {
         return if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
+    }
+
+    @JvmStatic
+    fun formatNumberOrPlaceholder(value: Long): String {
+        return if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
     }
 
     // Method taken from Skyhanni

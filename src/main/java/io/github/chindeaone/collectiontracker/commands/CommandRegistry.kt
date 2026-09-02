@@ -117,7 +117,7 @@ object CommandRegistry {
                 .suggests(COLLECTION_SUGGESTIONS)
                 .executes { it ->
                     val input = StringArgumentType.getString(it, "collection").trim()
-                    val collections = CollectionsManager.getAllCollections()
+                    val collections = CollectionsManager.allCollections
                         .sortedByDescending { it.length } // Sort by length to match longer names first
                     val foundCollections = mutableListOf<String>()
 
@@ -678,7 +678,7 @@ object CommandRegistry {
             }
         }
 
-        for (c in CollectionsManager.getAllCollections()) {
+        for (c in CollectionsManager.allCollections) {
             val matches = c
                 .lowercase()
                 .split("\\s+")
@@ -749,7 +749,7 @@ object CommandRegistry {
     private fun getAllCollectionAndSkillNames(): List<String> {
         val names = mutableListOf<String>()
 
-        names.addAll(CollectionsManager.getAllCollections())
+        names.addAll(CollectionsManager.allCollections)
         names.addAll(SkillUtils.getDisplayNames())
 
         return names.distinct()

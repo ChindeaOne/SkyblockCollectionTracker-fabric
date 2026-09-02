@@ -13,9 +13,9 @@ import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderMultiTrackingStringsWithColor
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
@@ -87,11 +87,11 @@ class MultiCollectionOverlay : AbstractOverlay() {
         lastExpandedHash = expandedHash
 
         val newLines = mutableListOf<String>()
-        TextUtils.updateMultiTrackingLines(newLines, expandedCollections, isChatOpened)
+        CollectionParser.updateMultiTrackingLines(newLines, expandedCollections, isChatOpened)
         newLines.add("Uptime: $uptime")
 
         if (isChatOpened) {
-            TextUtils.addToggleableSettingsLines(newLines)
+            CollectionParser.addToggleableSettingsLines(newLines)
         }
 
         cachedLines = newLines

@@ -17,7 +17,7 @@ object FetchGemstoneList {
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val json = JsonParser.parseString(response.body()).asJsonObject
-                    GemstonesManager.gemstones = json.keySet().toTypedArray()
+                    GemstonesManager.gemstones = json.keySet().toMutableList()
 
                     hasGemstoneList = true
                     logger.info("[SCT]: Successfully received the gemstone list.")

@@ -261,13 +261,10 @@ object ConfigAccess {
 
     fun getKeybindConfig(): KeybindConfig = keybindConfig
 
-    @JvmStatic
     fun getBazaarType(): Bazaar.BazaarType = bazaarType
 
-    @JvmStatic
     fun getGemstoneVariant(): Bazaar.GemstoneVariant = gemstoneVariant
 
-    @JvmStatic
     fun isUsingBazaar(): Boolean = useBazaar
 
     fun hasCheckedUpdate(): Boolean = hasCheckedUpdate
@@ -292,20 +289,16 @@ object ConfigAccess {
 
     fun isMiningStatsOverlayInMiningIslandsOnly(): Boolean = miningStatsOverlayInMiningIslandsOnly
 
-    @JvmStatic
     fun getStatsText(): List<CollectionConfig.OverlayText> = statsText
 
-    @JvmStatic
     fun isShowExtraStats(): Boolean = showExtraStats
 
-    @JvmStatic
     fun getExtraStatsText(): List<CollectionConfig.OverlayExtraText> = extraStatsText
 
     fun isExplicitValues(): Boolean = explicitValues
 
     fun isTamingTrackingEnabled(): Boolean = enableTamingTracking
 
-    @JvmStatic
     fun getBazaarPriceType(): Bazaar.BazaarPriceType = bazaarPriceType
 
     fun isColeweightRankingInChat(): Boolean = coleweightRankingInChat
@@ -456,7 +449,6 @@ object ConfigAccess {
 
     fun isDrawLineToPrecisionMiningEnabled(): Boolean = drawLineToPrecisionMining
 
-    @JvmStatic
     fun getTrackingOptions(): MultiCollectionConfig.TrackingOptions = trackingOptions
 
     fun isMultiTrackingSummaryEnabled(): Boolean = multiTrackingSummary
@@ -465,19 +457,14 @@ object ConfigAccess {
 
     fun getSummaryStats(): MultiCollectionConfig.SummaryStats = summaryStats
 
-    @JvmStatic
     fun isCollectionLeaderboardEnabled(): Boolean = collectionLeaderboard
 
-    @JvmStatic
     fun isSkillLeaderboardEnabled(): Boolean = skillLeaderboard
 
-    @JvmStatic
     fun isPreviousPositionEnabled(): Boolean = previousPosition
 
-    @JvmStatic
     fun isIncludeWipedProfilesEnabled(): Boolean = includeWipedProfiles
 
-    @JvmStatic
     fun isCustomPositionEnabled(): Boolean = customPosition
 
     fun getCustomGoals(): Map<String, Int> = customGoals
@@ -492,7 +479,6 @@ object ConfigAccess {
  */
 object ConfigHelper {
 
-    @JvmStatic
     fun setBazaarType(type: Bazaar.BazaarType) {
         bazaarConfig.bazaarType = type
     }

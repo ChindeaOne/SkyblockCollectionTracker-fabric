@@ -1,119 +1,100 @@
-package io.github.chindeaone.collectiontracker.collections.prices;
+package io.github.chindeaone.collectiontracker.collections.prices
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager;
+import com.google.gson.JsonParser
+import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 
-import java.util.HashMap;
-import java.util.Map;
+object GemstonePrices {
+    var gemstoneInstantBuyPrices: MutableMap<String, Float> = mutableMapOf()
+    var gemstoneInstantSellPrices: MutableMap<String, Float> = mutableMapOf()
+    var recipes: MutableMap<String, Int> = mutableMapOf()
 
-public class GemstonePrices {
+    var multiGemstoneInstantBuyPrices: MutableMap<String, MutableMap<String, Float>> = mutableMapOf()
+    var multiGemstoneInstantSellPrices: MutableMap<String, MutableMap<String, Float>> = mutableMapOf()
+    var multiGemstoneRecipes: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
 
-    public static Map<String, Float> gemstoneInstantBuyPrices = new HashMap<>();
-    public static Map<String, Float> gemstoneInstantSellPrices = new HashMap<>();
-    public static Map<String, Integer> recipes = new HashMap<>();
+    fun setPrices(json: String) {
+        val jsonObject = JsonParser.parseString(json).getAsJsonObject()
+        val instantSell = jsonObject.getAsJsonObject("INSTANT_SELL")
+        val instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY")
 
-    public static Map<String, Map<String, Float>> multiGemstoneInstantBuyPrices = new HashMap<>();
-    public static Map<String, Map<String, Float>> multiGemstoneInstantSellPrices = new HashMap<>();
-    public static Map<String, Map<String, Integer>> multiGemstoneRecipes = new HashMap<>();
-
-    public static void setPrices(String json) {
-        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        JsonObject instantSell = jsonObject.getAsJsonObject("INSTANT_SELL");
-        JsonObject instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY");
-
-        gemstoneInstantSellPrices.clear();
-        for (Map.Entry<String, JsonElement> entry : instantSell.entrySet()) {
-            gemstoneInstantSellPrices.put(entry.getKey(), entry.getValue().getAsFloat());
+        gemstoneInstantSellPrices.clear()
+        for (entry in instantSell.entrySet()) {
+            gemstoneInstantSellPrices[entry.key] = entry.value.asFloat
         }
 
-        gemstoneInstantBuyPrices.clear();
-        for (Map.Entry<String, JsonElement> entry : instantBuy.entrySet()) {
-            gemstoneInstantBuyPrices.put(entry.getKey(), entry.getValue().getAsFloat());
+        gemstoneInstantBuyPrices.clear()
+        for (entry in instantBuy.entrySet()) {
+            gemstoneInstantBuyPrices[entry.key] = entry.value.asFloat
         }
 
-        setRecipes();
-        BazaarCollectionsManager.hasBazaarData = true;
+        setRecipes()
+        BazaarCollectionsManager.hasBazaarData = true
     }
 
-    public static void setPrices(String collection, String json) {
-        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        JsonObject instantSell = jsonObject.getAsJsonObject("INSTANT_SELL");
-        JsonObject instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY");
+    fun setPrices(collection: String, json: String) {
+        val jsonObject = JsonParser.parseString(json).getAsJsonObject()
+        val instantSell = jsonObject.getAsJsonObject("INSTANT_SELL")
+        val instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY")
 
-        Map<String, Float> sellPrices = new HashMap<>();
-        for (Map.Entry<String, JsonElement> entry : instantSell.entrySet()) {
-            sellPrices.put(entry.getKey(), entry.getValue().getAsFloat());
+        val sellPrices: MutableMap<String, Float> = mutableMapOf()
+        for (entry in instantSell.entrySet()) {
+            sellPrices[entry.key] = entry.value.asFloat
         }
-        multiGemstoneInstantSellPrices.put(collection, sellPrices);
+        multiGemstoneInstantSellPrices[collection] = sellPrices
 
-        Map<String, Float> buyPrices = new HashMap<>();
-        for (Map.Entry<String, JsonElement> entry : instantBuy.entrySet()) {
-            buyPrices.put(entry.getKey(), entry.getValue().getAsFloat());
+        val buyPrices: MutableMap<String, Float> = mutableMapOf()
+        for (entry in instantBuy.entrySet()) {
+            buyPrices[entry.key] = entry.value.asFloat
         }
-        multiGemstoneInstantBuyPrices.put(collection, buyPrices);
+        multiGemstoneInstantBuyPrices[collection] = buyPrices
 
-        setRecipes(collection, sellPrices);
-        BazaarCollectionsManager.hasBazaarData = true;
+        setRecipes(collection, sellPrices)
+        BazaarCollectionsManager.hasBazaarData = true
     }
 
-    private static void setRecipes() {
-        recipes.clear();
-        for (String key : gemstoneInstantSellPrices.keySet()) {
-            int amount = 0;
-            if (key.contains("ROUGH")) {
-                amount = 1;
-            } else if (key.contains("FLAWED")) {
-                amount = 80;
-            } else if (key.contains("FINE")) {
-                amount = 80 * 80;
-            } else if (key.contains("FLAWLESS")) {
-                amount = 80 * 80 * 80;
-            } else if (key.contains("PERFECT")) {
-                amount = 5 * 80 * 80 * 80;
+    private fun setRecipes() {
+        recipes.clear()
+        for (key in gemstoneInstantSellPrices.keys) {
+            var amount = 0
+            when {
+                key.contains("ROUGH") -> amount = 1
+                key.contains("FLAWED") -> amount = 80
+                key.contains("FINE") -> amount = 80 * 80
+                key.contains("FLAWLESS") -> amount = 80 * 80 * 80
+                key.contains("PERFECT") -> amount = 5 * 80 * 80 * 80
             }
-            recipes.put(key, amount);
+            recipes[key] = amount
         }
     }
 
-    private static void setRecipes(String collection, Map<String, Float> sellPrices) {
-        Map<String, Integer> recipesPerColl = new HashMap<>();
-        for (String key : sellPrices.keySet()) {
-            int amount = 0;
-            if (key.contains("ROUGH")) {
-                amount = 1;
-            } else if (key.contains("FLAWED")) {
-                amount = 80;
-            } else if (key.contains("FINE")) {
-                amount = 80 * 80;
-            } else if (key.contains("FLAWLESS")) {
-                amount = 80 * 80 * 80;
-            } else if (key.contains("PERFECT")) {
-                amount = 5 * 80 * 80 * 80;
+    private fun setRecipes(collection: String, sellPrices: MutableMap<String, Float>) {
+        val recipesPerColl: MutableMap<String, Int> = mutableMapOf()
+        for (key in sellPrices.keys) {
+            var amount = 0
+            when {
+                key.contains("ROUGH") -> amount = 1
+                key.contains("FLAWED") -> amount = 80
+                key.contains("FINE") -> amount = 80 * 80
+                key.contains("FLAWLESS") -> amount = 80 * 80 * 80
+                key.contains("PERFECT") -> amount = 5 * 80 * 80 * 80
             }
 
-            if (amount != 0) {
-                recipesPerColl.put(key, amount);
-            }
+            if (amount != 0) recipesPerColl[key] = amount
+
         }
-        multiGemstoneRecipes.put(collection, recipesPerColl);
+        multiGemstoneRecipes[collection] = recipesPerColl
     }
 
-    public static float getInstantBuyPrice(String gemstoneVariant) {
-        return gemstoneInstantBuyPrices.getOrDefault(gemstoneVariant, 0.0f);
-    }
+    fun getInstantBuyPrice(gemstoneVariant: String): Float = gemstoneInstantBuyPrices.getOrDefault(gemstoneVariant, 0.0f)
 
-    public static float getInstantSellPrice(String gemstoneVariant) {
-        return gemstoneInstantSellPrices.getOrDefault(gemstoneVariant, 0.0f);
-    }
+    fun getInstantSellPrice(gemstoneVariant: String): Float = gemstoneInstantSellPrices.getOrDefault(gemstoneVariant, 0.0f)
 
-    public static void resetPrices() {
-        gemstoneInstantBuyPrices.clear();
-        gemstoneInstantSellPrices.clear();
-        recipes.clear();
-        multiGemstoneInstantBuyPrices.clear();
-        multiGemstoneInstantSellPrices.clear();
-        multiGemstoneRecipes.clear();
+    fun resetPrices() {
+        gemstoneInstantBuyPrices.clear()
+        gemstoneInstantSellPrices.clear()
+        recipes.clear()
+        multiGemstoneInstantBuyPrices.clear()
+        multiGemstoneInstantSellPrices.clear()
+        multiGemstoneRecipes.clear()
     }
 }

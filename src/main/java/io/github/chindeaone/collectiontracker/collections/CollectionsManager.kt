@@ -1,70 +1,67 @@
-package io.github.chindeaone.collectiontracker.collections;
+package io.github.chindeaone.collectiontracker.collections
 
-import io.github.chindeaone.collectiontracker.commands.CollectionTracker;
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList
 
-import java.util.*;
+object CollectionsManager {
+    var collections = linkedMapOf<String, Set<String>>()
+    var collectionSource: String? = null
+    var collectionType: String? = null
 
-public class CollectionsManager {
+    var multiCollectionSource: MutableList<String> = mutableListOf()
+    var multiCollectionTypes: MutableMap<String, String> = mutableMapOf()
 
-    public static Map<String, Set<String>> collections = new LinkedHashMap<>();
-    public static String collectionSource;
-    public static String collectionType;
-
-    public static List<String> multiCollectionSource = new LinkedList<>();
-    public static Map<String, String> multiCollectionTypes = new HashMap<>();
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean isValidCollection(String collectionName) {
-        for (Set<String> collectionSet : collections.values()) {
+    fun isValidCollection(collectionName: String): Boolean {
+        for (collectionSet in collections.values) {
             if (collectionSet.contains(collectionName)) {
-                return true;
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public static boolean isCollection(String collectionName) {
-        for (Map.Entry<String, Set<String>> entry : collections.entrySet()) {
-            if (!entry.getKey().equals("Miscellaneous") && entry.getValue().contains(collectionName)) {
-                return true;
+    fun isCollection(collectionName: String): Boolean {
+        for (entry in collections.entries) {
+            if (entry.key != "Miscellaneous" && entry.value.contains(collectionName)) {
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public static List<String> getAllCollections() {
-        List<String> allCollections = new LinkedList<>();
-        for (Set<String> collectionSet : collections.values()) {
-            allCollections.addAll(collectionSet);
+    val allCollections: MutableList<String>
+        get() {
+            val allCollections: MutableList<String> = mutableListOf()
+            for (collectionSet in collections.values) {
+                allCollections.addAll(collectionSet)
+            }
+            return allCollections
         }
-        return allCollections;
-    }
 
-    public static boolean isRiftCollection(String collectionName) {
+    fun isRiftCollection(collectionName: String): Boolean {
         return collections
-                .getOrDefault("Rift", Collections.emptySet())
-                .contains(collectionName);
+            .getOrDefault("Rift", mutableSetOf())
+            .contains(collectionName)
     }
 
-    public static boolean hasAnyRiftCollection() {
-        Set<String> riftCollections = collections.getOrDefault("Rift", Collections.emptySet());
+    fun hasAnyRiftCollection(): Boolean {
+        val riftCollections = collections.getOrDefault("Rift", mutableSetOf())
 
-        return CollectionTracker.getCollectionList().stream().anyMatch(riftCollections::contains);
+        return collectionList.stream().anyMatch { o: String? -> riftCollections.contains(o) }
     }
 
-    public static boolean hasAllRiftCollections() {
-        Set<String> riftCollections = collections.getOrDefault("Rift", Collections.emptySet());
+    fun hasAllRiftCollections(): Boolean {
+        val riftCollections = collections.getOrDefault("Rift", mutableSetOf())
 
-        return riftCollections.containsAll(CollectionTracker.getCollectionList());
+        return riftCollections.containsAll(collectionList)
     }
 
-    public static void resetCollections() {
-        collectionSource = null;
-        collectionType = null;
+    fun resetCollections() {
+        collectionSource = null
+        collectionType = null
     }
 
-    public static void resetMultiCollections() {
-        multiCollectionSource.clear();
-        multiCollectionTypes.clear();
+    fun resetMultiCollections() {
+        multiCollectionSource.clear()
+        multiCollectionTypes.clear()
     }
 }

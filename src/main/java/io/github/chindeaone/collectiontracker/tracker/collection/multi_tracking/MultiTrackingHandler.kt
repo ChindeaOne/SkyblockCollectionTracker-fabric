@@ -17,7 +17,7 @@ import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils.formatCollectionName
+import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
 import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger

@@ -83,8 +83,8 @@ object SacksTrackingManager {
             val type = CollectionsManager.multiCollectionTypes[coll] ?: continue // gemstones
 
             var totalAmount = 0L
-            val normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.multiEnchantedRecipes.getOrDefault(coll, mapOf<String, Int>()), false, coll)
-            val normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.multiSuperEnchantedRecipes.getOrDefault(coll, mapOf<String, Int>()), true, coll)
+            val normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.multiEnchantedRecipes.getOrDefault(coll, mapOf()), false, coll)
+            val normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.multiSuperEnchantedRecipes.getOrDefault(coll, mapOf()), true, coll)
 
             for (entry in sacksDetails.entries) {
                 val itemName = entry.key
@@ -126,12 +126,10 @@ object SacksTrackingManager {
                     generalGemstoneGains += gain
 
                     var gemstoneType: String? = null
-                    if (GemstonesManager.gemstones != null) {
-                        for (gem in GemstonesManager.gemstones) {
-                            if (itemName.contains(gem.lowercase())) {
-                                gemstoneType = gem.lowercase()
-                                break
-                            }
+                    for (gem in GemstonesManager.gemstones) {
+                        if (itemName.contains(gem.lowercase())) {
+                            gemstoneType = gem.lowercase()
+                            break
                         }
                     }
                     if (gemstoneType != null) {

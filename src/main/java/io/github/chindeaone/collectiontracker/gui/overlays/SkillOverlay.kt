@@ -9,9 +9,9 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
+import io.github.chindeaone.collectiontracker.utils.StringUtils.formatNumberOrPlaceholder
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderSkillStringsWithTaming
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class SkillOverlay : AbstractOverlay() {
@@ -156,9 +156,9 @@ class SkillOverlay : AbstractOverlay() {
             } else " [#$currentSkillRank]"
         }
         newSkillLines.add("$currentSkill Level: " + formatNumber(currentSkillLvl.toLong()) + rankSuffix)
-        newSkillLines.add("Total $currentSkill XP: " + TextUtils.formatNumberOrPlaceholder(currentTotalXp))
-        newSkillLines.add("XP (Session): " + TextUtils.formatNumberOrPlaceholder(currentSkillGained))
-        newSkillLines.add("XP/h: " + TextUtils.formatNumberOrPlaceholder(currentSkillPerHour))
+        newSkillLines.add("Total $currentSkill XP: " + formatNumberOrPlaceholder(currentTotalXp))
+        newSkillLines.add("XP (Session): " + formatNumberOrPlaceholder(currentSkillGained))
+        newSkillLines.add("XP/h: " + formatNumberOrPlaceholder(currentSkillPerHour))
 
         addLeaderboardLines(
             newSkillLines,
@@ -181,9 +181,9 @@ class SkillOverlay : AbstractOverlay() {
                 } else " [#$currentTamingRank]"
             }
             newTamingLines.add("Taming Level: " + formatNumber(currentTamingLvl.toLong()) + tamingRankSuffix)
-            newTamingLines.add("Total Taming XP: " + TextUtils.formatNumberOrPlaceholder(currentTamingTotalXp))
-            newTamingLines.add("XP (Session): " + TextUtils.formatNumberOrPlaceholder(currentTamingGained))
-            newTamingLines.add("XP/h: " + TextUtils.formatNumberOrPlaceholder(currentTamingPerHour))
+            newTamingLines.add("Total Taming XP: " + formatNumberOrPlaceholder(currentTamingTotalXp))
+            newTamingLines.add("XP (Session): " + formatNumberOrPlaceholder(currentTamingGained))
+            newTamingLines.add("XP/h: " + formatNumberOrPlaceholder(currentTamingPerHour))
 
             addLeaderboardLines(
                 newTamingLines,

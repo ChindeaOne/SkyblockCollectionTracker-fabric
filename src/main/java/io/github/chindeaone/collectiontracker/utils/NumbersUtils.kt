@@ -6,7 +6,6 @@ object NumbersUtils {
 
     private val UNITS = arrayOf("", "k", "M", "B", "T")
 
-    @JvmStatic
     fun formatNumber(number: Long): String {
         if (number == 0L) return "0"
 

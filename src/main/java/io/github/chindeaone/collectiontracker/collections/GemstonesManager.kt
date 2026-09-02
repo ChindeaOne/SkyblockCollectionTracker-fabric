@@ -1,16 +1,15 @@
-package io.github.chindeaone.collectiontracker.collections;
+package io.github.chindeaone.collectiontracker.collections
 
 
-public class GemstonesManager {
+object GemstonesManager {
+    var gemstones: MutableList<String> = mutableListOf()
 
-    public static String[] gemstones;
-
-    public static boolean checkIfGemstone(String collectionName) {
-        for(String gemstone : gemstones) {
-            if (collectionName.equalsIgnoreCase(gemstone)) {
-                return true;
+    fun checkIfGemstone(collectionName: String): Boolean {
+        for (gemstone in gemstones) {
+            if (collectionName.equals(gemstone, ignoreCase = true)) {
+                return true
             }
         }
-        return false;
+        return false
     }
 }

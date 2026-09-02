@@ -14,8 +14,8 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper.setShowExtraSt
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.TextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
@@ -99,19 +99,19 @@ class CollectionOverlay : AbstractOverlay() {
         lastGemVariant = gemVariant
 
         val main = mutableListOf<String>()
-        TextUtils.updateTrackingLines(main)
+        CollectionParser.updateTrackingLines(main)
         if (main.isNotEmpty()) {
             main.add("Uptime: $uptime")
             if (!showExtra && isChatOpened) {
-                TextUtils.addToggleableSettingsLines(main)
+                CollectionParser.addToggleableSettingsLines(main)
             }
         }
 
         val extra = mutableListOf<String>()
         if (showExtra) {
-            TextUtils.updateTrackingExtraLines(extra)
+            CollectionParser.updateTrackingExtraLines(extra)
             if (isChatOpened) {
-                TextUtils.addToggleableSettingsLines(extra)
+                CollectionParser.addToggleableSettingsLines(extra)
             }
         }
 

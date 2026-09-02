@@ -1,110 +1,103 @@
-package io.github.chindeaone.collectiontracker.collections.prices;
+package io.github.chindeaone.collectiontracker.collections.prices
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.JsonParser
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+object BazaarPrices {
+    var normalInstantBuy: Float = 0.0f
+    var normalInstantSell: Float = 0.0f
+    var enchantedInstantBuy: Float = 0.0f
+    var enchantedInstantSell: Float = 0.0f
+    var superEnchantedInstantBuy: Float = 0.0f
+    var superEnchantedInstantSell: Float = 0.0f
 
-public class BazaarPrices {
+    val multiNormalInstantBuy: MutableMap<String, Float> = mutableMapOf()
+    val multiNormalInstantSell: MutableMap<String, Float> = mutableMapOf()
+    val multiEnchantedInstantBuy: MutableMap<String, Float> = mutableMapOf()
+    val multiEnchantedInstantSell: MutableMap<String, Float> = mutableMapOf()
+    val multiSuperEnchantedInstantBuy: MutableMap<String, Float> = mutableMapOf()
+    val multiSuperEnchantedInstantSell: MutableMap<String, Float> = mutableMapOf()
 
-    public static float normalInstantBuy = 0.0f;
-    public static float normalInstantSell = 0.0f;
-    public static float enchantedInstantBuy = 0.0f;
-    public static float enchantedInstantSell = 0.0f;
-    public static float superEnchantedInstantBuy = 0.0f;
-    public static float superEnchantedInstantSell = 0.0f;
+    fun setPrices(json: String, type: String) {
+        val jsonObject = JsonParser.parseString(json).getAsJsonObject()
 
-    public static final Map<String, Float> multiNormalInstantBuy = new HashMap<>();
-    public static final Map<String, Float> multiNormalInstantSell = new HashMap<>();
-    public static final Map<String, Float> multiEnchantedInstantBuy = new HashMap<>();
-    public static final Map<String, Float> multiEnchantedInstantSell = new HashMap<>();
-    public static final Map<String, Float> multiSuperEnchantedInstantBuy = new HashMap<>();
-    public static final Map<String, Float> multiSuperEnchantedInstantSell = new HashMap<>();
-
-    public static void setPrices(String json, String type) {
-        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-
-        if (type.equals("normal")) {
+        if (type == "normal") {
             // normal: { "ITEM_ID": { "INSTANT_BUY": 25498.465, "INSTANT_SELL": 24380.9 } }
-            for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-                JsonObject prices = entry.getValue().getAsJsonObject();
-                normalInstantBuy = prices.get("INSTANT_BUY").getAsFloat();
-                normalInstantSell = prices.get("INSTANT_SELL").getAsFloat();
-                break; // Should only be one item
+            for (entry in jsonObject.entrySet()) {
+                val prices = entry.value.getAsJsonObject()
+                normalInstantBuy = prices.get("INSTANT_BUY").asFloat
+                normalInstantSell = prices.get("INSTANT_SELL").asFloat
+                break // Should only be one item
             }
-        } else if (type.equals("enchanted")) {
+        } else if (type == "enchanted") {
             // enchanted: { "INSTANT_SELL": { "ENCHANTED_GOLD": 486.3, "ENCHANTED_GOLD_BLOCK": 83085.2 }, "INSTANT_BUY": { ... } }
-            JsonObject instantSell = jsonObject.getAsJsonObject("INSTANT_SELL");
-            JsonObject instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY");
+            val instantSell = jsonObject.getAsJsonObject("INSTANT_SELL")
+            val instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY")
 
-            Iterator<Map.Entry<String, JsonElement>> sellIterator = instantSell.entrySet().iterator();
-            Iterator<Map.Entry<String, JsonElement>> buyIterator = instantBuy.entrySet().iterator();
-
-            if (sellIterator.hasNext()) {
-                enchantedInstantSell = sellIterator.next().getValue().getAsFloat();
-            }
-            if (buyIterator.hasNext()) {
-                enchantedInstantBuy = buyIterator.next().getValue().getAsFloat();
-            }
+            val sellIterator = instantSell.entrySet().iterator()
+            val buyIterator = instantBuy.entrySet().iterator()
 
             if (sellIterator.hasNext()) {
-                superEnchantedInstantSell = sellIterator.next().getValue().getAsFloat();
+                enchantedInstantSell = sellIterator.next().value.asFloat
             }
             if (buyIterator.hasNext()) {
-                superEnchantedInstantBuy = buyIterator.next().getValue().getAsFloat();
+                enchantedInstantBuy = buyIterator.next().value.asFloat
+            }
+
+            if (sellIterator.hasNext()) {
+                superEnchantedInstantSell = sellIterator.next().value.asFloat
+            }
+            if (buyIterator.hasNext()) {
+                superEnchantedInstantBuy = buyIterator.next().value.asFloat
             }
         }
     }
 
-    public static void setPrices(String collection, String json, String type) {
-        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+    fun setPrices(collection: String, json: String, type: String) {
+        val jsonObject = JsonParser.parseString(json).getAsJsonObject()
 
-        if (type.equals("normal")) {
-            for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-                JsonObject prices = entry.getValue().getAsJsonObject();
-                multiNormalInstantBuy.put(collection, prices.get("INSTANT_BUY").getAsFloat());
-                multiNormalInstantSell.put(collection, prices.get("INSTANT_SELL").getAsFloat());
-                break;
+        if (type == "normal") {
+            for (entry in jsonObject.entrySet()) {
+                val prices = entry.value.getAsJsonObject()
+                multiNormalInstantBuy[collection] = prices.get("INSTANT_BUY").asFloat
+                multiNormalInstantSell[collection] = prices.get("INSTANT_SELL").asFloat
+                break
             }
-        } else if (type.equals("enchanted")) {
-            JsonObject instantSell = jsonObject.getAsJsonObject("INSTANT_SELL");
-            JsonObject instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY");
+        } else if (type == "enchanted") {
+            val instantSell = jsonObject.getAsJsonObject("INSTANT_SELL")
+            val instantBuy = jsonObject.getAsJsonObject("INSTANT_BUY")
 
-            Iterator<Map.Entry<String, JsonElement>> sellIterator = instantSell.entrySet().iterator();
-            Iterator<Map.Entry<String, JsonElement>> buyIterator = instantBuy.entrySet().iterator();
-
-            if (sellIterator.hasNext()) {
-                multiEnchantedInstantSell.put(collection, sellIterator.next().getValue().getAsFloat());
-            }
-            if (buyIterator.hasNext()) {
-                multiEnchantedInstantBuy.put(collection, buyIterator.next().getValue().getAsFloat());
-            }
+            val sellIterator = instantSell.entrySet().iterator()
+            val buyIterator = instantBuy.entrySet().iterator()
 
             if (sellIterator.hasNext()) {
-                multiSuperEnchantedInstantSell.put(collection, sellIterator.next().getValue().getAsFloat());
+                multiEnchantedInstantSell[collection] = sellIterator.next().value.asFloat
             }
             if (buyIterator.hasNext()) {
-                multiSuperEnchantedInstantBuy.put(collection, buyIterator.next().getValue().getAsFloat());
+                multiEnchantedInstantBuy[collection] = buyIterator.next().value.asFloat
+            }
+
+            if (sellIterator.hasNext()) {
+                multiSuperEnchantedInstantSell[collection] = sellIterator.next().value.asFloat
+            }
+            if (buyIterator.hasNext()) {
+                multiSuperEnchantedInstantBuy[collection] = buyIterator.next().value.asFloat
             }
         }
     }
 
-    public static void resetPrices() {
-        normalInstantBuy = 0.0f;
-        normalInstantSell = 0.0f;
-        enchantedInstantBuy = 0.0f;
-        enchantedInstantSell = 0.0f;
-        superEnchantedInstantBuy = 0.0f;
-        superEnchantedInstantSell = 0.0f;
+    fun resetPrices() {
+        normalInstantBuy = 0.0f
+        normalInstantSell = 0.0f
+        enchantedInstantBuy = 0.0f
+        enchantedInstantSell = 0.0f
+        superEnchantedInstantBuy = 0.0f
+        superEnchantedInstantSell = 0.0f
 
-        multiNormalInstantBuy.clear();
-        multiNormalInstantSell.clear();
-        multiEnchantedInstantBuy.clear();
-        multiEnchantedInstantSell.clear();
-        multiSuperEnchantedInstantBuy.clear();
-        multiSuperEnchantedInstantSell.clear();
+        multiNormalInstantBuy.clear()
+        multiNormalInstantSell.clear()
+        multiEnchantedInstantBuy.clear()
+        multiEnchantedInstantSell.clear()
+        multiSuperEnchantedInstantBuy.clear()
+        multiSuperEnchantedInstantSell.clear()
     }
 }

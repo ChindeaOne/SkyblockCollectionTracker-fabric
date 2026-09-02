@@ -68,7 +68,7 @@ object MultiTrackingRates {
 
                 // Initialize NPC money maps for gemstones
                 if (coll == "gemstone") {
-                    GemstonesManager.gemstones?.forEach { gemstoneType ->
+                    GemstonesManager.gemstones.forEach { gemstoneType ->
                         val gemstoneKey = gemstoneType.lowercase()
                         GemstonePrices.multiGemstoneRecipes[gemstoneKey]?.keys?.forEach { tier ->
                             val keyPrefix = (gemstoneType + "_" + tier).uppercase()
