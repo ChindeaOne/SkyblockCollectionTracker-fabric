@@ -503,16 +503,8 @@ object ConfigHelper {
         commissionsConfig.enableCommissionsOverlay = false
     }
 
-    fun disableMiningStats() {
-        miningConfig.miningStatsConfig.enableMiningStatsOverlay = false
-    }
-
     fun disableTamingTracking() {
         skillConfig.enableTamingTracking = false
-    }
-
-    fun disableForagingStats() {
-        foragingStatsConfig.enableForagingStatsOverlay = false
     }
 
     fun disableCollectionLeaderboardTracking() {
