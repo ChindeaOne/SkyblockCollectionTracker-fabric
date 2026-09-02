@@ -39,7 +39,7 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.notenoughupdates.moulconfig.ChromaColour
 
 /**
- * Global accessors for the configuration.
+ * Global accessors for configs
  */
 val modConfig: ModConfig get() = SkyblockCollectionTracker.configManager.config ?: throw IllegalStateException("[SCT]: Config not initialized.")
 
@@ -217,59 +217,42 @@ val abilityCooldownOnly: Boolean get() = miscConfig.abilityCooldownOnly
 val showTimerTitle: Boolean get() = miscConfig.showTimerTitle
 
 /**
- * Accessors for configuration sections.
+ * Accessors for configs
  */
 object ConfigAccess {
 
-    @JvmStatic
     fun getTrackingPosition(): Position = trackingPosition
 
-    @JvmStatic
     fun getMiningStatsPosition(): Position = miningStatsPosition
 
-    @JvmStatic
     fun getForagingStatsPosition(): Position = foragingStatsPosition
 
-    @JvmStatic
     fun getCommissionsPosition(): Position = commissionsPosition
 
-    @JvmStatic
     fun getSkyMallPosition(): Position = skyMallPosition
 
-    @JvmStatic
     fun getLotteryPosition(): Position = lotteryPosition
 
-    @JvmStatic
     fun getBeekeeperPosition(): Position = beekeeperPosition
 
-    @JvmStatic
     fun getSkillPosition(): Position = skillPosition
 
-    @JvmStatic
     fun getPickaxeAbilityPosition(): Position = pickaxeAbilityPosition
 
-    @JvmStatic
     fun getAxeAbilityPosition(): Position = axeAbilityPosition
 
-    @JvmStatic
     fun getDeployablePosition(): Position = deployablePosition
 
-    @JvmStatic
     fun getTempBuffPosition(): Position = tempBuffPosition
 
-    @JvmStatic
     fun getTitlePosition(): Position = titlePosition
 
-    @JvmStatic
     fun getMultiOverlayPosition(): Position = multiOverlayPosition
 
-    @JvmStatic
     fun getColeweightTimerPosition(): Position = coleweightTimerPosition
 
-    @JvmStatic
     fun getColeweightStopwatchPosition(): Position = coleweightStopwatchPosition
 
-    @JvmStatic
     fun getColeweightTrackerPosition(): Position = coleweightTrackerPosition
 
     fun getUpdateStream(): About.UpdateStream = updateStream
@@ -289,23 +272,18 @@ object ConfigAccess {
 
     fun hasCheckedUpdate(): Boolean = hasCheckedUpdate
 
-    @JvmStatic
     fun isApiTrackingEnabled(): Boolean = trackingConfig.apiTracking
 
-    @JvmStatic
     fun isOverlayTextColorEnabled(): Boolean = trackingConfig.overlayTextColor
 
-    @JvmStatic
     fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionConfig.showTrackingRatesAtEndOfSession
 
-    @JvmStatic
     fun isCommissionsOverlayEnabled(): Boolean = enableCommissionsOverlay
 
     fun isCompletionTitleEnabled(): Boolean = completionTitle
 
     fun isNewCommissionTitleEnabled(): Boolean = newCommissionTitle
 
-    @JvmStatic
     fun isCommissionsTrackingEnabled(): Boolean = enableCommissionsTracking
 
     fun isCommissionsKeybindsEnabled(): Boolean = keybindConfig.enableCommissionsKeybinds
@@ -323,10 +301,8 @@ object ConfigAccess {
     @JvmStatic
     fun getExtraStatsText(): List<CollectionConfig.OverlayExtraText> = extraStatsText
 
-    @JvmStatic
     fun isExplicitValues(): Boolean = explicitValues
 
-    @JvmStatic
     fun isTamingTrackingEnabled(): Boolean = enableTamingTracking
 
     @JvmStatic
@@ -368,37 +344,28 @@ object ConfigAccess {
 
     fun getCotmLevel(): Int = cotmLevel
 
-    @JvmStatic
     fun isSkyMallEnabled(): Boolean = enableSkyMall
 
     fun isSkyMallChatMessagesDisabled(): Boolean = disableSkyMallChatMessages
 
-    @JvmStatic
     fun isLotteryEnabled(): Boolean = enableLottery
 
     fun isLotteryChatMessagesDisabled(): Boolean = disableLotteryChatMessages
 
-    @JvmStatic
     fun isBeekeeperEnabled(): Boolean = enableBeekeeper
 
     fun isBeekeeperChatMessagesDisabled(): Boolean = disableBeekeeperChatMessages
 
-    @JvmStatic
     fun isSkyMallInMiningIslandsOnly(): Boolean = skyMallInMiningIslandsOnly
 
-    @JvmStatic
     fun isLotteryInForagingIslandsOnly(): Boolean = lotteryInForagingIslandsOnly
 
-    @JvmStatic
     fun isBeekeeperInForagingIslandsOnly(): Boolean = beekeeperInForagingIslandsOnly
 
-    @JvmStatic
     fun isPickaxeAbilityDisplayed(): Boolean = displayPickaxeAbility
 
-    @JvmStatic
     fun getPickaxeAbilityDisplayIndicator(): Misc.AbilityDisplayIndicator = pickaxeAbilityDisplayIndicator
 
-    @JvmStatic
     fun getPickaxeAbilityName(): String = abilityName
 
     fun hasCooldownAttribute(): Boolean = getAttributeLevel() > 0
@@ -413,55 +380,40 @@ object ConfigAccess {
 
     fun getLastBeekeeperBuff(): String = lastBeekeeperBuff
 
-    @JvmStatic
     fun isAxeAbilityDisplayed(): Boolean = displayAxeAbility
 
-    @JvmStatic
     fun getAxeAbilityDisplayIndicator(): Misc.AbilityDisplayIndicator = axeAbilityDisplayIndicator
 
-    @JvmStatic
     fun getAxeAbilityName(): String = abilityNameAxe
 
     fun getCotfLevel(): Int = cotfLevel
 
-    @JvmStatic
     fun getAbilityPrecision(): Int = precision
 
-    @JvmStatic
     fun isColeweightAbilityFormat(): Boolean = coleweightAbilityFormat
 
-    @JvmStatic
     fun getTitleDisplayTimer(): Long = titleDisplayTimer * 1000L
 
-    @JvmStatic
     fun isShowPickaxeReadyAbilityTitle(): Boolean = showPickaxeReadyAbilityTitle
 
-    @JvmStatic
     fun isShowPickaxeExpiredAbilityTitle(): Boolean = showPickaxeExpiredAbilityTitle
 
-    @JvmStatic
     fun isShowAxeReadyAbilityTitle(): Boolean = showAxeReadyAbilityTitle
 
-    @JvmStatic
     fun isShowAxeExpiredAbilityTitle(): Boolean = showAxeExpiredAbilityTitle
 
     fun getTitleScale(): Misc.TitleScale = titleScale
 
-    @JvmStatic
     fun isPickaxeAbilityInMiningIslandsOnly(): Boolean = pickaxeAbilityInMiningIslandsOnly
 
-    @JvmStatic
     fun isAxeAbilityInForagingIslandsOnly(): Boolean = axeAbilityInForagingIslandsOnly
 
-    @JvmStatic
     fun isAbilityCooldownOnly(): Boolean = abilityCooldownOnly
 
     fun isServerLagProtectionEnabled(): Boolean = miscConfig.serverLagProtection
 
-    @JvmStatic
     fun isShowTimerTitle(): Boolean = showTimerTitle
 
-    @JvmStatic
     fun isDeployableEnabled(): Boolean = enableDeployable
 
     fun isShowDeployableTitle(): Boolean = showDeployableTitle
@@ -482,10 +434,8 @@ object ConfigAccess {
 
     fun getPureOresRoutes(): PureOresRoutes.PureOreRoutes = pureOresRoutes
 
-    @JvmStatic
     fun isTempBuffTrackerEnabled(): Boolean = enableTempBuffTracker
 
-    @JvmStatic
     fun isShowTempBuffExpiredTitle(): Boolean = showTempBuffExpiredTitle
 
     fun getRefinedCacaoTime(): Long = refinedCacaoTime
@@ -530,17 +480,15 @@ object ConfigAccess {
     @JvmStatic
     fun isCustomPositionEnabled(): Boolean = customPosition
 
-    @JvmStatic
     fun getCustomGoals(): Map<String, Int> = customGoals
 
-    @JvmStatic
     fun getCustomPositionEntry(name: String): Int? {
         return customGoals[name.lowercase()]
     }
 }
 
 /**
- * Utility helper for common configuration operations.
+ * Helper functions for configs
  */
 object ConfigHelper {
 
@@ -573,7 +521,6 @@ object ConfigHelper {
         miningConfig.miningStatsConfig.enableMiningStatsOverlay = false
     }
 
-    @JvmStatic
     fun disableTamingTracking() {
         skillConfig.enableTamingTracking = false
     }
@@ -590,7 +537,6 @@ object ConfigHelper {
         leaderboardOverlay.skillLeaderboard = false
     }
 
-    @JvmStatic
     fun setCustomGoal(name: String, position: Int?) {
         val lowercase = name.lowercase()
         if (position == null) {
@@ -612,7 +558,6 @@ object ConfigHelper {
         skyMallConfig.lastSkyMallBuff = buff
     }
 
-    @JvmStatic
     fun disableSkyMall() {
         skyMallConfig.enableSkyMall = false
     }
@@ -621,7 +566,6 @@ object ConfigHelper {
         lotteryConfig.lastLotteryBuff = buff
     }
 
-    @JvmStatic
     fun disableLottery() {
         lotteryConfig.enableLottery = false
     }
@@ -630,7 +574,6 @@ object ConfigHelper {
         beekeeperConfig.lastBeekeeperBuff = buff
     }
 
-    @JvmStatic
     fun disableBeekeeper() {
         beekeeperConfig.enableBeekeeper = false
     }
@@ -801,22 +744,18 @@ object ConfigHelper {
         modConfig.misc.titlePosition = Position(x, y)
     }
 
-    @JvmStatic
     fun setBazaar(enabled: Boolean) {
         bazaarConfig.useBazaar = enabled
     }
 
-    @JvmStatic
     fun setGemstoneVariant(variant: Bazaar.GemstoneVariant) {
         bazaarConfig.gemstoneVariant = variant
     }
 
-    @JvmStatic
     fun setShowExtraStats(show: Boolean) {
         collectionConfig.showExtraStats = show
     }
 
-    @JvmStatic
     fun changeBazaarPrice(type: Bazaar.BazaarPriceType) {
         bazaarConfig.bazaarPriceType = type
     }
@@ -845,22 +784,18 @@ object ConfigHelper {
         farmingweightColorConfig.customColors.remove(player)
     }
 
-    @JvmStatic
     fun setMineshaftSpawnRoutesEnabled(enabled: Boolean) {
         mineshaftRoutesConfig.enableMineshaftSpawnRoutes = enabled
     }
 
-    @JvmStatic
     fun setDwarvenMetalRoutesEnabled(enabled: Boolean) {
         dwarvenMetalsRoutesConfig.enableDwarvenMetalRoutes = enabled
     }
 
-    @JvmStatic
     fun setPureOresRoutesEnabled(enabled: Boolean) {
         pureOresRoutesConfig.enablePureOresRoutes = enabled
     }
 
-    @JvmStatic
     fun setApiTracking(enabled: Boolean) {
         trackingConfig.apiTracking = enabled
     }

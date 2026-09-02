@@ -45,8 +45,6 @@ object ChatListener {
     @JvmStatic var currentLotteryBuff = "§cUnknown"
     @JvmStatic var currentBeekeeperBuff = "§cUnknown"
 
-    @JvmStatic
-    var nextBuffTime: Long = 0
     var abilityName: String? = null
 
     private var expectingSkyMallBuff = false
@@ -250,7 +248,7 @@ object ChatListener {
     fun dailyPerksUpdate(message: Component): Boolean {
         if (!HypixelUtils.isInSkyblock) return false
 
-        val remaining = nextBuffTime - System.currentTimeMillis()
+        val remaining = ScoreboardUtils.nextBuffTime - System.currentTimeMillis()
         if ((remaining > 60_000L && remaining < 19 * 60_000L) && ScoreboardUtils.checkTime) {
             return false
         }

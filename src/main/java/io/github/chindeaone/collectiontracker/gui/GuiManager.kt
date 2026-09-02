@@ -21,10 +21,8 @@ object GuiManager {
 
     var editor: MoulConfigEditor<ModConfig>? = null
 
-    @JvmStatic
     fun getEditorInstance() = editor ?: MoulConfigEditor(configManager.processor).also { editor = it }
 
-    @JvmStatic
     fun openConfigGui(search: String? = null) {
         val editor = getEditorInstance()
 
@@ -34,7 +32,6 @@ object GuiManager {
         openEditor(editor)
     }
 
-    @JvmStatic
     fun openEditor(editor: MoulConfigEditor<*>) {
         screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
     }
@@ -49,7 +46,6 @@ object GuiManager {
         screenToOpen = DummyOverlay(old)
     }
 
-    @JvmStatic
     fun openChangelog() {
         OverlayManager.setGlobalRendering(false)
 

@@ -305,14 +305,7 @@ object TrackingHandler {
         val lines: MutableList<Component> = mutableListOf()
         lines.add(Component.literal(String.format("   §aCollection tracked: §f%s", collectionDisplay)))
         lines.add(
-            Component.literal(
-                String.format(
-                    "   §b%s Made: §f%s   §bRate: §f%s/h",
-                    collectionDisplay,
-                    formatNumber(collectionMade),
-                    formatNumber(collectionPerHour)
-                )
-            )
+            Component.literal(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour)))
         )
 
         val useBazaar = isUsingBazaar()
@@ -322,23 +315,13 @@ object TrackingHandler {
             val npcMoney: Long = moneyMade["NPC"] ?: 0L
             if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
                 lines.add(
-                    Component.literal(
-                        String.format(
-                            "   §6Motes: §f$%s   §6Rate: §f%s/h",
-                            formatNumber(npcMoney),
-                            formatNumber(moneyPerHourNPC)
-                        )
-                    )
+                    Component.literal(String.format("   §6Motes: §f$%s   §6Rate: §f%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)))
                 )
-            } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
-                Component.literal(
-                    String.format(
-                        "   §6Money (NPC): §f$%s   §6Rate: §f$%s/h",
-                        formatNumber(npcMoney),
-                        formatNumber(moneyPerHourNPC)
-                    )
+            } else if (NpcPrices.getNpcPrice(collection) != 0) {
+                lines.add(
+                    Component.literal(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)))
                 )
-            )
+            }
         } else {
             val suffix =
                 if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
@@ -347,13 +330,7 @@ object TrackingHandler {
                     val bazMoney = moneyMade.getOrDefault(CollectionsManager.collectionType + suffix, 0L)
                     val bazRate = moneyPerHourBazaar.getOrDefault(CollectionsManager.collectionType + suffix, 0L)
                     lines.add(
-                        Component.literal(
-                            String.format(
-                                "   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h",
-                                formatNumber(bazMoney),
-                                formatNumber(bazRate)
-                            )
-                        )
+                        Component.literal(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate)))
                     )
                 }
 
@@ -365,13 +342,7 @@ object TrackingHandler {
                     val money = moneyMade.getOrDefault(key + suffix, 0L)
                     val rate = moneyPerHourBazaar.getOrDefault(key + suffix, 0L)
                     lines.add(
-                        Component.literal(
-                            String.format(
-                                "   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h",
-                                formatNumber(money),
-                                formatNumber(rate)
-                            )
-                        )
+                        Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate)))
                     )
                 }
 
@@ -380,25 +351,14 @@ object TrackingHandler {
                     val gMoney = moneyMade.getOrDefault(variant + suffix, 0L)
                     val gRate = moneyPerHourBazaar.getOrDefault(variant + suffix, 0L)
                     lines.add(
-                        Component.literal(
-                            String.format(
-                                "   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h",
-                                formatNumber(gMoney),
-                                formatNumber(gRate)
-                            )
-                        )
+                        Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate)))
                     )
                 }
             }
         }
 
         lines.add(
-            Component.literal(
-                String.format(
-                    "   §7Elapsed time: §f%s",
-                    uptimeInWords
-                )
-            )
+            Component.literal(String.format("   §7Elapsed time: §f%s", uptimeInWords))
         )
 
         // If no collection update, skip best/worst rates
@@ -414,22 +374,12 @@ object TrackingHandler {
         // Collection extremes
         if (highestCollectionPerHour > 0) {
             lines.add(
-                Component.literal(
-                    String.format(
-                        "   §6Best collection rate: §f%s coll/h",
-                        formatNumber(highestCollectionPerHour)
-                    )
-                )
+                Component.literal(String.format("   §6Best collection rate: §f%s coll/h", formatNumber(highestCollectionPerHour)))
             )
         }
         if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Long.MAX_VALUE) {
             lines.add(
-                Component.literal(
-                    String.format(
-                        "   §6Worst collection rate: §f%s coll/h",
-                        formatNumber(lowestCollectionPerHour)
-                    )
-                )
+                Component.literal(String.format("   §6Worst collection rate: §f%s coll/h", formatNumber(lowestCollectionPerHour)))
             )
         }
 
@@ -437,40 +387,18 @@ object TrackingHandler {
             // NPC money extremes
             if (highestRatePerHourNPC > 0) {
                 if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(
-                        Component.literal(
-                            String.format(
-                                "   §6Best motes rate: §f%s/h",
-                                formatNumber(highestRatePerHourNPC)
-                            )
-                        )
-                    )
+                    lines.add(Component.literal(String.format("   §6Best motes rate: §f%s/h", formatNumber(highestRatePerHourNPC))))
                 } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
-                    Component.literal(
-                        String.format(
-                            "   §6Best NPC money rate: §f$%s/h",
-                            formatNumber(highestRatePerHourNPC)
-                        )
-                    )
+                    Component.literal(String.format("   §6Best NPC money rate: §f$%s/h", formatNumber(highestRatePerHourNPC)))
                 )
             }
             if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
                 if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
                     lines.add(
-                        Component.literal(
-                            String.format(
-                                "   §6Worst motes rate: §f%s/h",
-                                formatNumber(lowestRatePerHourNPC)
-                            )
-                        )
+                        Component.literal(String.format("   §6Worst motes rate: §f%s/h", formatNumber(lowestRatePerHourNPC)))
                     )
                 } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
-                    Component.literal(
-                        String.format(
-                            "   §6Worst NPC money rate: §f$%s/h",
-                            formatNumber(lowestRatePerHourNPC)
-                        )
-                    )
+                    Component.literal(String.format("   §6Worst NPC money rate: §f$%s/h", formatNumber(lowestRatePerHourNPC)))
                 )
             }
         } else {
@@ -483,8 +411,8 @@ object TrackingHandler {
                         val low = lowestRatesPerHourBazaar.getOrDefault("normal$suffix", 0L)
                         val high = highestRatesPerHourBazaar.getOrDefault("normal$suffix", 0L)
 
-                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))))
-                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))))
+                        lines.add(Component.literal(String.format("   §6Best money rate: §f$%s/h", formatNumber(high))))
+                        lines.add(Component.literal(String.format("   §6Worst money rate: §f$%s/h", formatNumber(low))))
                     }
 
                     "enchanted" -> {
@@ -495,8 +423,8 @@ object TrackingHandler {
                         val low = lowestRatesPerHourBazaar.getOrDefault(key + suffix, 0L)
                         val high = highestRatesPerHourBazaar.getOrDefault(key + suffix, 0L)
 
-                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))))
-                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))))
+                        lines.add(Component.literal(String.format("   §6Best money rate: §f$%s/h", formatNumber(high))))
+                        lines.add(Component.literal(String.format("   §6Worst money rate: §f$%s/h", formatNumber(low))))
                     }
 
                     "gemstone" -> {
@@ -504,8 +432,8 @@ object TrackingHandler {
                         val low = lowestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L)
                         val high = highestRatesPerHourBazaar.getOrDefault(variant + suffix, 0L)
 
-                        lines.add(Component.literal(String.format("   §6Best: §f$%s/h", formatNumber(high))))
-                        lines.add(Component.literal(String.format("   §6Worst: §f$%s/h", formatNumber(low))))
+                        lines.add(Component.literal(String.format("   §6Best money rate: §f$%s/h", formatNumber(high))))
+                        lines.add(Component.literal(String.format("   §6Worst money rate: §f$%s/h", formatNumber(low))))
                     }
                 }
             }

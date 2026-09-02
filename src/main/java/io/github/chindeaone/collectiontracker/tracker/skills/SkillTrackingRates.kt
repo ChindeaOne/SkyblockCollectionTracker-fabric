@@ -14,40 +14,19 @@ import kotlin.concurrent.Volatile
 import kotlin.math.floor
 
 object SkillTrackingRates {
-    @JvmField
-    @Volatile
-    var skillLevel: Int = 0 // session start level and api level
+    @Volatile var skillLevel: Int = 0 // session start level and api level
+    @Volatile var skillXp: Long = 0 // session start xp and api xp
+    @Volatile var totalSkillXp: Long = 0
+    @Volatile var skillXpGained: Long = 0L
+    @Volatile var skillPerHour: Long = 0L
 
-    @Volatile
-    var skillXp: Long = 0 // session start xp and api xp
-
-    @JvmField
-    @Volatile
-    var totalSkillXp: Long = 0
-
-    @JvmField
-    @Volatile
-    var skillXpGained: Long = 0L
-
-    @JvmField
-    @Volatile
-    var skillPerHour: Long = 0L
     private var lastXpGained = 0L
-
-    @JvmField
     var tamingLevel: Int = 0 // session start level and api level
 
-    @JvmField
-    @Volatile
-    var tamingXp: Long = 0 // session start xp and api xp
+    @Volatile var tamingXp: Long = 0 // session start xp and api xp
+    @Volatile var tamingXpGained: Long = 0L
+    @Volatile var tamingPerHour: Long = 0L
 
-    @JvmField
-    @Volatile
-    var tamingXpGained: Long = 0L
-
-    @JvmField
-    @Volatile
-    var tamingPerHour: Long = 0L
     private var lastTamingXpGained = 0L
 
     var afk: Boolean = false
@@ -56,77 +35,28 @@ object SkillTrackingRates {
     private const val THRESHOLD = 2 // Number of checks before considering AFK
 
     // Skill Leaderboard tracking data
-    @JvmField
-    @Volatile
-    var skillCurrentRank: Int = -1
-
-    @JvmField
-    @Volatile
-    var skillNextRankUsername: String? = null
-
-    @JvmField
-    @Volatile
-    var skillNextRankAmount: Long = -1L
-
-    @JvmField
-    @Volatile
-    var skillTillNextRank: Long = -1L
-
-    @JvmField
-    @Volatile
-    var skillEtaToNextRank: String? = null
-
-    @Volatile
-    var isNextSkillWiped: Boolean = false
-
-    @Volatile
-    var skillPreviousRankUsername: String? = null
-
-    @Volatile
-    var skillPreviousRankAmount: Long = -1L
-
-    @Volatile
-    var skillAbovePreviousRankAmount: Long = -1L
-
-    @Volatile
-    var isPreviousSkillWiped: Boolean = false
+    @Volatile var skillCurrentRank: Int = -1
+    @Volatile var skillNextRankUsername: String? = null
+    @Volatile var skillNextRankAmount: Long = -1L
+    @Volatile var skillTillNextRank: Long = -1L
+    @Volatile var skillEtaToNextRank: String? = null
+    @Volatile var isNextSkillWiped: Boolean = false
+    @Volatile var skillPreviousRankUsername: String? = null
+    @Volatile var skillPreviousRankAmount: Long = -1L
+    @Volatile var skillAbovePreviousRankAmount: Long = -1L
+    @Volatile var isPreviousSkillWiped: Boolean = false
 
     // Taming Leaderboard tracking data
-    @JvmField
-    @Volatile
-    var tamingCurrentRank: Int = -1
-
-    @JvmField
-    @Volatile
-    var tamingNextRankUsername: String? = null
-
-    @JvmField
-    @Volatile
-    var tamingNextRankAmount: Long = -1L
-
-    @JvmField
-    @Volatile
-    var tamingTillNextRank: Long = -1L
-
-    @JvmField
-    @Volatile
-    var tamingEtaToNextRank: String? = null
-
-    @JvmField
-    @Volatile
-    var isNextTamingWiped: Boolean = false
-
-    @Volatile
-    var tamingPreviousRankUsername: String? = null
-
-    @Volatile
-    var tamingPreviousRankAmount: Long = -1L
-
-    @Volatile
-    var tamingAbovePreviousRankAmount: Long = -1L
-
-    @Volatile
-    var isPreviousTamingWiped: Boolean = false
+    @Volatile var tamingCurrentRank: Int = -1
+    @Volatile var tamingNextRankUsername: String? = null
+    @Volatile var tamingNextRankAmount: Long = -1L
+    @Volatile var tamingTillNextRank: Long = -1L
+    @Volatile var tamingEtaToNextRank: String? = null
+    @Volatile var isNextTamingWiped: Boolean = false
+    @Volatile var tamingPreviousRankUsername: String? = null
+    @Volatile var tamingPreviousRankAmount: Long = -1L
+    @Volatile var tamingAbovePreviousRankAmount: Long = -1L
+    @Volatile var isPreviousTamingWiped: Boolean = false
 
     fun initTracking(level: Int, xp: Long) {
         skillLevel = level

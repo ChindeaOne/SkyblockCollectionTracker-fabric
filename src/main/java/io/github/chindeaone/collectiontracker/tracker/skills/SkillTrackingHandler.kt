@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit
 object SkillTrackingHandler {
     private val logger: Logger = LogManager.getLogger(SkillTrackingHandler::class.java)
 
-    @JvmField
     @Volatile
     var isTracking: Boolean = false
     var isPaused: Boolean = false
@@ -59,10 +58,8 @@ object SkillTrackingHandler {
         val skillLevel = SkillUtils.getSkillLevel(skillName)
         val skillXp = SkillUtils.getSkillValue(skillName)
 
-        SkillTrackingRates.initTracking(
-            skillLevel ?: 0,
-            skillXp?.toLong() ?: 0L
-        )
+        SkillTrackingRates.initTracking(skillLevel ?: 0, skillXp?.toLong() ?: 0L)
+
         SkillTrackingRates.updateSkillLeaderboardStats()
         if (isTamingTrackingEnabled()) {
             SkillTrackingRates.updateTamingLeaderboardStats()
@@ -117,7 +114,6 @@ object SkillTrackingHandler {
         logger.info("[SCT]: Resuming tracking skill: {}", skillName)
     }
 
-    @JvmStatic
     fun stopTracking() {
         if (!isTracking) return
 
@@ -220,7 +216,6 @@ object SkillTrackingHandler {
             }
         }
 
-    @JvmStatic
     val uptime: String
         get() {
             val uptime: Long = if (isPaused) {

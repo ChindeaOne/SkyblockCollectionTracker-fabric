@@ -36,7 +36,7 @@ object SkillFetcher {
     fun scheduleSkillFetch(isSkillMaxed: Boolean, value: Long, skillName: String) {
 
         // initial delay of 5 mins because data is already fetched when tracking starts
-        scheduler!!.scheduleAtFixedRate(
+        scheduler?.scheduleAtFixedRate(
             { fetchSkillData(skillName, isSkillMaxed) },
             5,
             5,

@@ -2,8 +2,6 @@ package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 
-import java.util.Locale
-
 object NumbersUtils {
 
     private val UNITS = arrayOf("", "k", "M", "B", "T")
@@ -13,11 +11,11 @@ object NumbersUtils {
         if (number == 0L) return "0"
 
         if (ConfigAccess.isExplicitValues()) {
-            return String.format(Locale.US, "%,d", number)
+            return String.format("%,d", number)
         }
 
         if (number < 1000) {
-            return String.format(Locale.US, "%d", number)
+            return String.format("%d", number)
         }
 
         var num = number.toFloat()
@@ -27,19 +25,18 @@ object NumbersUtils {
             index++
         }
 
-        return String.format(Locale.US, "%.2f%s", num, UNITS[index])
+        return String.format("%.2f%s", num, UNITS[index])
     }
 
-    @JvmStatic
     fun formatFloat(number: Float): String {
         if (number == 0f) return "0"
 
         if (ConfigAccess.isExplicitValues()) {
-            return String.format(Locale.US, "%,.2f", number)
+            return String.format("%,.2f", number)
         }
 
         if (number < 1000) {
-            return String.format(Locale.US, "%.2f", number)
+            return String.format("%.2f", number)
         }
 
         var num = number
@@ -49,6 +46,6 @@ object NumbersUtils {
             index++
         }
 
-        return String.format(Locale.US, "%.2f%s", num, UNITS[index])
+        return String.format("%.2f%s", num, UNITS[index])
     }
 }

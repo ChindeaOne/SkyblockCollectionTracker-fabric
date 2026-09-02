@@ -17,15 +17,10 @@ import kotlin.text.contains
 
 object DeployableParser {
 
-    @JvmStatic
     var buff: String = ""
-    @JvmStatic
     var buffColor: String = ""
-    @JvmStatic
     var remainingTime: String = ""
-    @JvmStatic
     var deployablePos: BlockPos? = null
-    @JvmStatic
     var isNear: Boolean = false
     private var wasNear: Boolean = false
 
@@ -143,7 +138,6 @@ object DeployableParser {
         RenderUtils.showTitle(message)
     }
 
-    @JvmStatic
     fun reset() {
         buff = ""
         buffColor = ""
