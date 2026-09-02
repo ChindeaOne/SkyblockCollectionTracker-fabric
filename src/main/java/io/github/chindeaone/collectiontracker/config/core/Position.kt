@@ -1,87 +1,64 @@
-package io.github.chindeaone.collectiontracker.config.core;
+package io.github.chindeaone.collectiontracker.config.core
 
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils;
+import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils.scaledHeight
+import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils.scaledWidth
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import java.lang.reflect.Field
+import kotlin.math.roundToInt
 
-import java.lang.reflect.Field;
-
-public class Position {
+class Position(@field:Expose var x: Int, @field:Expose var y: Int) {
+    @Expose
+    var scale: Float = 1.0f
+        private set
 
     @Expose
-    private int X;
-    @Expose
-    private int Y;
-    @Expose
-    private float scale = 1.0f;
-    @Expose
-    private int width = 100;
-    @Expose
-    private int height = 20;
+    var width: Int = 100
+        private set
 
-    public transient Field link;
+    @Expose
+    var height: Int = 20
+        private set
 
-    public void setLink(ConfigLink configLink) {
+    @Transient
+    var link: Field? = null
+
+    fun setLink(configLink: ConfigLink) {
         try {
-            this.link = configLink.owner().getDeclaredField(configLink.field());
-        } catch (NoSuchFieldException e) {
-            System.err.println("Failed to set ConfigLink for " + configLink.field() + " in " + configLink.owner());
+            link = configLink.owner.java.getDeclaredField(configLink.field)
+        } catch (_: NoSuchFieldException) {
+            System.err.println("Failed to set ConfigLink for " + configLink.field + " in " + configLink.owner)
         }
     }
 
-    public Position(int x, int y) {
-        this.X = x;
-        this.Y = y;
+    fun setPosition(x: Int, y: Int) {
+        val screenWidth = scaledWidth
+        val screenHeight = scaledHeight
+
+        val yPadding = 4
+        val scaledYPadding = (yPadding * scale).roundToInt()
+
+        val scaledWidth = (width * scale).roundToInt()
+        val scaledHeight = (height * scale).roundToInt()
+
+        var maxX = screenWidth - scaledWidth
+        var maxY = screenHeight - (scaledHeight + scaledYPadding)
+
+        if (maxX < 0) maxX = 0
+        if (maxY < scaledYPadding) maxY = scaledYPadding
+
+        this.x = Math.clamp(x.toLong(), 0, maxX)
+        this.y = Math.clamp(y.toLong(), scaledYPadding, maxY)
     }
 
-    public int getX() {
-        return X;
+    fun setScaling(scale: Float) {
+        this.scale = scale
+        setPosition(x, y)
     }
 
-    public int getY() {
-        return Y;
-    }
-
-    public float getScale() {
-        return scale;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setPosition(int x, int y) {
-        int screenWidth = ScaleUtils.getScaledWidth();
-        int screenHeight = ScaleUtils.getScaledHeight();
-
-        int yPadding = 4;
-        int scaledYPadding = Math.round(yPadding * this.scale);
-
-        int scaledWidth = Math.round(this.width * this.scale);
-        int scaledHeight = Math.round(this.height * this.scale);
-
-        int maxX = screenWidth - scaledWidth;
-        int maxY = screenHeight - (scaledHeight + scaledYPadding);
-
-        if (maxX < 0) maxX = 0;
-        if (maxY < scaledYPadding) maxY = scaledYPadding;
-
-        this.X = Math.clamp(x, 0, maxX);
-        this.Y = Math.clamp(y, scaledYPadding, maxY);
-    }
-
-    public void setScaling(float scale) {
-        this.scale = scale;
-        setPosition(this.X, this.Y);
-    }
-
-    public void setDimensions(int width, int height) {
-        this.width = width;
-        this.height = height;
-        setPosition(this.X, this.Y);
+    fun setDimensions(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+        setPosition(x, y)
     }
 }

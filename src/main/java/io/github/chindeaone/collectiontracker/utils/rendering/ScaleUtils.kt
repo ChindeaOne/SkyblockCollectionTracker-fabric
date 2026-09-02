@@ -10,9 +10,7 @@ object ScaleUtils {
     val height get() = mc.window.height
     val width get() = mc.window.width
     val scale get() = mc.window.guiScale
-    @JvmStatic
     val scaledHeight get() = mc.window.guiScaledHeight
-    @JvmStatic
     val scaledWidth get() = mc.window.guiScaledWidth
     val mouseX: Int get() {
         return (mouse.xpos() * scaledWidth / width).toInt()

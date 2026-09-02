@@ -26,7 +26,6 @@ class VersionCheck(option: ProcessedOption) : GuiOptionEditor(option) {
             StructuredText.of(currentVersion), fr, widthRemaining / 4F, 10F, true, widthRemaining / 2, -1
         )
         context.popMatrix()
-
     }
 
     override fun getHeight(): Int {
