@@ -17,7 +17,6 @@ import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardMana
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler;
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates;
 import io.github.chindeaone.collectiontracker.utils.StringUtils;
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +24,6 @@ import static io.github.chindeaone.collectiontracker.collections.CollectionsMana
 import static io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection;
 import static io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig.TrackingOptions.COLLECTION;
 import static io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.*;
-import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatFloat;
 import static io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber;
 
 public class TextUtils {
@@ -173,7 +171,8 @@ public class TextUtils {
         if (CollectionsManager.collectionSource.equals("sacks")) return null;
         String rankSuffix = "";
         if (ConfigAccess.isCollectionLeaderboardEnabled() && playerCurrentRank != -1) {
-            rankSuffix = " [#" + playerCurrentRank + "]";
+            if (playerCurrentRank == 10001) rankSuffix = " [Too low]";
+                else rankSuffix = " [#" + playerCurrentRank + "]";
         }
         return collectionAmount >= 0
                 ? formatCollectionName(collection) + " : " + formatNumber(collectionAmount) + rankSuffix
@@ -488,7 +487,8 @@ public class TextUtils {
     private static String handleCollectionMulti(String coll) {
         String rankSuffix = "";
         if ("gemstone".equals(coll) && ConfigAccess.isCollectionLeaderboardEnabled() && MultiTrackingRates.getPlayerCurrentRank() != -1) {
-            rankSuffix = " [#" + MultiTrackingRates.getPlayerCurrentRank() + "]";
+            if (MultiTrackingRates.getPlayerCurrentRank() == 10001) rankSuffix = " [Too low]";
+                else rankSuffix = " [#" + MultiTrackingRates.getPlayerCurrentRank() + "]";
         }
         return MultiTrackingRates.getCollectionAmounts().getOrDefault(coll, -1L) >= 0
                 ? formatCollectionName(coll) + " : " + formatNumber(MultiTrackingRates.getCollectionAmounts().getOrDefault(coll, 0L)) + rankSuffix
@@ -663,15 +663,6 @@ public class TextUtils {
         }
     }
 
-    public static String updateTimer() {
-        long timeLeft = (ChatListener.getNextBuffTime() - System.currentTimeMillis()) / 1000;
-        if (timeLeft <= 5) {
-            return "§aTime left: §cSoon";
-        }
-
-        return String.format("§aTime left: %s", StringUtils.INSTANCE.formatTime(timeLeft));
-    }
-
     public static String formatCollectionName(String collection) {
         String[] words = collection.split("[\\s_]+");
         StringBuilder formattedName = new StringBuilder();
@@ -689,16 +680,6 @@ public class TextUtils {
 
     public static String formatNumberOrPlaceholder(long value) {
         return value > 0 ? formatNumber(value) : "Calculating...";
-    }
-
-    public static String formatFloatOrPlaceholder(float value) {
-        return value > 0 ? formatFloat(value) : "Calculating...";
-    }
-
-    public static String formatTime(double time) {
-        int precision = ConfigAccess.getAbilityPrecision();
-        String formatString = "%." + precision + "fs";
-        return String.format(formatString, time);
     }
 
     private static void handleMultiLeaderboard(List<String> list) {
