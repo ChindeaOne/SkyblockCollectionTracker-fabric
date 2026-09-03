@@ -7,7 +7,6 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDispla
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isAbilityCooldownOnly
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isAxeAbilityDisplayed
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isAxeAbilityInForagingIslandsOnly
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isColeweightAbilityFormat
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowAxeExpiredAbilityTitle
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowAxeReadyAbilityTitle
 import io.github.chindeaone.collectiontracker.config.categories.Misc
@@ -28,7 +27,6 @@ class AxeAbilityOverlay : AbstractOverlay() {
     private var lastCooldown: Double = -1.0
     private var lastDuration: Double = -1.0
     private var lastAbilityName: String = ""
-    private var lastColeweightFormat: Boolean = false
 
     private var expiredTitleShown = true
     private var readyTitleShown = true
@@ -37,7 +35,7 @@ class AxeAbilityOverlay : AbstractOverlay() {
 
     override val position: Position get() = getAxeAbilityPosition()
 
-    override val isEnabled: Boolean get() = isAxeAbilityDisplayed()
+    override val isEnabled: Boolean get() = true
 
     override fun render(context: GuiGraphicsExtractor) {
         super.render(context)
@@ -73,18 +71,16 @@ class AxeAbilityOverlay : AbstractOverlay() {
         val abilityName = getAxeAbilityName()
         val cooldown = finalCooldown
         val active = finalDuration
-        val isColeweight = isColeweightAbilityFormat()
 
-        if (cachedLines.isNotEmpty() && cooldown == lastCooldown && active == lastDuration && abilityName == lastAbilityName && isColeweight == lastColeweightFormat) {
+        if (cachedLines.isNotEmpty() && cooldown == lastCooldown && active == lastDuration && abilityName == lastAbilityName) {
             return
         }
 
         lastCooldown = cooldown
         lastDuration = active
         lastAbilityName = abilityName
-        lastColeweightFormat = isColeweight
 
-        var displayName = abilityName.ifEmpty { "Unknown Ability" }
+        val displayName = abilityName.ifEmpty { "Unknown Ability" }
 
         if (active > 0) {
             expiredTitleShown = false
@@ -93,60 +89,32 @@ class AxeAbilityOverlay : AbstractOverlay() {
 
         val newLines = mutableListOf<String>()
 
-        if (isColeweight) {
-            if (active == 0.0) {
-                if (isShowAxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0) {
-                    val titleExpired = "§6[§3§kd§6] §b§l$displayName §cExpired! §6[§3§kd§6]"
-                    showTitle(Component.literal(titleExpired), getTitleDisplayTimer())
-                    expiredTitleShown = true
-                }
-
-                if (cooldown <= 0) {
-                    if (isShowAxeReadyAbilityTitle() && !readyTitleShown) {
-                        val titleReady = "§6[§3§kd§6] §b§l$displayName §6[§3§kd§6]"
-                        showTitle(Component.literal(titleReady), getTitleDisplayTimer())
-                        readyTitleShown = true
-                    }
-                } else {
-                    readyTitleShown = false
-                }
+        if (active == 0.0) {
+            if (isShowAxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0) {
+                val titleExpired = "§6[§3§kd§6] §b§l$displayName §cExpired! §6[§3§kd§6]" // Credit to Ninjune for Coleweight's formatting
+                showTitle(Component.literal(titleExpired), getTitleDisplayTimer())
+                expiredTitleShown = true
             }
 
-            val status = if (!isAbilityCooldownOnly() && active > 0) {
-                "§a" + StringUtils.formatTimeInSeconds(active)
-            } else if (cooldown > 0) {
-                "§c" + StringUtils.formatTimeInSeconds(cooldown)
+            if (cooldown <= 0) {
+                if (isShowAxeReadyAbilityTitle() && !readyTitleShown) {
+                    val titleReady = "§6[§3§kd§6] §b§l$displayName §6[§3§kd§6]" // Credit to Ninjune for Coleweight's formatting
+                    showTitle(Component.literal(titleReady), getTitleDisplayTimer())
+                    readyTitleShown = true
+                }
             } else {
-                "§aReady!"
-            }
-            newLines.add("§e$displayName CD: $status")
-        } else {
-            if (active == 0.0) {
-                if (isShowAxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0) {
-                    showTitle(Component.literal("§6$displayName §cExpired!"), getTitleDisplayTimer())
-                    expiredTitleShown = true
-                }
-                if (cooldown <= 0) {
-                    if (isShowAxeReadyAbilityTitle() && !readyTitleShown) {
-                        showTitle(Component.literal("§6$displayName §aReady!"), getTitleDisplayTimer())
-                        readyTitleShown = true
-                    }
-                } else {
-                    readyTitleShown = false
-                }
-            }
-
-            displayName = if (displayName == "Unknown Ability") "§cUnknown Ability" else "§e$displayName"
-            newLines.add("§bAxe Ability: $displayName")
-
-            if (!isAbilityCooldownOnly() && active > 0) {
-                newLines.add("§aActive: ${StringUtils.formatTimeInSeconds(active)}")
-            } else if (cooldown > 0) {
-                newLines.add("§cCooldown: ${StringUtils.formatTimeInSeconds(cooldown)}")
-            } else {
-                newLines.add("§aReady!")
+                readyTitleShown = false
             }
         }
+
+        val status = if (!isAbilityCooldownOnly() && active > 0) {
+            "§a" + StringUtils.formatTimeInSeconds(active)
+        } else if (cooldown > 0) {
+            "§c" + StringUtils.formatTimeInSeconds(cooldown)
+        } else {
+            "§aReady!"
+        }
+        newLines.add("§e$displayName CD: $status") // // Credit to Ninjune for Coleweight's formatting
 
         cachedLines = newLines
     }
