@@ -6,7 +6,6 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
@@ -20,37 +19,28 @@ object SkillTracker {
 
     fun startTracking(skill: String) {
         try {
-            if (!HypixelUtils.isInSkyblock) {
-                ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true)
+            if (isTracking) {
+                ChatUtils.sendMessage("§cAlready tracking a skill.", true)
                 return
             }
 
-            try {
-                if (isTracking) {
-                    ChatUtils.sendMessage("§cAlready tracking a skill.", true)
-                    return
-                }
-
-                skillName = skill
-                if (!SkillUtils.isValidSkill(skillName)) {
-                    ChatUtils.sendMessage("§4$skillName skill is not a real skill!", true)
-                    return
-                }
-
-                // Fetch skill data and leaderboard data asynchronously
-                SkillApiFetcher.fetchSkillsData()
-                        .thenCompose { SkillFetcher.fetchSkillLeaderboardData(skillName) }
-                        .thenCompose {
-                            if (ConfigAccess.isTamingTrackingEnabled()) SkillFetcher.fetchSkillLeaderboardData("Taming")
-                            else CompletableFuture.completedFuture(null)
-                        }
-                        .thenRun(SkillTrackingHandler::startTracking)
-            } catch (e: Exception) {
-                logger.error("An error occurred while starting skill tracking: ", e)
-                ChatUtils.sendMessage("§cAn error occurred while starting skill tracking. Please try again later.", true)
+            skillName = skill
+            if (!SkillUtils.isValidSkill(skillName)) {
+                ChatUtils.sendMessage("§4$skillName skill is not a real skill!", true)
+                return
             }
+
+            // Fetch skill data and leaderboard data asynchronously
+            SkillApiFetcher.fetchSkillsData()
+                    .thenCompose { SkillFetcher.fetchSkillLeaderboardData(skillName) }
+                    .thenCompose {
+                        if (ConfigAccess.isTamingTrackingEnabled()) SkillFetcher.fetchSkillLeaderboardData("Taming")
+                        else CompletableFuture.completedFuture(null)
+                    }
+                    .thenRun(SkillTrackingHandler::startTracking)
         } catch (e: Exception) {
-            logger.error("An unexpected error occurred: ", e)
+            logger.error("An error occurred while starting skill tracking: ", e)
+            ChatUtils.sendMessage("§cAn error occurred while starting skill tracking. Please try again later.", true)
         }
     }
 }

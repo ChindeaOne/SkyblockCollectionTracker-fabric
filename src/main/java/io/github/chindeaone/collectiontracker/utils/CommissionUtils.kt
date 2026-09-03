@@ -116,8 +116,6 @@ object CommissionUtils {
     }
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isInSkyblock) return
-
         val screen = ContainerParser.currentCommissionScreen ?: return
 
         val now = System.currentTimeMillis()
@@ -216,6 +214,7 @@ object CommissionUtils {
     private fun registerKeyGuards(screen: Screen) {
         // these 2 handle custom keybinds
         ScreenKeyboardEvents.allowKeyPress(screen).register(ScreenKeyboardEvents.AllowKeyPress { s, event ->
+            if (!HypixelUtils.isInSkyblock) return@AllowKeyPress true
             val container = s as? AbstractContainerScreen<*> ?: return@AllowKeyPress true
 
             val keyCode = event.key
@@ -248,6 +247,7 @@ object CommissionUtils {
 
         // this handles mouse click
         ScreenMouseEvents.beforeMouseClick(screen).register(ScreenMouseEvents.BeforeMouseClick { s, event ->
+            if (!HypixelUtils.isInSkyblock) return@BeforeMouseClick
             val container = s as? AbstractContainerScreen<*> ?: return@BeforeMouseClick
 
             if (!shouldHandleCommissionTracking(container)) return@BeforeMouseClick
@@ -279,7 +279,6 @@ object CommissionUtils {
     }
 
     private fun isCommissionScreen(screen: AbstractContainerScreen<*>): Boolean {
-        if (!HypixelUtils.isInSkyblock) return false
         if (!ConfigAccess.isCommissionsOverlayEnabled()) return false
         return screen.title.string.contains("Commissions", ignoreCase = true)
     }

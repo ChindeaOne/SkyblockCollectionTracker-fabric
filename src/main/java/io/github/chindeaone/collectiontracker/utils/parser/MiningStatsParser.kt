@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortune
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortuneValue
@@ -19,11 +18,6 @@ object MiningStatsParser {
     private val NON_DIGIT = Regex("[^0-9]+")
 
     fun onClientTick() {
-        if (!HypixelUtils.isInSkyblock) {
-            clear()
-            return
-        }
-
         cachedLines = parse(StatsWidget.rawStats)
     }
 

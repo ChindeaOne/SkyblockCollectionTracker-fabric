@@ -18,6 +18,8 @@ import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -43,12 +45,12 @@ object CommandRegistry {
         // sct edit -> opens the position editor
         .then(ClientCommands.literal("edit")
             .executes {
-                Minecraft.getInstance().execute(GuiManager::openGuiPositionEditor)
+                GuiManager.openGuiPositionEditor()
                 1
             }
             .then(ClientCommands.literal("title")
                 .executes {
-                    Minecraft.getInstance().execute(GuiManager::openGuiTitlePositionEditor)
+                    GuiManager.openGuiTitlePositionEditor()
                     1
                 }
             )
@@ -116,6 +118,8 @@ object CommandRegistry {
             .then(ClientCommands.argument("collection", StringArgumentType.greedyString())
                 .suggests(COLLECTION_SUGGESTIONS)
                 .executes { it ->
+                    if (!canUseCommand()) return@executes 0
+
                     val input = StringArgumentType.getString(it, "collection").trim()
                     val collections = CollectionsManager.allCollections
                         .sortedByDescending { it.length } // Sort by length to match longer names first
@@ -192,6 +196,8 @@ object CommandRegistry {
         // sct restart
         .then(ClientCommands.literal("restart")
             .executes {
+                if (!canUseCommand()) return@executes 0
+
                 if (MultiTrackingHandler.isMultiTracking) {
                     MultiTrackingHandler.restartMultiTracking()
                 } else {
@@ -212,6 +218,8 @@ object CommandRegistry {
                 .then(ClientCommands.argument("skillName", StringArgumentType.greedyString())
                     .suggests(SKILL_LIST)
                     .executes {
+                        if (!canUseCommand()) return@executes 0
+
                         SkillTracker.startTracking(StringArgumentType.getString(it, "skillName").trim())
                         1
                     }
@@ -354,6 +362,8 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("track")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     ColeweightTrackingHandler.startTracking()
                     1
                 }
@@ -808,5 +818,25 @@ object CommandRegistry {
         }
 
         return input.toLongOrNull() ?: -1
+    }
+
+    private fun canUseCommand(): Boolean {
+        return checkIfInSkyblock() && checkIfServerIsOnline()
+    }
+
+    private fun checkIfInSkyblock(): Boolean {
+        if (!HypixelUtils.isInSkyblock) {
+            ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true)
+            return false
+        }
+        return true
+    }
+
+    private fun checkIfServerIsOnline(): Boolean {
+        if (!ServerUtils.serverStatus) {
+            ChatUtils.sendMessage("§cThe API server is currently offline. Please try again later.", true)
+            return false
+        }
+        return true
     }
 }

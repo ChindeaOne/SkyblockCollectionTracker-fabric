@@ -9,7 +9,6 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
@@ -30,7 +29,6 @@ object InventoryListener {
     private var pendingConsumable: HandItemState? = null
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isInSkyblock) return
         if (ModLoader.clientTicks % 4L != 0L) return
 
         if (/*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) {
@@ -148,8 +146,6 @@ object InventoryListener {
 
     @Suppress("SameReturnValue")
     fun checkHandItem(player: Player, hand: InteractionHand): InteractionResult {
-        if (!HypixelUtils.isInSkyblock) return InteractionResult.PASS
-
         val stack = player.getItemInHand(hand)
         if (stack.isEmpty) return InteractionResult.PASS
 

@@ -36,6 +36,7 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.resources.Identifier
+import net.minecraft.world.InteractionResult
 
 object ModLoader: ModInitializer {
 
@@ -51,28 +52,43 @@ object ModLoader: ModInitializer {
     }
 
     private fun eventRegistration() {
-        ClientTickEvents.END_CLIENT_TICK.register(ClientTickEvents.EndTick {client ->
-            if (client.player == null) return@EndTick
+        ClientTickEvents.END_CLIENT_TICK.register {client ->
+            if (client.player == null || client.level == null) return@register
+
+            Hypixel.onClientTick(client)
+
+            if (!HypixelUtils.isInSkyblock) return@register
             TickDispatcher.onEndClientTick(client)
-        })
+        }
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
         ClientReceiveMessageEvents.GAME.register { message, actionBar ->
+            if (!HypixelUtils.isInSkyblock) return@register
+
             if (actionBar) return@register
 
             ChatListener.onChatMessage(message)
         }
         ClientReceiveMessageEvents.MODIFY_GAME.register { message, actionBar ->
+            if (!HypixelUtils.isInSkyblock) return@register message
+
             if (actionBar) return@register message
 
             ChatListener.farmingweightHandle(
                 ChatListener.coleweightHandle(message)
             )
         }
-        ClientReceiveMessageEvents.GAME_CANCELED.register { message, actionBar -> ChatListener.sacksListener(message, actionBar) }
+        ClientReceiveMessageEvents.GAME_CANCELED.register { message, actionBar ->
+            if (!HypixelUtils.isInSkyblock) return@register
+            ChatListener.sacksListener(message, actionBar)
+        }
 
-        UseItemCallback.EVENT.register { player, _, hand -> InventoryListener.checkHandItem(player, hand) }
+        UseItemCallback.EVENT.register { player, _, hand ->
+            if (!HypixelUtils.isInSkyblock) return@register InteractionResult.PASS
+            InventoryListener.checkHandItem(player, hand)
+        }
         LevelRenderEvents.END_MAIN.register { context ->
+            if (!HypixelUtils.isInSkyblock) return@register
             if (!RenderSystem.isOnRenderThread()) return@register
 
             try {
@@ -87,8 +103,7 @@ object ModLoader: ModInitializer {
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, _ ->
             // Avoid rendering in editor mode
-            if (OverlayManager.isInEditorMode()) return@attachElementBefore
-            if (!HypixelUtils.isInSkyblock) return@attachElementBefore
+            if (OverlayManager.isInEditorMode() || !HypixelUtils.isInSkyblock) return@attachElementBefore
 
             for (overlay in OverlayManager.all()) {
                 if (overlay.shouldRender()) {
@@ -121,7 +136,6 @@ object ModLoader: ModInitializer {
 
             // Call every onTick here
             SkyblockCollectionTracker.onClientTick(client)
-            Hypixel.onClientTick(client)
             CommissionUtils.onClientTick(client)
             TabData.onClientTick(client)
             BlockWatcher.onClientTick(client)

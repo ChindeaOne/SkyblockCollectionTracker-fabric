@@ -6,7 +6,6 @@ package io.github.chindeaone.collectiontracker.utils.parser
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.Minecraft
@@ -30,7 +29,6 @@ object DeployableParser {
     private var trackedEntity: ArmorStand? = null
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isInSkyblock) return
         val level = client.level ?: return
         val player = client.player ?: return
 

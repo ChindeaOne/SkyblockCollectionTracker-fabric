@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.mixins;
 
+import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.ServerTickUtils;
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -16,8 +17,8 @@ public class ClientPacketListenerMixin {
 
     @Inject(method = "handleSetTime", at = @At("RETURN"))
     private void sct$onServerTick(ClientboundSetTimePacket packet, CallbackInfo ci) {
-        long gameTime = packet.gameTime();
-        ServerTickUtils.onServerTick(gameTime);
+        if (!HypixelUtils.isInSkyblock()) return;
+        ServerTickUtils.onServerTick(packet.gameTime());
     }
 
     @Inject(method = "handleLogin", at = @At("RETURN"))
@@ -27,11 +28,13 @@ public class ClientPacketListenerMixin {
 
     @Inject(method = "handleSystemChat", at = @At("RETURN"))
     private void sct$onSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
+        if (!HypixelUtils.isInSkyblock()) return;
        ChatListener.skillListener(packet.content().toString());
     }
 
     @Inject(method = "handleSystemChat", at = @At("HEAD"), cancellable = true)
     private void sct$onHandleSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
+        if (!HypixelUtils.isInSkyblock()) return;
         if (ChatListener.dailyPerksUpdate(packet.content())) {
             ci.cancel();
         }

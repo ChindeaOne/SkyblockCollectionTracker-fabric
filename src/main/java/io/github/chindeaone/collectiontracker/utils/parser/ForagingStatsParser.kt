@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowDetailedForagingFortune
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser.lastDisplayedBeaconFortuneValue
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser.lastDisplayedFortuneColor
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser.lastDisplayedSpecificFortune
@@ -23,11 +22,6 @@ object ForagingStatsParser {
     private val NON_DIGIT = Regex("[^0-9]+")
 
     fun onClientTick() {
-        if (!HypixelUtils.isInSkyblock) {
-            clear()
-            return
-        }
-
         cachedLines = parse(StatsWidget.rawStats, StatsWidget.rawBeaconStats, StatsWidget.rawStarbornTempleStats)
     }
 

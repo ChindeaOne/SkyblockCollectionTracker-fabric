@@ -70,9 +70,8 @@ object Hypixel {
         val isNowOnSkyblock = ScoreboardUtils.checkScoreboard(client) ?: return
         val wasOnSkyblock = skyblock
 
-        if (wasOnSkyblock == isNowOnSkyblock) {
-            return
-        }
+        if (wasOnSkyblock == isNowOnSkyblock) return
+
         skyblock = isNowOnSkyblock
 
         if (isNowOnSkyblock && HypixelUtils.isInHypixel) {

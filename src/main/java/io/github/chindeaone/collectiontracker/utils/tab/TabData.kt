@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.utils.tab
 
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
@@ -22,7 +21,6 @@ object TabData {
     )
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isInSkyblock) return
         if (ModLoader.clientTicks % 4L != 0L) return
 
         val currentWorld = client.level

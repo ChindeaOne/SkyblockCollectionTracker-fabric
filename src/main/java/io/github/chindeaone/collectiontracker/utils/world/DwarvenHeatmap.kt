@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
@@ -31,7 +30,6 @@ object DwarvenHeatmap {
     )
 
     fun render (context: LevelRenderContext) {
-        if (!HypixelUtils.isInSkyblock) return
         if (!ConfigAccess.isHeatmapEnabled() || IslandTracker.currentMiningIsland != "Dwarven Mines") return
 
         val camera = context.levelState().cameraRenderState

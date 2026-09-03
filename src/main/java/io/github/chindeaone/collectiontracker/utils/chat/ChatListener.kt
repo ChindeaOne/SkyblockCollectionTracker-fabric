@@ -67,8 +67,6 @@ object ChatListener {
     var maxAxeDuration = 0.0
 
     fun onChatMessage(message: Component) {
-        if (!HypixelUtils.isInSkyblock) return
-
         val text = message.string
         val cleanText = text.removeColor()
 
@@ -103,7 +101,7 @@ object ChatListener {
 
     @JvmStatic
     fun skillListener(text: String) {
-        if (!SkillTrackingHandler.isTracking || !HypixelUtils.isInSkyblock) return
+        if (!SkillTrackingHandler.isTracking) return
         val cleanText = text.removeColor()
 
         val match = Patterns.SKILL.find(cleanText)
@@ -209,7 +207,7 @@ object ChatListener {
         val finalCooldownSec = AbilityUtils.calculateReduction(
             baseCooldown = baseCooldown,
             snap = snap,
-            skyMallActive = isSkyMallPickaxeAbilityActive(),
+            skyMallActive = isPickaxeAbility,
             abilityName = ability
         )
 
@@ -240,14 +238,8 @@ object ChatListener {
         ConfigHelper.setAxeAbilityName(ability)
     }
 
-    private fun isSkyMallPickaxeAbilityActive(): Boolean {
-        return isPickaxeAbility
-    }
-
     @JvmStatic
     fun dailyPerksUpdate(message: Component): Boolean {
-        if (!HypixelUtils.isInSkyblock) return false
-
         val remaining = ScoreboardUtils.nextBuffTime - System.currentTimeMillis()
         if ((remaining > 60_000L && remaining < 19 * 60_000L) && ScoreboardUtils.checkTime) {
             return false
@@ -440,10 +432,10 @@ object ChatListener {
     }
 
     fun coleweightHandle(message: Component): Component {
-        if (!HypixelUtils.isInSkyblock || !ConfigAccess.isColeweightRankingInChat()) return message
+        if (!ConfigAccess.isColeweightRankingInChat()) return message
 
         if (ConfigAccess.isOnlyOnMiningIslands()) {
-            if (!MiningMapping.miningIslands.contains(IslandTracker.currentMiningIsland)) return message
+            if (IslandTracker.currentMiningIsland in MiningMapping.miningIslands) return message
         }
 
         val text = message.string.removeColor()
@@ -459,10 +451,10 @@ object ChatListener {
     }
 
     fun farmingweightHandle(message: Component): Component {
-        if (!HypixelUtils.isInSkyblock || !ConfigAccess.isFarmingweightRankingInChat()) return message
+        if (!ConfigAccess.isFarmingweightRankingInChat()) return message
 
         if (ConfigAccess.isOnlyOnFarmingIslands()) {
-            if (!FarmingMapping.farmingAreas.contains(IslandTracker.currentFarmingIsland)) return message
+            if (IslandTracker.currentForagingIsland in FarmingMapping.farmingAreas) return message
         }
 
         val text = message.string.removeColor()

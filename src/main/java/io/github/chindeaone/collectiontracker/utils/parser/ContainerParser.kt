@@ -2,7 +2,6 @@ package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentBeekeeperBuff
@@ -40,8 +39,6 @@ object ContainerParser {
     private var currentHotxType: HotxScreenType? = null
 
     fun onScreenChanged(screen: Screen?) {
-        if (!HypixelUtils.isInSkyblock) return
-
         currentCommissionScreen = null
         detachListener()
 
@@ -65,8 +62,6 @@ object ContainerParser {
     }
 
     fun onClientTick(client: Minecraft) {
-        if (!HypixelUtils.isInSkyblock) return
-
         val screen = currentHotxScreen ?: return
 
         if (client./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ !== screen) {

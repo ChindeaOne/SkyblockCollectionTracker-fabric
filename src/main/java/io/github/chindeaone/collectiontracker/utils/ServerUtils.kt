@@ -56,7 +56,6 @@ object ServerUtils {
     }
 
     private fun checkIfDataWasFetched() {
-        if (!HypixelUtils.isInSkyblock) return
         if (hasData()) return
 
         Hypixel.fetchData()

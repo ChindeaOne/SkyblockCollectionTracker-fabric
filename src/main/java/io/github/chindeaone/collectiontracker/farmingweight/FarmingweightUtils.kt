@@ -4,7 +4,6 @@ import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
-import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.toFWRankComponent
 import net.minecraft.network.chat.Component
@@ -21,11 +20,6 @@ object FarmingweightUtils {
     }
 
     fun getFarmingweight(playerName: String) {
-        if (!ServerUtils.serverStatus) {
-            ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
-            return
-        }
-
         ChatUtils.sendMessage("§aFetching Farming Weight for $playerName ...", true)
 
         if (isPlayerCached(playerName)) {
@@ -45,10 +39,6 @@ object FarmingweightUtils {
     }
 
     fun getFarmingweightLeaderboard(position: Int) {
-        if (!ServerUtils.serverStatus) {
-            ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
-            return
-        }
         if (position > 100000) {
             ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 100000.", true)
             return

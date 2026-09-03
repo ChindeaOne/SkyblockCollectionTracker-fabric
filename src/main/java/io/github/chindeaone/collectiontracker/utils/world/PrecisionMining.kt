@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleOptions
@@ -19,7 +18,6 @@ object PrecisionMining {
     private var activeParticlePos: Vec3? = null
 
     fun render(context: LevelRenderContext) {
-        if (!HypixelUtils.isInSkyblock) return
         if (!ConfigAccess.isPrecisionMiningHighlightEnabled()) return
         if (BlockWatcher.precisionMiningBlockType.isEmpty()) {
             isLooking = false
@@ -48,7 +46,6 @@ object PrecisionMining {
 
     @JvmStatic
     fun handleParticles(options: ParticleOptions, x: Double, y: Double, z: Double) {
-        if (!HypixelUtils.isInSkyblock) return
         if (options.type != lookingParticle && options.type != notLookingParticle) return
         if (BlockWatcher.precisionMiningBlockType.isEmpty()) return
 

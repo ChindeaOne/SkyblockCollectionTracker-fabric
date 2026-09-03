@@ -5,7 +5,6 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
-import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.toCWRankComponent
 import net.minecraft.network.chat.Component
 
@@ -16,11 +15,6 @@ object ColeweightUtils {
     private const val COOLDOWN_DURATION = 5 * 60 * 1000L // 5 minutes cd
 
     fun getColeweight(playerName: String, detailed: Boolean = false) {
-        if (!ServerUtils.serverStatus) {
-            ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
-            return
-        }
-
         val msg = if (detailed) "detailed Coleweight" else "Coleweight"
         ChatUtils.sendMessage("§aFetching $msg for $playerName ...", true)
 
@@ -51,10 +45,6 @@ object ColeweightUtils {
     }
 
     fun getColeweightLeaderboard(position: Int) {
-        if (!ServerUtils.serverStatus) {
-            ChatUtils.sendMessage("§cAPI server is currently offline. Please try again later.", true)
-            return
-        }
         if (position > 5000) {
             ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 5000.", true)
             return

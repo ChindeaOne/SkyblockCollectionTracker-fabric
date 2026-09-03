@@ -43,10 +43,7 @@ abstract class AbstractOverlay {
         if (!HypixelUtils.isInSkyblock && !isEnabled) return
 
         val lines = lines
-        if (lines.isEmpty()) {
-            position.setDimensions(0, 0)
-            return
-        }
+        if (lines.isEmpty()) return
 
         val fr = Minecraft.getInstance().font
         var maxW = 0
