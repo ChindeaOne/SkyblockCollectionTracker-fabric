@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.config
 
 import com.google.gson.GsonBuilder
-import com.google.gson.stream.JsonReader
 import io.github.chindeaone.collectiontracker.config.error.ConfigError
 import io.github.chindeaone.collectiontracker.config.version.VersionManager
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
@@ -16,7 +15,9 @@ import java.util.*
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import com.google.gson.Gson
+import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.core.PositionDeserializer
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
@@ -36,6 +37,16 @@ class ConfigManager {
             .setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
+            .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
+            .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
+            .enableComplexMapKeySerialization()
+            .create()
+
+        val migrationGson: Gson = GsonBuilder()
+            .setPrettyPrinting()
+            .excludeFieldsWithoutExposeAnnotation()
+            .serializeSpecialFloatingPointValues()
+            .registerTypeAdapter(Position::class.java, PositionDeserializer())
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
             .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
             .enableComplexMapKeySerialization()
@@ -116,13 +127,30 @@ class ConfigManager {
 
     private fun tryReadConfig() {
         try {
-            InputStreamReader(FileInputStream(configFile), StandardCharsets.UTF_8).use { isr ->
-                JsonReader(isr).use { reader ->
-                    config = gson.fromJson(reader, ModConfig::class.java)
-                }
+            val json = FileReader(configFile, StandardCharsets.UTF_8).use {
+                JsonParser.parseReader(it)
             }
-            // Remove null entries
-            config?.let { removeNulls(it) }
+
+            val migrationDone = json.asJsonObject
+                .getAsJsonObject("internal")
+                ?.get("migratedToLowercasePositions")
+                ?.asBoolean
+                ?: false
+
+            println(migrationDone)
+
+            config = if (migrationDone) {
+                gson.fromJson(json, ModConfig::class.java)
+            } else {
+                migrationGson.fromJson(json, ModConfig::class.java)
+            }
+
+            config?.let { loadedConfig ->
+                // Remove null entries
+                removeNulls(loadedConfig)
+
+                if (!migrationDone) loadedConfig.internal.migratedToLowercasePositions = true
+            }
         } catch (e: Exception) {
             throw ConfigError("[SCT]: Could not load config", e)
         }
@@ -199,8 +227,6 @@ class ConfigManager {
 
     @Synchronized
     fun save(auto: Boolean = false) {
-        if (!HypixelUtils.isInSkyblock) return
-
         TemporaryBuffsParser.saveDurations()
         lastSaveTime = System.currentTimeMillis()
         val config = config ?: error("[SCT]: Cannot save null config.")
@@ -259,7 +285,7 @@ class ConfigManager {
 
     fun startAutoSave() {
         fixedRateTimer("sct-auto-save", daemon = true, initialDelay = 60_000L, period = 60_000L) {
-            save(true)
+            if (HypixelUtils.isInSkyblock) save(true)
         }
     }
 }

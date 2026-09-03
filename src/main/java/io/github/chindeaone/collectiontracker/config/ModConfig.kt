@@ -19,37 +19,48 @@ class ModConfig : Config() {
     @Category(name = "About", desc = "")
     @SerializedName("about")
     val about: About = About()
+
     @Expose
     @Category(name = "GUI", desc = "GUI config")
     val gui: GUIConfig = GUIConfig()
+
     @Expose
     @Category(name = "Tracking", desc = "Tracking config")
     @SerializedName("tracking")
     val tracking: Tracking = Tracking()
+
     @Expose
     @Category(name = "Bazaar", desc = "Bazaar config")
     @SerializedName("bazaar")
     val bazaar: Bazaar = Bazaar()
+
     @Expose
     @Category(name = "Mining", desc = "Mining config")
     @SerializedName("mining")
     @Accordion
     val mining: Mining = Mining()
+
     @Expose
     @Category(name = "Foraging", desc = "Foraging config")
     @SerializedName("foraging")
     @Accordion
     val foraging: Foraging = Foraging()
+
     @Expose
     @Category(name = "Farming", desc = "Farming config")
     @SerializedName("farming")
     @Accordion
     val farming: Farming = Farming()
+
     @Expose
     @Category(name = "Misc", desc = "Misc config")
     @SerializedName("misc")
     @Accordion
     val misc: Misc = Misc()
+
+    @Expose
+    @SerializedName("internal")
+    val internal: Internal = Internal()
 
     override fun getTitle() : StructuredText {
         val modName = "SkyblockCollectionTracker"
