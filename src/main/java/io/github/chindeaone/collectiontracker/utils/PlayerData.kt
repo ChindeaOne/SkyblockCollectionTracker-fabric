@@ -12,20 +12,13 @@ object PlayerData {
         cachedPlayerName = user.name
     }
 
-    val cachedName: String
-        get() = cachedPlayerName
+    val cachedName: String get() = cachedPlayerName
 
-    @JvmStatic
-    val playerUUID: String
-        get() = profileId.toString().replace("-", "")
+    val playerUUID: String get() = profileId.toString().replace("-", "")
 
-    @JvmStatic
-    val playerName: String
-        get() = Minecraft.getInstance().user.name
+    val playerName: String get() = Minecraft.getInstance().user.name
 
-    val profileId: UUID
-        get() = Minecraft.getInstance().user.profileId
+    val profileId: UUID get() = Minecraft.getInstance().user.profileId
 
-    val accessToken: String
-        get() = Minecraft.getInstance().user.accessToken
+    val accessToken: String get() = Minecraft.getInstance().user.accessToken
 }

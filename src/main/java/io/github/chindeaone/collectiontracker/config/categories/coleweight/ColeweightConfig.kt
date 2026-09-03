@@ -26,14 +26,6 @@ class ColeweightConfig {
     var onlyOnMiningIslands: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Coleweight ability format",
-        desc = "Changes ability display and title to use Coleweight's format."
-    )
-    @ConfigEditorBoolean
-    var coleweightAbilityFormat: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Custom Coleweight Rank Color", desc = "")
     @Accordion
     var coleweightColorConfig: ColeweightColorConfig = ColeweightColorConfig()

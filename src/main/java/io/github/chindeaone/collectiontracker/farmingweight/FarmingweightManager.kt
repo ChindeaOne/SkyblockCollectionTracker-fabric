@@ -7,7 +7,6 @@ object FarmingweightManager {
 
     @Volatile
     var storage: FarmingweightStorage = FarmingweightStorage()
-        private set
 
     fun updateFarmingweight(data: String) {
         val root = JsonParser.parseString(data).asJsonObject

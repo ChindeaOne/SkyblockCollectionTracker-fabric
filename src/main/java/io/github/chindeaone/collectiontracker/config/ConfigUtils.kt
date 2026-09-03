@@ -121,7 +121,6 @@ val fiestaFlaskTime: Long get() = temporaryBuffsConfig.fiestaFlaskTime
 
 // Coleweight Config Accessors
 val coleweightConfig: ColeweightConfig get() = miningConfig.coleweightConfig
-val coleweightAbilityFormat: Boolean get() = coleweightConfig.coleweightAbilityFormat
 val coleweightColorConfig: ColeweightColorConfig get() = coleweightConfig.coleweightColorConfig
 val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
 val coleweightRankInNameTag: Boolean get() = coleweightConfig.coleweightRankInNameTag
@@ -382,8 +381,6 @@ object ConfigAccess {
     fun getCotfLevel(): Int = cotfLevel
 
     fun getAbilityPrecision(): Int = precision
-
-    fun isColeweightAbilityFormat(): Boolean = coleweightAbilityFormat
 
     fun getTitleDisplayTimer(): Long = titleDisplayTimer * 1000L
 

@@ -354,10 +354,8 @@ enum class TabWidget(headerRegex: String) {
     private val pattern: Regex = Regex("^\\s*($headerRegex)\\s*$")
 
     var lines: List<String> = emptyList()
-        private set
 
     var isPresent: Boolean = false
-        private set
 
     companion object {
         fun update(tabLines: List<String>) {

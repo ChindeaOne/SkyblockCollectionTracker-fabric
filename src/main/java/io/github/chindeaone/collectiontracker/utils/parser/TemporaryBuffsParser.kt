@@ -8,11 +8,11 @@ object TemporaryBuffsParser {
 
     private val HOUR = 1.hours.inWholeMilliseconds
 
-    @JvmStatic var refinedCacaoTime: Long = 0L
-    @JvmStatic var filetTime: Long = 0L
-    @JvmStatic var pristinePotatoTime: Long = 0L
-    @JvmStatic var powderPumpkinTime: Long = 0L
-    @JvmStatic var fiestaFlaskTime: Long = 0L
+    var refinedCacaoTime: Long = 0L
+    var filetTime: Long = 0L
+    var pristinePotatoTime: Long = 0L
+    var powderPumpkinTime: Long = 0L
+    var fiestaFlaskTime: Long = 0L
 
     fun loadDurations() {
         val now = System.currentTimeMillis()

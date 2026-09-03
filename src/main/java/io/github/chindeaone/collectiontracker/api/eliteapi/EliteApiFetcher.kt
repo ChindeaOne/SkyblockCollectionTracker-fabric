@@ -15,11 +15,9 @@ object EliteApiFetcher {
 
     @Volatile
     var hasFarmingweightLb = false
-        private set
 
     @Volatile
     var hasFarmingweightTopColors = false
-        private set
 
     fun fetchFarmingweightData(playerName: String, uuid: String): CompletableFuture<String?> {
         return ApiManager.requestAsync("farmingweight", authHeaders(uuid, playerName))

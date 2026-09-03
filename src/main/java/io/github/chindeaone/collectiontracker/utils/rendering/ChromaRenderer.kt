@@ -10,7 +10,6 @@ import java.awt.Color
 
 object ChromaRenderer {
 
-    @JvmStatic
     val chromaUniform = ChromaUniform()
     var normalChromaSlice: GpuBufferSlice? = null
     var prefixGradientSlice: GpuBufferSlice? = null

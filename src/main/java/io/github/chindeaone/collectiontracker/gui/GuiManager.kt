@@ -36,7 +36,6 @@ object GuiManager {
         screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
     }
 
-    @JvmStatic
     fun openGuiPositionEditor() {
         OverlayManager.setGlobalRendering(false)
 
@@ -55,7 +54,6 @@ object GuiManager {
         screenToOpen = ChangelogOverlay(old)
     }
 
-    @JvmStatic
     fun openGuiTitlePositionEditor() {
         OverlayManager.setGlobalRendering(false)
 

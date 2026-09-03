@@ -16,11 +16,8 @@ import java.util.concurrent.ConcurrentHashMap
 object MultiTrackingRates {
 
     // Collection tracking data
-    @JvmStatic
     val collectionAmounts = ConcurrentHashMap<String, Long>()
-    @JvmStatic
     val collectionPerHour = ConcurrentHashMap<String, Long>()
-    @JvmStatic
     val collectionMade = ConcurrentHashMap<String, Long>()
     val collectionSinceLast = ConcurrentHashMap<String, Long>()
     val sessionStartCollections = ConcurrentHashMap<String, Long>()
@@ -28,33 +25,28 @@ object MultiTrackingRates {
     val lastApiCollections = ConcurrentHashMap<String, Long>()
 
     // Track seen gemstones to only render them if they've been received from chat
-    @JvmStatic
     val seenGemstones: MutableSet<String>  = ConcurrentHashMap.newKeySet()
 
     // Money tracking data
     // NPC
-    @JvmStatic
     val moneyPerHourNPC = ConcurrentHashMap<String, Long>()
-    @JvmStatic
     val moneyMadeNPC = ConcurrentHashMap<String, Long>()
 
     // Bazaar
-    @JvmStatic
     val moneyMadeBazaar = ConcurrentHashMap<String, Long>()
-    @JvmStatic
     val moneyPerHourBazaar = ConcurrentHashMap<String, Long>()
 
     // Leaderboard tracking data
-    @JvmStatic var playerCurrentRank = -1
-    @JvmStatic var nextRankUsername: String? = null
-    @JvmStatic var nextRankAmount = -1L
-    @JvmStatic var etaToNextRank: String? = null
-    @JvmStatic var collectionTillNextRank = -1L
-    @JvmStatic var isNextWiped = false
-    @JvmStatic var previousRankUsername: String? = null
-    @JvmStatic var previousRankAmount = -1L
-    @JvmStatic var collectionAbovePreviousRankAmount = -1L
-    @JvmStatic var isPreviousWiped = false
+    var playerCurrentRank = -1
+    var nextRankUsername: String? = null
+    var nextRankAmount = -1L
+    var etaToNextRank: String? = null
+    var collectionTillNextRank = -1L
+    var isNextWiped = false
+    var previousRankUsername: String? = null
+    var previousRankAmount = -1L
+    var collectionAbovePreviousRankAmount = -1L
+    var isPreviousWiped = false
 
     fun setCollections(values: Map<String, Long>) {
         val now = System.currentTimeMillis()

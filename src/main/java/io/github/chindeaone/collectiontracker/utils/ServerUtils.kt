@@ -17,7 +17,6 @@ import kotlin.concurrent.fixedRateTimer
 
 object ServerUtils {
 
-    @JvmStatic
     var serverStatus = false
 
     private const val CHECK_INTERVAL = 600_000L

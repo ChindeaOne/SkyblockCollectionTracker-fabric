@@ -7,7 +7,6 @@ object ServerTickUtils {
     private var lastServerGameTime = -1L
     private var lastPacketSystemTime = -1L
     var totalLagAdjustment = 0L
-        private set
 
     @JvmStatic
     fun onServerTick(gameTime: Long) {

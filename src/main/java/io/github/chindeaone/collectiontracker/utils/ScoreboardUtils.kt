@@ -22,7 +22,6 @@ object ScoreboardUtils {
     var heatValue: Int = 0
     var coldValue: Int = 0
 
-    @JvmStatic
     var nextBuffTime: Long = 0
     var checkTime: Boolean = true
     var timeLeft: Int = 0

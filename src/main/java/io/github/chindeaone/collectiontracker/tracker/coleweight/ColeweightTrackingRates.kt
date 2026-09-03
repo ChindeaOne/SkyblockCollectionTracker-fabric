@@ -3,25 +3,11 @@ package io.github.chindeaone.collectiontracker.tracker.coleweight
 import io.github.chindeaone.collectiontracker.gui.overlays.ColeweightOverlay
 
 object ColeweightTrackingRates {
-    @JvmStatic
     var coleweightAmount = 0f
-        private set
-
-    @JvmStatic
     var coleweightGained = 0f
-        private set
-
-    @JvmStatic
     var coleweightPerHour = 0f
-        private set
-
-    @JvmStatic
     var coleweightSinceLast = 0f
-        private set
-
-    @JvmStatic
     var lastColeweightTime = -1L
-        private set
 
     var afk = false
 

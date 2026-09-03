@@ -10,15 +10,12 @@ import kotlin.math.roundToInt
 class Position(@field:Expose var x: Int, @field:Expose var y: Int) {
     @Expose
     var scale: Float = 1.0f
-        private set
 
     @Expose
     var width: Int = 100
-        private set
 
     @Expose
     var height: Int = 20
-        private set
 
     @Transient
     var link: Field? = null

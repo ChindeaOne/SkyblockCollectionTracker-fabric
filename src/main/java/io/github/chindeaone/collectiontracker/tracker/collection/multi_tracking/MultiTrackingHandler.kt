@@ -29,7 +29,6 @@ object MultiTrackingHandler  {
     val COOLDOWN_MILLIS: Long = TimeUnit.SECONDS.toMillis(10) // 10-second cooldown
 
     @Volatile
-    @JvmStatic
     var isMultiTracking = false
     var isMultiPaused = false
     var leaderboardTrackingInitialized = false
@@ -266,7 +265,6 @@ object MultiTrackingHandler  {
             return StringUtils.formatTimeIntoText(uptime)
         }
 
-    @JvmStatic
     val multiUptime: String
         get() {
             val uptime: Long = if (isMultiPaused) {

@@ -2,20 +2,20 @@ package io.github.chindeaone.collectiontracker.utils.world
 
 object ForagingMapping {
 
-    val foragingAreas = listOf(
+    val foragingAreas = setOf(
         "Hub",
         "The Park",
         "Moonglade Marsh",
         "Torrhus Canyon"
     )
 
-    val foragingIslands = listOf(
+    val foragingIslands = setOf(
         "The Park",
         "Moonglade Marsh",
         "Torrhus Canyon"
     )
 
-    val foragingStats = listOf(
+    val foragingStats = setOf(
         "Foraging Fortune",
         "Fig Fortune",
         "Helix Fortune",

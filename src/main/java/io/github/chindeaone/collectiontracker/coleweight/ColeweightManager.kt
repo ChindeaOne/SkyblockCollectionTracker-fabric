@@ -7,7 +7,6 @@ object ColeweightManager {
 
     @Volatile
     var storage: ColeweightStorage = ColeweightStorage()
-        private set
 
     fun updateColeweight(data: String) {
         val root = JsonParser.parseString(data).asJsonObject

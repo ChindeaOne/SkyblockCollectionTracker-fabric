@@ -20,9 +20,7 @@ import java.util.concurrent.ScheduledFuture
 
 object CollectionTracker {
 
-    @JvmField
     var collection = ""
-    @JvmStatic
     var collectionList: MutableList<String> = mutableListOf()
     var isApiTracking = false
     var scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)

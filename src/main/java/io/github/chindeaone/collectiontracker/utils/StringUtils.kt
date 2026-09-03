@@ -119,14 +119,9 @@ object StringUtils {
         return String.format("§aTime left: §e%s", formatTime(timeLeft))
     }
 
-    fun formatFloatOrPlaceholder(value: Float): String {
-        return if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
-    }
+    fun formatFloatOrPlaceholder(value: Float): String = if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
 
-    @JvmStatic
-    fun formatNumberOrPlaceholder(value: Long): String {
-        return if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
-    }
+    fun formatNumberOrPlaceholder(value: Long): String = if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
 
     // Method taken from Skyhanni
     fun CharSequence.removeColor(keepFormatting: Boolean = false): String {

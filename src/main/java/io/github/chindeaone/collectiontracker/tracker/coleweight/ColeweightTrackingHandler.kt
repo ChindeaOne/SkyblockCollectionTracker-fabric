@@ -16,7 +16,6 @@ object ColeweightTrackingHandler {
 
     private val logger: Logger = LogManager.getLogger(ColeweightTrackingHandler::class.java)
 
-    @JvmField
     var isTracking = false
     var isPaused = false
 
@@ -198,7 +197,6 @@ object ColeweightTrackingHandler {
         }
     }
 
-    @JvmStatic
     val uptime: String
         get() {
             val uptime: Long = if (isPaused) {

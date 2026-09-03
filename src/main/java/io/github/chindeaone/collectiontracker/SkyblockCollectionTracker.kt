@@ -51,8 +51,6 @@ object SkyblockCollectionTracker {
     const val NAMESPACE: String = "sct"
     const val MODID = "skyblockcollectiontracker"
 
-    @JvmField
     val VERSION: String = FabricLoader.getInstance().getModContainer(MODID).orElseThrow().metadata.version.friendlyString
-    @JvmField
     val MC_VERSION: String = SharedConstants.getCurrentVersion().name()
 }

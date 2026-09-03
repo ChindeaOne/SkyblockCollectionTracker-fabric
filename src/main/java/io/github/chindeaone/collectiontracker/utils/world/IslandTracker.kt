@@ -10,24 +10,14 @@ object IslandTracker {
 
     private var currentIsland: String? = null
 
-    @JvmStatic var currentMiningIsland: String? = null
-        private set
-
-    @JvmStatic
+    var currentMiningIsland: String? = null
     var currentForagingIsland: String? = null
-        private set
-
     var currentFarmingIsland: String? = null
-        private set
 
     var isInPark: Boolean = false
-        private set
-
     var isInMoongladeMarsh: Boolean = false
-        private set
 
     var isInRift: Boolean = false
-        private set
 
     private var wasReset: Boolean = false
 
@@ -53,36 +43,23 @@ object IslandTracker {
     }
 
     private fun updateIslands(island: String) {
-        currentMiningIsland = MiningMapping.miningAreas.firstOrNull { name ->
-            island.equals(name, ignoreCase = true)
-        }
+        currentMiningIsland = island.takeIf { it in MiningMapping.miningAreas }
+
         WaypointsUtils.enableRoutes()
         onMineshaftEnter()
 
-        currentForagingIsland = ForagingMapping.foragingAreas.firstOrNull { name ->
-            island.equals(name, ignoreCase = true)
-        }
+        currentForagingIsland = island.takeIf { it in ForagingMapping.foragingAreas }
         isInPark = currentForagingIsland == "The Park"
         isInMoongladeMarsh = currentForagingIsland == "Moonglade Marsh"
 
-        currentFarmingIsland = FarmingMapping.farmingAreas.firstOrNull { name ->
-            island.equals(name, ignoreCase = true)
-        }
+        currentFarmingIsland = island.takeIf { it in FarmingMapping.farmingAreas }
 
         updateRiftIsland(island)
     }
 
-    fun isMiningIsland(): Boolean {
-        return MiningMapping.miningIslands.find { name ->
-            currentMiningIsland?.equals(name, ignoreCase = true) == true
-        } != null
-    }
+    fun isMiningIsland() = currentMiningIsland in MiningMapping.miningIslands
 
-    fun isForagingIsland(): Boolean {
-        return ForagingMapping.foragingIslands.find { name ->
-            currentForagingIsland?.equals(name, ignoreCase = true) == true
-        } != null
-    }
+    fun isForagingIsland() = currentForagingIsland in ForagingMapping.foragingIslands
 
     private fun updateRiftIsland(island: String) {
         val currentlyInRift = island.equals("The Rift", ignoreCase = true)

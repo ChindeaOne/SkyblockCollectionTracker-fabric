@@ -31,7 +31,6 @@ import org.apache.logging.log4j.Logger
 
 object Hypixel {
 
-    @JvmStatic
     var server = false
     var skyblock = false
     private var updateCheckPerformed = false

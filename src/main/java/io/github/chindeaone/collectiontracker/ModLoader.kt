@@ -114,7 +114,6 @@ object ModLoader: ModInitializer {
     }
 
     var clientTicks = 0L
-        private set
 
     private object TickDispatcher {
         fun onEndClientTick(client: Minecraft) {

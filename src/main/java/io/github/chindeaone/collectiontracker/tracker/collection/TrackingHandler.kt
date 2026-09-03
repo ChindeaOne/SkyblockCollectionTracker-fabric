@@ -55,7 +55,6 @@ object TrackingHandler {
     private val logger: Logger = LogManager.getLogger(TrackingHandler::class.java)
     val COOLDOWN_MILLIS: Long = TimeUnit.SECONDS.toMillis(10) // 10-second cooldown
 
-    @JvmField
     @Volatile
     var isTracking: Boolean = false
     var isPaused: Boolean = false
@@ -455,7 +454,6 @@ object TrackingHandler {
             return StringUtils.formatTimeIntoText(uptime)
         }
 
-    @JvmStatic
     val uptime: String
         get() {
             val uptime = if (isPaused) {

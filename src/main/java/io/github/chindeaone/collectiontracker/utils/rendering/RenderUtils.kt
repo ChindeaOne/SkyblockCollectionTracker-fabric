@@ -27,7 +27,6 @@ object RenderUtils {
     private data class QueuedTitle(val title: Component, val duration: Long)
     private val titleQueue = ArrayDeque<QueuedTitle>()
 
-    @JvmStatic
     fun drawOverlayFrame(context: GuiGraphicsExtractor, pos: Position, drawContext: Runnable) {
         context.pose().pushMatrix()
         context.pose().translate(pos.x.toFloat(), pos.y.toFloat())
@@ -62,7 +61,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun renderTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
         var y = 0
 
@@ -130,7 +128,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun renderMultiTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, withColor: Boolean) {
         var y = 0
 
@@ -175,7 +172,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun renderSkillStringsWithTaming(context: GuiGraphicsExtractor, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
         var y = 0
 
@@ -195,7 +191,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun renderColeweightStrings(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
         val color = ColorUtils.SILVER_BLUE
@@ -206,7 +201,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun renderStrings(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
 
@@ -216,7 +210,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun renderCooldownCircle(context: GuiGraphicsExtractor, ability: String) {
         val centerX = ScaleUtils.scaledWidth / 2f - 1f
         val centerY = ScaleUtils.scaledHeight / 2f - 1f
@@ -244,7 +237,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun renderCooldownBar(context: GuiGraphicsExtractor, ability: String) {
         val centerX = ScaleUtils.scaledWidth / 2f - 1f
         val centerY = ScaleUtils.scaledHeight / 2f - 1f + 8f
@@ -435,7 +427,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun showTitle(title: Component, duration: Long = getTitleDisplayTimer()) {
         if (titleQueue.isEmpty()) {
             titleQueue.add(QueuedTitle(title, System.currentTimeMillis() + duration))
@@ -444,7 +435,6 @@ object RenderUtils {
         }
     }
 
-    @JvmStatic
     fun drawActiveTitle(context: GuiGraphicsExtractor) {
         val title = titleQueue.firstOrNull() ?: return
         if (System.currentTimeMillis() < title.duration) {
@@ -468,7 +458,6 @@ object RenderUtils {
         context.pose().popMatrix()
     }
 
-    @JvmStatic
     fun renderChangelog(context: GuiGraphicsExtractor, scrollOffset: Int) {
         val rawNotes = RepoUtils.latestNotes ?: return
         if (rawNotes.isEmpty()) return

@@ -6,7 +6,6 @@ object TokenManager {
 
     @Volatile
     var token: String? = null
-        private set
 
     fun fetchAndStoreToken(notify: Boolean = false): CompletableFuture<String?> {
         return TokenFetcher.fetchToken(notify).thenApply { fetchedToken ->

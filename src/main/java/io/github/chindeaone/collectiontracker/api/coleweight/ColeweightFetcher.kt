@@ -13,11 +13,9 @@ object ColeweightFetcher {
 
     @Volatile
     var hasColeweightLb = false
-        private set
 
     @Volatile
     var hasColeweightTopColors = false
-        private set
 
     fun fetchColeweightData(playerName: String, uuid: String): CompletableFuture<String?> {
         return ApiManager.requestAsync("coleweight", authHeaders(uuid, playerName))

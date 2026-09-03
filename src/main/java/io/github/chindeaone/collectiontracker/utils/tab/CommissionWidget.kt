@@ -1,9 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.tab
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.utils.Colors
-import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser.ActiveCommission
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
@@ -12,9 +10,7 @@ import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
 
 object CommissionWidget {
-    @JvmStatic
     var commissions: MutableList<ActiveCommission> = mutableListOf()
-        private set
     private var ignoredStates = mutableListOf<List<ActiveCommission>>()
 
     fun updateCommission(index: Int, newValue: String) {
@@ -76,17 +72,6 @@ object CommissionWidget {
         }
 
         val widget = TabWidget.COMMISSIONS
-        if (!widget.isPresent) {
-            // avoid spamming messages when tab widgets are not visible
-            if (!TabWidget.INFO.isPresent) return
-
-            val now = System.currentTimeMillis()
-            if (now - TabData.lastWorldSwitch < 10_000L) return // 10s buffer
-
-            // disable the overlay if the widget is not found
-            disableOverlay()
-            return
-        }
 
         val currentRaw = TabData.parseWidgetData(widget.lines) ?: return
 
@@ -100,12 +85,5 @@ object CommissionWidget {
         }
 
         commissions = parsed.toMutableList()
-    }
-
-    private fun disableOverlay() {
-        if (ConfigAccess.isCommissionsOverlayEnabled()) {
-            ConfigHelper.disableCommissions()
-            ChatUtils.sendMessage("§cWarning: Commissions widget not found. This can happen in low TPS lobbies. Please enable it using /widget or re-enable the commissions overlay config in your mod.", true)
-        }
     }
 }

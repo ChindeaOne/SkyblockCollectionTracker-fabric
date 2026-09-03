@@ -9,17 +9,11 @@ import net.minecraft.world.phys.BlockHitResult
 object BlockWatcher {
 
     var blockId : String = ""
-        private set
     var blockBox: AABB? = null
-    @JvmStatic
     var miningBlockType: String = ""
-        private set
-    @JvmStatic
     var foragingBlockType: String = ""
-        private set
     @Volatile
     var precisionMiningBlockType: String = ""
-        private set
 
     // Check the block the player is looking at
     fun onClientTick(client: Minecraft) {

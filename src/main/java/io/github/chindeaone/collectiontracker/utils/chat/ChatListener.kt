@@ -40,10 +40,10 @@ object ChatListener {
 
     var lastSkillValue = 0L
 
-    @JvmStatic var currentSkyMallBuff = "§cUnknown"
+    var currentSkyMallBuff = "§cUnknown"
     var isPickaxeAbility = false
-    @JvmStatic var currentLotteryBuff = "§cUnknown"
-    @JvmStatic var currentBeekeeperBuff = "§cUnknown"
+    var currentLotteryBuff = "§cUnknown"
+    var currentBeekeeperBuff = "§cUnknown"
 
     var abilityName: String? = null
 
@@ -56,10 +56,10 @@ object ChatListener {
     private val axeDuration = TimerState()
     private val axeCooldown = TimerState()
 
-    @JvmStatic val finalCooldown: Double get() = pickaxeCooldown.remainingSeconds
-    @JvmStatic val finalDuration: Double get() = pickaxeDuration.remainingSeconds
-    @JvmStatic val finalAxeCooldown: Double get() = axeCooldown.remainingSeconds
-    @JvmStatic val finalAxeDuration: Double get() = axeDuration.remainingSeconds
+    val finalCooldown: Double get() = pickaxeCooldown.remainingSeconds
+    val finalDuration: Double get() = pickaxeDuration.remainingSeconds
+    val finalAxeCooldown: Double get() = axeCooldown.remainingSeconds
+    val finalAxeDuration: Double get() = axeDuration.remainingSeconds
 
     var maxCooldown = 0.0
     var maxDuration = 0.0

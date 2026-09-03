@@ -9,12 +9,10 @@ object LeaderboardManager {
     @Volatile
     private var skillLeaderboards = mutableMapOf<String, List<LeaderboardEntry>>()
 
-    @JvmStatic
     fun set(entries: MutableList<LeaderboardEntry>) {
         currentLeaderboard = entries
     }
 
-    @JvmStatic
     fun setSkillLeaderboard(skill: String, entries: MutableList<LeaderboardEntry>) {
         skillLeaderboards[skill.lowercase()] = entries
     }
@@ -50,7 +48,6 @@ object LeaderboardManager {
         return if (index < lb.size) lb[index] else null
     }
 
-    @JvmStatic
     fun getPlayerRank(skill: String, amount: Long): Int {
         val lb = skillLeaderboards.getOrDefault(skill.lowercase(), listOf())
         if (lb.isEmpty()) {
@@ -182,12 +179,10 @@ object LeaderboardManager {
         return getPreviousRankEntryRaw(amount)
     }
 
-    @JvmStatic
     fun getPlayerRank(): Int {
         return getPlayerRank(TrackingRates.collectionAmount)
     }
 
-    @JvmStatic
     fun getNextRankEntry(): LeaderboardEntry? {
         // Custom position
         if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
@@ -207,7 +202,6 @@ object LeaderboardManager {
         return getNextRankEntryRaw(TrackingRates.collectionAmount)
     }
 
-    @JvmStatic
     fun getPreviousRankEntry(): LeaderboardEntry? {
         return getPreviousRankEntryRaw(TrackingRates.collectionAmount)
     }
@@ -221,12 +215,10 @@ object LeaderboardManager {
         return lb[position - 1]
     }
 
-    @JvmStatic
     fun getNextRankEntryForSkill(skill: String, skillXp: Long): LeaderboardEntry? {
         return getNextRankEntry(skill, skillXp)
     }
 
-    @JvmStatic
     fun getPreviousRankEntryForSkill(skill: String, skillXp: Long): LeaderboardEntry? {
         return getPreviousRankEntry(skill, skillXp)
     }
@@ -250,13 +242,11 @@ object LeaderboardManager {
         return index
     }
 
-    @JvmStatic
     fun clear() {
         currentLeaderboard = mutableListOf()
         skillLeaderboards.clear()
     }
 
-    @JvmStatic
     fun isEmpty(): Boolean {
         return currentLeaderboard.isEmpty()
     }

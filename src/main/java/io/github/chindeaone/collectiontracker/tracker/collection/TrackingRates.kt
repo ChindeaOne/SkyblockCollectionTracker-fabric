@@ -24,112 +24,48 @@ object TrackingRates {
     val logger: Logger = LogManager.getLogger(TrackingRates::class.java)
 
     // Collection tracking data
-    @JvmField
-    @Volatile
-    var collectionAmount: Long = 0
-
-    @JvmField
-    @Volatile
-    var collectionPerHour: Long = 0
-
-    @JvmField
-    @Volatile
-    var collectionMade: Long = 0
-
-    @JvmField
-    @Volatile
-    var collectionSinceLast: Long = 0
-
-    @Volatile
-    var sessionStartCollection: Long = -1L
-
-    @JvmField
-    @Volatile
-    var lastCollectionTime: Long = -1L
+    @Volatile var collectionAmount: Long = 0
+    @Volatile var collectionPerHour: Long = 0
+    @Volatile var collectionMade: Long = 0
+    @Volatile var collectionSinceLast: Long = 0
+    @Volatile var sessionStartCollection: Long = -1L
+    @Volatile var lastCollectionTime: Long = -1L
 
     // Sacks tracking data
-    @Volatile
-    var lastApiCollection: Long = -1L
-
-    @Volatile
-    var sacksCollectionGained: Long = 0L
+    @Volatile var lastApiCollection: Long = -1L
+    @Volatile var sacksCollectionGained: Long = 0L
 
     // Highest and lowest rates
-    @Volatile
-    var highestCollectionPerHour: Long = 0
-
-    @Volatile
-    var lowestCollectionPerHour: Long = Long.MAX_VALUE
+    @Volatile var highestCollectionPerHour: Long = 0
+    @Volatile var lowestCollectionPerHour: Long = Long.MAX_VALUE
 
     // Money tracking data
     // NPC
-    @Volatile
-    @JvmField
-    var moneyPerHourNPC: Long = 0
+    @Volatile var moneyPerHourNPC: Long = 0
 
     // Highest and lowest rates
-    @Volatile
-    var highestRatePerHourNPC: Long = 0
-
-    @Volatile
-    var lowestRatePerHourNPC: Long = Long.MAX_VALUE
+    @Volatile var highestRatePerHourNPC: Long = 0
+    @Volatile var lowestRatePerHourNPC: Long = Long.MAX_VALUE
 
     // Bazaar
-    @JvmField
-    @Volatile
-    var moneyMade: MutableMap<String, Long> = mutableMapOf()
-
-    @Volatile
-    @JvmField
-    var moneyPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
+    @Volatile var moneyMade: MutableMap<String, Long> = mutableMapOf()
+    @Volatile var moneyPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
 
     // Highest and lowest rates
-    @Volatile
-    var lowestRatesPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
-
-    @Volatile
-    var highestRatesPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
+    @Volatile var lowestRatesPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
+    @Volatile var highestRatesPerHourBazaar: MutableMap<String, Long> = mutableMapOf()
 
     // Leaderboard tracking data
-    @JvmField
-    @Volatile
-    var playerCurrentRank: Int = -1
-
-    @JvmField
-    @Volatile
-    var nextRankUsername: String? = null
-
-    @JvmField
-    @Volatile
-    var nextRankAmount: Long = -1L
-
-    @JvmField
-    @Volatile
-    var etaToNextRank: String? = null
-
-    @JvmField
-    @Volatile
-    var collectionTillNextRank: Long = -1L
-
-    @JvmField
-    @Volatile
-    var isNextWiped: Boolean = false
-
-    @JvmField
-    @Volatile
-    var previousRankUsername: String? = null
-
-    @JvmField
-    @Volatile
-    var previousRankAmount: Long = -1L
-
-    @JvmField
-    @Volatile
-    var collectionAbovePreviousRankAmount: Long = -1L
-
-    @JvmField
-    @Volatile
-    var isPreviousWiped: Boolean = false
+    @Volatile var playerCurrentRank: Int = -1
+    @Volatile var nextRankUsername: String? = null
+    @Volatile var nextRankAmount: Long = -1L
+    @Volatile var etaToNextRank: String? = null
+    @Volatile var collectionTillNextRank: Long = -1L
+    @Volatile var isNextWiped: Boolean = false
+    @Volatile var previousRankUsername: String? = null
+    @Volatile var previousRankAmount: Long = -1L
+    @Volatile var collectionAbovePreviousRankAmount: Long = -1L
+    @Volatile var isPreviousWiped: Boolean = false
 
     fun setCollection(value: Long) {
         val now = System.currentTimeMillis()

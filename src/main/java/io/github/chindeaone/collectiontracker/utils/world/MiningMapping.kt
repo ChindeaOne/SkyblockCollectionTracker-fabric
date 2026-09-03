@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.world
 object MiningMapping {
 
     // Areas where you can mine
-    val miningAreas = listOf(
+    val miningAreas = setOf(
         // actual mining ares
         "Dwarven Mines",
         "Crystal Hollows",
@@ -21,8 +21,7 @@ object MiningMapping {
     )
 
     // Mining specific islands
-    @JvmStatic
-    val miningIslands = listOf(
+    val miningIslands = setOf(
         "Dwarven Mines",
         "Crystal Hollows",
         "Mineshaft",
@@ -30,7 +29,7 @@ object MiningMapping {
         "Deep Caverns"
     )
 
-    val miningStats = listOf(
+    val miningStats = setOf(
         "Mining Speed",
         "Mining Fortune",
         "Dwarven Metal Fortune",

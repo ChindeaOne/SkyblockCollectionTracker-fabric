@@ -27,7 +27,6 @@ object ChatUtils {
     private const val CATEGORY_PAGE_MESSAGE_ID = 2
     private val messageSignatures = mutableMapOf<Int, MessageSignature>()
 
-    @JvmStatic
     fun sendMessage(message: String, prefix: Boolean = true) {
         val mc = Minecraft.getInstance()
         if (!mc.isSameThread) {
@@ -231,7 +230,6 @@ object ChatUtils {
         return title
     }
 
-    @JvmStatic
     fun sendSummary(
         title: String,
         lines: List<Component>

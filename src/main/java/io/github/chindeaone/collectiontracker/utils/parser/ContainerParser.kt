@@ -25,7 +25,7 @@ object ContainerParser {
     var currentCommissionScreen: AbstractContainerScreen<*>? = null
     var attachedCommissionMenu: AbstractContainerMenu? = null
     var isCommissionMenuOpen = false
-        private set
+
     var openedAt = 0L
 
     var lastClick = -1L

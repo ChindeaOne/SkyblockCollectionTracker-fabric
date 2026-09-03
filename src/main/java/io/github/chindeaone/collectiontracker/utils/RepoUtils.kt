@@ -8,26 +8,20 @@ import io.github.chindeaone.collectiontracker.config.categories.About
 object RepoUtils {
 
     var latestVersion: String? = null
-        private set
 
     @Volatile
     var latestReleaseTag: String? = null
-        private set
 
     @Volatile
     var latestBetaTag: String? = null
-        private set
 
     var latestNotes: String? = null
-        private set
 
     @Volatile
     var latestReleaseNotes: String? = null
-        private set
 
     @Volatile
     var latestBetaNotes: String? = null
-        private set
 
     private val currentVersion = SkyblockCollectionTracker.VERSION
 
