@@ -496,10 +496,6 @@ object ConfigHelper {
         collectionConfig.showExtraStats = false
     }
 
-    fun disableCommissions() {
-        commissionsConfig.enableCommissionsOverlay = false
-    }
-
     fun disableTamingTracking() {
         skillConfig.enableTamingTracking = false
     }
