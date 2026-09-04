@@ -45,7 +45,6 @@ object IslandTracker {
     private fun updateIslands(island: String) {
         currentMiningIsland = island.takeIf { it in MiningMapping.miningAreas }
 
-        WaypointsUtils.enableRoutes()
         onMineshaftEnter()
 
         currentForagingIsland = island.takeIf { it in ForagingMapping.foragingAreas }

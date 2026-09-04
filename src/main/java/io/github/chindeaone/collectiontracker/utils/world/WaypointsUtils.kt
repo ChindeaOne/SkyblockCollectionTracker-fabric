@@ -29,6 +29,7 @@ object WaypointsUtils {
         UMBE_1,
         TUNG_1,
         FAIR_1,
+        LITT_L,
         RUBY_1, RUBY_2, RUBY_C,
         ONYX_1, ONYX_2, ONYX_C,
         AQUA_1, AQUA_2, AQUA_C,
@@ -77,7 +78,7 @@ object WaypointsUtils {
         }
     }
 
-    fun enableRoutes() {
+    fun checkConfig() {
         if (currentMiningIsland == "Dwarven Mines") {
             val routes = listOf(
                 Triple(ConfigAccess.isMineshaftSpawnRoutesEnabled(), lastMineshaftEnabled, ConfigHelper::setMineshaftSpawnRoutesEnabled),
@@ -123,8 +124,7 @@ object WaypointsUtils {
         return player.position().closerThan(targetVec, 3.0)
     }
 
-    fun getWaypointsForCategory(category: String): List<Pair<String, BlockPos>> =
-        waypointCategories[category] ?: emptyList()
+    fun getWaypointsForCategory(category: String): List<Pair<String, BlockPos>> = waypointCategories[category] ?: emptyList()
 
     fun reset() {
         currentIndex = 0

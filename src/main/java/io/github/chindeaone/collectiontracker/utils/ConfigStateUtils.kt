@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 
 object ConfigStateUtils {
 
@@ -27,6 +28,7 @@ object ConfigStateUtils {
         checkSkyMallPerk()
         checkLotteryPerk()
         checkBeekeeperPerk()
+        WaypointsUtils.checkConfig()
     }
 
     private fun checkApiTracking() {
