@@ -82,6 +82,16 @@ repositories {
             includeGroup("org.notenoughupdates.moulconfig")
         }
     }
+
+    // Modrinth
+    exclusiveContent {
+        forRepository {
+            maven ("https://api.modrinth.com/maven")
+        }
+        filter {
+            includeGroup("maven.modrinth")
+        }
+    }
 }
 
 loom {
@@ -111,6 +121,8 @@ dependencies {
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
 
     implementation("com.terraformersmc:modmenu:${project.property("mod_menu_version")}")
+
+    implementation("maven.modrinth:l6YH9Als:J1GUYyGQ") // spark
 
     shadowImpl("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}") {
         exclude(group = "org.jetbrains.kotlin")
