@@ -58,18 +58,11 @@ object RenderUtils {
         }
     }
 
-    fun renderTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, extraLines: List<String>, withColor: Boolean) {
+    fun renderTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, withColor: Boolean) {
         var y = 0
 
-        val allLines = mutableListOf<String>()
-        allLines.addAll(lines)
-        if (extraLines.isNotEmpty()) {
-            allLines.add("")
-            allLines.addAll(extraLines)
-        }
-
-        val maxTextWidth = allLines.maxOfOrNull { font.width(it) } ?: 0
-        val totalTextHeight = allLines.size * font.lineHeight
+        val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
+        val totalTextHeight = lines.size * font.lineHeight
 
         val padding = 8
         val overlayW = maxTextWidth + padding * 2
@@ -80,53 +73,49 @@ object RenderUtils {
         val color: Int = if (withColor) (ColorUtils.collectionColors[CollectionTracker.collection]) ?: Colors.GREEN.color else Colors.GREEN.color
 
         if (color != Colors.GREEN.color) {
-            val outlineShade = Colors.DARK_GRAY.color
-
-            val startX = -padding
-            val startY = -padding
-            val baseR = radius.coerceAtMost(overlayW / 2).coerceAtMost(overlayH / 2)
-
-            if (baseR >= 3) {
-                drawOverlayOutline(context, startX, startY, overlayW, overlayH, baseR, outlineShade)
-                drawOverlayOutline(
-                    context,
-                    startX + 1,
-                    startY + 1,
-                    overlayW - 2,
-                    overlayH - 2,
-                    (baseR - 1).coerceAtLeast(1),
-                    color
-                )
-                drawOverlayOutline(
-                    context,
-                    startX + 2,
-                    startY + 2,
-                    overlayW - 4,
-                    overlayH - 4,
-                    (baseR - 2).coerceAtLeast(1),
-                    outlineShade
-                )
-            } else {
-                drawOverlayOutline(context, startX, startY, overlayW, overlayH, baseR, outlineShade)
-            }
+            drawLayeredOutline(
+                context = context,
+                x = -padding,
+                y = -padding,
+                width = overlayW,
+                height = overlayH,
+                radius = radius,
+                outlineShade = Colors.DARK_GRAY.color,
+                accentColor = color
+            )
         }
 
         for (line in lines) {
             drawHelper(line, context, y, color)
             y += font.lineHeight
         }
-
-        if (extraLines.isNotEmpty()) {
-            y += font.lineHeight
-            for (line in extraLines) {
-                drawHelper(line, context, y, color)
-                y += font.lineHeight
-            }
-        }
     }
 
     fun renderMultiTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, withColor: Boolean) {
         var y = 0
+
+        val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
+        val totalTextHeight = lines.size * font.lineHeight
+
+        val padding = 8
+        val overlayW = maxTextWidth + padding * 2
+        val overlayH = totalTextHeight + padding * 2
+        val radius = (overlayH / 12).coerceAtLeast(1)
+
+        val color: Int = if (withColor) (ColorUtils.collectionColors["gemstone"]) ?: Colors.GREEN.color else Colors.GREEN.color
+
+        if (color != Colors.GREEN.color) {
+            drawLayeredOutline(
+                context = context,
+                x = -padding,
+                y = -padding,
+                width = overlayW,
+                height = overlayH,
+                radius = radius,
+                outlineShade = Colors.DARK_GRAY.color,
+                accentColor = color
+            )
+        }
 
         for (line in lines) {
             var color: Int = Colors.GREEN.color
@@ -597,28 +586,41 @@ object RenderUtils {
         }
     }
 
+    @Suppress("SameParameterValue")
+    private fun drawLayeredOutline(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, radius: Int, outlineShade: Int, accentColor: Int) {
+        val baseR = radius.coerceAtMost(width / 2).coerceAtMost(height / 2)
+
+        if (baseR >= 3) {
+            drawOverlayOutline(context, x, y, width, height, baseR, outlineShade) // outer layer
+            drawOverlayOutline(context, x + 1, y + 1, width - 2, height - 2, baseR - 1, accentColor) // middle layer
+            drawOverlayOutline(context, x + 2, y + 2, width - 4, height - 4, baseR - 2, outlineShade) // inner layer
+        } else {
+            drawOverlayOutline(context, x, y, width, height, baseR, outlineShade)
+        }
+    }
+
     private fun drawOverlayOutline(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
-        val r = radius.coerceAtMost(width / 2).coerceAtMost(height / 2)
+        if (width <= 0 || height <= 0) return
+        val r = radius.coerceIn(0, 3).coerceAtMost(width / 2).coerceAtMost(height / 2)
 
-        context.fill(x + r, y, x + width - r, y + 1, color)
-        context.fill(x + r, y + height - 1, x + width - r, y + height, color)
-        context.fill(x, y + r, x + 1, y + height - r, color)
-        context.fill(x + width - 1, y + r, x + width, y + height - r, color)
+        if (r <= 0) {
+            context.fill(x, y, x + width, y + 1, color) // top
+            context.fill(x, y + height - 1, x + width, y + height, color) // bottom
+            context.fill(x, y + 1, x + 1, y + height - 1, color) // left
+            context.fill(x + width - 1, y + 1, x + width, y + height - 1, color) // right
+            return
+        }
+        context.fill(x + r, y, x + width - r, y + 1, color) // top
+        context.fill(x + r, y + height - 1, x + width - r, y + height, color) // bottom
+        context.fill(x, y + r, x + 1, y + height - r, color) // left
+        context.fill(x + width - 1, y + r, x + width, y + height - r, color) // right
 
-        val innerR = r - 1
-        for (cx in 0 until r) {
-            for (cy in 0 until r) {
-                val dx = (r - cx - 0.5)
-                val dy = (r - cy - 0.5)
-                val dist = sqrt(dx * dx + dy * dy)
-
-                if (dist < r && dist >= innerR) {
-                    context.fill(x + cx, y + cy, x + cx + 1, y + cy + 1, color) // top left
-                    context.fill(x + width - cx - 1, y + cy, x + width - cx, y + cy + 1, color) // top right
-                    context.fill(x + cx, y + height - cy - 1, x + cx + 1, y + height - cy, color) // bottom left
-                    context.fill(x + width - cx - 1, y + height - cy - 1, x + width - cx, y + height - cy, color) // bottom right
-                }
-            }
+        for (i in 1 until r) {
+            val offset = r - i
+            context.fill(x + i, y + offset, x + i + 1, y + offset + 1, color) // top-left
+            context.fill(x + width - i - 1, y + offset, x + width - i, y + offset + 1, color) // top-right
+            context.fill(x + i, y + height - offset - 1, x + i + 1, y + height - offset, color) // bottom-left
+            context.fill(x + width - i - 1, y + height - offset - 1, x + width - i, y + height - offset, color) // bottom-right
         }
     }
 }

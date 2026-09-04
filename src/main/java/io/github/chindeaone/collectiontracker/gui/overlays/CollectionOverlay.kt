@@ -43,18 +43,10 @@ class CollectionOverlay : AbstractOverlay() {
     override fun render(context: GuiGraphicsExtractor) {
         if (!isEnabled || !trackingDirty) return
 
-        updateLinesIfNeeded()
+        val lines = lines
+        if (lines.isEmpty()) return
 
-        if (cachedMainLines.isEmpty()) return
-
-        RenderUtils.drawOverlayFrame(context, position) {
-            RenderUtils.renderTrackingStringsWithColor(
-                context,
-                cachedMainLines,
-                cachedExtraLines,
-                isOverlayTextColorEnabled()
-            )
-        }
+        RenderUtils.drawOverlayFrame(context, position) { RenderUtils.renderTrackingStringsWithColor(context, lines, isOverlayTextColorEnabled()) }
     }
 
     override fun updateDimensions() {
