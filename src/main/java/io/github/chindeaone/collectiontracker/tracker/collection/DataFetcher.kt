@@ -9,10 +9,10 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collect
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
@@ -53,19 +53,15 @@ object DataFetcher {
                         }
 
                         if (isInitialFetch) {
-                            Minecraft.getInstance().execute {
-                                Minecraft.getInstance()
-                                    ./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
-                                        CustomCollectionScreen(listOf(collection)) {
-                                            CollectionsManager.resetCollections()
-                                        }
-                                    )
+                            MinecraftUtils.runOnClientThread {
+                                MinecraftUtils.setScreen(CustomCollectionScreen(listOf(collection)) {
+                                    CollectionsManager.resetCollections()
+                                })
                             }
                         }
                         return@thenAccept
                     }
-                    collectionData =
-                        JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().value.asLong
+                    collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().value.asLong
 
                     collectionCache[collection] = collectionData
                     cacheTimestamps[collection] = System.currentTimeMillis()

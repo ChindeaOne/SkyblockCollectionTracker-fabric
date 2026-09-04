@@ -5,10 +5,10 @@ import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.font.TextRenderable
 import net.minecraft.client.gui.render.TextureSetup
@@ -120,7 +120,7 @@ object BlockOutline {
             scale(0.03f, -0.03f, 0.03f)
         }
 
-        val fr: Font = Minecraft.getInstance().font
+        val fr = MinecraftUtils.font
         val offset = -fr.width(text) / 2f
         // set a background color based on Skyblocker's code
         val glyphs: Font.PreparedText = fr.prepareText(text, offset, 0f, color, false, 0)

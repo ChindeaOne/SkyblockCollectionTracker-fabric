@@ -8,10 +8,9 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDispla
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils.font
 import io.github.chindeaone.collectiontracker.utils.RepoUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import kotlin.math.abs
@@ -21,8 +20,6 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 object RenderUtils {
-
-    private val fr: Font get() = Minecraft.getInstance().font
 
     private data class QueuedTitle(val title: Component, val duration: Long)
     private val titleQueue = ArrayDeque<QueuedTitle>()
@@ -48,7 +45,7 @@ object RenderUtils {
             val overlayText = Component.literal(label).withColor(Colors.GREEN.color)
             val textScale = 0.8f
 
-            val textHeight = fr.lineHeight * textScale
+            val textHeight = font.lineHeight * textScale
             val centerYInBox = (totalBoxHeight - textHeight) / 2f
 
             val xPos = (pos.width / 2f) / textScale
@@ -56,7 +53,7 @@ object RenderUtils {
 
             context.pose().pushMatrix()
             context.pose().scale(textScale, textScale)
-            context.centeredText(fr, overlayText, xPos.toInt(), yPos.toInt(), Colors.WHITE.color)
+            context.centeredText(font, overlayText, xPos.toInt(), yPos.toInt(), Colors.WHITE.color)
             context.pose().popMatrix()
         }
     }
@@ -71,8 +68,8 @@ object RenderUtils {
             allLines.addAll(extraLines)
         }
 
-        val maxTextWidth = allLines.maxOfOrNull { fr.width(it) } ?: 0
-        val totalTextHeight = allLines.size * fr.lineHeight
+        val maxTextWidth = allLines.maxOfOrNull { font.width(it) } ?: 0
+        val totalTextHeight = allLines.size * font.lineHeight
 
         val padding = 8
         val overlayW = maxTextWidth + padding * 2
@@ -116,14 +113,14 @@ object RenderUtils {
 
         for (line in lines) {
             drawHelper(line, context, y, color)
-            y += fr.lineHeight
+            y += font.lineHeight
         }
 
         if (extraLines.isNotEmpty()) {
-            y += fr.lineHeight
+            y += font.lineHeight
             for (line in extraLines) {
                 drawHelper(line, context, y, color)
-                y += fr.lineHeight
+                y += font.lineHeight
             }
         }
     }
@@ -168,7 +165,7 @@ object RenderUtils {
             }
 
             drawHelper(line, context, y, color)
-            y += fr.lineHeight
+            y += font.lineHeight
         }
     }
 
@@ -178,15 +175,15 @@ object RenderUtils {
         val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
         for (line in lines) {
             drawHelper(line, context, y, color)
-            y += fr.lineHeight
+            y += font.lineHeight
         }
 
         if (withTaming) {
-            y += fr.lineHeight
+            y += font.lineHeight
             val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: Colors.GREEN.color
             for (line in tamingLines) {
                 drawHelper(line, context, y, tamingColor)
-                y += fr.lineHeight
+                y += font.lineHeight
             }
         }
     }
@@ -197,7 +194,7 @@ object RenderUtils {
 
         for (line in lines) {
             drawHelper(line, context, y, color)
-            y += fr.lineHeight
+            y += font.lineHeight
         }
     }
 
@@ -205,8 +202,8 @@ object RenderUtils {
         var y = 0
 
         for (line in lines) {
-            context.text(fr, line, 0, y, Colors.WHITE.color, true)
-            y += fr.lineHeight
+            context.text(font, line, 0, y, Colors.WHITE.color, true)
+            y += font.lineHeight
         }
     }
 
@@ -364,13 +361,13 @@ object RenderUtils {
         val textScale = 0.75f
         val resizeText = Component.literal("").withColor(Colors.GREEN.color)
 
-        val textWidth = fr.width(resizeText)
+        val textWidth = font.width(resizeText)
         val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
         val textY = 10f
 
         context.pose().pushMatrix()
         context.pose().scale(textScale, textScale)
-        context.text(fr, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), Colors.WHITE.color, true)
+        context.text(font, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), Colors.WHITE.color, true)
         context.pose().popMatrix()
 
         if (pos != null) {
@@ -391,11 +388,11 @@ object RenderUtils {
         val padding = 2
         val space = 2
 
-        val lines = fr.split(positionText, 1000)
-        val maxTextWidth = lines.maxOfOrNull { fr.width(it) } ?: 0
+        val lines = font.split(positionText, 1000)
+        val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
 
         val positionWidth = maxTextWidth * textScale
-        val maxHeight = (lines.size * fr.lineHeight + (lines.size - 1) * space) * textScale
+        val maxHeight = (lines.size * font.lineHeight + (lines.size - 1) * space) * textScale
 
         val positionY = (y.toFloat()).coerceIn(8f, context.guiHeight() - maxHeight - padding * 2 - 8f)
         val positionX = (x.toFloat()).coerceIn(8f, context.guiWidth() - positionWidth - padding * 2 - 8f)
@@ -406,8 +403,8 @@ object RenderUtils {
         context.pose().translate(positionX, positionY)
         context.pose().scale(textScale, textScale)
         lines.forEachIndexed { index, line ->
-            val yOffset = index * (fr.lineHeight + space)
-            context.text(fr, line, 0, yOffset, Colors.YELLOW.color, true)
+            val yOffset = index * (font.lineHeight + space)
+            context.text(font, line, 0, yOffset, Colors.YELLOW.color, true)
         }
         context.pose().popMatrix()
     }
@@ -418,12 +415,12 @@ object RenderUtils {
             val prefix = line.substring(0, splitIndex)
             val numberPart = line.substring(splitIndex)
 
-            context.text(fr, prefix, 0, y, prefixColor, true)
+            context.text(font, prefix, 0, y, prefixColor, true)
 
-            val prefixWidth = fr.width(prefix)
-            context.text(fr, numberPart,  prefixWidth, y, ColorUtils.CUSTOM_WHITE, true)
+            val prefixWidth = font.width(prefix)
+            context.text(font, numberPart,  prefixWidth, y, ColorUtils.CUSTOM_WHITE, true)
         } else {
-            context.text(fr, line, 0, y, prefixColor, true)
+            context.text(font, line, 0, y, prefixColor, true)
         }
     }
 
@@ -449,12 +446,12 @@ object RenderUtils {
         val scale = ConfigAccess.getTitleScale().scale * ScaleUtils.scale
 
         val y = if (pos.y == 0) ((screenHeight - (pos.height * scale))/ 2f) else pos.y.toFloat()
-        val yOffset = (pos.height - fr.lineHeight) / 2f
+        val yOffset = (pos.height - font.lineHeight) / 2f
 
         context.pose().pushMatrix()
         context.pose().translate(screenWidth / 2f, y)
         context.pose().scale(scale, scale)
-        context.centeredText(fr, title, 0, yOffset.toInt(), Colors.WHITE.color)
+        context.centeredText(font, title, 0, yOffset.toInt(), Colors.WHITE.color)
         context.pose().popMatrix()
     }
 
@@ -476,7 +473,7 @@ object RenderUtils {
 
         // Render current version first
         SkyblockCollectionTracker.VERSION.let { version ->
-            context.centeredText(fr, "Version: $version", screenWidth / 2, startY - 20, Colors.GREEN.color)
+            context.centeredText(font, "Version: $version", screenWidth / 2, startY - 20, Colors.GREEN.color)
         }
 
         context.enableScissor(startX, startY, startX + overlayWidth, startY + overlayHeight)
@@ -493,7 +490,7 @@ object RenderUtils {
             val trimmed = line.trimEnd()
 
             if (trimmed.isEmpty() || trimmed == "---") {
-                currentY += fr.lineHeight / 2
+                currentY += font.lineHeight / 2
                 continue
             }
             // Set header colors
@@ -509,11 +506,11 @@ object RenderUtils {
                 .replace("`", "")
                 .replace(referenceRegex, "")
 
-            val wrappedLines = fr.split(Component.literal(cleanLine), overlayWidth)
+            val wrappedLines = font.split(Component.literal(cleanLine), overlayWidth)
             for (wrapped in wrappedLines) {
-                if (currentY + fr.lineHeight >= limitStartY && currentY <= limitStartY + limitHeight)
-                    context.text(fr, wrapped, startX, currentY, color, true)
-                currentY += fr.lineHeight
+                if (currentY + font.lineHeight >= limitStartY && currentY <= limitStartY + limitHeight)
+                    context.text(font, wrapped, startX, currentY, color, true)
+                currentY += font.lineHeight
             }
         }
     }
@@ -531,7 +528,7 @@ object RenderUtils {
         for (line in lines) {
             val trimmed = line.trim()
             if (trimmed.isEmpty() || trimmed == "---") {
-                totalHeight += fr.lineHeight / 2
+                totalHeight += font.lineHeight / 2
                 continue
             }
 
@@ -540,8 +537,8 @@ object RenderUtils {
                 .replace("`", "")
                 .replace(referenceRegex, "")
 
-            val wrappedLines = fr.split(Component.literal(cleanLine), overlayWidth)
-            totalHeight += wrappedLines.size * fr.lineHeight
+            val wrappedLines = font.split(Component.literal(cleanLine), overlayWidth)
+            totalHeight += wrappedLines.size * font.lineHeight
         }
         return totalHeight
     }

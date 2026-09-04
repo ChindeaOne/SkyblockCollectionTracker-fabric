@@ -66,9 +66,8 @@ object CommissionUtils {
         val commissionIndex = getCommissionIndex(slot) ?: return
         if (stack.isEmpty) return
 
-        val client = Minecraft.getInstance()
-        val player = client.player ?: return
-        val level = client.level ?: return
+        val player = MinecraftUtils.player ?: return
+        val level = MinecraftUtils.level ?: return
 
         val tooltipContext = Item.TooltipContext.of(level.registryAccess())
         val tooltipLines = stack.getTooltipLines(
@@ -131,8 +130,8 @@ object CommissionUtils {
 
         val clickedItem = slot.item.copy()
 
-        val player = client.player ?: return
-        val gm = client.gameMode ?: return
+        val player = MinecraftUtils.player ?: return
+        val gm = MinecraftUtils.gameMode ?: return
 
         val playerMenu = player.containerMenu
         if (playerMenu.containerId != screen.menu.containerId) {
@@ -295,9 +294,8 @@ object CommissionUtils {
     private fun isCompletedCommission(stack: ItemStack): Boolean {
         if (stack.isEmpty) return false
 
-        val client = Minecraft.getInstance()
-        val player = client.player ?: return false
-        val level = client.level ?: return false
+        val player = MinecraftUtils.player ?: return false
+        val level = MinecraftUtils.level ?: return false
 
         val tooltipLines = stack.getTooltipLines(
             Item.TooltipContext.of(level.registryAccess()),

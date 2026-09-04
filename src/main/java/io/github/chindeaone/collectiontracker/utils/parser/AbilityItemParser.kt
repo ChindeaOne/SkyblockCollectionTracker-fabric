@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
-import net.minecraft.client.Minecraft
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import net.minecraft.world.item.TooltipFlag
 
 object AbilityItemParser {
@@ -12,7 +12,7 @@ object AbilityItemParser {
     private val GAUNTLET_REGEX = Regex("\\bgauntlet\\b")
 
     fun tooltipFlag(): TooltipFlag.Default =
-        if (Minecraft.getInstance().options.advancedItemTooltips) TooltipFlag.Default.ADVANCED
+        if (MinecraftUtils.options.advancedItemTooltips) TooltipFlag.Default.ADVANCED
         else TooltipFlag.Default.NORMAL
 
     fun parse(lines: List<String>): AbilityUtils.AbilitySnapshot? {

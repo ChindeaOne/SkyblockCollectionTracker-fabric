@@ -51,7 +51,7 @@ object TabData {
             !ConfigAccess.isColeweightRankingInChat() &&
             !ConfigAccess.isFarmingweightRankingInChat()) return
 
-        val newTab = readTab() ?: return
+        val newTab = readTab(client) ?: return
         if (newTab.isEmpty()) return
         if (newTab == tabCache) return
 
@@ -63,12 +63,11 @@ object TabData {
         StatsWidget.onTabUpdate()
     }
 
-    private fun readTab(): List<String>? {
-        val mc = Minecraft.getInstance()
-        val player = mc.player ?: return null
+    private fun readTab(client: Minecraft): List<String>? {
+        val player = client.player ?: return null
         val connection = player.connection
 
-        val tabOverlay = mc.gui /*? if 26.2 {*/ /*.hud *//*?}*/.tabList
+        val tabOverlay = client.gui /*? if 26.2 {*/ /*.hud *//*?}*/.tabList
 
         val result = connection.onlinePlayers
             .sortedWith(TAB_COMPARATOR)

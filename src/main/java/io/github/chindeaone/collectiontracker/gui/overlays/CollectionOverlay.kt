@@ -14,9 +14,9 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper.setShowExtraSt
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.concurrent.Volatile
@@ -81,7 +81,7 @@ class CollectionOverlay : AbstractOverlay() {
         }
 
         val uptime = TrackingHandler.uptime
-        val isChatOpened = Minecraft.getInstance()./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ is ChatScreen
+        val isChatOpened = MinecraftUtils.screen is ChatScreen
         val showExtra = isShowExtraStats()
         val bzType = getBazaarType()
         val bzPriceType = getBazaarPriceType()

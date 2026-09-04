@@ -24,14 +24,11 @@ object ApiManager {
 
     private val logger: Logger = LogManager.getLogger(ApiManager::class.java)
 
-    val session: MinecraftSessionService
-        get() = Minecraft.getInstance().services().sessionService()
+    val session: MinecraftSessionService get() = Minecraft.getInstance().services().sessionService()
 
-    val agent: String
-        get() = "$AGENT_BASE/${SkyblockCollectionTracker.VERSION}"
+    val agent: String get() = "$AGENT_BASE/${SkyblockCollectionTracker.VERSION}"
 
     var serverId: String? = null
-        private set
 
     private var lastTokenRequest = 0L
 

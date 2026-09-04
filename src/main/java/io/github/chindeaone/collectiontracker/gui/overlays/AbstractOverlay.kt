@@ -4,9 +4,9 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.gui.GuiManager.getEditorInstance
 import io.github.chindeaone.collectiontracker.gui.GuiManager.openEditor
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.roundToInt
 
@@ -23,9 +23,8 @@ abstract class AbstractOverlay {
     open val isEnabled: Boolean get() = false
 
     fun shouldRender(): Boolean {
-        val mc = Minecraft.getInstance()
-        return !mc./*? if 26.2 {*/ /*gui.hud.isHidden() */ /*?} else {*/options.hideGui /*?}*/
-                && !mc.debugEntries.isOverlayVisible
+        return !MinecraftUtils.hideGui
+                && !MinecraftUtils.isDebugHudVisible
                 && isEnabled
                 && isRenderingAllowed
     }
@@ -45,7 +44,7 @@ abstract class AbstractOverlay {
         val lines = lines
         if (lines.isEmpty()) return
 
-        val fr = Minecraft.getInstance().font
+        val fr = MinecraftUtils.font
         var maxW = 0
         for (l in lines) maxW = maxOf(maxW, fr.width(l))
         val h = fr.lineHeight * lines.size
@@ -68,7 +67,7 @@ abstract class AbstractOverlay {
         val y = position.y
         val scale = position.scale
 
-        val fr = Minecraft.getInstance().font
+        val fr = MinecraftUtils.font
         val height = (fr.lineHeight * lines.size * scale).toInt()
         val width = (position.width * scale).toInt()
 

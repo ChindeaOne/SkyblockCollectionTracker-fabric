@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.chat
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.Formatting
-import net.minecraft.client.Minecraft
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
@@ -28,19 +28,15 @@ object ChatUtils {
     private val messageSignatures = mutableMapOf<Int, MessageSignature>()
 
     fun sendMessage(message: String, prefix: Boolean = true) {
-        val mc = Minecraft.getInstance()
-        if (!mc.isSameThread) {
-            mc.execute { sendMessage(message, prefix) }
-            return
+        MinecraftUtils.runOnClientThread {
+            val messageComponent = Component.literal(message)
+            val text = if (prefix) {
+                Component.empty().append(PREFIX).append(messageComponent)
+            } else {
+                messageComponent
+            }
+            MinecraftUtils.chat.addClientSystemMessage(text)
         }
-
-        val messageComponent = Component.literal(message)
-        val text = if (prefix) {
-            Component.empty().append(PREFIX).append(messageComponent)
-        } else {
-            messageComponent
-        }
-        mc.gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat.addClientSystemMessage(text)
     }
 
     private fun sendEmptyMessage() {
@@ -48,26 +44,22 @@ object ChatUtils {
     }
 
     fun sendComponent(component: Component, prefix: Boolean = true, messageId: Int? = null) {
-        val mc = Minecraft.getInstance()
-        if (!mc.isSameThread) {
-            mc.execute { sendComponent(component, prefix, messageId) }
-            return
-        }
+        MinecraftUtils.runOnClientThread {
+            val finalComponent = if (prefix) {
+                Component.empty().append(PREFIX).append(component)
+            } else {
+                component
+            }
 
-        val finalComponent = if (prefix) {
-            Component.empty().append(PREFIX).append(component)
-        } else {
-            component
-        }
+            val chat = MinecraftUtils.chat
 
-        val chat = mc.gui/*? if 26.2 {*/ /*.hud *//*?}*/.chat
-
-        if (messageId == null) {
-            chat.addClientSystemMessage(finalComponent)
-        } else {
-            val signature = createMessageSignature(messageId)
-            removeChatMessage(chat, signature)
-            chat.addMessage(finalComponent, signature, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
+            if (messageId == null) {
+                chat.addClientSystemMessage(finalComponent)
+            } else {
+                val signature = createMessageSignature(messageId)
+                removeChatMessage(chat, signature)
+                chat.addMessage(finalComponent, signature, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
+            }
         }
     }
 
@@ -132,8 +124,8 @@ object ChatUtils {
     fun String.asComponent(): Component = Component.literal(this)
 
     private fun Component.centerText(width: Int = getWidth()): Component {
-        val textWidth = Minecraft.getInstance().font.width(this)
-        val spaceWidth = Minecraft.getInstance().font.width(Component.literal(" "))
+        val textWidth = MinecraftUtils.font.width(this)
+        val spaceWidth = MinecraftUtils.font.width(Component.literal(" "))
         val paddingPixels = (width - textWidth) / 2
         val spaces = " ".repeat((paddingPixels / spaceWidth).coerceAtLeast(0))
         if (spaces.isEmpty()) return this
@@ -146,7 +138,7 @@ object ChatUtils {
 
     private fun fillChat(width: Int = getWidth()): Component {
         val symbolComponent = Component.literal("-").withStyle(Formatting.STRIKETHROUGH.format).withColor(Colors.GOLD.color)
-        val symbolWidth = Minecraft.getInstance().font.width(symbolComponent)
+        val symbolWidth = MinecraftUtils.font.width(symbolComponent)
         if (symbolWidth <= 0) return symbolComponent
         if (symbolWidth >= width) return symbolComponent
         val repeat = (width / symbolWidth).coerceAtLeast(1)
@@ -155,7 +147,7 @@ object ChatUtils {
         return component
     }
 
-    private fun getWidth(): Int = ChatComponent.getWidth(Minecraft.getInstance().options.chatWidth().get())
+    private fun getWidth(): Int = ChatComponent.getWidth(MinecraftUtils.options.chatWidth().get())
 
     fun sendCommandPage(
         category: String,

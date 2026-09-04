@@ -3,9 +3,9 @@ package io.github.chindeaone.collectiontracker.utils.world
 import com.google.gson.JsonObject
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentMiningIsland
-import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.Vec3
 
@@ -20,39 +20,22 @@ object WaypointsUtils {
     private var lastOresEnabled = false
 
     enum class MineshaftTypes {
-        TOPA_1,
-        TOPA_2,
-        SAPP_1,
-        SAPP_2,
-        AMET_1,
-        AMET_2,
-        AMBE_1,
-        AMBE_2,
-        JADE_1,
-        JADE_2,
+        TOPA_1, TOPA_2,
+        SAPP_1, SAPP_2,
+        AMET_1, AMET_2,
+        AMBE_1, AMBE_2,
+        JADE_1, JADE_2,
         TITA_1,
         UMBE_1,
         TUNG_1,
         FAIR_1,
-        RUBY_1,
-        RUBY_2,
-        RUBY_C,
-        ONYX_1,
-        ONYX_2,
-        ONYX_C,
-        AQUA_1,
-        AQUA_2,
-        AQUA_C,
-        CITR_1,
-        CITR_2,
-        CITR_C,
-        PERI_1,
-        PERI_2,
-        PERI_C,
-        JASP_1,
-        JASP_C,
-        OPAL_1,
-        OPAL_C;
+        RUBY_1, RUBY_2, RUBY_C,
+        ONYX_1, ONYX_2, ONYX_C,
+        AQUA_1, AQUA_2, AQUA_C,
+        CITR_1, CITR_2, CITR_C,
+        PERI_1, PERI_2, PERI_C,
+        JASP_1, JASP_C,
+        OPAL_1, OPAL_C;
     }
 
     fun setWaypoints(data: JsonObject) {
@@ -135,7 +118,7 @@ object WaypointsUtils {
     }
 
     private fun isPlayerNear(pos: BlockPos): Boolean {
-        val player = Minecraft.getInstance().player ?: return false
+        val player = MinecraftUtils.player ?: return false
         val targetVec = Vec3.atCenterOf(pos)
         return player.position().closerThan(targetVec, 3.0)
     }

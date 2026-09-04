@@ -1,15 +1,17 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
 
-class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(Component.literal("Dummy Overlay")) {
+class DummyOverlay(
+    private val oldScreen: AbstractContainerScreen<*>?
+) : Screen(Component.literal("Dummy Overlay")) {
 
     private var dragging: AbstractOverlay? = null
     private var dragOffsetX = 0
@@ -17,7 +19,7 @@ class DummyOverlay(private val oldScreen: AbstractContainerScreen<*>?) : Screen(
 
     override fun onClose() {
         OverlayManager.setGlobalRendering(true)
-        Minecraft.getInstance()./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(oldScreen)
+        MinecraftUtils.setScreen(oldScreen)
     }
 
     override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {

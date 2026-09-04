@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils
 
-import net.minecraft.client.Minecraft
 import java.util.UUID
 
 object PlayerData {
@@ -8,17 +7,16 @@ object PlayerData {
     private var cachedPlayerName: String = ""
 
     fun init() {
-        val user = Minecraft.getInstance().user
-        cachedPlayerName = user.name
+        cachedPlayerName = MinecraftUtils.name
     }
 
     val cachedName: String get() = cachedPlayerName
 
     val playerUUID: String get() = profileId.toString().replace("-", "")
 
-    val playerName: String get() = Minecraft.getInstance().user.name
+    val playerName: String get() = MinecraftUtils.name
 
-    val profileId: UUID get() = Minecraft.getInstance().user.profileId
+    val profileId: UUID get() = MinecraftUtils.profileId
 
-    val accessToken: String get() = Minecraft.getInstance().user.accessToken
+    val accessToken: String get() = MinecraftUtils.accessToken
 }

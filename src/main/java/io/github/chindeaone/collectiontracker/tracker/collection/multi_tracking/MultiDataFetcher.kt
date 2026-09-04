@@ -8,8 +8,8 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiTracking
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
-import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
@@ -43,13 +43,10 @@ object MultiDataFetcher {
                         }
 
                         if (isInitialFetch) {
-                            Minecraft.getInstance().execute {
-                                Minecraft.getInstance()
-                                    ./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(
-                                        CustomCollectionScreen(CollectionTracker.collectionList) {
-                                            CollectionsManager.resetMultiCollections()
-                                        }
-                                    )
+                            MinecraftUtils.runOnClientThread {
+                                MinecraftUtils.setScreen(CustomCollectionScreen(CollectionTracker.collectionList) {
+                                    CollectionsManager.resetMultiCollections()
+                                })
                             }
                         }
                         return@thenAccept

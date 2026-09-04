@@ -12,10 +12,6 @@ object ScaleUtils {
     val scale get() = mc.window.guiScale
     val scaledHeight get() = mc.window.guiScaledHeight
     val scaledWidth get() = mc.window.guiScaledWidth
-    val mouseX: Int get() {
-        return (mouse.xpos() * scaledWidth / width).toInt()
-    }
-    val mouseY: Int get() {
-        return (mouse.ypos() * scaledHeight / height).toInt()
-    }
+    val mouseX: Int get() = (mouse.xpos() * scaledWidth / width).toInt()
+    val mouseY: Int get() =(mouse.ypos() * scaledHeight / height).toInt()
 }

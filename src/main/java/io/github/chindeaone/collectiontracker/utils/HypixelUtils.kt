@@ -1,12 +1,10 @@
 package io.github.chindeaone.collectiontracker.utils
 
-import net.minecraft.client.Minecraft
-
 object HypixelUtils {
 
     private val HypixelServer get() = Hypixel.server
 
-    val isInHypixel get() = HypixelServer && Minecraft.getInstance().player != null
+    val isInHypixel get() = HypixelServer && MinecraftUtils.player != null
 
     @JvmStatic
     val isInSkyblock get() = isInHypixel && Hypixel.skyblock

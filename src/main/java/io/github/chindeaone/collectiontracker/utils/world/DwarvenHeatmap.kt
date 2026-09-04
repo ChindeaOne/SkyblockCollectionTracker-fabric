@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
@@ -34,8 +34,8 @@ object DwarvenHeatmap {
 
         val camera = context.levelState().cameraRenderState
 
-        val world = Minecraft.getInstance().level ?: return
-        val player = Minecraft.getInstance().player ?: return
+        val world = MinecraftUtils.level ?: return
+        val player = MinecraftUtils.player ?: return
         val playerPos = player.blockPosition()
 
         for (x in playerPos.x - 7..playerPos.x + 7) {

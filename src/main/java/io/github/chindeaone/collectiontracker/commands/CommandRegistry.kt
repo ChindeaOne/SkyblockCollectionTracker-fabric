@@ -24,7 +24,6 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
-import net.minecraft.client.Minecraft
 
 object CommandRegistry {
 
@@ -490,7 +489,7 @@ object CommandRegistry {
         // sct changelog -> opens the changelog GUI
         .then(ClientCommands.literal("changelog")
             .executes {
-                Minecraft.getInstance().execute(GuiManager::openChangelog)
+                GuiManager.openChangelog()
                 1
             }
         )

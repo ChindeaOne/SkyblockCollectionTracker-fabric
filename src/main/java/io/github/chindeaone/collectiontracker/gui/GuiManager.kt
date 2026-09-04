@@ -9,11 +9,12 @@ import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.gui.overlays.ChangelogOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyTitle
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
-import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 
@@ -36,30 +37,24 @@ object GuiManager {
         screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
     }
 
-    fun openGuiPositionEditor() {
+    private fun openScreen(createScreen: (AbstractContainerScreen<*>?) -> Screen) {
         OverlayManager.setGlobalRendering(false)
 
-        val current = Minecraft.getInstance()./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/
+        val current = MinecraftUtils.screen
         val old = current as? AbstractContainerScreen<*>
 
-        screenToOpen = DummyOverlay(old)
+        screenToOpen = createScreen(old)
+    }
+
+    fun openGuiPositionEditor() {
+        openScreen(::DummyOverlay)
     }
 
     fun openChangelog() {
-        OverlayManager.setGlobalRendering(false)
-
-        val current = Minecraft.getInstance()./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/
-        val old = current as? AbstractContainerScreen<*>
-
-        screenToOpen = ChangelogOverlay(old)
+        openScreen(::ChangelogOverlay)
     }
 
     fun openGuiTitlePositionEditor() {
-        OverlayManager.setGlobalRendering(false)
-
-        val current = Minecraft.getInstance()./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/
-        val old = current as? AbstractContainerScreen<*>
-
-        screenToOpen = DummyTitle(old)
+        openScreen(::DummyTitle)
     }
 }

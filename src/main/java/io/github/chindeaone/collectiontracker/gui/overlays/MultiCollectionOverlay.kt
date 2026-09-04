@@ -12,11 +12,11 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaarType
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderMultiTrackingStringsWithColor
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.concurrent.Volatile
@@ -69,7 +69,7 @@ class MultiCollectionOverlay : AbstractOverlay() {
         }
 
         val uptime = MultiTrackingHandler.multiUptime
-        val isChatOpened = Minecraft.getInstance()./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ is ChatScreen
+        val isChatOpened = MinecraftUtils.screen is ChatScreen
         val bzType = getBazaarType()
         val bzPriceType = getBazaarPriceType()
         val gemVariant = getGemstoneVariant()

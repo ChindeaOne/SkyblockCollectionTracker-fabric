@@ -2,10 +2,10 @@ package io.github.chindeaone.collectiontracker.gui
 
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
@@ -34,7 +34,6 @@ class CustomCollectionScreen(
             val yPos = startY + (index * 20)
             val displayName = formatCollectionName(s)
             val box = CollectionEditBox(
-                font,
                 width / 2 - 25,
                 yPos,
                 100,
@@ -79,7 +78,7 @@ class CustomCollectionScreen(
         extractMenuBackground(context)
 
         context.centeredText(
-            font,
+            MinecraftUtils.font,
             title,
             width / 2,
             20,
@@ -89,9 +88,9 @@ class CustomCollectionScreen(
         map.forEach { (name, box) ->
             val displayName = formatCollectionName(name)
             context.text(
-                font,
+                MinecraftUtils.font,
                 displayName,
-                box.x - font.width(name) - 10,
+                box.x - MinecraftUtils.font.width(name) - 10,
                 box.y + 5,
                 0xFFFFFFFF.toInt()
             )
@@ -127,13 +126,12 @@ class CustomCollectionScreen(
     }
 
     class CollectionEditBox(
-        font: Font,
         x: Int,
         y: Int,
         width: Int,
         height: Int,
         message: Component
-    ) : EditBox(font, x, y, width, height, message) {
+    ) : EditBox(MinecraftUtils.font, x, y, width, height, message) {
 
         override fun insertText(input: String) {
             val filtered = input.filter {
