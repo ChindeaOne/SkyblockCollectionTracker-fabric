@@ -113,9 +113,10 @@ object MiningStatsParser {
             else -> false
         }
 
+        ctx.specificFortuneName = if (ctx.specificFortune > 0) ctx.getFortuneLabel() else "Mining Fortune"
+
         if (match) {
             ctx.specificFortune = value
-            ctx.specificFortuneName = ctx.getFortuneLabel()
 
             // Update last displayed specific fortune
             lastDisplayedSpecificFortune = ctx.specificFortuneName
@@ -182,7 +183,7 @@ private class MiningContext(
             "pure_ores", "ores" -> "Ore Fortune"
             "gemstones" -> "Gemstone Fortune"
             "blocks" -> "Block Fortune"
-            else -> ""
+            else -> "Mining Fortune"
         }
     }
 
@@ -192,7 +193,7 @@ private class MiningContext(
             "pure_ores", "ores" -> "§e" // Yellow
             "gemstones" -> "§d" // Light Purple
             "blocks" -> "§8" // Dark Gray
-            else -> "" // No color
+            else -> "§a" // default
         }
     }
 
