@@ -17,8 +17,7 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalDurat
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderCooldownBar
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderCooldownCircle
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
-import io.github.chindeaone.collectiontracker.utils.world.ForagingMapping.foragingIslands
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentForagingIsland
+import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 
@@ -35,7 +34,7 @@ class AxeAbilityOverlay : AbstractOverlay() {
 
     override val position: Position get() = getAxeAbilityPosition()
 
-    override val isEnabled: Boolean get() = true
+    override val isEnabled: Boolean get() = isAxeAbilityDisplayed() && (!isAxeAbilityInForagingIslandsOnly() || IslandTracker.isForagingIsland())
 
     override fun render(context: GuiGraphicsExtractor) {
         super.render(context)
@@ -61,7 +60,7 @@ class AxeAbilityOverlay : AbstractOverlay() {
         }
 
     private fun updateLinesIfNeeded() {
-        if (!isAxeAbilityDisplayed() || (isAxeAbilityInForagingIslandsOnly() && !foragingIslands.contains(currentForagingIsland))) {
+        if (!isAxeAbilityDisplayed() || (isAxeAbilityInForagingIslandsOnly() && !IslandTracker.isForagingIsland())) {
             if (cachedLines.isNotEmpty()) {
                 cachedLines = emptyList()
             }
