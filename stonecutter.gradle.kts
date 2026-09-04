@@ -11,7 +11,7 @@ stonecutter {
             string(current.parsed < "26.2") {
                 replace(
                     "GpuBufferSlice;II)V",
-                    "GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat\$IndexType;II)V"
+                    $$"GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V"
                 )
                 replace(
                     "\"createForGrayscaleTexture\"",

@@ -15,7 +15,7 @@ object DwarvenHeatmap {
     private data class HeatmapHighlight(val pos: BlockPos, val r: Float, val g: Float, val b: Float)
 
     private val trackedBlocks = setOf(
-        Blocks.BROWN_TERRACOTTA,
+        Blocks./*? if 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/,
         Blocks.SMOOTH_RED_SANDSTONE,
         Blocks.TERRACOTTA,
         Blocks.INFESTED_COBBLESTONE,
@@ -63,7 +63,7 @@ object DwarvenHeatmap {
         cachedHighlights = list
     }
 
-    fun render (context: LevelRenderContext) {
+    fun render(context: LevelRenderContext) {
         val camera = context.levelState().cameraRenderState
 
         for (highlight in cachedHighlights) {
@@ -74,7 +74,7 @@ object DwarvenHeatmap {
     private fun priorityColor(block: Block): Triple<Float, Float, Float> {
         return when (block) {
             Blocks.SMOOTH_RED_SANDSTONE, Blocks.CLAY -> Triple(0f / 255f, 100f / 255f, 0f / 255f)
-            Blocks.BROWN_TERRACOTTA -> Triple(144f / 255f, 238f / 255f, 144f / 255f)
+            Blocks./*? if 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/ -> Triple(144f / 255f, 238f / 255f, 144f / 255f)
             else -> Triple(0f / 255f, 255f / 255f, 0f / 255f)
         }
     }
