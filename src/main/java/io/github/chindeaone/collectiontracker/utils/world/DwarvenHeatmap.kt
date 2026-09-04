@@ -1,92 +1,80 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
+import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
+import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.BlockPos
-import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 
 object DwarvenHeatmap {
 
-    private val blockList = setOf(
-        "minecraft:brown_terracotta", // umber
-        "minecraft:smooth_red_sandstone", // umber
-        "minecraft:terracotta", // umber
-        "minecraft:infested_cobblestone", // tungsten
-        "minecraft:clay" // tungsten
+    private data class HeatmapHighlight(val pos: BlockPos, val r: Float, val g: Float, val b: Float)
+
+    private val trackedBlocks = setOf(
+        Blocks.BROWN_TERRACOTTA,
+        Blocks.SMOOTH_RED_SANDSTONE,
+        Blocks.TERRACOTTA,
+        Blocks.INFESTED_COBBLESTONE,
+        Blocks.CLAY
     )
 
     private val badBlocks = setOf(
-        "minecraft:infested_cobblestone", // tungsten
-        "minecraft:terracotta" // umber
+        Blocks.INFESTED_COBBLESTONE,
+        Blocks.TERRACOTTA
     )
 
-    private val goodBlocks = mapOf(
-        "minecraft:clay" to 3, // tungsten
-        "minecraft:smooth_red_sandstone" to 3, // umber
-        "minecraft:brown_terracotta" to 2 // umber
-    )
+    private var cachedHighlights: List<HeatmapHighlight> = emptyList()
 
-    fun render (context: LevelRenderContext) {
-        if (!ConfigAccess.isHeatmapEnabled() || IslandTracker.currentMiningIsland != "Dwarven Mines") return
+    fun onClientTick(client: Minecraft) {
+        if (ModLoader.clientTicks % 4L != 0L) return
 
-        val camera = context.levelState().cameraRenderState
+        if (!ConfigAccess.isHeatmapEnabled() || !ScoreboardUtils.isColdStatRelevant()) {
+            if (cachedHighlights.isNotEmpty()) cachedHighlights = emptyList()
+            return
+        }
 
-        val world = MinecraftUtils.level ?: return
-        val player = MinecraftUtils.player ?: return
+        val world = client.level ?: return
+        val player = client.player ?: return
         val playerPos = player.blockPosition()
+
+        val mutablePos = BlockPos.MutableBlockPos()
+        val list = mutableListOf<HeatmapHighlight>()
 
         for (x in playerPos.x - 7..playerPos.x + 7) {
             for (y in playerPos.y - 1..playerPos.y + 7) {
                 for (z in playerPos.z - 7..playerPos.z + 7) {
-                    val checkPos = BlockPos(x, y, z)
+                    mutablePos.set(x, y, z)
 
-                    if (!isBlockExposed(world, checkPos)) continue
-                    if (!isTrackedBlock(world, checkPos)) continue
+                    val state = world.getBlockState(mutablePos)
+                    val block = state.block
 
-                    val score = calculateBlockScore(world, checkPos)
-                    if (score > 0) {
-                        val block = world.getBlockState(checkPos).block
-                        val key = BuiltInRegistries.BLOCK.getKey(block)
-                        val blockName = key.toString()
+                    if (block !in trackedBlocks || block in badBlocks) continue
+                    if (!isBlockExposed(world, mutablePos)) continue
 
-                        val (r, g, b) = priorityColor(blockName)
-                        BlockOutline.renderBlockHighlight(checkPos, camera, r, g, b)
-                    }
+                    val (r, g, b) = priorityColor(block)
+                    list.add(HeatmapHighlight(mutablePos.immutable(), r, g ,b))
                 }
             }
         }
+        cachedHighlights = list
     }
 
-    private fun isTrackedBlock(world: ClientLevel, pos: BlockPos): Boolean {
-        val block = world.getBlockState(pos).block
-        val key = BuiltInRegistries.BLOCK.getKey(block)
-        val blockName = key.toString()
-        return blockName in blockList && blockName !in badBlocks
-    }
+    fun render (context: LevelRenderContext) {
+        val camera = context.levelState().cameraRenderState
 
-    private fun calculateBlockScore(world: ClientLevel, pos: BlockPos): Int {
-        var score = 0
-        for (x in -1..1) {
-            for (y in -1..1) {
-                for (z in -1..1) {
-                    val checkPos = pos.offset(x, y, z)
-                    val block = world.getBlockState(checkPos).block
-                    val key = BuiltInRegistries.BLOCK.getKey(block)
-                    val blockName = key.toString()
-                    if (blockName in blockList && isBlockExposed(world, checkPos)) score += goodBlocks.getOrDefault(blockName, 0)
-                }
-            }
+        for (highlight in cachedHighlights) {
+            BlockOutline.renderBlockHighlight(highlight.pos, camera, highlight.r, highlight.g, highlight.b)
         }
-        return score
     }
 
-    private fun priorityColor(blockName: String): Triple<Float, Float, Float> {
-        return when (blockName) {
-            "minecraft:smooth_red_sandstone", "minecraft:clay" -> Triple(0f / 255f, 100f / 255f, 0f / 255f)
-            "minecraft:brown_terracotta" -> Triple(144f / 255f, 238f / 255f, 144f / 255f)
+    private fun priorityColor(block: Block): Triple<Float, Float, Float> {
+        return when (block) {
+            Blocks.SMOOTH_RED_SANDSTONE, Blocks.CLAY -> Triple(0f / 255f, 100f / 255f, 0f / 255f)
+            Blocks.BROWN_TERRACOTTA -> Triple(144f / 255f, 238f / 255f, 144f / 255f)
             else -> Triple(0f / 255f, 255f / 255f, 0f / 255f)
         }
     }

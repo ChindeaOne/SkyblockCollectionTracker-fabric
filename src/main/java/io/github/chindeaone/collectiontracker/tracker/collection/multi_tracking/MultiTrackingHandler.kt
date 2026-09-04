@@ -22,11 +22,13 @@ import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 
 object MultiTrackingHandler  {
 
     private val logger: Logger = LogManager.getLogger(MultiTrackingHandler::class.java)
-    val COOLDOWN_MILLIS: Long = TimeUnit.SECONDS.toMillis(10) // 10-second cooldown
+    val COOLDOWN_MILLIS: Long = 10.seconds.inWholeMilliseconds
 
     @Volatile
     var isMultiTracking = false
@@ -105,7 +107,7 @@ object MultiTrackingHandler  {
             multiFirstRestartTime = System.currentTimeMillis()
         } else {
             val elapsedTime = System.currentTimeMillis() - multiFirstRestartTime
-            if (elapsedTime >= TimeUnit.HOURS.toMillis(1)) {
+            if (elapsedTime >= 1.hours.inWholeMilliseconds) {
                 multiRestartCount = 0
                 multiFirstRestartTime = System.currentTimeMillis()
             }

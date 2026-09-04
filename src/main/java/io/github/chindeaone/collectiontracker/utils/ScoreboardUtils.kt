@@ -183,11 +183,7 @@ object ScoreboardUtils {
         heatValue = heat ?: 0
     }
 
-    fun isColdStatRelevant(): Boolean {
-        return location == "Glacite Tunnels" || location == "Glacite Mineshafts" || location == "Great Glacite Lake" || location == "Dwarven Base Camp" || location == "Grandpa Wolf's Cave"
-    }
+    fun isColdStatRelevant(): Boolean = location == "Glacite Tunnels" || location == "Glacite Mineshafts" || location == "Great Glacite Lake" || location == "Dwarven Base Camp" || location == "Grandpa Wolf's Cave"
 
-    fun isHeatStatRelevant(): Boolean {
-        return location == "Magma Fields"
-    }
+    fun isHeatStatRelevant(): Boolean = location == "Magma Fields"
 }

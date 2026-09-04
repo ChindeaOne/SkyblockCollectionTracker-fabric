@@ -3,7 +3,7 @@
  */
 package io.github.chindeaone.collectiontracker.utils
 
-import java.util.*
+import java.util.EnumMap
 import kotlin.math.floor
 import kotlin.math.min
 

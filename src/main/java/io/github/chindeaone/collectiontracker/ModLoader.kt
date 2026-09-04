@@ -139,6 +139,7 @@ object ModLoader: ModInitializer {
             CommissionUtils.onClientTick(client)
             TabData.onClientTick(client)
             BlockWatcher.onClientTick(client)
+            DwarvenHeatmap.onClientTick(client)
             ScoreboardUtils.onClientTick(client)
             DeployableParser.onClientTick(client)
             InventoryListener.onClientTick(client)

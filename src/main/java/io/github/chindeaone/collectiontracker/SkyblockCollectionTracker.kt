@@ -37,7 +37,7 @@ object SkyblockCollectionTracker {
 
     fun onClientTick(client: Minecraft) {
         val screenToOpen = screenToOpen ?: return
-        if (ModLoader.clientTicks % 4 != 0L) return
+        if (ModLoader.clientTicks % 4L != 0L) return
         shouldCloseScreen = true
         client./*? if 26.2 {*/ /*gui.setScreen *//*?} else {*/ setScreen /*?}*/(screenToOpen)
         this.screenToOpen = null
