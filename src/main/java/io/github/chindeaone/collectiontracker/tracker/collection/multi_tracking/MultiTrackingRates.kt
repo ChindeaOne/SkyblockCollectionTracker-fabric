@@ -16,37 +16,37 @@ import java.util.concurrent.ConcurrentHashMap
 object MultiTrackingRates {
 
     // Collection tracking data
-    val collectionAmounts = ConcurrentHashMap<String, Long>()
-    val collectionPerHour = ConcurrentHashMap<String, Long>()
-    val collectionMade = ConcurrentHashMap<String, Long>()
-    val collectionSinceLast = ConcurrentHashMap<String, Long>()
-    val sessionStartCollections = ConcurrentHashMap<String, Long>()
-    val lastCollectionTimes = ConcurrentHashMap<String, Long>()
-    val lastApiCollections = ConcurrentHashMap<String, Long>()
+    @Volatile var collectionAmounts = ConcurrentHashMap<String, Long>()
+    @Volatile var collectionPerHour = ConcurrentHashMap<String, Long>()
+    @Volatile var collectionMade = ConcurrentHashMap<String, Long>()
+    @Volatile var collectionSinceLast = ConcurrentHashMap<String, Long>()
+    @Volatile var sessionStartCollections = ConcurrentHashMap<String, Long>()
+    @Volatile var lastCollectionTimes = ConcurrentHashMap<String, Long>()
+    @Volatile var lastApiCollections = ConcurrentHashMap<String, Long>()
 
     // Track seen gemstones to only render them if they've been received from chat
-    val seenGemstones: MutableSet<String>  = ConcurrentHashMap.newKeySet()
+    @Volatile var seenGemstones: MutableSet<String>  = ConcurrentHashMap.newKeySet()
 
     // Money tracking data
     // NPC
-    val moneyPerHourNPC = ConcurrentHashMap<String, Long>()
-    val moneyMadeNPC = ConcurrentHashMap<String, Long>()
+    @Volatile var moneyPerHourNPC = ConcurrentHashMap<String, Long>()
+    @Volatile var moneyMadeNPC = ConcurrentHashMap<String, Long>()
 
     // Bazaar
-    val moneyMadeBazaar = ConcurrentHashMap<String, Long>()
-    val moneyPerHourBazaar = ConcurrentHashMap<String, Long>()
+    @Volatile var moneyMadeBazaar = ConcurrentHashMap<String, Long>()
+    @Volatile var moneyPerHourBazaar = ConcurrentHashMap<String, Long>()
 
     // Leaderboard tracking data
-    var playerCurrentRank = -1
-    var nextRankUsername: String? = null
-    var nextRankAmount = -1L
-    var etaToNextRank: String? = null
-    var collectionTillNextRank = -1L
-    var isNextWiped = false
-    var previousRankUsername: String? = null
-    var previousRankAmount = -1L
-    var collectionAbovePreviousRankAmount = -1L
-    var isPreviousWiped = false
+    @Volatile var playerCurrentRank = -1
+    @Volatile var nextRankUsername: String? = null
+    @Volatile var nextRankAmount = -1L
+    @Volatile var etaToNextRank: String? = null
+    @Volatile var collectionTillNextRank = -1L
+    @Volatile var isNextWiped = false
+    @Volatile var previousRankUsername: String? = null
+    @Volatile var previousRankAmount = -1L
+    @Volatile var collectionAbovePreviousRankAmount = -1L
+    @Volatile var isPreviousWiped = false
 
     fun setCollections(values: Map<String, Long>) {
         val now = System.currentTimeMillis()

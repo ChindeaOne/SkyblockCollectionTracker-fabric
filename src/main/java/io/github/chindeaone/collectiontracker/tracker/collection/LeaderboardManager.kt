@@ -243,13 +243,11 @@ object LeaderboardManager {
     }
 
     fun clear() {
-        currentLeaderboard = mutableListOf()
+        currentLeaderboard.clear()
         skillLeaderboards.clear()
     }
 
-    fun isEmpty(): Boolean {
-        return currentLeaderboard.isEmpty()
-    }
+    fun isEmpty(): Boolean = currentLeaderboard.isEmpty()
 }
 
 data class LeaderboardEntry(var username: String, var rank: Int, var amount: Long, var wiped: Boolean)

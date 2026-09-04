@@ -27,25 +27,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCol
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.isEmpty
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionAmount
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.collectionAbovePreviousRankAmount
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.collectionAmounts
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.collectionMade
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.collectionPerHour
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.collectionTillNextRank
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.etaToNextRank
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.isNextWiped
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.isPreviousWiped
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.moneyMadeBazaar
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.moneyMadeNPC
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.moneyPerHourBazaar
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.moneyPerHourNPC
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.nextRankAmount
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.nextRankUsername
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.playerCurrentRank
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.previousRankAmount
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.previousRankUsername
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.seenGemstones
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatBazaarItemName
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatNumberOrPlaceholder
@@ -83,111 +65,111 @@ object CollectionParser {
     }
 
     private fun handleNextPosition(): String? {
-        if (isEmpty() || playerCurrentRank == 1) return null
+        if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
         if (isCustomPositionEnabled()) {
-            if (nextRankAmount == -1L) return "Custom Position: Calculating..."
-            if (isNextWiped) return String.format("Custom Position (%s-wiped): %s", nextRankUsername, formatNumber(nextRankAmount))
-            return String.format("Custom Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount))
+            if (TrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
+            if (TrackingRates.isNextWiped) return String.format("Custom Position (%s-wiped): %s", TrackingRates.nextRankUsername, formatNumber(TrackingRates.nextRankAmount))
+            return String.format("Custom Position (%s): %s", TrackingRates.nextRankUsername, formatNumber(TrackingRates.nextRankAmount))
         }
 
-        if (nextRankUsername == null) return "Next Position: Calculating..."
-        if (isNextWiped) return String.format("Next Position (%s-wiped): %s", nextRankUsername, formatNumber(nextRankAmount))
-        return String.format("Next Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount))
+        if (TrackingRates.nextRankUsername == null) return "Next Position: Calculating..."
+        if (TrackingRates.isNextWiped) return String.format("Next Position (%s-wiped): %s", TrackingRates.nextRankUsername, formatNumber(TrackingRates.nextRankAmount))
+        return String.format("Next Position (%s): %s", TrackingRates.nextRankUsername, formatNumber(TrackingRates.nextRankAmount))
     }
 
     private fun handleCollectionTillNextRank(): String? {
-        if (isEmpty() || playerCurrentRank == 1) return null
+        if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
         if (isCustomPositionEnabled()) {
-            if (collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
-            return "Till Custom Position: " + formatNumber(collectionTillNextRank)
+            if (TrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
+            return "Till Custom Position: " + formatNumber(TrackingRates.collectionTillNextRank)
         }
 
-        if (collectionTillNextRank == -1L) return "Till Next Position: Calculating..."
-        return "Till Next Position: " + formatNumber(collectionTillNextRank)
+        if (TrackingRates.collectionTillNextRank == -1L) return "Till Next Position: Calculating..."
+        return "Till Next Position: " + formatNumber(TrackingRates.collectionTillNextRank)
     }
 
     private fun handleEta(): String? {
-        if (isEmpty() || playerCurrentRank == 1) return null
+        if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
         if (isCustomPositionEnabled()) {
-            if (etaToNextRank == null) return "ETA to Custom Position: Calculating..."
-            return "ETA to Custom Position: $etaToNextRank"
+            if (TrackingRates.etaToNextRank == null) return "ETA to Custom Position: Calculating..."
+            return "ETA to Custom Position: ${TrackingRates.etaToNextRank}"
         }
 
-        if (etaToNextRank == null) return "ETA: Calculating..."
-        return "ETA: $etaToNextRank"
+        if (TrackingRates.etaToNextRank == null) return "ETA: Calculating..."
+        return "ETA: ${TrackingRates.etaToNextRank}"
     }
 
     private fun handlePreviousPosition(): String? {
         if (isEmpty() || !isPreviousPositionEnabled()) return null
 
-        if (previousRankUsername == null) return "Passed: Calculating..."
-        if (isPreviousWiped) return String.format("Passed (%s-wiped): %s", previousRankUsername, formatNumber(previousRankAmount))
-        return String.format("Passed (%s): %s", previousRankUsername, formatNumber(previousRankAmount))
+        if (TrackingRates.previousRankUsername == null) return "Passed: Calculating..."
+        if (TrackingRates.isPreviousWiped) return String.format("Passed (%s-wiped): %s", TrackingRates.previousRankUsername, formatNumber(TrackingRates.previousRankAmount))
+        return String.format("Passed (%s): %s", TrackingRates.previousRankUsername, formatNumber(TrackingRates.previousRankAmount))
     }
 
     private fun handleCollectionAbovePreviousRank(): String? {
         if (isEmpty() || !isPreviousPositionEnabled()) return null
 
-        if (collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
-        return "Difference: " + formatNumber(collectionAbovePreviousRankAmount)
+        if (TrackingRates.collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
+        return "Difference: " + formatNumber(TrackingRates.collectionAbovePreviousRankAmount)
     }
 
     private fun handleMultiNextPosition(): String? {
-        if (isEmpty() || playerCurrentRank == 1) return null
+        if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
         if (isCustomPositionEnabled()) {
-            if (nextRankAmount == -1L) return "Custom Position: Calculating..."
-            if (isNextWiped) return String.format("Custom Position (%s-wiped): %s", nextRankUsername, formatNumber(nextRankAmount))
-            return String.format("Custom Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount))
+            if (MultiTrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
+            if (MultiTrackingRates.isNextWiped) return String.format("Custom Position (%s-wiped): %s", MultiTrackingRates.nextRankUsername, formatNumber(MultiTrackingRates.nextRankAmount))
+            return String.format("Custom Position (%s): %s", MultiTrackingRates.nextRankUsername, formatNumber(MultiTrackingRates.nextRankAmount))
         }
 
-        if (nextRankUsername == null) return "Next Position: Calculating..."
-        if (isNextWiped) return String.format("Next Position (%s-wiped): %s", nextRankUsername, formatNumber(nextRankAmount))
-        return String.format("Next Position (%s): %s", nextRankUsername, formatNumber(nextRankAmount))
+        if (MultiTrackingRates.nextRankUsername == null) return "Next Position: Calculating..."
+        if (MultiTrackingRates.isNextWiped) return String.format("Next Position (%s-wiped): %s", MultiTrackingRates.nextRankUsername, formatNumber(MultiTrackingRates.nextRankAmount))
+        return String.format("Next Position (%s): %s", MultiTrackingRates.nextRankUsername, formatNumber(MultiTrackingRates.nextRankAmount))
     }
 
     private fun handleMultiCollectionTillNextRank(): String? {
-        if (isEmpty() || playerCurrentRank == 1) return null
+        if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
         if (isCustomPositionEnabled()) {
-            if (collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
-            return "Till Custom Position: " + formatNumber(collectionTillNextRank)
+            if (MultiTrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
+            return "Till Custom Position: " + formatNumber(MultiTrackingRates.collectionTillNextRank)
         }
 
-        if (collectionTillNextRank == -1L) return "Till Next Position: Calculating..."
-        return "Till Next Position: " + formatNumber(collectionTillNextRank)
+        if (MultiTrackingRates.collectionTillNextRank == -1L) return "Till Next Position: Calculating..."
+        return "Till Next Position: " + formatNumber(MultiTrackingRates.collectionTillNextRank)
     }
 
     private fun handleMultiEta(): String? {
-        if (isEmpty() || playerCurrentRank == 1) return null
+        if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
         if (isCustomPositionEnabled()) {
-            if (etaToNextRank == null || etaToNextRank!!.isEmpty()) {
+            if (MultiTrackingRates.etaToNextRank == null) {
                 return "ETA to Custom Position: Calculating..."
             }
-            return "ETA to Custom Position: $etaToNextRank"
+            return "ETA to Custom Position: ${MultiTrackingRates.etaToNextRank}"
         }
 
-        if (etaToNextRank == null || etaToNextRank!!.isEmpty()) return "ETA: Calculating..."
-        return "ETA: $etaToNextRank"
+        if (MultiTrackingRates.etaToNextRank == null) return "ETA: Calculating..."
+        return "ETA: ${MultiTrackingRates.etaToNextRank}"
     }
 
     private fun handleMultiPreviousPosition(): String? {
         if (isEmpty() || !isPreviousPositionEnabled()) return null
 
-        if (previousRankUsername == null) return "Passed: Calculating..."
-        if (isPreviousWiped) return String.format("Passed (%s-wiped): %s", previousRankUsername, formatNumber(previousRankAmount))
-        return String.format("Passed (%s): %s", previousRankUsername, formatNumber(previousRankAmount))
+        if (MultiTrackingRates.previousRankUsername == null) return "Passed: Calculating..."
+        if (MultiTrackingRates.isPreviousWiped) return String.format("Passed (%s-wiped): %s", MultiTrackingRates.previousRankUsername, formatNumber(MultiTrackingRates.previousRankAmount))
+        return String.format("Passed (%s): %s", MultiTrackingRates.previousRankUsername, formatNumber(MultiTrackingRates.previousRankAmount))
     }
 
     private fun handleMultiCollectionAbovePreviousRank(): String? {
         if (isEmpty() || !isPreviousPositionEnabled()) return null
 
-        if (collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
-        return "Difference: " + formatNumber(collectionAbovePreviousRankAmount)
+        if (MultiTrackingRates.collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
+        return "Difference: " + formatNumber(MultiTrackingRates.collectionAbovePreviousRankAmount)
     }
 
     private fun addIfNotNull(list: MutableList<String>, line: String?) {
@@ -197,12 +179,12 @@ object CollectionParser {
     private fun handleCollection(): String? {
         if (CollectionsManager.collectionSource == "sacks") return null
         var rankSuffix = ""
-        if (isCollectionLeaderboardEnabled() && playerCurrentRank != -1) {
-            rankSuffix = if (playerCurrentRank == 10001) " [Too low]"
-            else " [#$playerCurrentRank]"
+        if (isCollectionLeaderboardEnabled() && TrackingRates.playerCurrentRank != -1) {
+            rankSuffix = if (TrackingRates.playerCurrentRank == 10001) " [Too low]"
+            else " [#${TrackingRates.playerCurrentRank}]"
         }
-        return if (collectionAmount >= 0)
-            formatCollectionName(collection) + " : " + formatNumber(collectionAmount) + rankSuffix
+        return if (TrackingRates.collectionAmount >= 0)
+            formatCollectionName(collection) + " : " + formatNumber(TrackingRates.collectionAmount) + rankSuffix
         else
             formatCollectionName(collection) + " : Calculating..."
     }
@@ -245,16 +227,16 @@ object CollectionParser {
         val suffix = if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
         when (collectionType) {
             "normal" -> {
-                localMoneyPerHour = moneyPerHourBazaar.getOrDefault(collectionType + suffix, 0L)
+                localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault(collectionType + suffix, 0L)
                 return "$/h (Bazaar): " + formatNumberOrPlaceholder(localMoneyPerHour)
             }
 
             "enchanted" -> {
                 if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) {
-                    localMoneyPerHour = moneyPerHourBazaar.getOrDefault("Enchanted version$suffix", 0L)
+                    localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("Enchanted version$suffix", 0L)
                     return "$/h (Bazaar): " + formatNumberOrPlaceholder(localMoneyPerHour)
                 } else {
-                    localMoneyPerHour = moneyPerHourBazaar.getOrDefault("Super Enchanted version$suffix", -1L)
+                    localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("Super Enchanted version$suffix", -1L)
                     if (localMoneyPerHour == -1L) {
                         setBazaarType(Bazaar.BazaarType.ENCHANTED_VERSION)
                         return null
@@ -263,7 +245,7 @@ object CollectionParser {
             }
 
             "gemstone" -> {
-                localMoneyPerHour = moneyPerHourBazaar.getOrDefault(getGemstoneVariant().toString() + suffix, 0L)
+                localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault(getGemstoneVariant().toString() + suffix, 0L)
                 return "$/h (Bazaar): " + formatNumberOrPlaceholder(localMoneyPerHour)
             }
 
@@ -437,7 +419,7 @@ object CollectionParser {
                     list.add(prefix + "Gemstones: ")
 
                     GemstonePrices.multiGemstoneRecipes.forEach { (type: String?) ->
-                        if (seenGemstones.contains(type)) {
+                        if (MultiTrackingRates.seenGemstones.contains(type)) {
                             var line: String? = null
                             when (getTrackingOptions()) {
                                 MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> line = handleCollectionPerHourMulti(type!!)
@@ -485,13 +467,13 @@ object CollectionParser {
         when (getTrackingOptions()) {
             MultiCollectionConfig.TrackingOptions.MONEY_RATE -> {
                 if (!isUsingBazaar()) {
-                    val total = moneyPerHourNPC.entries
+                    val total = MultiTrackingRates.moneyPerHourNPC.entries
                         .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
                         .sumOf { it.value }
                     if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes/h: " + formatNumber(total))
                     else list.add("§eOverall $/h (NPC): " + formatNumber(total))
                 } else {
-                    val total = moneyPerHourBazaar.entries
+                    val total = MultiTrackingRates.moneyPerHourBazaar.entries
                         .filter { (key, value) -> value > 0 && key.endsWith(suffix) }
                         .filter { (key) -> key.contains("_normal") || key.contains("_$type") || key.contains("_$variant") }
                         .sumOf { it.value }
@@ -502,7 +484,7 @@ object CollectionParser {
 
             MultiCollectionConfig.TrackingOptions.MONEY_MADE -> {
                 if (!isUsingBazaar()) {
-                    val total = moneyMadeNPC.entries
+                    val total = MultiTrackingRates.moneyMadeNPC.entries
                         .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
                         .sumOf { it.value }
                     if (CollectionsManager.hasAllRiftCollections()) list.add(
@@ -512,7 +494,7 @@ object CollectionParser {
                     )
                     else list.add("§eOverall $ made (NPC): " + formatNumber(total))
                 } else {
-                    val total = moneyMadeBazaar.entries
+                    val total = MultiTrackingRates.moneyMadeBazaar.entries
                         .filter { (key, value) -> value > 0 && (key.contains('_') && key.endsWith("_$variant")) }
                         .filter { (key) -> key.contains("_normal") || key.contains("_$type") || key.contains("_$variant") }
                         .sumOf { it.value }
@@ -526,26 +508,26 @@ object CollectionParser {
 
     private fun handleCollectionMulti(coll: String): String {
         var rankSuffix = ""
-        if ("gemstone" == coll && isCollectionLeaderboardEnabled() && playerCurrentRank != -1) {
-            rankSuffix = if (playerCurrentRank == 10001) " [Too low]"
-            else " [#$playerCurrentRank]"
+        if ("gemstone" == coll && isCollectionLeaderboardEnabled() && MultiTrackingRates.playerCurrentRank != -1) {
+            rankSuffix = if (MultiTrackingRates.playerCurrentRank == 10001) " [Too low]"
+            else " [#${MultiTrackingRates.playerCurrentRank}]"
         }
-        return if (collectionAmounts.getOrDefault(coll, -1L) >= 0)
-            formatCollectionName(coll) + " : " + formatNumber(collectionAmounts.getOrDefault(coll, 0L)) + rankSuffix
+        return if (MultiTrackingRates.collectionAmounts.getOrDefault(coll, -1L) >= 0)
+            formatCollectionName(coll) + " : " + formatNumber(MultiTrackingRates.collectionAmounts.getOrDefault(coll, 0L)) + rankSuffix
         else
             formatCollectionName(coll) + " : Calculating..."
     }
 
     private fun handleCollectionSessionMulti(coll: String): String {
-        return if (collectionMade.getOrDefault(coll, -1L) > 0)
-            formatCollectionName(coll) + " (session): " + formatNumber(collectionMade.getOrDefault(coll, 0L))
+        return if (MultiTrackingRates.collectionMade.getOrDefault(coll, -1L) > 0)
+            formatCollectionName(coll) + " (session): " + formatNumber(MultiTrackingRates.collectionMade.getOrDefault(coll, 0L))
         else
             formatCollectionName(coll) + " (session): Calculating..."
     }
 
     private fun handleCollectionPerHourMulti(coll: String): String {
-        return if (collectionPerHour.getOrDefault(coll, -1L) > 0)
-            formatCollectionName(coll) + " Coll/h: " + formatNumber(collectionPerHour.getOrDefault(coll, 0L))
+        return if (MultiTrackingRates.collectionPerHour.getOrDefault(coll, -1L) > 0)
+            formatCollectionName(coll) + " Coll/h: " + formatNumber(MultiTrackingRates.collectionPerHour.getOrDefault(coll, 0L))
         else
             formatCollectionName(coll) + " Coll/h: Calculating..."
     }
@@ -558,14 +540,14 @@ object CollectionParser {
             val suffix =
                 if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
 
-            for (gem in seenGemstones) {
+            for (gem in MultiTrackingRates.seenGemstones) {
                 totalRate += if (useBazaar) {
-                    moneyPerHourBazaar.getOrDefault(
+                    MultiTrackingRates.moneyPerHourBazaar.getOrDefault(
                         (gem + "_" + variant).uppercase() + suffix,
                         0L
                     )
                 } else {
-                    moneyPerHourNPC.getOrDefault((gem + "_" + variant).uppercase(), 0L)
+                    MultiTrackingRates.moneyPerHourNPC.getOrDefault((gem + "_" + variant).uppercase(), 0L)
                 }
             }
             return "Gemstone $/h (" + (if (useBazaar) "Bazaar" else "NPC") + "): " + formatNumberOrPlaceholder(totalRate)
@@ -573,12 +555,12 @@ object CollectionParser {
 
         if (!useBazaar) {
             var key: String = coll
-            if (seenGemstones.contains(coll)) {
+            if (MultiTrackingRates.seenGemstones.contains(coll)) {
                 val variant: String = getGemstoneVariant().toString()
                 key = (coll + "_" + variant).uppercase()
             }
 
-            val npcRate = moneyPerHourNPC.getOrDefault(key, -1L)
+            val npcRate = MultiTrackingRates.moneyPerHourNPC.getOrDefault(key, -1L)
             if (CollectionsManager.isRiftCollection(coll)) {
                 return formatCollectionName(coll) + " Motes/h: " + formatNumberOrPlaceholder(npcRate)
             }
@@ -587,7 +569,7 @@ object CollectionParser {
             var actualColl: String = coll
             var gemstoneVariant: String? = null
 
-            if (seenGemstones.contains(coll)) {
+            if (MultiTrackingRates.seenGemstones.contains(coll)) {
                 actualColl = "gemstone"
                 val variant: String = getGemstoneVariant().toString()
                 gemstoneVariant = (coll + "_" + variant).uppercase()
@@ -596,7 +578,7 @@ object CollectionParser {
                 if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
 
             if (gemstoneVariant != null) {
-                val rate = moneyPerHourBazaar.getOrDefault(gemstoneVariant + suffix, 0L)
+                val rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault(gemstoneVariant + suffix, 0L)
                 return formatCollectionName(coll) + " $/h (Bazaar): " + formatNumberOrPlaceholder(rate)
             }
 
@@ -605,11 +587,11 @@ object CollectionParser {
             if (type != null) {
                 var rate: Long = 0
                 when (type) {
-                    "normal" -> rate = moneyPerHourBazaar.getOrDefault(actualColl + "_normal" + suffix, 0L)
+                    "normal" -> rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault(actualColl + "_normal" + suffix, 0L)
                     "enchanted" -> {
                         val key =
                             if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) "Enchanted version" else "Super Enchanted version"
-                        rate = moneyPerHourBazaar.getOrDefault(actualColl + "_" + key + suffix, 0L)
+                        rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault(actualColl + "_" + key + suffix, 0L)
                     }
                 }
 
@@ -628,11 +610,11 @@ object CollectionParser {
             val suffix =
                 if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
 
-            for (gem in seenGemstones) {
+            for (gem in MultiTrackingRates.seenGemstones) {
                 totalMoney += if (useBazaar) {
-                    moneyMadeBazaar.getOrDefault((gem + "_" + variant).uppercase() + suffix, 0L)
+                    MultiTrackingRates.moneyMadeBazaar.getOrDefault((gem + "_" + variant).uppercase() + suffix, 0L)
                 } else {
-                    moneyMadeNPC.getOrDefault((gem + "_" + variant).uppercase(), 0L)
+                    MultiTrackingRates.moneyMadeNPC.getOrDefault((gem + "_" + variant).uppercase(), 0L)
                 }
             }
             return "Gemstone $ made (" + (if (useBazaar) "Bazaar" else "NPC") + "): " + formatNumberOrPlaceholder(
@@ -642,12 +624,12 @@ object CollectionParser {
 
         if (!useBazaar) {
             var key: String = coll
-            if (seenGemstones.contains(coll)) {
+            if (MultiTrackingRates.seenGemstones.contains(coll)) {
                 val variant: String = getGemstoneVariant().toString()
                 key = (coll + "_" + variant).uppercase()
             }
 
-            val npcMoney = moneyMadeNPC.getOrDefault(key, -1L)
+            val npcMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(key, -1L)
             if (CollectionsManager.isRiftCollection(coll)) {
                 return formatCollectionName(coll) + " Motes made: " + formatNumberOrPlaceholder(npcMoney)
             }
@@ -656,7 +638,7 @@ object CollectionParser {
             var actualColl: String = coll
             var gemstoneVariant: String? = null
 
-            if (seenGemstones.contains(coll)) {
+            if (MultiTrackingRates.seenGemstones.contains(coll)) {
                 actualColl = "gemstone"
                 val variant: String = getGemstoneVariant().toString()
                 gemstoneVariant = (coll + "_" + variant).uppercase()
@@ -666,7 +648,7 @@ object CollectionParser {
                 if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
 
             if (gemstoneVariant != null) {
-                val money = moneyMadeBazaar.getOrDefault(gemstoneVariant + suffix, 0L)
+                val money = MultiTrackingRates.moneyMadeBazaar.getOrDefault(gemstoneVariant + suffix, 0L)
                 return formatCollectionName(coll) + " $ made (Bazaar): " + formatNumberOrPlaceholder(money)
             }
 
@@ -675,11 +657,11 @@ object CollectionParser {
             if (type != null) {
                 var money: Long = 0
                 when (type) {
-                    "normal" -> money = moneyMadeBazaar.getOrDefault(actualColl + "_normal" + suffix, 0L)
+                    "normal" -> money = MultiTrackingRates.moneyMadeBazaar.getOrDefault(actualColl + "_normal" + suffix, 0L)
                     "enchanted" -> {
                         val key =
                             if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) "Enchanted version" else "Super Enchanted version"
-                        money = moneyMadeBazaar.getOrDefault(actualColl + "_" + key + suffix, 0L)
+                        money = MultiTrackingRates.moneyMadeBazaar.getOrDefault(actualColl + "_" + key + suffix, 0L)
                     }
                 }
 
