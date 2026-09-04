@@ -34,7 +34,7 @@ public class GuiChromaMixin {
                     target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;"
             )
     )
-    private RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
+    private RenderPipeline sct$replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         if (state instanceof GlyphRenderState glyphState) {
             if (glyphState.renderable() instanceof GlyphInstance glyph) {
                 if (ChromaText.isPrefixGradientGlyph(glyph)) {
@@ -54,7 +54,7 @@ public class GuiChromaMixin {
             method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
             at = @At("HEAD")
     )
-    public void prepareChromaUniforms(
+    public void sct$prepareChromaUniforms(
             Supplier<String> label,
             RenderTarget mainRenderTarget,
             //? if 26.1
@@ -76,7 +76,7 @@ public class GuiChromaMixin {
                     target = "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
             )
     )
-    private void bindChromaUniformPerDraw(
+    private void sct$bindChromaUniformPerDraw(
             GuiRenderer.Draw draw,
             RenderPass renderPass,
             //? if 26.1

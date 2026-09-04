@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ParticleMixin {
 
     @Inject(method = "createParticle", at = @At("HEAD"))
-    private void onCreateParticle(ParticleOptions options, double x, double y, double z, double xa, double ya, double za, CallbackInfoReturnable<Particle> cir) {
+    private void sct$onCreateParticle(ParticleOptions options, double x, double y, double z, double xa, double ya, double za, CallbackInfoReturnable<Particle> cir) {
         if (!HypixelUtils.isInSkyblock()) return;
         PrecisionMining.handleParticles(options, x, y, z);
     }

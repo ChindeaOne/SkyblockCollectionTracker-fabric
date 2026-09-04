@@ -19,7 +19,7 @@ public class GlyphTypesMixin {
     private Identifier sct$identifier;
 
     @ModifyReturnValue(method = {"createForColorTexture", "createForIntensityTexture"}, at = @At("RETURN"))
-    private static GlyphRenderTypes ofMethods(GlyphRenderTypes original, @Local(argsOnly = true, name = "name") Identifier name) {
+    private static GlyphRenderTypes sct$ofMethods(GlyphRenderTypes original, @Local(argsOnly = true, name = "name") Identifier name) {
         ((GlyphTypesMixin) (Object) original).sct$identifier = name;
         return original;
     }

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class AbstractContainerMenuMixin {
 
     @Inject(method = "setItem", at = @At("TAIL"))
-    private void onSetItem(int slot, int stateId, ItemStack itemStack, CallbackInfo ci) {
+    private void sct$onSetItem(int slot, int stateId, ItemStack itemStack, CallbackInfo ci) {
         CommissionUtils.onSlotUpdated(
                 (AbstractContainerMenu)(Object)this,
                 slot,
