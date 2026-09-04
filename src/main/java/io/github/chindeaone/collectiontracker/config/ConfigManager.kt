@@ -137,8 +137,6 @@ class ConfigManager {
                 ?.asBoolean
                 ?: false
 
-            println(migrationDone)
-
             config = if (migrationDone) {
                 gson.fromJson(json, ModConfig::class.java)
             } else {

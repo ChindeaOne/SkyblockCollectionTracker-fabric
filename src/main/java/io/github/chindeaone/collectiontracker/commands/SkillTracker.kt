@@ -27,6 +27,7 @@ object SkillTracker {
             skillName = skill
             if (!SkillUtils.isValidSkill(skillName)) {
                 ChatUtils.sendMessage("§4$skillName skill is not a real skill!", true)
+                skillName = ""
                 return
             }
 

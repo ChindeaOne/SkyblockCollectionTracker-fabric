@@ -45,7 +45,7 @@ object SkillFetcher {
         // because of that, manual call is needed
         if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(value) // only if skill isn't maxed, as maxed skills use chat messages to track
 
-        SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().toLong())
+        SkillTrackingRates.calculateTamingRates(SkillUtils.tamingValue.toLong())
         logger.info("[SCT]: Skill data fetching scheduled to run every 5 minutes")
     }
 
@@ -73,7 +73,7 @@ object SkillFetcher {
 
             if (!isSkillMaxed) SkillTrackingRates.calculateSkillRates(skillXp?.toLong() ?: 0L) // only if skill isn't maxed, as maxed skills use chat messages to track
 
-            SkillTrackingRates.calculateTamingRates(SkillUtils.getTamingValue().toLong())
+            SkillTrackingRates.calculateTamingRates(SkillUtils.tamingValue.toLong())
         } catch (e: Exception) {
             logger.error("[SCT]: Error while fetching data from the Hypixel API", e)
         }

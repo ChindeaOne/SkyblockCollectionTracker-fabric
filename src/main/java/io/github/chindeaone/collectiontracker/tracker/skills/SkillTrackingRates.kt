@@ -64,8 +64,8 @@ object SkillTrackingRates {
         totalSkillXp = xp
 
         if (isTamingTrackingEnabled()) {
-            tamingLevel = SkillUtils.getTamingLevel()
-            tamingXp = SkillUtils.getTamingValue().toLong()
+            tamingLevel = SkillUtils.tamingLevel
+            tamingXp = SkillUtils.tamingValue.toLong()
         }
     }
 
