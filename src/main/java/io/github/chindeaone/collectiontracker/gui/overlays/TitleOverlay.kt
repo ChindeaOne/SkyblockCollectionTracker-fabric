@@ -10,8 +10,9 @@ class TitleOverlay : AbstractOverlay() {
 
     override val position: Position get() = getTitlePosition()
 
+    override val isEnabled: Boolean get() = true
+
     override fun render(context: GuiGraphicsExtractor) {
-        if (!isEnabled) return
         RenderUtils.drawActiveTitle(context)
     }
 
