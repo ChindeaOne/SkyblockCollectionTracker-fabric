@@ -5,7 +5,6 @@ import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher.fetch
 import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher.fetchSkillsData
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isIncludeWipedProfilesEnabled
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardEntry
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -54,10 +53,6 @@ object SkillFetcher {
             if (SkillTrackingHandler.isPaused) return
 
             getData(skillName) // fetch data for the tracked skill
-
-            // Skill leaderboard fetching
-            fetchSkillLeaderboardData(skillName)
-            if (isTamingTrackingEnabled()) fetchSkillLeaderboardData("Taming")
 
             val skillXp = SkillUtils.getSkillValue(skillName) // get the XP of the tracked skill again here
 

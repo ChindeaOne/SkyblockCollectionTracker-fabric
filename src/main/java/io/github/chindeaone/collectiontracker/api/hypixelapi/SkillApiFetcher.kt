@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
-import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
@@ -40,14 +39,6 @@ object SkillApiFetcher {
             response.body(),
             object : TypeToken<Map<String, Double>>() {}.type
         )
-            
-        if (skills.isEmpty()) {
-            ChatUtils.sendMessage("§c[SCT] Skill API disabled. Please enable it in the settings.", true)
-            logger.warn("[SCT]: Skill API disabled for player.")
-
-            SkillTrackingHandler.stopTracking()
-            return
-        }
 
         SkillUtils.updateFromApi(skills)
         logger.info("[SCT]: Successfully received the skill data.")
