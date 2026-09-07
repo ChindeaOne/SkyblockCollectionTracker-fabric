@@ -16,6 +16,7 @@ object VersionUtils {
     }
 
     fun checkIfVersionIsSupported(): Boolean {
+        if (mcVersions.isEmpty()) return true
         val currentVersion = SkyblockCollectionTracker.MC_VERSION
         return mcVersions.any { currentVersion.startsWith(it) }
     }
