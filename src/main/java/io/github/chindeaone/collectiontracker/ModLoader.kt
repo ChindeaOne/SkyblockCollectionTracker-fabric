@@ -65,13 +65,22 @@ object ModLoader: ModInitializer {
         ClientReceiveMessageEvents.GAME.register { message, actionBar ->
             if (!HypixelUtils.isInSkyblock) return@register
 
-            if (actionBar) return@register
+            if (actionBar) {
+                ChatListener.skillListener(message.toString())
+                return@register
+            }
 
             ChatListener.onChatMessage(message)
         }
+        ClientReceiveMessageEvents.ALLOW_GAME.register { component, actionBar ->
+            if (!HypixelUtils.isInSkyblock) return@register true
+            if (actionBar) return@register true
+
+            ChatListener.dailyPerksUpdate(component)
+        }
+
         ClientReceiveMessageEvents.MODIFY_GAME.register { message, actionBar ->
             if (!HypixelUtils.isInSkyblock) return@register message
-
             if (actionBar) return@register message
 
             ChatListener.farmingweightHandle(
@@ -80,11 +89,14 @@ object ModLoader: ModInitializer {
         }
         ClientReceiveMessageEvents.GAME_CANCELED.register { message, actionBar ->
             if (!HypixelUtils.isInSkyblock) return@register
-            ChatListener.sacksListener(message, actionBar)
+            if (actionBar) return@register
+
+            ChatListener.sacksListener(message)
         }
 
         UseItemCallback.EVENT.register { player, _, hand ->
             if (!HypixelUtils.isInSkyblock) return@register InteractionResult.PASS
+
             InventoryListener.checkHandItem(player, hand)
         }
         LevelRenderEvents.END_MAIN.register { context ->

@@ -78,7 +78,7 @@ object ChatListener {
         if (cleanText.contains("You have reset")) treeResetListener(cleanText)
         if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
         if (cleanText.startsWith("You equipped")) onLoadoutChange()
-        sacksListener(message, actionBar = false)
+        sacksListener(message)
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
             TrackingHandler.pauseRiftTracking()
@@ -86,9 +86,7 @@ object ChatListener {
         }
     }
 
-    fun sacksListener(component: Component, actionBar: Boolean) {
-        if (actionBar) return
-
+    fun sacksListener(component: Component) {
         if (!TrackingHandler.isTracking && !MultiTrackingHandler.isMultiTracking) return
         if (TrackingHandler.isPaused || MultiTrackingHandler.isMultiPaused) return
         if (ConfigAccess.isApiTrackingEnabled()) return
@@ -96,7 +94,6 @@ object ChatListener {
         if (component.string.startsWith("[Sacks]")) parseSacksMessage(component)
     }
 
-    @JvmStatic
     fun skillListener(text: String) {
         if (!SkillTrackingHandler.isTracking) return
         val cleanText = text.removeColor()
@@ -235,11 +232,10 @@ object ChatListener {
         ConfigHelper.setAxeAbilityName(ability)
     }
 
-    @JvmStatic
     fun dailyPerksUpdate(message: Component): Boolean {
         val remaining = ScoreboardUtils.nextBuffTime - System.currentTimeMillis()
         if ((remaining > 60_000L && remaining < 19 * 60_000L) && ScoreboardUtils.checkTime) {
-            return false
+            return true
         }
 
         val text = message.string.removeColor()
@@ -250,15 +246,15 @@ object ChatListener {
             }
             text.contains("Your Sky Mall buff changed!") -> {
                 expectingSkyMallBuff = true
-                return ConfigAccess.isSkyMallEnabled()
+                return !ConfigAccess.isSkyMallEnabled()
             }
             text.contains("Your Lottery buff changed!") -> {
                 expectingLotteryBuff = true
-                return ConfigAccess.isLotteryEnabled()
+                return !ConfigAccess.isLotteryEnabled()
             }
             text.contains("Your Beekeeper buff changed") -> {
                 expectingBeekeeper = true
-                return ConfigAccess.isBeekeeperEnabled()
+                return !ConfigAccess.isBeekeeperEnabled()
             }
             text.startsWith("New buff: ") -> {
                 val buffText = text.substringAfter("New buff: ").trim()
@@ -269,45 +265,45 @@ object ChatListener {
                     currentSkyMallBuff = compact
                     ConfigHelper.setLastSkyMallBuff(compact)
                     expectingSkyMallBuff = false
-                    if (ConfigAccess.isSkyMallChatMessagesDisabled()) return true // Don't render Sky Mall buff in chat, but update the buffs in overlay
+                    if (ConfigAccess.isSkyMallChatMessagesDisabled()) return false // Don't render Sky Mall buff in chat, but update the buffs in overlay
 
                     // Compact messages if overlay is enabled
                     if (ConfigAccess.isSkyMallEnabled()) {
                         ChatUtils.sendMessage("§eNew §bSky Mall §eBuff§r: $compact", prefix = true)
-                        return true
+                        return false
                     }
-                    return false
+                    return true
                 }
                 if (expectingLotteryBuff) {
                     currentLotteryBuff = compact
                     ConfigHelper.setLastLotteryBuff(compact)
                     expectingLotteryBuff = false
-                    if (ConfigAccess.isLotteryChatMessagesDisabled()) return true // Don't render Lottery buff in chat, but update the buffs in overlay
+                    if (ConfigAccess.isLotteryChatMessagesDisabled()) return false // Don't render Lottery buff in chat, but update the buffs in overlay
 
                     // Compact messages if overlay is enabled
                     if (ConfigAccess.isLotteryEnabled()) {
                         ChatUtils.sendMessage("§eNew §2Lottery §eBuff§r: $compact", prefix = true)
-                        return true
+                        return false
                     }
-                    return false
+                    return true
                 }
                 if (expectingBeekeeper) {
                     currentBeekeeperBuff = compact
                     ConfigHelper.setLastBeekeeperBuff(compact)
                     expectingBeekeeper = false
-                    if (ConfigAccess.isBeekeeperChatMessagesDisabled()) return true
+                    if (ConfigAccess.isBeekeeperChatMessagesDisabled()) return false
 
                     if (ConfigAccess.isBeekeeperEnabled()) {
                         ChatUtils.sendMessage("§eNew §6Beekeeper §eBuff§r: $compact", prefix = true)
-                        return true
+                        return false
                     }
-                    return false
+                    return true
                 }
             }
             // Don't render these messages at all
-            text.startsWith("You can disable this messaging by toggling") -> return true
+            text.startsWith("You can disable this messaging by toggling") -> return false
         }
-        return false
+        return true
     }
 
     fun compactBuffs(message: String): String {
