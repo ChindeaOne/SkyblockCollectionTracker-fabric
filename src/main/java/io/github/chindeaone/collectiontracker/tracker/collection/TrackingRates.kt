@@ -139,7 +139,7 @@ object TrackingRates {
     }
 
     private fun updateValues(currentCollection: Long, collectionSinceLastVal: Long) {
-        collectionSinceLast = collectionSinceLastVal
+        if (collectionSinceLastVal != 0L) collectionSinceLast = collectionSinceLastVal
 
         if (collectionSinceLastVal > 0) {
             logger.info("[SCT]: Current collection for $collection (using sacks) is $currentCollection")
