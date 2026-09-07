@@ -112,11 +112,15 @@ object StringUtils {
 
     fun updateTimer(): String {
         val timeLeft = (nextBuffTime - System.currentTimeMillis()) / 1000
-        if (timeLeft <= 5) {
+        if (timeLeft in 0..5) {
+            return "§aTime left: §cSoon"
+        }
+        if (timeLeft < 0 && !ScoreboardUtils.checkTime) {
+            ScoreboardUtils.checkTime = true
             return "§aTime left: §cSoon"
         }
 
-        return String.format("§aTime left: §e%s", formatTime(timeLeft))
+        return "§aTime left: §e${formatTime(timeLeft)}"
     }
 
     fun formatFloatOrPlaceholder(value: Float): String = if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
