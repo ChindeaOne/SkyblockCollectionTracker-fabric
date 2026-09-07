@@ -174,7 +174,7 @@ object ColorUtils {
     }
 
     fun collToColor(collection: String): Component {
-        return Component.literal(collection).withColor(collectionColors[collection] ?: Colors.WHITE.color)
+        return Component.literal(collection).withColor(collectionColors[collection.lowercase()] ?: Colors.WHITE.color)
     }
 
     fun coloredText(color: String): Component {
