@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTempBuffPosition
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTempBuffExpiredTitle
@@ -17,12 +18,6 @@ import net.minecraft.network.chat.Component
 class TemporaryBuffsOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
     private val activeStates: MutableMap<String, Boolean> = mutableMapOf()
-
-    private var lastCacaoSeconds: Long = -1L
-    private var lastFiletSeconds: Long = -1L
-    private var lastPotatoSeconds: Long = -1L
-    private var lastPumpkinSeconds: Long = -1L
-    private var lastFlaskSeconds: Long = -1L
 
     override val overlayLabel: String = "Temporary Buffs"
 
@@ -51,25 +46,9 @@ class TemporaryBuffsOverlay : AbstractOverlay() {
             return
         }
 
+        if (ModLoader.clientTicks % 5L != 0L) return
+
         val now = System.currentTimeMillis()
-
-        val cacaoSeconds = if (refinedCacaoTime > now) (refinedCacaoTime - now) / 1000 else 0L
-        val filetSeconds = if (filetTime > now) (filetTime - now) / 1000 else 0L
-        val potatoSeconds = if (pristinePotatoTime > now) (pristinePotatoTime - now) / 1000 else 0L
-        val pumpkinSeconds = if (powderPumpkinTime > now) (powderPumpkinTime - now) / 1000 else 0L
-        val flaskSeconds = if (fiestaFlaskTime > now) (fiestaFlaskTime - now) / 1000 else 0L
-
-        if (cachedLines.isNotEmpty()
-            && cacaoSeconds == lastCacaoSeconds && filetSeconds == lastFiletSeconds
-            && potatoSeconds == lastPotatoSeconds && pumpkinSeconds == lastPumpkinSeconds
-            && flaskSeconds == lastFlaskSeconds) return
-
-        lastCacaoSeconds = cacaoSeconds
-        lastFiletSeconds = filetSeconds
-        lastPotatoSeconds = potatoSeconds
-        lastPumpkinSeconds = pumpkinSeconds
-        lastFlaskSeconds = flaskSeconds
-
         val newLines = mutableListOf<String>()
 
         processBuff(newLines, "§6Refined Dark Cacao Truffle", refinedCacaoTime, now)

@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getPickaxeAbilityDisplayIndicator
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getPickaxeAbilityName
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getPickaxeAbilityPosition
@@ -23,9 +24,6 @@ import net.minecraft.network.chat.Component
 
 class PickaxeAbilityOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
-    private var lastCooldown: Double = -1.0
-    private var lastDuration: Double = -1.0
-    private var lastAbilityName: String = ""
 
     private var expiredTitleShown = true
     private var readyTitleShown = true
@@ -39,6 +37,7 @@ class PickaxeAbilityOverlay : AbstractOverlay() {
     override fun render(context: GuiGraphicsExtractor) {
         super.render(context)
 
+        if (!isEnabled) return
         when (getPickaxeAbilityDisplayIndicator()) {
             Misc.AbilityDisplayIndicator.CROSSHAIR_CIRCLE -> renderCooldownCircle(context, "pickaxe")
             Misc.AbilityDisplayIndicator.CROSSHAIR_BAR -> renderCooldownBar(context, "pickaxe")
@@ -60,24 +59,18 @@ class PickaxeAbilityOverlay : AbstractOverlay() {
         }
 
     private fun updateLinesIfNeeded() {
-        if (!isPickaxeAbilityDisplayed() || (isPickaxeAbilityInMiningIslandsOnly() && !IslandTracker.isMiningIsland())) {
+        if (!isEnabled) {
             if (cachedLines.isNotEmpty()) {
                 cachedLines = emptyList()
             }
             return
         }
 
+        if (ModLoader.clientTicks % 5L != 0L) return
+
         val abilityName = getPickaxeAbilityName()
         val cooldown = finalCooldown
         val active = finalDuration
-
-        if (cachedLines.isNotEmpty() && cooldown == lastCooldown && active == lastDuration && abilityName == lastAbilityName) {
-            return
-        }
-
-        lastCooldown = cooldown
-        lastDuration = active
-        lastAbilityName = abilityName
 
         val displayName = abilityName.ifEmpty { "Unknown Ability" }
 
@@ -85,8 +78,6 @@ class PickaxeAbilityOverlay : AbstractOverlay() {
             expiredTitleShown = false
             readyTitleShown = false
         }
-
-        val newLines = mutableListOf<String>()
 
         if (active == 0.0) {
             if (isShowPickaxeExpiredAbilityTitle() && !expiredTitleShown && cooldown > 0 && (displayName != "Pickobulus")) {
@@ -112,8 +103,7 @@ class PickaxeAbilityOverlay : AbstractOverlay() {
         } else {
             "§aReady!"
         }
-        newLines.add("§e$displayName CD: $status") // Credit to Ninjune for Coleweight's formatting
 
-        cachedLines = newLines
+        cachedLines = listOf("§e$displayName CD: $status") // Credit to Ninjune for Coleweight's formatting
     }
 }

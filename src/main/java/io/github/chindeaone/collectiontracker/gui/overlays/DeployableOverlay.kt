@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getDeployablePosition
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isDeployableEnabled
 import io.github.chindeaone.collectiontracker.config.core.Position
@@ -10,11 +11,6 @@ import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser.rema
 
 class DeployableOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
-
-    private var lastBuff: String = ""
-    private var lastExpireTime: String = ""
-    private var lastBuffColor: String = ""
-    private var lastIsNear: Boolean = false
 
     override val overlayLabel: String = "Lantern Deployable"
 
@@ -43,6 +39,8 @@ class DeployableOverlay : AbstractOverlay() {
             return
         }
 
+        if (ModLoader.clientTicks % 5L != 0L) return
+
         val currentBuff = buff
         val expireTime = remainingTime
         val currentNear = isNear
@@ -51,19 +49,9 @@ class DeployableOverlay : AbstractOverlay() {
         if (currentBuff.isEmpty() || expireTime.isEmpty() || !currentNear) {
             if (cachedLines.isNotEmpty()) {
                 cachedLines = emptyList()
-                lastBuff = ""
-                lastExpireTime = ""
-                lastBuffColor = ""
-                lastIsNear = false
             }
             return
         }
-
-        if (cachedLines.isNotEmpty()
-                && currentBuff == lastBuff
-                && expireTime == lastExpireTime
-                && currentBuffColor == lastBuffColor
-                && lastIsNear) return
 
         var timeLeft: Int
         try {
@@ -74,11 +62,6 @@ class DeployableOverlay : AbstractOverlay() {
             }
             return
         }
-
-        lastBuff = currentBuff
-        lastExpireTime = expireTime
-        lastBuffColor = currentBuffColor
-        lastIsNear = true
 
         val newLines = if (timeLeft <= 5) {
             listOf("$currentBuffColor$currentBuff §cSoon!")

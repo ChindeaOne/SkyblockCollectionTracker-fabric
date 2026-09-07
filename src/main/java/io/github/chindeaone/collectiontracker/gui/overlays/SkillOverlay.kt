@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getSkillPosition
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
@@ -18,30 +19,6 @@ class SkillOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
     private var cachedSkillLines: List<String> = emptyList()
     private var cachedTamingLines: List<String> = emptyList()
-
-    private var lastUptime: String = ""
-    private var lastSkillName: String = ""
-    private var lastSkillLevel: Int = -1
-    private var lastTotalSkillXp: Long = -1L
-    private var lastSkillXpGained: Long = -1L
-    private var lastSkillPerHour: Long = -1L
-    private var lastSkillRank: Int = -1
-    private var lastSkillNextUser: String? = null
-    private var lastSkillNextAmount: Long = -1L
-    private var lastSkillTillNext: Long = -1L
-    private var lastSkillEta: String? = null
-
-    private var lastWithTaming: Boolean = false
-    private var lastTamingLevel: Int = -1
-    private var lastTamingTotalXp: Long = -1L
-    private var lastTamingXpGained: Long = -1L
-    private var lastTamingPerHour: Long = -1L
-    private var lastTamingRank: Int = -1
-    private var lastTamingNextUser: String? = null
-    private var lastTamingNextAmount: Long = -1L
-    private var lastTamingTillNext: Long = -1L
-    private var lastTamingEta: String? = null
-    private var lastLeaderboard: Boolean = false
 
     override val overlayLabel: String = "Skill Tracker"
 
@@ -88,6 +65,8 @@ class SkillOverlay : AbstractOverlay() {
             return
         }
 
+        if (ModLoader.clientTicks % 5L != 0L) return
+
         val currentUptime = SkillTrackingHandler.uptime
         val currentSkill = SkillTracker.skillName
         val currentSkillLvl = SkillTrackingRates.skillLevel
@@ -112,42 +91,6 @@ class SkillOverlay : AbstractOverlay() {
         val currentTamingEta = SkillTrackingRates.tamingEtaToNextRank
         val leaderboard = isSkillLeaderboardEnabled()
 
-        if (cachedLines.isNotEmpty()
-            && currentUptime == lastUptime && currentSkill == lastSkillName && currentSkillLvl == lastSkillLevel && currentTotalXp == lastTotalSkillXp
-            && currentSkillGained == lastSkillXpGained && currentSkillPerHour == lastSkillPerHour
-            && currentSkillRank == lastSkillRank && currentSkillNextUser == lastSkillNextUser && currentSkillNextAmount == lastSkillNextAmount
-            && currentSkillTillNext == lastSkillTillNext && currentSkillEta == lastSkillEta
-            && withTaming == lastWithTaming && currentTamingLvl == lastTamingLevel && currentTamingTotalXp == lastTamingTotalXp
-            && currentTamingGained == lastTamingXpGained && currentTamingPerHour == lastTamingPerHour
-            && currentTamingRank == lastTamingRank && currentTamingNextUser == lastTamingNextUser
-            && currentTamingNextAmount == lastTamingNextAmount && currentTamingTillNext == lastTamingTillNext && currentTamingEta == lastTamingEta
-            && leaderboard == lastLeaderboard
-        ) return
-
-        lastUptime = currentUptime
-        lastSkillName = currentSkill
-        lastSkillLevel = currentSkillLvl
-        lastTotalSkillXp = currentTotalXp
-        lastSkillXpGained = currentSkillGained
-        lastSkillPerHour = currentSkillPerHour
-        lastSkillRank = currentSkillRank
-        lastSkillNextUser = currentSkillNextUser
-        lastSkillNextAmount = currentSkillNextAmount
-        lastSkillTillNext = currentSkillTillNext
-        lastSkillEta = currentSkillEta
-
-        lastWithTaming = withTaming
-        lastTamingLevel = currentTamingLvl
-        lastTamingTotalXp = currentTamingTotalXp
-        lastTamingXpGained = currentTamingGained
-        lastTamingPerHour = currentTamingPerHour
-        lastTamingRank = currentTamingRank
-        lastTamingNextUser = currentTamingNextUser
-        lastTamingNextAmount = currentTamingNextAmount
-        lastTamingTillNext = currentTamingTillNext
-        lastTamingEta = currentTamingEta
-        lastLeaderboard = leaderboard
-
         val newSkillLines = mutableListOf<String>()
         var rankSuffix = ""
         if (leaderboard && currentSkillRank != -1) {
@@ -166,7 +109,8 @@ class SkillOverlay : AbstractOverlay() {
             currentSkillNextUser,
             currentSkillNextAmount,
             currentSkillTillNext,
-            currentSkillEta
+            currentSkillEta,
+            leaderboard
         )
         newSkillLines.add("Uptime: $currentUptime")
 
@@ -191,7 +135,8 @@ class SkillOverlay : AbstractOverlay() {
                 currentTamingNextUser,
                 currentTamingNextAmount,
                 currentTamingTillNext,
-                currentTamingEta
+                currentTamingEta,
+                leaderboard
             )
         }
 
@@ -213,9 +158,10 @@ class SkillOverlay : AbstractOverlay() {
         nextUser: String?,
         nextAmount: Long,
         tillNext: Long,
-        eta: String?
+        eta: String?,
+        leaderboardEnabled: Boolean
     ) {
-        if (!isSkillLeaderboardEnabled()) return
+        if (!leaderboardEnabled) return
         if (rank == 1) return
 
         list.add("")

@@ -33,8 +33,7 @@ abstract class AbstractRotatingPerksOverlay: AbstractOverlay() {
         }
 
     private fun updateLinesIfNeeded() {
-        val islandAllowed = isIslandAllowed
-        if (!islandAllowed) {
+        if (!isIslandAllowed) {
             if (cachedLines.isNotEmpty()) {
                 cachedLines = emptyList()
                 lastIslandAllowed = false

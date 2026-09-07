@@ -112,8 +112,6 @@ class StopwatchOverlay : AbstractOverlay() {
         lastRunning = stopwatchRunning
 
         val pauseText = if (stopwatchPaused) "§7 (Paused)" else ""
-        val newLines = listOf("§bStopwatch: §e" + StringUtils.formatCompactTime(elapsedSeconds) + pauseText)
-
-        cachedLines = newLines
+        cachedLines = listOf("§bStopwatch: §e" + StringUtils.formatCompactTime(elapsedSeconds) + pauseText)
     }
 }
