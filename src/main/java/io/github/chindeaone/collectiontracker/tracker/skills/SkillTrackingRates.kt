@@ -69,10 +69,8 @@ object SkillTrackingRates {
         }
     }
 
-    @Synchronized
     fun calculateSkillRates(value: Long) {
-        skillXpGained =
-            value - (skillXp - (if (SkillTrackingHandler.isSkillMaxed) SkillUtils.getMaxXpForSkill(skillName) else 0L)) // total gained since tracking started
+        skillXpGained = value - (skillXp - (if (SkillTrackingHandler.isSkillMaxed) SkillUtils.getMaxXpForSkill(skillName) else 0L)) // total gained since tracking started
 
         // AFK detection (API calls only)
         if (!SkillTrackingHandler.isSkillMaxed) {
@@ -97,7 +95,6 @@ object SkillTrackingRates {
         updateSkillEta()
     }
 
-    @Synchronized
     fun calculateTamingRates(value: Long) {
         tamingXpGained = value - tamingXp // total gained since tracking started
 

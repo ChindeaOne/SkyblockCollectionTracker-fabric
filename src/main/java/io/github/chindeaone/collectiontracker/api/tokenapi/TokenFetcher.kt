@@ -29,7 +29,7 @@ object TokenFetcher {
             ApiManager.requestAsync("token", headers)
                 .thenApply { response ->
                     if (response.statusCode() != 200) {
-                        logger.error("[SCT]: Failed to fetch token, response code: {}", response.statusCode())
+                        logger.error("[SCT]: Failed to fetch token, response code: ${response.statusCode()}")
 
                         if (notify) {
                             sendMessage("§cFailed to fetch token.", true)

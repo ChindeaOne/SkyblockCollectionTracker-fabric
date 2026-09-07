@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.utils.PlayerData
+import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
@@ -20,18 +21,19 @@ object HypixelApiFetcher {
                     200 -> response.body()
 
                     404 -> {
+                        ChatUtils.sendMessage("§eCollection API disabled in game or Hypixel API is down. Setting collection values manually...", true)
                         logger.warn("[SCT]: Collection API disabled in game.")
                         null
                     }
 
                     else -> {
-                        logger.error("[SCT]: Failed to fetch collection data. HTTP {}", response.statusCode())
+                        logger.error("[SCT]: Failed to fetch collection data. HTTP ${response.statusCode()}")
                         null
                     }
                 }
             }
             .exceptionally { e ->
-                logger.error("[SCT]: An error occurred while fetching data from the server", e)
+                logger.error("[SCT]: Error fetching data from the Hypixel API: ${e.message}", e)
                 null
             }
     }
@@ -43,18 +45,19 @@ object HypixelApiFetcher {
                     200 -> response.body()
 
                     404 -> {
+                        ChatUtils.sendMessage("§eCollection API disabled in game or Hypixel API is down. Setting collection values manually...", true)
                         logger.warn("[SCT]: Collection API disabled in game.")
                         null
                     }
 
                     else -> {
-                        logger.error("[SCT]: Failed to fetch multi-collection data. HTTP {}", response.statusCode())
+                        logger.error("[SCT]: Failed to fetch multi-collection data. HTTP ${response.statusCode()}")
                         null
                     }
                 }
             }
             .exceptionally { e ->
-                logger.error("[SCT]: An error occurred while fetching multi-collection data from the server", e)
+                logger.error("[SCT]: Error fetching data from the Hypixel API: ${e.message}", e)
                 null
             }
     }

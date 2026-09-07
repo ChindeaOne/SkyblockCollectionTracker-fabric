@@ -27,7 +27,7 @@ object FetchNpcPrices {
                     logger.info("[SCT]: Successfully received the npc prices.")
 
                 } else {
-                    logger.error("[SCT]: Failed to fetch NPC prices. HTTP {}", response.statusCode())
+                    logger.error("[SCT]: Failed to fetch NPC prices. HTTP ${response.statusCode()}")
                 }
             }.exceptionally { e ->
                 logger.error("[SCT]: Error while receiving the npc prices", e)

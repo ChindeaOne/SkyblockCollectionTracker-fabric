@@ -41,7 +41,7 @@ object ColeweightTrackingRates {
         coleweightAmount = currentValue
 
         coleweightGained = currentValue - startColeweight
-        val uptime = ColeweightTrackingHandler.getUptimeInSeconds()
+        val uptime = ColeweightTrackingHandler.uptimeInSeconds
         coleweightPerHour = if (uptime > 0) {
             (coleweightGained / (uptime / 3600.0)).toFloat()
         } else {

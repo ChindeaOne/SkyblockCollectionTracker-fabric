@@ -17,7 +17,7 @@ object FetchRepoData {
             .thenAccept { response ->
                 val status = response.statusCode()
                 if (status != 200) {
-                    logger.error("[SCT]: Failed to fetch GitHub releases, response code: {}", status)
+                    logger.error("[SCT]: Failed to fetch GitHub releases, response code: $status")
                     return@thenAccept
                 }
 

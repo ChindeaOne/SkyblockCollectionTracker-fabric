@@ -18,7 +18,7 @@ object FetchBazaarPrice {
         return requestHelper(collection)
             .thenAccept { response ->
                 if (response.statusCode() != 200) {
-                    logger.error("[SCT]: Failed to fetch bazaar price for collection '{}', response code: {}", collection, response.statusCode())
+                    logger.error("[SCT]: Failed to fetch bazaar price for collection $collection, response code: ${response.statusCode()}")
                     return@thenAccept
                 }
 
@@ -37,10 +37,10 @@ object FetchBazaarPrice {
                 }
 
                 CollectionsManager.collectionType = type
-                logger.info("[SCT]: Successfully fetched bazaar price for collection '{}'", collection)
+                logger.info("[SCT]: Successfully fetched bazaar price for collection $collection")
             }
             .exceptionally { e ->
-                logger.error("[SCT]: Error fetching bazaar price for collection '{}': {}", collection, e.message)
+                logger.error("[SCT]: Error fetching bazaar price for collection $collection: ${e.message}")
                 null
             }
     }
@@ -49,7 +49,7 @@ object FetchBazaarPrice {
         return requestHelper(addGemstones(collections).joinToString(", "))
             .thenAccept { response ->
                 if (response.statusCode() != 200) {
-                    logger.error("[SCT]: Failed to fetch bazaar price for collections '{}', response code: {}", collections, response.statusCode())
+                    logger.error("[SCT]: Failed to fetch bazaar price for collections $collections, response code: ${response.statusCode()}")
                     return@thenAccept
                 }
 
@@ -72,9 +72,9 @@ object FetchBazaarPrice {
                     CollectionsManager.multiCollectionTypes[collectionId] = type
                 }
 
-                logger.info("[SCT]: Successfully fetched bazaar price for collection list '{}'", collections)
+                logger.info("[SCT]: Successfully fetched bazaar price for collection list $collections")
             }.exceptionally { e ->
-                logger.error("[SCT]: Error fetching bazaar price for collections '{}': {}", collections, e.message)
+                logger.error("[SCT]: Error fetching bazaar price for collections $collections: ${e.message}")
                 null
             }
     }

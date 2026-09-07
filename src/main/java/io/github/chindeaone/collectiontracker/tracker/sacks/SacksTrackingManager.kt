@@ -16,7 +16,6 @@ object SacksTrackingManager {
     private val logger: Logger = LogManager.getLogger(SacksTrackingManager::class.java)
 
     fun onSacksGain(sacksDetails: Map<String, Int>) {
-
         if (TrackingHandler.isTracking) {
             handleTracking(sacksDetails)
             return
@@ -46,13 +45,11 @@ object SacksTrackingManager {
             val isSuperEnchanted = superEnchantedMultiplier != null
 
             if (type == null) {
-                logger.error("[SCT]: Collection type is null for collection: {}", collectionName)
+                logger.error("[SCT]: Collection type is null for collection: $collectionName")
                 return
             }
 
-            val matchesCollection =
-                if (type == "gemstone") itemName.contains(collectionName)
-                else itemName == collectionName
+            val matchesCollection = if (type == "gemstone") itemName.contains(collectionName) else itemName == collectionName
 
             if (!matchesCollection && !isEnchanted && !isSuperEnchanted) continue
 
@@ -66,14 +63,10 @@ object SacksTrackingManager {
                 } else {
                     amount
                 }
-            } else {
-                amount
-            }
+            } else amount
         }
 
-        if (totalAmount > 0) {
-            TrackingRates.calculateRates(totalAmount)
-        }
+        if (totalAmount > 0) TrackingRates.calculateRates(totalAmount)
     }
 
     private fun handleMultiTracking(sacksDetails: Map<String, Int>) {
@@ -110,9 +103,7 @@ object SacksTrackingManager {
                 }
             }
 
-            if (totalAmount > 0) {
-                gains[coll] = totalAmount
-            }
+            if (totalAmount > 0) gains[coll] = totalAmount
         }
 
         if (CollectionTracker.collectionList.contains("gemstone")) {
@@ -132,20 +123,14 @@ object SacksTrackingManager {
                             break
                         }
                     }
-                    if (gemstoneType != null) {
-                        gains.merge(gemstoneType, gain, Long::plus)
-                    }
+                    if (gemstoneType != null) gains.merge(gemstoneType, gain, Long::plus)
                 }
             }
 
-            if (generalGemstoneGains > 0) {
-                gains.merge("gemstone", generalGemstoneGains, Long::plus)
-            }
+            if (generalGemstoneGains > 0) gains.merge("gemstone", generalGemstoneGains, Long::plus)
         }
 
-        if (gains.isNotEmpty()) {
-            MultiTrackingRates.calculateMultiRates(gains)
-        }
+        if (gains.isNotEmpty()) MultiTrackingRates.calculateMultiRates(gains)
     }
 
     private fun getGemstoneMultiplier(itemName: String): Int {
@@ -164,7 +149,7 @@ object SacksTrackingManager {
         val override = overrides[collectionName]
 
         map.entries.forEach { entry ->
-            val key = entry.key.lowercase().replace("_", " ")
+            val key = entry.key.lowercase().replace('_', ' ')
             normalizedMap[override ?: key] = entry.value
         }
 

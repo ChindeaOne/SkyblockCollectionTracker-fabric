@@ -117,7 +117,7 @@ object Hypixel {
         if (updateCheckPerformed) return
         updateCheckPerformed = true
 
-        logger.info("[SCT]: Update stream status: {}", ConfigAccess.getUpdateStream())
+        logger.info("[SCT]: Update stream status: ${ConfigAccess.getUpdateStream()}")
 
         if (ConfigAccess.getUpdateStream() == About.UpdateStream.NONE) {
             logger.info("[SCT]: Update stream is disabled.")

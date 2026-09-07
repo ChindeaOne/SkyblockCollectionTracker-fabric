@@ -97,12 +97,9 @@ object ScoreboardUtils {
             if (checkTime) {
                 val totalMinutesInDay = 24 * 60
                 var minutesUntilMidnight = (totalMinutesInDay - minutesSinceMidnight) % totalMinutesInDay
-
                 if (minutesSinceMidnight == 0) minutesUntilMidnight = 0
 
-                val tenMinuteChunks =
-                    if (minutesUntilMidnight == 0) 0.0
-                    else ceil(minutesUntilMidnight / 10.0)
+                val tenMinuteChunks = if (minutesUntilMidnight == 0) 0.0 else ceil(minutesUntilMidnight / 10.0)
 
                 val secondsLeft = tenMinuteChunks * sb10Minutes
 

@@ -30,7 +30,7 @@ object FetchCollectionList {
                     hasCollectionList = true
                     logger.info("[SCT]: Successfully received the collection list.")
                 } else {
-                    logger.error("[SCT]: Failed to fetch collection list. HTTP {}", response.statusCode())
+                    logger.error("[SCT]: Failed to fetch collection list. HTTP ${response.statusCode()}")
                 }
             }.exceptionally { e ->
                 logger.error("[SCT]: Error while receiving the collection list", e)

@@ -28,18 +28,18 @@ object EliteApiFetcher {
 
                         if (body.isNullOrBlank()) {
                             ChatUtils.sendMessage("§cCouldn't find $playerName's Farming Weight.")
-                            logger.warn("[SCT]: Empty response for {}", playerName)
+                            logger.warn("[SCT]: Empty response for $playerName")
                             null
                         } else body
                     }
                     429 -> {
                         ChatUtils.sendMessage("§cRate limit exceeded for $playerName's Farming Weight.")
-                        logger.warn("[SCT]: Rate limit exceeded for {}", playerName)
+                        logger.warn("[SCT]: Rate limit exceeded for $playerName")
                         null
                     }
                     else -> {
                         ChatUtils.sendMessage("§cError fetching Farming Weight for $playerName.")
-                        logger.warn("[SCT]: Error fetching Farming Weight for {}: HTTP {}", playerName, response.statusCode())
+                        logger.warn("[SCT]: Error fetching Farming Weight for $playerName: HTTP ${response.statusCode()}")
                         null
                     }
                 }
@@ -63,7 +63,7 @@ object EliteApiFetcher {
                         } else body
                     }
                     else -> {
-                        logger.warn("[SCT]: Failed to fetch Farming Weight leaderboard. HTTP {}", response.statusCode())
+                        logger.warn("[SCT]: Failed to fetch Farming Weight leaderboard. HTTP ${response.statusCode()}")
                         null
                     }
                 }
@@ -85,7 +85,7 @@ object EliteApiFetcher {
                             null
                         } else body
                     } else -> {
-                        logger.warn("[SCT]: Failed to fetch Farming Weight top 1k. HTTP {}", response.statusCode())
+                        logger.warn("[SCT]: Failed to fetch Farming Weight top 1k. HTTP ${response.statusCode()}")
                         null
                     }
                 }
@@ -106,10 +106,10 @@ object EliteApiFetcher {
             put("X-COLOR", color)
         }).thenApply { response ->
             if (response.statusCode() == 200) {
-                logger.info("[SCT]: Successfully set global Farming Weight color for {}", playerName)
+                logger.info("[SCT]: Successfully set global Farming Weight color for $playerName")
                 true
             } else {
-                logger.warn("[SCT]: Failed to set global Farming Weight color for {}. HTTP {}", playerName, response.statusCode())
+                logger.warn("[SCT]: Failed to set global Farming Weight color for $playerName. HTTP ${response.statusCode()}")
                 false
             }
         }.exceptionally { e ->
@@ -130,7 +130,7 @@ object EliteApiFetcher {
                         } else body
                     }
                     else -> {
-                        logger.warn("[SCT]: Failed to fetch Farming Weight top colors. HTTP {}", response.statusCode())
+                        logger.warn("[SCT]: Failed to fetch Farming Weight top colors. HTTP ${response.statusCode()}")
                         null
                     }
                 }
@@ -147,7 +147,7 @@ object EliteApiFetcher {
     }
 
     fun fetchCollectionLeaderboard(collection: String): CompletableFuture<String?> {
-        return ApiManager.requestAsync("collection/leaderboard/${collection.replace(" ", "-")}", authHeaders(PlayerData.playerUUID, PlayerData.playerName).apply{
+        return ApiManager.requestAsync("collection/leaderboard/${collection.replace(' ', '-')}", authHeaders(PlayerData.playerUUID, PlayerData.playerName).apply{
             remove("X-NAME")
             put("X-CONTAINS-WIPED", if (ConfigAccess.isIncludeWipedProfilesEnabled()) "true" else "false")
         }).thenApply { response ->
@@ -160,7 +160,7 @@ object EliteApiFetcher {
                     }
 
                     else -> {
-                        logger.error("[SCT]: Failed to fetch leaderboard data. HTTP {}", response.statusCode())
+                        logger.error("[SCT]: Failed to fetch leaderboard data. HTTP ${response.statusCode()}")
                         null
                     }
                 }

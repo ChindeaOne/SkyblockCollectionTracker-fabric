@@ -22,7 +22,7 @@ object FetchGemstoneList {
                     hasGemstoneList = true
                     logger.info("[SCT]: Successfully received the gemstone list.")
                 } else {
-                    logger.error("[SCT]: Failed to fetch gemstone list. HTTP {}", response.statusCode())
+                    logger.error("[SCT]: Failed to fetch gemstone list. HTTP ${response.statusCode()}")
                 }
             }.exceptionally { e ->
                 logger.error("[SCT]: Error while receiving the gemstone list", e)

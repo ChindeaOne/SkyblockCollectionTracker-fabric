@@ -21,7 +21,7 @@ object FetchWaypoints {
                     hasWaypoints = true
                     logger.info("[SCT]: Successfully fetched waypoints.")
                 } else {
-                    logger.error("[SCT]: Failed to fetch waypoints. Server responded with code: {}", response.statusCode())
+                    logger.error("[SCT]: Failed to fetch waypoints. Server responded with code: ${response.statusCode()}")
                 }
             }.exceptionally { e ->
                 logger.error("[SCT]: An error occurred while fetching waypoints: ", e)

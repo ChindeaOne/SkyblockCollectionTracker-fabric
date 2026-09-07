@@ -34,67 +34,64 @@ object DataFetcher {
     fun fetchData(isInitialFetch: Boolean) {
         logger.info("[SCT]: Fetching collection data")
 
-        try {
-            if (!ServerUtils.serverStatus) {
-                logger.warn("[SCT]: API server not online. Stopping the tracker.")
-                TrackingHandler.stopTracking()
-                return
-            }
-            if (!isInitialFetch && !isTracking) return
+        if (!ServerUtils.serverStatus) {
+            logger.warn("[SCT]: API server not online. Stopping the tracker.")
+            TrackingHandler.stopTracking()
+            return
+        }
+        if (!isInitialFetch && !isTracking) return
 
-            var collectionData = getCachedData(collection)
-            if (collectionData == null) {
-                fetchDataFromApi(collection).thenAccept { jsonData ->
-                    if (jsonData == null) {
-                        logger.error("[SCT]: Failed to fetch data from the Hypixel API")
+        var collectionData = getCachedData(collection)
+        if (collectionData == null) {
+            fetchDataFromApi(collection).thenAccept { jsonData ->
+                if (jsonData == null) {
+                    logger.error("[SCT]: Failed to fetch data from the Hypixel API")
 
-                        if (ConfigAccess.isApiTrackingEnabled()) {
-                            CollectionTracker.cancelScheduledTask()
-                        }
-
-                        if (isInitialFetch) {
-                            MinecraftUtils.runOnClientThread {
-                                MinecraftUtils.setScreen(CustomCollectionScreen(listOf(collection)) {
-                                    CollectionsManager.resetCollections()
-                                })
-                            }
-                        }
-                        return@thenAccept
+                    if (ConfigAccess.isApiTrackingEnabled()) {
+                        CollectionTracker.cancelScheduledTask()
                     }
-                    collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().value.asLong
-
-                    collectionCache[collection] = collectionData
-                    cacheTimestamps[collection] = System.currentTimeMillis()
 
                     if (isInitialFetch) {
-                        TrackingRates.setCollection(collectionData)
-                    } else {
-                        TrackingRates.updateCollection(collectionData)
+                        MinecraftUtils.runOnClientThread {
+                            MinecraftUtils.setScreen(CustomCollectionScreen(listOf(collection)) {
+                                CollectionsManager.resetCollections()
+                            })
+                        }
                     }
-                    logger.info("[SCT]: Data successfully fetched for collection: {}", collection)
-                }.exceptionally { throwable ->
-                    logger.error("[SCT]: Error fetching data from the Hypixel API: {}", throwable.message, throwable)
-                    null
+                    return@thenAccept
                 }
-            } else {
+                collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().value.asLong
+
+                collectionCache[collection] = collectionData
+                cacheTimestamps[collection] = System.currentTimeMillis()
+
                 if (isInitialFetch) {
                     TrackingRates.setCollection(collectionData)
                 } else {
                     TrackingRates.updateCollection(collectionData)
                 }
-                logger.info("[SCT]: Data successfully retrieved for collection: {}", collection)
+                logger.info("[SCT]: Data successfully fetched for collection: $collection")
+            }.exceptionally { throwable ->
+                logger.error("[SCT]: Error processing API data for collection '$collection': ${throwable.message}", throwable)
+                null
             }
-        } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching data from the Hypixel API: {}", e.message, e)
+        } else {
+            if (isInitialFetch) {
+                TrackingRates.setCollection(collectionData)
+            } else {
+                TrackingRates.updateCollection(collectionData)
+            }
+            logger.info("[SCT]: Data successfully retrieved for collection: $collection")
         }
     }
 
     private fun getCachedData(collection: String): Long? {
         val lastFetched = cacheTimestamps[collection]
+        val now = System.currentTimeMillis()
 
-        if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < CACHE_LIFESPAN_MS) {
-            val elapsed = System.currentTimeMillis() - lastFetched
-            logger.info("[SCT]: Returning cached data for collection: {} (last fetched {} ms ago)", collection, elapsed)
+        if (lastFetched != null && (now - lastFetched) < CACHE_LIFESPAN_MS) {
+            val elapsed = now - lastFetched
+            logger.info("[SCT]: Returning cached data for collection: $collection (last fetched $elapsed ms ago)")
             return collectionCache[collection]
         }
         return null
@@ -105,9 +102,9 @@ object DataFetcher {
 
         if (lastFetched != null) {
             val elapsed = System.currentTimeMillis() - lastFetched
-            logger.info("[SCT]: Cache expired for collection {} (last fetched {} ms ago). Fetching new data.", collection, elapsed)
+            logger.info("[SCT]: Cache expired for collection $collection (last fetched $elapsed ms ago). Fetching new data.")
         } else {
-            logger.info("[SCT]: No cache present for collection {}. Fetching data.", collection)
+            logger.info("[SCT]: No cache present for collection $collection. Fetching data.")
         }
 
         return HypixelApiFetcher.fetchJsonData(collection)
@@ -140,7 +137,7 @@ object DataFetcher {
                 leaderboardFetchInProgress.store(false)
                 return CompletableFuture.completedFuture(null)
             } else {
-                logger.info("[SCT]: Fetching leaderboard data for collection: {}", targetCollection)
+                logger.info("[SCT]: Fetching leaderboard data for collection: $targetCollection")
 
                 EliteApiFetcher.fetchCollectionLeaderboard(targetCollection).thenAccept { jsonData ->
                     if (jsonData == null) {
@@ -168,16 +165,16 @@ object DataFetcher {
                     }
                     LeaderboardManager.set(entries)
                     leaderboardCacheTimestamps[targetCollection] = System.currentTimeMillis()
-                    logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: {}", targetCollection)
+                    logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: $targetCollection")
                 }.exceptionally { throwable ->
-                    logger.error("[SCT]: Error fetching leaderboard data: {}", throwable.message, throwable)
+                    logger.error("[SCT]: Error fetching leaderboard data: ${throwable.message}", throwable)
                     null
                 }.whenComplete { _, _ ->
                     leaderboardFetchInProgress.store(false)
                 }
             }
         } catch (e: Exception) {
-            logger.error("[SCT]: Error fetching leaderboard data: {}", e.message, e)
+            logger.error("[SCT]: Error fetching leaderboard data: ${e.message}", e)
             leaderboardFetchInProgress.store(false)
             CompletableFuture.failedFuture(e)
         }

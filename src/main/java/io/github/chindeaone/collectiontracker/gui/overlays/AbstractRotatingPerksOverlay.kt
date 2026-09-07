@@ -53,10 +53,7 @@ abstract class AbstractRotatingPerksOverlay: AbstractOverlay() {
         lastBuff = buff
         lastIslandAllowed = true
 
-        val newLines = listOf(
-            "$buffPrefix: $buff",
-            StringUtils.updateTimer()
-        )
+        val newLines = listOf("$buffPrefix: $buff", StringUtils.updateTimer())
 
         cachedLines = newLines
     }

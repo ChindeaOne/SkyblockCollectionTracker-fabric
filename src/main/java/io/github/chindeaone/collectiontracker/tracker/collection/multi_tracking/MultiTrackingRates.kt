@@ -16,25 +16,25 @@ import java.util.concurrent.ConcurrentHashMap
 object MultiTrackingRates {
 
     // Collection tracking data
-    @Volatile var collectionAmounts = ConcurrentHashMap<String, Long>()
-    @Volatile var collectionPerHour = ConcurrentHashMap<String, Long>()
-    @Volatile var collectionMade = ConcurrentHashMap<String, Long>()
-    @Volatile var collectionSinceLast = ConcurrentHashMap<String, Long>()
-    @Volatile var sessionStartCollections = ConcurrentHashMap<String, Long>()
-    @Volatile var lastCollectionTimes = ConcurrentHashMap<String, Long>()
-    @Volatile var lastApiCollections = ConcurrentHashMap<String, Long>()
+    val collectionAmounts = ConcurrentHashMap<String, Long>()
+    val collectionPerHour = ConcurrentHashMap<String, Long>()
+    val collectionMade = ConcurrentHashMap<String, Long>()
+    val collectionSinceLast = ConcurrentHashMap<String, Long>()
+    val sessionStartCollections = ConcurrentHashMap<String, Long>()
+    val lastCollectionTimes = ConcurrentHashMap<String, Long>()
+    val lastApiCollections = ConcurrentHashMap<String, Long>()
 
     // Track seen gemstones to only render them if they've been received from chat
-    @Volatile var seenGemstones: MutableSet<String>  = ConcurrentHashMap.newKeySet()
+    val seenGemstones: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
     // Money tracking data
     // NPC
-    @Volatile var moneyPerHourNPC = ConcurrentHashMap<String, Long>()
-    @Volatile var moneyMadeNPC = ConcurrentHashMap<String, Long>()
+    val moneyPerHourNPC = ConcurrentHashMap<String, Long>()
+    val moneyMadeNPC = ConcurrentHashMap<String, Long>()
 
     // Bazaar
-    @Volatile var moneyMadeBazaar = ConcurrentHashMap<String, Long>()
-    @Volatile var moneyPerHourBazaar = ConcurrentHashMap<String, Long>()
+    val moneyMadeBazaar = ConcurrentHashMap<String, Long>()
+    val moneyPerHourBazaar = ConcurrentHashMap<String, Long>()
 
     // Leaderboard tracking data
     @Volatile var playerCurrentRank = -1
@@ -50,7 +50,7 @@ object MultiTrackingRates {
 
     fun setCollections(values: Map<String, Long>) {
         val now = System.currentTimeMillis()
-        MultiTrackingHandler.initMultiTracking()
+        MultiTrackingHandler.initMultiTracking(now)
 
         for ((coll, value) in values) {
             lastApiCollections[coll] = value
@@ -63,7 +63,7 @@ object MultiTrackingRates {
                     GemstonesManager.gemstones.forEach { gemstoneType ->
                         val gemstoneKey = gemstoneType.lowercase()
                         GemstonePrices.multiGemstoneRecipes[gemstoneKey]?.keys?.forEach { tier ->
-                            val keyPrefix = (gemstoneType + "_" + tier).uppercase()
+                            val keyPrefix = ("${gemstoneType}_$tier").uppercase()
                             moneyPerHourNPC.putIfAbsent(keyPrefix, 0L)
                             moneyMadeNPC.putIfAbsent(keyPrefix, 0L)
                         }
@@ -82,9 +82,7 @@ object MultiTrackingRates {
 
             lastApiCollections[coll] = newTotal
 
-            if (sessionStartCollections.getOrDefault(coll, -1L) == -1L) {
-                sessionStartCollections[coll] = newTotal
-            }
+            if (sessionStartCollections.getOrDefault(coll, -1L) == -1L) sessionStartCollections[coll] = newTotal
 
             updateValues(coll, newTotal, gained)
         }
@@ -93,14 +91,10 @@ object MultiTrackingRates {
     fun calculateMultiRates(gains: Map<String, Long>) {
         for ((coll, amount) in gains) {
             val isGemstone = GemstonesManager.checkIfGemstone(coll)
-            if (isGemstone) {
-                seenGemstones.add(coll)
-            }
+            if (isGemstone) seenGemstones.add(coll)
 
             val startValue = sessionStartCollections[coll] ?: -1L
-            if (startValue == -1L) {
-                sessionStartCollections[coll] = (collectionAmounts[coll] ?: lastApiCollections.getOrDefault(coll, 0L))
-            }
+            if (startValue == -1L) sessionStartCollections[coll] = (collectionAmounts[coll] ?: lastApiCollections.getOrDefault(coll, 0L))
 
             val currentTotal = (collectionAmounts[coll] ?: lastApiCollections.getOrDefault(coll, 0L)) + amount
             updateValues(coll, currentTotal, amount)
@@ -135,14 +129,10 @@ object MultiTrackingRates {
             moneyMadeNPC[coll] = (priceNPC * collectedSinceStart)
 
             // Bazaar Prices
-            if (BazaarCollectionsManager.hasBazaarData) {
-                updateBazaarRates(coll, collectedSinceStart, uptime)
-            }
+            if (BazaarCollectionsManager.hasBazaarData) updateBazaarRates(coll, collectedSinceStart, uptime)
 
             // Special handling for gemstones
-            if (GemstonesManager.checkIfGemstone(coll)) {
-                updateGemstoneDetailedRates(coll, collectedSinceStart, uptime)
-            }
+            if (GemstonesManager.checkIfGemstone(coll)) updateGemstoneDetailedRates(coll, collectedSinceStart, uptime)
         }
 
         if (!MultiCollectionOverlay.trackingDirty) MultiCollectionOverlay.trackingDirty = true
@@ -240,7 +230,7 @@ object MultiTrackingRates {
         val basePriceNPC = NpcPrices.getNpcPrice(gemstoneKey)
 
         for (variant in gemstoneRecipes.keys) {
-            val tier = variant.split("_")[0].uppercase()
+            val tier = variant.split('_')[0].uppercase()
             val keyPrefix = "${gemstoneType.uppercase()}_$tier"
 
             if (basePriceNPC != -1) {
@@ -259,7 +249,7 @@ object MultiTrackingRates {
                 val sellPrice = gemstoneSellPrices[tier] ?: 0f
                 val recipe = gemstoneRecipes[tier]?.toDouble() ?: 1.0
 
-                val tierName = tier.split("_")[0].uppercase()
+                val tierName = tier.split('_')[0].uppercase()
                 val keyPrefix = "${gemstoneType.uppercase()}_$tierName"
 
                 moneyPerHourBazaar["${keyPrefix}_INSTANT_BUY"] = if (uptime > 0) (buyPrice * (collectedSinceStart / recipe) / (uptime / 3600.0)).toLong() else 0L

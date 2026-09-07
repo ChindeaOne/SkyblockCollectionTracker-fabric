@@ -23,7 +23,7 @@ object FetchVersions {
                     hasVersions = true
                     logger.info("[SCT]: Successfully fetched versions data.")
                 } else {
-                    logger.error("[SCT]: Failed to fetch versions data. Server responded with code: {}", response.statusCode())
+                    logger.error("[SCT]: Failed to fetch versions data. Server responded with code: ${response.statusCode()}")
                 }
             }.exceptionally { e ->
                 logger.error("[SCT]: Exception occurred while fetching versions data.", e)

@@ -189,21 +189,12 @@ object ColeweightTrackingHandler {
         }
     }
 
-    fun getUptimeInSeconds(): Long {
-        return if (isPaused) {
+    val uptimeInSeconds: Long
+        get() = if (isPaused) {
             lastTime
         } else {
             lastTime + (System.currentTimeMillis() - startTime) / 1000
         }
-    }
 
-    val uptime: String
-        get() {
-            val uptime: Long = if (isPaused) {
-                lastTime
-            } else {
-                lastTime + (System.currentTimeMillis() - startTime) / 1000
-            }
-            return StringUtils.formatTime(uptime)
-        }
+    val uptime: String get() = StringUtils.formatTime(uptimeInSeconds)
 }

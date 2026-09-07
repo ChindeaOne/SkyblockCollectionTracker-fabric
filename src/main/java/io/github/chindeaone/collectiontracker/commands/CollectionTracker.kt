@@ -156,6 +156,6 @@ object CollectionTracker {
         }
 
         ConfigHelper.setApiTracking(false)
-        ChatUtils.sendMessage("§eAPI data could not be fetched. Automatic API tracking has been disabled. Continuing with sack tracking.", true)
+        ChatUtils.sendMessage("§eAPI data could not be fetched. API tracking has been disabled. Continuing with sack tracking.", true)
     }
 }

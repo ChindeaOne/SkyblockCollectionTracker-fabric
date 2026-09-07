@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 object SkillTrackingHandler {
     private val logger: Logger = LogManager.getLogger(SkillTrackingHandler::class.java)
@@ -29,7 +30,7 @@ object SkillTrackingHandler {
     var startTime: Long = 0
     private var lastTime: Long = 0
     private var lastTrackedTime: Long = 0
-    private val TRACKING_INTERVAL = TimeUnit.SECONDS.toMillis(10) // 10 seconds
+    private val COOLDOWN_MILLIS = 10.seconds.inWholeMilliseconds
 
     private const val RESETS = 10
     private var restartCount = 0
@@ -40,16 +41,14 @@ object SkillTrackingHandler {
     fun startTracking() {
         val now = System.currentTimeMillis()
 
-        if (now - lastTrackedTime < TRACKING_INTERVAL) {
+        if (now - lastTrackedTime < COOLDOWN_MILLIS) {
             sendMessage("§cPlease wait a few seconds before tracking another skill!", true)
             return
         } else {
             sendMessage("§aTracking $skillName skill.", true)
         }
 
-        if (scheduler == null || scheduler!!.isShutdown) {
-            scheduler = Executors.newSingleThreadScheduledExecutor()
-        }
+        if (scheduler == null || scheduler!!.isShutdown) scheduler = Executors.newSingleThreadScheduledExecutor()
 
         initTracking(now)
         setSkillOverlayRendering(true)
@@ -61,15 +60,13 @@ object SkillTrackingHandler {
         SkillTrackingRates.initTracking(skillLevel ?: 0, skillXp?.toLong() ?: 0L)
 
         SkillTrackingRates.updateSkillLeaderboardStats()
-        if (isTamingTrackingEnabled()) {
-            SkillTrackingRates.updateTamingLeaderboardStats()
-        }
+        if (isTamingTrackingEnabled()) SkillTrackingRates.updateTamingLeaderboardStats()
 
         if (!isSkillMaxed || isTamingTrackingEnabled()) {
             // Track only via API
             scheduleSkillFetch(isSkillMaxed, skillXp?.toLong() ?: 0L, skillName)
         }
-        logger.info("[SCT]: Started tracking skill: {}", skillName)
+        logger.info("[SCT]: Started tracking $skillName")
     }
 
     fun onSkillGain(value: Long, skillName: String?) {
@@ -97,8 +94,8 @@ object SkillTrackingHandler {
         }
         isPaused = true
         lastTime = (System.currentTimeMillis() - startTime) / 1000
-        sendMessage("§7Paused tracking " + skillName.lowercase() + " skill.", true)
-        logger.info("[SCT]: Pausing tracking skill: {}", skillName)
+        sendMessage("§7Paused tracking $skillName skill.", true)
+        logger.info("[SCT]: Pausing tracking $skillName")
     }
 
     fun resumeTracking() {
@@ -110,8 +107,8 @@ object SkillTrackingHandler {
         }
         isPaused = false
         startTime = System.currentTimeMillis()
-        sendMessage("§7Resumed tracking " + skillName.lowercase() + " skill.", true)
-        logger.info("[SCT]: Resuming tracking skill: {}", skillName)
+        sendMessage("§7Resumed tracking $skillName skill.", true)
+        logger.info("[SCT]: Resuming tracking $skillName")
     }
 
     fun stopTracking() {
@@ -134,9 +131,8 @@ object SkillTrackingHandler {
         if (checkTracking()) return
 
         resetTrackingData(false)
-
-        sendMessage("§cStopped tracking " + skillName.lowercase() + " skill!", true)
-        logger.info("[SCT]: Stopped tracking skill: {}", skillName)
+        sendMessage("§cStopped tracking $skillName skill!", true)
+        logger.info("[SCT]: Stopped tracking $skillName")
     }
 
     private fun resetTrackingData(restart: Boolean) {
@@ -164,7 +160,7 @@ object SkillTrackingHandler {
         val now = System.currentTimeMillis()
         lastTrackedTime = if (!restart) {
             now
-        } else now - TRACKING_INTERVAL
+        } else now - COOLDOWN_MILLIS
 
         isSkillMaxed = false
         setSkillOverlayRendering(false)
@@ -208,22 +204,12 @@ object SkillTrackingHandler {
     }
 
     val uptimeInSeconds: Long
-        get() {
-            return if (isPaused) {
-                lastTime
-            } else {
-                lastTime + (System.currentTimeMillis() - startTime) / 1000
-            }
+        get() = if (isPaused) {
+            lastTime
+        } else {
+            lastTime + (System.currentTimeMillis() - startTime) / 1000
         }
 
-    val uptime: String
-        get() {
-            val uptime: Long = if (isPaused) {
-                lastTime
-            } else {
-                lastTime + (System.currentTimeMillis() - startTime) / 1000
-            }
+    val uptime: String get() = StringUtils.formatTime(uptimeInSeconds)
 
-            return StringUtils.formatTime(uptime)
-        }
 }

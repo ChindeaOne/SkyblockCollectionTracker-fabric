@@ -15,8 +15,8 @@ import kotlin.collections.set
 object ColeweightDataFetcher {
     private val logger = LogManager.getLogger(ColeweightDataFetcher::class.java)
 
-    private val cache: MutableMap<CacheKey, String> = ConcurrentHashMap<CacheKey, String>()
-    private val cacheTimestamps: MutableMap<CacheKey, Long> = ConcurrentHashMap<CacheKey, Long>()
+    private val cache: MutableMap<String, String> = ConcurrentHashMap<String, String>()
+    private val cacheTimestamps: MutableMap<String, Long> = ConcurrentHashMap<String, Long>()
     private const val CACHE_LIFESPAN_MS: Long = 180000L // default 3 minutes
     var scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
@@ -62,29 +62,29 @@ object ColeweightDataFetcher {
     fun getData(): CompletableFuture<String> {
         val uuid = PlayerData.playerUUID
         val name = PlayerData.playerName
+        val now = System.currentTimeMillis()
 
-        val cacheKey = CacheKey(uuid)
-        val lastFetched = cacheTimestamps[cacheKey]
+        val lastFetched = cacheTimestamps[uuid]
 
-        if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < CACHE_LIFESPAN_MS) {
-            val elapsed: Long = System.currentTimeMillis() - lastFetched
-            logger.info("[SCT]: Returning cached data for player with UUID: {} (cache age: {} ms)", uuid, elapsed)
-            return CompletableFuture.completedFuture(cache[cacheKey] ?: "")
+        if (lastFetched != null && (now - lastFetched) < CACHE_LIFESPAN_MS) {
+            val elapsed: Long = now - lastFetched
+            logger.info("[SCT]: Returning cached data for player with UUID: $uuid (cache age: $elapsed ms)")
+            return CompletableFuture.completedFuture(cache[uuid] ?: "")
         }
 
         return ColeweightFetcher.fetchColeweightData(name, uuid)
             .thenApply { data ->
                 if (data.isNullOrEmpty()) {
-                    logger.warn("[SCT]: Received empty response when fetching Coleweight data for player: {}", name)
+                    logger.warn("[SCT]: Received empty response when fetching Coleweight data for player: $name")
                     ""
                 } else {
-                    cache[cacheKey] = data
-                    cacheTimestamps[cacheKey] = System.currentTimeMillis()
+                    cache[uuid] = data
+                    cacheTimestamps[uuid] = now
                     data
                 }
             }
             .exceptionally { e ->
-                logger.error("[SCT]: Error fetching Coleweight data for player: {}: {}", name, e.message)
+                logger.error("[SCT]: Error fetching Coleweight data for player $name: ${e.message}")
                 ""
             }
     }
@@ -94,6 +94,4 @@ object ColeweightDataFetcher {
         cacheTimestamps.clear()
         logger.info("[SCT]: Coleweight data cache cleared.")
     }
-
-    private data class CacheKey(val uuid: String)
 }

@@ -21,7 +21,7 @@ object FetchColors {
                     hasColors = true
                     logger.info("[SCT]: Successfully fetched colors data.")
                 } else {
-                    logger.error("[SCT]: Failed to fetch colors data. Server responded with code: {}", response.statusCode())
+                    logger.error("[SCT]: Failed to fetch colors data. Server responded with code: ${response.statusCode()}")
                 }
             }.exceptionally { e ->
                 logger.error("[SCT]: An error occurred while fetching colors data: ", e)

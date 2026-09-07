@@ -2,16 +2,15 @@ package io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager.hasAnyRiftCollection
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearCollectionCache
-import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -19,6 +18,8 @@ import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
+import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
+import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -29,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 object MultiTrackingHandler  {
 
     private val logger: Logger = LogManager.getLogger(MultiTrackingHandler::class.java)
-    val COOLDOWN_MILLIS: Long = 10.seconds.inWholeMilliseconds
+    val COOLDOWN_MILLIS = 10.seconds.inWholeMilliseconds
 
     @Volatile
     var isMultiTracking = false
@@ -53,12 +54,12 @@ object MultiTrackingHandler  {
         MultiDataFetcher.fetchMultiCollectionData()
 
         if (ConfigAccess.isApiTrackingEnabled()) {
-            trackingTask = scheduler.scheduleWithFixedDelay({ MultiDataFetcher.fetchMultiCollectionData(false) }, 5, 5, TimeUnit.MINUTES)
+            trackingTask = scheduler.scheduleWithFixedDelay(
+                { MultiDataFetcher.fetchMultiCollectionData(false) }, 5, 5, TimeUnit.MINUTES)
         }
     }
 
-    fun initMultiTracking() {
-        val now = System.currentTimeMillis()
+    fun initMultiTracking(now: Long) {
         multiStartTime = now
         multiLastTrackTime = now
         multiLastTime = 0
@@ -221,7 +222,7 @@ object MultiTrackingHandler  {
             return
         }
 
-        if (!CollectionsManager.hasAnyRiftCollection()) {
+        if (!hasAnyRiftCollection()) {
             logger.warn("[SCT]: Attempted to resume Rift multi tracking, but none of the tracked collections are Rift collections.")
             return
         }
@@ -240,7 +241,7 @@ object MultiTrackingHandler  {
             return
         }
 
-        if (!CollectionsManager.hasAnyRiftCollection()) {
+        if (!hasAnyRiftCollection()) {
             logger.warn("[SCT]: Attempted to pause Rift multi tracking, but none of the tracked collections are Rift collections.")
             return
         }
@@ -255,13 +256,12 @@ object MultiTrackingHandler  {
     }
 
     val multiUptimeInSeconds: Long
-        get() {
-            return if (isMultiPaused) {
-                multiLastTime
-            } else {
-                multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
-            }
+        get() = if (isMultiPaused) {
+            multiLastTime
+        } else {
+            multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
         }
+
 
     private val multiUptimeInWords: String
         get() {
@@ -281,9 +281,9 @@ object MultiTrackingHandler  {
         val useMotes = !useBazaar && allRiftCollections
 
         val variant = ConfigAccess.getGemstoneVariant().toString()
-        val suffix = if (ConfigAccess.getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
+        val suffix = CollectionParser.bazaarPriceTypeSuffix()
         val bazaarSuffix = if (useBazaar) if (suffix.contains("BUY")) "Instant Buy" else "Instant Sell" else ""
-        val bazaarType = if (ConfigAccess.getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) "Enchanted version" else "Super Enchanted version"
+        val typeKey = CollectionParser.bazaarTypeKey()
 
         val pricingLabel = if (useBazaar) bazaarSuffix else if (useMotes) "NPC / Motes" else "NPC"
 
@@ -301,7 +301,7 @@ object MultiTrackingHandler  {
             if (coll == "gemstone") continue
 
             val collName = formatCollectionName(coll)
-            val formattedName = ColorUtils.collToColor(collName)
+            val formattedName = collName.toColor()
 
             val currentMoney: Long
             val currentRate: Long
@@ -313,7 +313,7 @@ object MultiTrackingHandler  {
                 val type = CollectionsManager.multiCollectionTypes[coll]
                 val key = when (type) {
                     "normal" -> "${coll}_normal$suffix"
-                    "enchanted" -> "${coll}_${bazaarType}$suffix"
+                    "enchanted" -> "${coll}_${typeKey}$suffix"
                     else -> ""
                 }
 
@@ -362,12 +362,12 @@ object MultiTrackingHandler  {
         if (trackedCollections.contains("gemstone")) {
             for (gemstone in MultiTrackingRates.seenGemstones) {
                 val name = formatCollectionName(gemstone)
-                val formattedName = ColorUtils.collToColor(name)
+                val formattedName = name.toColor()
 
                 val gemMoney: Long
                 val gemRate: Long
 
-                val keyPrefix = (gemstone + "_" + variant).uppercase()
+                val keyPrefix = ("${gemstone}_$variant").uppercase()
 
                 if (!useBazaar) {
                     gemMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(keyPrefix, 0L)
@@ -387,20 +387,11 @@ object MultiTrackingHandler  {
                 val line = Component.literal("    - ").append(formattedName).append(": ")
 
                 when (ConfigAccess.getSummaryStats().name) {
-                    "COLLECTION" -> {
-                        line.append("§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)")
-                    }
+                    "COLLECTION" -> line.append("§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)")
 
-                    "MONEY" -> {
-                        line.append("§a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
-                    }
+                    "MONEY" -> line.append("§a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
 
-                    "BOTH" -> {
-                        line.append(
-                            "§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)   " +
-                                    "§a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)"
-                        )
-                    }
+                    "BOTH" -> line.append("§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)   §a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
                 }
 
                 gemstoneLines.add(line)
@@ -415,17 +406,9 @@ object MultiTrackingHandler  {
                 val totalLine = Component.literal("   ")
 
                 if (useMotes) {
-                    totalLine.append(
-                        "§eTotal Motes: §f${formatNumber(totalMoneyMade)}   " +
-                                "§eRate: §f${formatNumber(totalMoneyRate)} Motes/h   " +
-                                "§ePricing: §f$pricingLabel"
-                    )
+                    totalLine.append("§eTotal Motes: §f${formatNumber(totalMoneyMade)}   §eRate: §f${formatNumber(totalMoneyRate)} Motes/h   §ePricing: §f$pricingLabel")
                 } else {
-                    totalLine.append(
-                        "§eTotal Profit: §f$${formatNumber(totalMoneyMade)}   " +
-                                "§eRate: §f$${formatNumber(totalMoneyRate)}/h   " +
-                                "§ePricing: §f$pricingLabel"
-                    )
+                    totalLine.append("§eTotal Profit: §f$${formatNumber(totalMoneyMade)}   §eRate: §f$${formatNumber(totalMoneyRate)}/h   §ePricing: §f$pricingLabel")
                 }
 
                 lines.add(totalLine)
@@ -446,28 +429,21 @@ object MultiTrackingHandler  {
                     summaryLine.append("§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)")
                 }
 
-                "MONEY" -> {
-                    summaryLine.append(
-                        "§a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)"
-                    )
-                }
+                "MONEY" -> summaryLine.append("§a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)")
 
                 "BOTH" -> {
                     val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
                     val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
 
                     summaryLine.append(
-                        "§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)   " +
-                                "§a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)"
+                        "§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)   §a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)"
                     )
                 }
             }
 
             lines.add(summaryLine)
 
-            if (ConfigAccess.isMultiDetailedSummaryEnabled()) {
-                lines.addAll(gemstoneLines)
-            }
+            if (ConfigAccess.isMultiDetailedSummaryEnabled()) lines.addAll(gemstoneLines)
         }
 
         lines.add(Component.empty())
