@@ -26,7 +26,7 @@ object ColeweightFetcher {
 
                         if (body.isNullOrBlank()) {
                             ChatUtils.sendMessage("§cCouldn't find $playerName's coleweight.")
-                            logger.warn("[SCT]: Empty response for {}", playerName)
+                            logger.warn("[SCT]: Empty response for $playerName")
                             null
                         } else body
                     }
@@ -36,7 +36,7 @@ object ColeweightFetcher {
                         null
                     }
                     else -> {
-                        logger.warn("[SCT]: Failed to fetch Coleweight for {}. HTTP {}", playerName, response.statusCode())
+                        logger.warn("[SCT]: Failed to fetch Coleweight for $playerName. HTTP ${response.statusCode()}")
                         ChatUtils.sendMessage("§cCouldn't find $playerName's coleweight.")
                         null
                     }
@@ -60,7 +60,7 @@ object ColeweightFetcher {
                         } else body
                     }
                     else -> {
-                        logger.warn("[SCT]: Failed to fetch Coleweight leaderboard. HTTP {}", response.statusCode())
+                        logger.warn("[SCT]: Failed to fetch Coleweight leaderboard. HTTP ${response.statusCode()}")
                         null
                     }
                 }
@@ -83,7 +83,7 @@ object ColeweightFetcher {
                         } else body
                     }
                     else -> {
-                        logger.warn("[SCT]: Failed to fetch Coleweight top 1k. HTTP {}", response.statusCode())
+                        logger.warn("[SCT]: Failed to fetch Coleweight top 1k. HTTP ${response.statusCode()}")
                         null
                     }
                 }
@@ -103,10 +103,10 @@ object ColeweightFetcher {
             put("X-COLOR", color)
         }).thenApply { response ->
             if (response.statusCode() == 200) {
-                logger.info("[SCT]: Successfully set global color for {}", playerName)
+                logger.info("[SCT]: Successfully set global color for $playerName")
                 true
             } else {
-                logger.warn("[SCT]: Failed to set global color for {}. HTTP {}", playerName, response.statusCode())
+                logger.warn("[SCT]: Failed to set global color for $playerName. HTTP ${response.statusCode()}")
                 false
             }
         }.exceptionally { e ->
@@ -128,7 +128,7 @@ object ColeweightFetcher {
                         } else body
                     }
                     else -> {
-                        logger.warn("[SCT]: Failed to fetch Coleweight top colors. HTTP {}", response.statusCode())
+                        logger.warn("[SCT]: Failed to fetch Coleweight top colors. HTTP ${response.statusCode()}")
                         null
                     }
                 }

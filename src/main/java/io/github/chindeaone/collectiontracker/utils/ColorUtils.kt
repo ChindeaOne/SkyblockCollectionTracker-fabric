@@ -176,11 +176,7 @@ object ColorUtils {
         }
     }
 
-    fun collToColor(collection: String): Component {
-        return Component.literal(collection).withColor(collectionColors[collection.lowercase()] ?: Colors.WHITE.color)
-    }
+    fun collToColor(collection: String): Component = Component.literal(collection).withColor(collectionColors[collection.lowercase()] ?: Colors.WHITE.color)
 
-    fun coloredText(color: String): Component {
-        return Component.literal(color).withColor(TextColor.fromRgb(Color.decode(color).rgb).value)
-    }
+    fun coloredText(color: String): Component = Component.literal(color).withColor(TextColor.fromRgb(Color.decode(color).rgb).value)
 }

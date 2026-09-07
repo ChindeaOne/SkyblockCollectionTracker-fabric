@@ -19,13 +19,13 @@ object CommissionWidget {
         if (index !in commissions.indices) return
 
         val current = commissions.getOrNull(index)
-        if (current != null && current.completed && updated.isFresh && current.type != updated.type) {
+        if (current != null && current.completed && updated.isNew && current.type != updated.type) {
             ignoredStates.add(commissions.map { it.copy() })
         }
 
         commissions[index] = updated
 
-        if (!updated.isFresh) return
+        if (!updated.isNew) return
         if (!ConfigAccess.isNewCommissionTitleEnabled()) return
 
         val color = updated.type.color ?: Colors.YELLOW.color

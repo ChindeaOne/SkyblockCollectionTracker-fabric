@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
-import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
+import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.Level
@@ -8,11 +8,11 @@ import net.minecraft.world.phys.AABB
 
 object EntityUtils {
 
-    fun getEntitiesInRange(): List<ArmorStand> {
-        if (!MinecraftUtils.isSameThread) return emptyList()
+    fun getEntitiesInRange(client: Minecraft): List<ArmorStand> {
+        if (!client.isSameThread) return emptyList()
 
-        val player = MinecraftUtils.player ?: return emptyList()
-        val level = MinecraftUtils.level ?: return emptyList()
+        val player = client.player ?: return emptyList()
+        val level = client.level ?: return emptyList()
         val searchBox = player.boundingBox.inflate(30.0)
 
         return level.getEntitiesOfClass(ArmorStand::class.java, searchBox)

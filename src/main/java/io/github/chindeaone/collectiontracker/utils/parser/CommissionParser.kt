@@ -23,17 +23,10 @@ object CommissionParser {
         val type: CommissionType,
         var progress: String,
     ) {
-        val completed: Boolean
-            get() = progress.equals("DONE", ignoreCase = true)
-
-        val isFresh: Boolean
-            get() = progress == "0%"
-
-        val displayLine: String
-            get() = "${type.name}: $progress"
-
-        val formattedLine: String
-            get() = type.format(displayLine)
+        val completed: Boolean get() = progress.equals("DONE", ignoreCase = true)
+        val isNew: Boolean get() = progress == "0%"
+        val displayLine: String get() = "${type.name}: $progress"
+        val formattedLine: String get() = type.format(displayLine)
     }
 
     val COMMISSIONS = listOf(
