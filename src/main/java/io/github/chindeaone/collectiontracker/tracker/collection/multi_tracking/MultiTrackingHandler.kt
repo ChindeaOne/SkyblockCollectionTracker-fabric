@@ -9,7 +9,8 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearCache
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearAllCache
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearCollectionCache
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
@@ -69,7 +70,6 @@ object MultiTrackingHandler  {
 
     fun stopMultiTrackingManual() {
         if (isMultiTracking) {
-            sendMultiRates()
             sendMessage("§cStopped multi-tracking!", true)
 
             resetMultiTrackingData(false)
@@ -125,8 +125,14 @@ object MultiTrackingHandler  {
     }
 
     private fun resetMultiTrackingData(restart: Boolean) {
+        if (ConfigAccess.isMultiTrackingSummaryEnabled()) sendMultiRates()
+
         resetVariables()
-        clearCache()
+        if (restart) {
+            clearCollectionCache()
+        } else {
+            clearAllCache()
+        }
 
         val now = System.currentTimeMillis()
         if (!restart) {
@@ -250,10 +256,6 @@ object MultiTrackingHandler  {
 
     val multiUptimeInSeconds: Long
         get() {
-            if (multiStartTime == 0L) {
-                return 0
-            }
-
             return if (isMultiPaused) {
                 multiLastTime
             } else {
@@ -267,19 +269,10 @@ object MultiTrackingHandler  {
             return StringUtils.formatTimeIntoText(uptime)
         }
 
-    val multiUptime: String
-        get() {
-            val uptime: Long = if (isMultiPaused) {
-                multiLastTime
-            } else {
-                multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
-            }
-
-            return StringUtils.formatTime(uptime)
-        }
+    val multiUptime: String get() = StringUtils.formatTime(multiUptimeInSeconds)
 
     fun sendMultiRates() {
-        if (!ConfigAccess.isMultiTrackingSummaryEnabled()) return
+        MultiTrackingRates.updateRates()
 
         val lines = mutableListOf<Component>()
 
@@ -337,9 +330,7 @@ object MultiTrackingHandler  {
             val line = Component.literal("   ").append(formattedName).append("§r: ")
 
             when (ConfigAccess.getSummaryStats().name) {
-                "COLLECTION" -> {
-                    line.append("§f${formatNumber(collectionMade)} §7(${formatNumber(collectionRate)}/h)")
-                }
+                "COLLECTION" -> line.append("§f${formatNumber(collectionMade)} §7(${formatNumber(collectionRate)}/h)")
 
                 "MONEY" -> {
                     if (useMotes) {

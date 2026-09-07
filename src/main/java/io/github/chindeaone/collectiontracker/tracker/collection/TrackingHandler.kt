@@ -40,6 +40,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.s
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.sessionStartCollection
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lastCollectionTime
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionTillNextRank
+import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
 import io.github.chindeaone.collectiontracker.utils.StringUtils
@@ -298,13 +299,13 @@ object TrackingHandler {
     }
 
     private fun sendRates() {
+        TrackingRates.updateRates()
+
         val collectionDisplay = StringUtils.formatCollectionName(collection)
 
         val lines: MutableList<Component> = mutableListOf()
-        lines.add(Component.literal(String.format("   §aCollection tracked: §f%s", collectionDisplay)))
-        lines.add(
-            Component.literal(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour)))
-        )
+        lines.add(Component.literal(String.format("   §aCollection tracked: §f%s", ColorUtils.collToColor(collectionDisplay))))
+        lines.add(Component.literal(String.format("   §b%s Made: §f%s   §bRate: §f%s/h", collectionDisplay, formatNumber(collectionMade), formatNumber(collectionPerHour))))
 
         val useBazaar = isUsingBazaar()
         val bazaarType = getBazaarType()
@@ -312,24 +313,17 @@ object TrackingHandler {
         if (!useBazaar) {
             val npcMoney: Long = moneyMade["NPC"] ?: 0L
             if (CollectionsManager.isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                lines.add(
-                    Component.literal(String.format("   §6Motes: §f$%s   §6Rate: §f%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)))
-                )
+                lines.add(Component.literal(String.format("   §6Motes: §f$%s   §6Rate: §f%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC))))
             } else if (NpcPrices.getNpcPrice(collection) != 0) {
-                lines.add(
-                    Component.literal(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC)))
-                )
+                lines.add(Component.literal(String.format("   §6Money (NPC): §f$%s   §6Rate: §f$%s/h", formatNumber(npcMoney), formatNumber(moneyPerHourNPC))))
             }
         } else {
-            val suffix =
-                if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
+            val suffix = if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "_INSTANT_BUY" else "_INSTANT_SELL"
             when (CollectionsManager.collectionType) {
                 "normal" -> {
                     val bazMoney = moneyMade.getOrDefault(CollectionsManager.collectionType + suffix, 0L)
                     val bazRate = moneyPerHourBazaar.getOrDefault(CollectionsManager.collectionType + suffix, 0L)
-                    lines.add(
-                        Component.literal(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate)))
-                    )
+                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s   §6Rate: §f$%s/h", formatNumber(bazMoney), formatNumber(bazRate))))
                 }
 
                 "enchanted" -> {
@@ -339,25 +333,19 @@ object TrackingHandler {
                         "Super Enchanted version"
                     val money = moneyMade.getOrDefault(key + suffix, 0L)
                     val rate = moneyPerHourBazaar.getOrDefault(key + suffix, 0L)
-                    lines.add(
-                        Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate)))
-                    )
+                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(money), formatNumber(rate))))
                 }
 
                 "gemstone" -> {
                     val variant: String = getGemstoneVariant().toString()
                     val gMoney = moneyMade.getOrDefault(variant + suffix, 0L)
                     val gRate = moneyPerHourBazaar.getOrDefault(variant + suffix, 0L)
-                    lines.add(
-                        Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate)))
-                    )
+                    lines.add(Component.literal(String.format("   §6Money (Bazaar): §f$%s  §6Rate: §f$%s/h", formatNumber(gMoney), formatNumber(gRate))))
                 }
             }
         }
 
-        lines.add(
-            Component.literal(String.format("   §7Elapsed time: §f%s", uptimeInWords))
-        )
+        lines.add(Component.literal(String.format("   §7Elapsed time: §f%s", uptimeInWords)))
 
         // If no collection update, skip best/worst rates
         if (collectionMade == 0L) {
@@ -454,13 +442,5 @@ object TrackingHandler {
             return StringUtils.formatTimeIntoText(uptime)
         }
 
-    val uptime: String
-        get() {
-            val uptime = if (isPaused) {
-                lastTime
-            } else {
-                lastTime + (System.currentTimeMillis() - startTime) / 1000
-            }
-            return StringUtils.formatTime(uptime)
-        }
+    val uptime: String get() = StringUtils.formatTime(uptimeInSeconds)
 }

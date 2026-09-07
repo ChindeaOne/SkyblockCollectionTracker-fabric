@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarPriceType
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarType
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getGemstoneVariant
@@ -14,6 +15,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper.setShowExtraSt
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
@@ -24,15 +26,6 @@ import kotlin.math.roundToInt
 
 class CollectionOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
-    private var cachedMainLines: List<String> = emptyList()
-    private var cachedExtraLines: List<String> = emptyList()
-
-    private var lastUptime: String = ""
-    private var lastIsChatOpened: Boolean = false
-    private var lastShowExtraStats: Boolean = false
-    private var lastBzType: Bazaar.BazaarType? = null
-    private var lastBzPriceType: Bazaar.BazaarPriceType? = null
-    private var lastGemVariant: Bazaar.GemstoneVariant? = null
 
     override val overlayLabel: String = "Collection Tracker"
 
@@ -66,49 +59,30 @@ class CollectionOverlay : AbstractOverlay() {
         if (!isEnabled || !trackingDirty) {
             if (cachedLines.isNotEmpty()) {
                 cachedLines = emptyList()
-                cachedMainLines = emptyList()
-                cachedExtraLines = emptyList()
             }
             return
         }
 
+        if (ModLoader.clientTicks % 5L != 0L) return
+
+        TrackingRates.updateRates()
+
         val uptime = TrackingHandler.uptime
         val isChatOpened = MinecraftUtils.screen is ChatScreen
         val showExtra = isShowExtraStats()
-        val bzType = getBazaarType()
-        val bzPriceType = getBazaarPriceType()
-        val gemVariant = getGemstoneVariant()
-
-        if (cachedLines.isNotEmpty() && uptime == lastUptime && isChatOpened == lastIsChatOpened
-            && showExtra == lastShowExtraStats && bzType == lastBzType && bzPriceType == lastBzPriceType
-            && gemVariant == lastGemVariant) return
-
-        lastUptime = uptime
-        lastIsChatOpened = isChatOpened
-        lastShowExtraStats = showExtra
-        lastBzType = bzType
-        lastBzPriceType = bzPriceType
-        lastGemVariant = gemVariant
 
         val main = mutableListOf<String>()
         CollectionParser.updateTrackingLines(main)
         if (main.isNotEmpty()) {
             main.add("Uptime: $uptime")
-            if (!showExtra && isChatOpened) {
-                CollectionParser.addToggleableSettingsLines(main)
-            }
+            if (!showExtra && isChatOpened) CollectionParser.addToggleableSettingsLines(main)
         }
 
         val extra = mutableListOf<String>()
         if (showExtra) {
             CollectionParser.updateTrackingExtraLines(extra)
-            if (isChatOpened) {
-                CollectionParser.addToggleableSettingsLines(extra)
-            }
+            if (isChatOpened) CollectionParser.addToggleableSettingsLines(extra)
         }
-
-        cachedMainLines = main
-        cachedExtraLines = extra
 
         val combined = mutableListOf<String>()
         combined.addAll(main)
@@ -121,19 +95,13 @@ class CollectionOverlay : AbstractOverlay() {
     }
 
     override fun handleLineAction(line: String) {
-        when (line) {
-            "§e[Bazaar Prices]" -> setBazaar(true)
-            "§e[NPC Prices]" -> setBazaar(false)
-            "§e[Extra Stats]" -> setShowExtraStats(!isShowExtraStats())
-        }
-        if (line.contains(getGemstoneVariant().toString())) {
-            cycleGemstoneVariant()
-        }
-        if (line.contains("version")) {
-            changeEnchantedType()
-        }
-        if (line.contains("Instant")) {
-            changeBazaarPriceType()
+        when {
+            line == "§e[Bazaar Prices]" -> setBazaar(true)
+            line == "§e[NPC Prices]" -> setBazaar(false)
+            line == "§e[Extra Stats]" -> setShowExtraStats(!isShowExtraStats())
+            line.contains(getGemstoneVariant().toString()) -> cycleGemstoneVariant()
+            line.contains("version") -> changeEnchantedType()
+            line.contains("Instant") -> changeBazaarPriceType()
         }
     }
 
@@ -142,7 +110,7 @@ class CollectionOverlay : AbstractOverlay() {
 
         updateDimensions()
 
-        val position = this.position
+        val position = position
 
         val padding = 8
 

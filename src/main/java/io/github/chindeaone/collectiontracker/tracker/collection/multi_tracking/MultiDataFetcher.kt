@@ -121,11 +121,16 @@ object MultiDataFetcher {
         return HypixelApiFetcher.fetchMultiJsonData()
     }
 
-    fun clearCache() {
+    fun clearCollectionCache() {
         collectionCache.clear()
         cacheTimestamps.clear()
-        DataFetcher.clearAllCache()
         logger.info("[SCT]: Multi collection data cache cleared.")
+    }
+
+    fun clearAllCache() {
+        clearCollectionCache()
+        DataFetcher.clearAllCache()
+        logger.info("[SCT]: All caches cleared.")
     }
 
     private data class CacheKey(val collectionList: List<String>)

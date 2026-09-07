@@ -88,15 +88,12 @@ object ChatListener {
 
     fun sacksListener(component: Component, actionBar: Boolean) {
         if (actionBar) return
-        val normalTracking = TrackingHandler.isTracking
-        val multiTracking = MultiTrackingHandler.isMultiTracking
 
-        if (!normalTracking && !multiTracking) return
+        if (!TrackingHandler.isTracking && !MultiTrackingHandler.isMultiTracking) return
+        if (TrackingHandler.isPaused || MultiTrackingHandler.isMultiPaused) return
         if (ConfigAccess.isApiTrackingEnabled()) return
 
-        if (component.string.startsWith("[Sacks]")) {
-            parseSacksMessage(component)
-        }
+        if (component.string.startsWith("[Sacks]")) parseSacksMessage(component)
     }
 
     @JvmStatic

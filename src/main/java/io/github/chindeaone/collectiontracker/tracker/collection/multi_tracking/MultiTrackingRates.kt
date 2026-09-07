@@ -107,14 +107,19 @@ object MultiTrackingRates {
         }
     }
 
+    fun updateRates() {
+        for (coll in collectionAmounts.keys) {
+            val currentTotal = collectionAmounts[coll] ?: lastApiCollections.getOrDefault(coll, 0L)
+            updateValues(coll, currentTotal, 0)
+        }
+    }
+
     private fun updateValues(coll: String, currentCollection: Long, sinceLast: Long) {
         val uptime = MultiTrackingHandler.multiUptimeInSeconds
         val now = System.currentTimeMillis()
 
         collectionSinceLast[coll] = sinceLast
-        if (sinceLast > 0) {
-            lastCollectionTimes[coll] = now
-        }
+        if (sinceLast > 0)  lastCollectionTimes[coll] = now
 
         val sessionStart = sessionStartCollections.getOrDefault(coll, currentCollection)
         val collectedSinceStart = currentCollection - sessionStart
@@ -140,17 +145,13 @@ object MultiTrackingRates {
             }
         }
 
-        if (!MultiCollectionOverlay.trackingDirty) {
-            MultiCollectionOverlay.trackingDirty = true
-        }
+        if (!MultiCollectionOverlay.trackingDirty) MultiCollectionOverlay.trackingDirty = true
 
         updateMultiLeaderboardStats()
     }
 
     fun updateMultiLeaderboardStats() {
-        if (!ConfigAccess.isCollectionLeaderboardEnabled() ||
-            CollectionTracker.collectionList.size != 1 ||
-            !CollectionTracker.collectionList.contains("gemstone")) return
+        if (!ConfigAccess.isCollectionLeaderboardEnabled() || CollectionTracker.collectionList.size != 1 || !CollectionTracker.collectionList.contains("gemstone")) return
 
         val currentGemstoneAmount = collectionAmounts["gemstone"] ?: 0L
         playerCurrentRank = LeaderboardManager.getPlayerRank(currentGemstoneAmount)

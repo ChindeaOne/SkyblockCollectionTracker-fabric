@@ -80,7 +80,6 @@ object TrackingRates {
         updateValues(collectionAmount, 0)
     }
 
-    @Synchronized
     fun calculateRates(value: Long) {
         // 'value' here is what you gained from sacks since last check
         sacksCollectionGained += value // update sacks gained
@@ -93,6 +92,12 @@ object TrackingRates {
         val gainedSinceLast = value - lastApiCollection
         lastApiCollection = value // update last API collection
         updateValues(value, gainedSinceLast)
+    }
+
+    fun updateRates() {
+        if (TrackingHandler.isPaused) return
+        val currentCollection = lastApiCollection + sacksCollectionGained
+        updateValues(currentCollection, 0)
     }
 
     fun updateLeaderboardStats() {

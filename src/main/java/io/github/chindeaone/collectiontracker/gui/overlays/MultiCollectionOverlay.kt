@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarPriceType
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarType
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getGemstoneVariant
@@ -12,6 +13,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaarType
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
@@ -24,13 +26,6 @@ import kotlin.concurrent.Volatile
 class MultiCollectionOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
     private val expandedCollections: MutableList<String> = mutableListOf()
-
-    private var lastUptime: String = ""
-    private var lastIsChatOpened: Boolean = false
-    private var lastBzType: Bazaar.BazaarType? = null
-    private var lastBzPriceType: Bazaar.BazaarPriceType? = null
-    private var lastGemVariant: Bazaar.GemstoneVariant? = null
-    private var lastExpandedHash: Int = 0
 
     override val overlayLabel: String = "Multi-Collection Tracker"
 
@@ -68,31 +63,18 @@ class MultiCollectionOverlay : AbstractOverlay() {
             return
         }
 
+        if (ModLoader.clientTicks % 5L != 0L) return
+
+        MultiTrackingRates.updateRates()
+
         val uptime = MultiTrackingHandler.multiUptime
         val isChatOpened = MinecraftUtils.screen is ChatScreen
-        val bzType = getBazaarType()
-        val bzPriceType = getBazaarPriceType()
-        val gemVariant = getGemstoneVariant()
-        val expandedHash = expandedCollections.hashCode()
-
-        if (cachedLines.isNotEmpty() && uptime == lastUptime && isChatOpened == lastIsChatOpened
-            && bzType == lastBzType && bzPriceType == lastBzPriceType && gemVariant == lastGemVariant
-            && expandedHash == lastExpandedHash) return
-
-        lastUptime = uptime
-        lastIsChatOpened = isChatOpened
-        lastBzType = bzType
-        lastBzPriceType = bzPriceType
-        lastGemVariant = gemVariant
-        lastExpandedHash = expandedHash
 
         val newLines = mutableListOf<String>()
         CollectionParser.updateMultiTrackingLines(newLines, expandedCollections, isChatOpened)
         newLines.add("Uptime: $uptime")
 
-        if (isChatOpened) {
-            CollectionParser.addToggleableSettingsLines(newLines)
-        }
+        if (isChatOpened) CollectionParser.addToggleableSettingsLines(newLines)
 
         cachedLines = newLines
     }
@@ -127,18 +109,12 @@ class MultiCollectionOverlay : AbstractOverlay() {
             return
         }
 
-        when (line) {
-            "§e[Bazaar Prices]" -> setBazaar(true)
-            "§e[NPC Prices]" -> setBazaar(false)
-        }
-        if (line.contains(getGemstoneVariant().toString())) {
-            cycleGemstoneVariant()
-        }
-        if (line.contains("version")) {
-            changeEnchantedType()
-        }
-        if (line.contains("Instant")) {
-            changeBazaarPriceType()
+        when {
+            line == "§e[Bazaar Prices]" -> setBazaar(true)
+            line == "§e[NPC Prices]" -> setBazaar(false)
+            line.contains(getGemstoneVariant().toString()) -> cycleGemstoneVariant()
+            line.contains("version") -> changeEnchantedType()
+            line.contains("Instant") -> changeBazaarPriceType()
         }
     }
 
