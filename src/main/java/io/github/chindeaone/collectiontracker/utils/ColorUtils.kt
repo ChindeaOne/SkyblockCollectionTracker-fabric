@@ -21,6 +21,9 @@ fun Int.toFWRankComponent(isMe: Boolean, playerName: String): Component =
 fun Color.toChromaColor(alpha: Int = this.alpha, chromaSpeedMillis: Int = 0): ChromaColour =
     ChromaColour.fromRGB(red, green, blue, chromaSpeedMillis, alpha)
 
+fun String.toColor(): Component =
+    ColorUtils.collToColor(this)
+
 @Suppress("unused")
 enum class Colors(private val colorCode: Char, val color: Int) {
     BLACK('0', 0xFF000000.toInt()),

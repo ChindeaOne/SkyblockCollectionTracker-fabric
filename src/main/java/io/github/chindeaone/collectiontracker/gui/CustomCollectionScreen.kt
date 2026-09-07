@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
@@ -57,9 +58,10 @@ class CustomCollectionScreen(
                 ChatUtils.sendMessage("§eCustom collection values set:")
 
                 values.forEach { (name, value) ->
-                    val displayName = formatCollectionName(name)
+                    val displayName = formatCollectionName(name).toColor()
                     val formattedValue = NumbersUtils.formatNumber(value)
-                    ChatUtils.sendMessage(" §7- §f$displayName: §a$formattedValue", false)
+                    val component = Component.literal(" §7- §f").append(displayName).append(": §a$formattedValue")
+                    ChatUtils.sendComponent(component, false)
                 }
                 confirmed = true
                 onClose()
