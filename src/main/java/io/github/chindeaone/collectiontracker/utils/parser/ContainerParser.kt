@@ -2,8 +2,8 @@ package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentBeekeeperBuff
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentLotteryBuff
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentSkyMallBuff
@@ -224,9 +224,11 @@ object ContainerParser {
         return tooltip
             .dropWhile { it != "Your Current Effect" }
             .drop(1)
-            .firstOrNull { it.isNotBlank() }
-            ?.trim()
-            ?.let(ChatListener::compactBuffs)
+            .takeWhile { it.isNotBlank()}
+            .joinToString(" ")
+            .trim()
+            .takeIf { it.isNotEmpty() }
+            ?.let(StringUtils::compactBuffs)
     }
 
     private fun getTooltips(stack: ItemStack, client: Minecraft): List<String> {

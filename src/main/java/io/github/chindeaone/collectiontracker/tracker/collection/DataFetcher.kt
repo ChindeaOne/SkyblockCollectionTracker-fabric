@@ -60,7 +60,7 @@ object DataFetcher {
                     }
                     return@thenAccept
                 }
-                collectionData = JsonParser.parseString(jsonData).getAsJsonObject().entrySet().iterator().next().value.asLong
+                collectionData = JsonParser.parseString(jsonData).asJsonObject[collection].asLong
 
                 collectionCache[collection] = collectionData
                 cacheTimestamps[collection] = System.currentTimeMillis()

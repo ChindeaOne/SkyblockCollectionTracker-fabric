@@ -259,7 +259,7 @@ object ChatListener {
             text.startsWith("New buff: ") -> {
                 val buffText = text.substringAfter("New buff: ").trim()
 
-                val compact = compactBuffs(buffText)
+                val compact = StringUtils.compactBuffs(buffText)
                 if (expectingSkyMallBuff) {
                     isPickaxeAbility = "Pickaxe Ability" in text
                     currentSkyMallBuff = compact
@@ -269,7 +269,7 @@ object ChatListener {
 
                     // Compact messages if overlay is enabled
                     if (ConfigAccess.isSkyMallEnabled()) {
-                        ChatUtils.sendMessage("§eNew §bSky Mall §eBuff§r: $compact", prefix = true)
+                        ChatUtils.sendMessage("§eNew §bSky Mall §ebuff§r: $compact", prefix = true)
                         return false
                     }
                     return true
@@ -282,7 +282,7 @@ object ChatListener {
 
                     // Compact messages if overlay is enabled
                     if (ConfigAccess.isLotteryEnabled()) {
-                        ChatUtils.sendMessage("§eNew §2Lottery §eBuff§r: $compact", prefix = true)
+                        ChatUtils.sendMessage("§eNew §2Lottery §ebuff§r: $compact", prefix = true)
                         return false
                     }
                     return true
@@ -294,7 +294,7 @@ object ChatListener {
                     if (ConfigAccess.isBeekeeperChatMessagesDisabled()) return false
 
                     if (ConfigAccess.isBeekeeperEnabled()) {
-                        ChatUtils.sendMessage("§eNew §6Beekeeper §eBuff§r: $compact", prefix = true)
+                        ChatUtils.sendMessage("§eNew §6Beekeeper §ebuff§r: $compact", prefix = true)
                         return false
                     }
                     return true
@@ -304,87 +304,6 @@ object ChatListener {
             text.startsWith("You can disable this messaging by toggling") -> return false
         }
         return true
-    }
-
-    fun compactBuffs(message: String): String {
-        val text = message.trim().removeSuffix(".")
-
-        val numberRegex = Regex("[+-]?\\d+")
-        val percentRegex = Regex("[+-]?\\d+%")
-        val xRegex = Regex("\\d+x", RegexOption.IGNORE_CASE)
-
-        return when {
-            // Sky Mall buffs
-            "Mining Speed" in text -> {
-                val num = numberRegex.find(text)?.value
-                "§6$num \uE015 Mining Speed"
-            }
-            "Mining Fortune" in text -> {
-                val num = numberRegex.find(text)?.value
-                "§6$num \uE053 Mining Fortune"
-            }
-            "Titanium" in text -> {
-                val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
-                "§a$x §9Titanium"
-            }
-            "Pickaxe Ability" in text -> {
-                val rawPct = percentRegex.find(text)?.value
-                val pct = "${rawPct?.trimEnd('%')}%"
-                "§a$pct §9Pickaxe Ability Cooldown"
-            }
-            "Powder" in text -> {
-                val rawPct = percentRegex.find(text)?.value
-                "§a$rawPct §9Powder"
-            }
-            "chance" in text -> {
-                val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
-                "§a$x §6Golden §7and §bDiamond §7Goblins"
-            }
-
-            // Lottery buffs
-            "Fig" in text -> {
-                val num = numberRegex.find(text)?.value
-                "§6$num \uE054 Fig Fortune"
-            }
-            "Mangrove" in text -> {
-                val num = numberRegex.find(text)?.value
-                "§6$num \uE054 Mangrove Fortune"
-            }
-            "Helix" in text -> {
-                val num = numberRegex.find(text)?.value
-                "§6$num \uE054 Helix Fortune"
-            }
-            "Sweep" in text -> {
-                var rawPct = percentRegex.find(text)?.value
-                var pct: String
-                if (rawPct != null) {
-                    pct = "${rawPct.trimEnd('%')}%"
-                    "§a$pct §2\uE023 Sweep"
-                } else {
-                    rawPct = numberRegex.find(text)?.value
-                    "§a$rawPct §2\uE023 Sweep"
-                }
-            }
-
-            // Beekeeper buffs
-            "Honeyhives refill" in text -> {
-                val rawPct = percentRegex.find(text)?.value
-                "§a$rawPct §6Honeyhives Refill"
-            }
-            "Trees lathered" in text && "attract" in text -> {
-                val rawPct = percentRegex.find(text)?.value
-                "§a$rawPct §a\uE05BCritter Speed"
-            }
-            "Gain" in text && "Honeycomb" in text -> {
-                val x = xRegex.find(text)?.value ?: numberRegex.find(text)?.value?.let { "${it}x" }
-                "§a$x §6Honeycomb"
-            }
-            "second Critter" in text -> {
-                val rawPct = percentRegex.find(text)?.value
-                " §a$rawPct §a\uE05BExtra Critter"
-            }
-            else -> message // fallback to original text
-        }
     }
 
     private fun treeResetListener(text: String) {

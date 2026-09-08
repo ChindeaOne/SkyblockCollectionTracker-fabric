@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getAbilityPrecision
-import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils.nextBuffTime
 
 object StringUtils {
 
@@ -110,22 +109,79 @@ object StringUtils {
         }
     }
 
-    fun updateTimer(): String {
-        val timeLeft = (nextBuffTime - System.currentTimeMillis()) / 1000
-        if (timeLeft in 0..5) {
-            return "§aTime left: §cSoon"
-        }
-        if (timeLeft < 0 && !ScoreboardUtils.checkTime) {
-            ScoreboardUtils.checkTime = true
-            return "§aTime left: §cSoon"
-        }
-
-        return "§aTime left: §e${formatTime(timeLeft)}"
-    }
-
     fun formatFloatOrPlaceholder(value: Float): String = if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
 
     fun formatNumberOrPlaceholder(value: Long): String = if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
+
+    fun compactBuffs(message: String): String {
+        val numberRegex = Regex("[+-]?\\d+")
+        val percentRegex = Regex("[+-]?\\d+%")
+        val xRegex = Regex("\\d+x", RegexOption.IGNORE_CASE)
+
+        return when {
+            // Sky Mall buffs
+            "Mining Speed" in message -> {
+                val num = numberRegex.find(message)?.value
+                "§6$num\uE015 Mining Speed"
+            }
+            "Mining Fortune" in message -> {
+                val num = numberRegex.find(message)?.value
+                "§6$num\uE053 Mining Fortune"
+            }
+            "Titanium" in message -> {
+                val x = xRegex.find(message)?.value ?: numberRegex.find(message)?.value?.let { "${it}x" }
+                "§a$x §9Titanium"
+            }
+            "Pickaxe Ability" in message -> {
+                val pct = percentRegex.find(message)?.value
+                "§a$pct §9Pickaxe CD"
+            }
+            "Powder" in message -> {
+                val pct = percentRegex.find(message)?.value
+                "§a$pct §9Powder"
+            }
+            "Goblins" in message -> {
+                val x = xRegex.find(message)?.value ?: numberRegex.find(message)?.value?.let { "${it}x" }
+                "§6$x §bGoblins"
+            }
+
+            // Lottery buffs
+            "Fig" in message -> {
+                val num = numberRegex.find(message)?.value
+                "§6$num\uE054 Fig Fortune"
+            }
+            "Mangrove" in message -> {
+                val num = numberRegex.find(message)?.value
+                "§6$num\uE054 Mangrove Fortune"
+            }
+            "Helix" in message -> {
+                val num = numberRegex.find(message)?.value
+                "§6$num\uE054 Helix Fortune"
+            }
+            "Sweep" in message -> {
+                val num = numberRegex.find(message)?.value
+                "§2$num\uE023 Sweep"
+            }
+
+            // Beekeeper buffs
+            "Honeyhives refill" in message -> {
+                val pct = percentRegex.find(message)?.value
+                "§a$pct §6Honeyhives Refill"
+            }
+            "Critters" in message -> {
+                val pct = percentRegex.find(message)?.value
+                "§a$pct \uE05BFaster Critters"
+            }
+
+            "Gain 2x" in message -> {
+                val x = xRegex.find(message)?.value ?: numberRegex.find(message)?.value?.let { "${it}x" }
+                "§a$x §6Honeycomb"
+            }
+            "Critter" in message -> "§a\uE05BExtra Critter"
+
+            else -> message // fallback to original text
+        }
+    }
 
     // Method taken from Skyhanni
     fun CharSequence.removeColor(keepFormatting: Boolean = false): String {

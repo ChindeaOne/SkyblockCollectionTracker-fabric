@@ -1,7 +1,9 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
-import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils.nextBuffTime
+import io.github.chindeaone.collectiontracker.utils.StringUtils.formatTime
+import kotlin.ranges.contains
 
 /**
  * Another abstract class for Sky Mall, Lottery and Beekeeper overlays
@@ -9,9 +11,6 @@ import io.github.chindeaone.collectiontracker.utils.StringUtils
 abstract class AbstractRotatingPerksOverlay: AbstractOverlay() {
 
     private var cachedLines: List<String> = emptyList()
-    private var lastSecondsLeft: Long = -1L
-    private var lastBuff: String? = null
-    private var lastIslandAllowed: Boolean = false
 
     abstract val buffPrefix: String
 
@@ -36,24 +35,23 @@ abstract class AbstractRotatingPerksOverlay: AbstractOverlay() {
         if (!isIslandAllowed) {
             if (cachedLines.isNotEmpty()) {
                 cachedLines = emptyList()
-                lastIslandAllowed = false
             }
             return
         }
 
-        val secondsLeft = (ScoreboardUtils.nextBuffTime - System.currentTimeMillis()) / 1000
-        val buff = currentBuff
+        cachedLines = listOf("$buffPrefix: $currentBuff", updateTimer())
+    }
 
-        if (cachedLines.isNotEmpty() && secondsLeft == lastSecondsLeft && buff == lastBuff) {
-            return
+    private fun updateTimer(): String {
+        val timeLeft = (nextBuffTime - System.currentTimeMillis()) / 1000
+        if (timeLeft in 0..5) {
+            return "§aTime left: §cSoon"
+        }
+        if (timeLeft < 0 && !ScoreboardUtils.checkTime) {
+            ScoreboardUtils.checkTime = true
+            return "§aTime left: §cSoon"
         }
 
-        lastSecondsLeft = secondsLeft
-        lastBuff = buff
-        lastIslandAllowed = true
-
-        val newLines = listOf("$buffPrefix: $buff", StringUtils.updateTimer())
-
-        cachedLines = newLines
+        return "§aTime left: §e${formatTime(timeLeft)}"
     }
 }
