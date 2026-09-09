@@ -259,7 +259,7 @@ object ChatListener {
             text.startsWith("New buff: ") -> {
                 val buffText = text.substringAfter("New buff: ").trim()
 
-                val compact = StringUtils.compactBuffs(buffText)
+                val compact = StringUtils.formatHotXPerkBuffs(buffText)
                 if (expectingSkyMallBuff) {
                     isPickaxeAbility = "Pickaxe Ability" in text
                     currentSkyMallBuff = compact

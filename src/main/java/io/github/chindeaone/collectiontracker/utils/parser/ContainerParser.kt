@@ -228,7 +228,7 @@ object ContainerParser {
             .joinToString(" ")
             .trim()
             .takeIf { it.isNotEmpty() }
-            ?.let(StringUtils::compactBuffs)
+            ?.let(StringUtils::formatHotXPerkBuffs)
     }
 
     private fun getTooltips(stack: ItemStack, client: Minecraft): List<String> {

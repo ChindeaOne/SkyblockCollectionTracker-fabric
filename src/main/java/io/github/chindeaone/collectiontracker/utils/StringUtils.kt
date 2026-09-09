@@ -113,7 +113,7 @@ object StringUtils {
 
     fun formatNumberOrPlaceholder(value: Long): String = if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
 
-    fun compactBuffs(message: String): String {
+    fun formatHotXPerkBuffs(message: String): String {
         val numberRegex = Regex("[+-]?\\d+")
         val percentRegex = Regex("[+-]?\\d+%")
         val xRegex = Regex("\\d+x", RegexOption.IGNORE_CASE)
@@ -142,7 +142,7 @@ object StringUtils {
             }
             "Goblins" in message -> {
                 val x = xRegex.find(message)?.value ?: numberRegex.find(message)?.value?.let { "${it}x" }
-                "§6$x §bGoblins"
+                "§a$x §6Elusive §bGoblins"
             }
 
             // Lottery buffs
@@ -166,18 +166,20 @@ object StringUtils {
             // Beekeeper buffs
             "Honeyhives refill" in message -> {
                 val pct = percentRegex.find(message)?.value
-                "§a$pct §6Honeyhives Refill"
+                "§a$pct Faster §6Honeyhives"
             }
             "Critters" in message -> {
                 val pct = percentRegex.find(message)?.value
-                "§a$pct \uE05BFaster Critters"
+                "§a$pct Faster \uE05BCritters"
             }
-
             "Gain 2x" in message -> {
                 val x = xRegex.find(message)?.value ?: numberRegex.find(message)?.value?.let { "${it}x" }
                 "§a$x §6Honeycomb"
             }
-            "Critter" in message -> "§a\uE05BExtra Critter"
+            "Critter" in message -> {
+                val pct = percentRegex.find(message)?.value
+                "§a$pct Extra \uE05BCritter"
+            }
 
             else -> message // fallback to original text
         }
