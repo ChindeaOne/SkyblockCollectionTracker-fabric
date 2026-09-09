@@ -18,6 +18,8 @@ import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbil
 import io.github.chindeaone.collectiontracker.config.categories.foraging.BeekeeperConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
+import io.github.chindeaone.collectiontracker.config.categories.milestones.CollectionMilestonesConfig
+import io.github.chindeaone.collectiontracker.config.categories.milestones.SkillMilestonesConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployableConfig
@@ -32,6 +34,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.Collecti
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.ForagingStatsConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MilestonesConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
@@ -61,6 +64,8 @@ val multiOverlayPosition: Position get() = modConfig.tracking.multiCollectionCon
 val coleweightTimerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTimerPosition
 val coleweightStopwatchPosition: Position get() = modConfig.mining.coleweightConfig.coleweightStopwatchPosition
 val coleweightTrackerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTrackerPosition
+val collectionMilestonesPosition: Position get() = modConfig.tracking.milestonesConfig.collectionMilestonesConfig.collectionMilestonesPosition
+val skillMilestonesPosition: Position get() = modConfig.tracking.milestonesConfig.skillMilestonesConfig.skillMilestonesPosition
 
 // About Config Accessor
 val aboutConfig: About get() = modConfig.about
@@ -188,13 +193,15 @@ val statsText: List<CollectionConfig.OverlayText> get() = collectionConfig.stats
 val extraStatsText: List<CollectionConfig.OverlayExtraText> get() = collectionConfig.extraStatsText
 val showExtraStats: Boolean get() = collectionConfig.showExtraStats
 val explicitValues: Boolean get() = trackingConfig.explicitValues
+
+// Leaderboard Tracking Config Accessors
 val leaderboardOverlay: LeaderboardConfig get() = trackingConfig.leaderboardConfig
 val collectionLeaderboard: Boolean get() = leaderboardOverlay.collectionLeaderboard
 val skillLeaderboard: Boolean get() = leaderboardOverlay.skillLeaderboard
 val previousPosition: Boolean get() = leaderboardOverlay.previousPosition
 val includeWipedProfiles: Boolean get() = leaderboardOverlay.includeWipedProfiles
 val customPosition: Boolean get() = leaderboardOverlay.customPosition
-val customGoals: Map<String, Int> get() = leaderboardOverlay.customPositions
+val customPositions: Map<String, Int> get() = leaderboardOverlay.customPositions
 
 // Multi Collection Tracking Config Accessors
 val multiCollectionOverlay: MultiCollectionConfig get() = trackingConfig.multiCollectionConfig
@@ -206,6 +213,20 @@ val summaryStats: MultiCollectionConfig.SummaryStats get() = multiCollectionOver
 // Skills Tracking Config Accessors
 val skillConfig: SkillConfig get() = trackingConfig.skillConfig
 val enableTamingTracking: Boolean get() = skillConfig.enableTamingTracking
+
+// Milestones Config Accessors
+val milestonesConfig: MilestonesConfig get() = trackingConfig.milestonesConfig
+// Collection Milestones
+val collectionMilestonesConfig: CollectionMilestonesConfig get() = milestonesConfig.collectionMilestonesConfig
+val collectionMilestones: Boolean get() = collectionMilestonesConfig.collectionMilestones
+val collectionMilestonesTitleNotification: Boolean get() = collectionMilestonesConfig.collectionMilestonesTitleNotification
+val collectionMilestonesSoundNotification: Boolean get() = collectionMilestonesConfig.collectionMilestonesSoundNotification
+
+// Skill Milestones
+val skillMilestonesConfig: SkillMilestonesConfig get() = milestonesConfig.skillMilestonesConfig
+val skillMilestones: Boolean get() = skillMilestonesConfig.skillMilestones
+val skillMilestonesTitleNotification: Boolean get() = skillMilestonesConfig.skillMilestonesTitleNotification
+val skillMilestonesSoundNotification: Boolean get() = skillMilestonesConfig.skillMilestonesSoundNotification
 
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
@@ -464,10 +485,10 @@ object ConfigAccess {
 
     fun isCustomPositionEnabled(): Boolean = customPosition
 
-    fun getCustomGoals(): Map<String, Int> = customGoals
+    fun getCustomPositions(): Map<String, Int> = customPositions
 
     fun getCustomPositionEntry(name: String): Int? {
-        return customGoals[name.lowercase()]
+        return customPositions[name.lowercase()]
     }
 }
 

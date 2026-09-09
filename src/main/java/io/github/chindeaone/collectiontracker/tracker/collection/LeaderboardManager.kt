@@ -120,7 +120,7 @@ object LeaderboardManager {
         }
 
         // Custom position
-        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
+        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomPositions().isEmpty()) {
             val position = ConfigAccess.getCustomPositionEntry("gemstone")
 
             if (position != null) {
@@ -144,7 +144,7 @@ object LeaderboardManager {
         }
 
         // Custom position
-        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
+        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomPositions().isEmpty()) {
             val position = ConfigAccess.getCustomPositionEntry(skill)
 
             if (position != null) {
@@ -185,7 +185,7 @@ object LeaderboardManager {
 
     fun getNextRankEntry(): LeaderboardEntry? {
         // Custom position
-        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomGoals().isEmpty()) {
+        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomPositions().isEmpty()) {
             val position = ConfigAccess.getCustomPositionEntry(CollectionTracker.collection)
 
             if (position != null) {
