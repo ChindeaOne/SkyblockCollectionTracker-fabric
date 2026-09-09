@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.LeaderboardConfig
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MilestonesConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -34,6 +35,12 @@ class Tracking {
     @SerializedName("leaderboardConfig")
     @Accordion
     var leaderboardConfig: LeaderboardConfig = LeaderboardConfig()
+
+    @Expose
+    @ConfigOption(name = "Milestones Overlay", desc = "")
+    @SerializedName("milestonesConfig")
+    @Accordion
+    var milestonesConfig: MilestonesConfig = MilestonesConfig()
 
     @Expose
     @ConfigOption(

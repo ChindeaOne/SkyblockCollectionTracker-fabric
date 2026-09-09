@@ -683,12 +683,12 @@ object ConfigHelper {
         axeAbilityConfig.abilityNameAxe = name
     }
 
-    fun setDuration(refined: Long = -1, filet: Long = -1, potato: Long = -1, pumpkin: Long = -1, fiesta: Long = -1) {
-        if (refined != -1L) temporaryBuffsConfig.refinedCacaoTime = refined
-        if (filet != -1L) temporaryBuffsConfig.filetTime = filet
-        if (potato != -1L) temporaryBuffsConfig.pristinePotatoTime = potato
-        if (pumpkin != -1L) temporaryBuffsConfig.powderPumpkinTime = pumpkin
-        if (fiesta != -1L) temporaryBuffsConfig.fiestaFlaskTime = fiesta
+    fun setDuration(refined: Long = 0L, filet: Long = 0L, potato: Long = 0L, pumpkin: Long = 0L, fiesta: Long = 0L) {
+        if (temporaryBuffsConfig.refinedCacaoTime != refined) temporaryBuffsConfig.refinedCacaoTime = refined
+        if (temporaryBuffsConfig.filetTime != filet) temporaryBuffsConfig.filetTime = filet
+        if (temporaryBuffsConfig.pristinePotatoTime != potato) temporaryBuffsConfig.pristinePotatoTime = potato
+        if (temporaryBuffsConfig.powderPumpkinTime != pumpkin) temporaryBuffsConfig.powderPumpkinTime = pumpkin
+        if (temporaryBuffsConfig.fiestaFlaskTime != fiesta) temporaryBuffsConfig.fiestaFlaskTime = fiesta
     }
 
     fun setProfessionalMS(level: Int) {

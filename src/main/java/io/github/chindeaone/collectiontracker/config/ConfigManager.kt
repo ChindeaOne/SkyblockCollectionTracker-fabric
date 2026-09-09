@@ -1,7 +1,6 @@
 package io.github.chindeaone.collectiontracker.config
 
 import com.google.gson.GsonBuilder
-import io.github.chindeaone.collectiontracker.config.error.ConfigError
 import io.github.chindeaone.collectiontracker.config.version.VersionManager
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
@@ -17,7 +16,7 @@ import org.apache.logging.log4j.Logger
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.config.core.PositionDeserializer
+import io.github.chindeaone.collectiontracker.config.migration.ConfigMigrator
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
@@ -41,16 +40,6 @@ class ConfigManager {
             .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
             .enableComplexMapKeySerialization()
             .create()
-
-        val migrationGson: Gson = GsonBuilder()
-            .setPrettyPrinting()
-            .excludeFieldsWithoutExposeAnnotation()
-            .serializeSpecialFloatingPointValues()
-            .registerTypeAdapter(Position::class.java, PositionDeserializer())
-            .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
-            .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
-            .enableComplexMapKeySerialization()
-            .create()
     }
 
     private val logger: Logger = LogManager.getLogger(ConfigManager::class)
@@ -61,7 +50,7 @@ class ConfigManager {
     private var configBackupFile: File
 
     var config: ModConfig? = null
-    private var lastSaveTime = 0L
+    private var savedConfig: String? = null
 
     var processor: MoulConfigProcessor<ModConfig>
 
@@ -127,30 +116,22 @@ class ConfigManager {
 
     private fun tryReadConfig() {
         try {
-            val json = FileReader(configFile, StandardCharsets.UTF_8).use {
-                JsonParser.parseReader(it)
+            val jsonObject = FileReader(configFile, StandardCharsets.UTF_8).use {
+                JsonParser.parseReader(it).asJsonObject
             }
 
-            val migrationDone = json.asJsonObject
-                .getAsJsonObject("internal")
-                ?.get("migratedToLowercasePositions")
-                ?.asBoolean
-                ?: false
-
-            config = if (migrationDone) {
-                gson.fromJson(json, ModConfig::class.java)
-            } else {
-                migrationGson.fromJson(json, ModConfig::class.java)
+            val saved = ConfigMigrator.migrate(jsonObject)
+            if (saved) {
+                logger.info("[SCT]: Config migrated to the latest version, saving the updated config.")
             }
 
+            config = gson.fromJson(jsonObject, ModConfig::class.java)
+            // Remove null entries
             config?.let { loadedConfig ->
-                // Remove null entries
                 removeNulls(loadedConfig)
-
-                if (!migrationDone) loadedConfig.internal.migratedToLowercasePositions = true
             }
         } catch (e: Exception) {
-            throw ConfigError("[SCT]: Could not load config", e)
+            logger.error("[SCT]: Could not load config", e)
         }
     }
 
@@ -189,13 +170,9 @@ class ConfigManager {
                             for (entry in value.values) remove(entry)
                         }
 
-                        else -> {
-                            remove(value)
-                        }
+                        else -> remove(value)
                     }
-                } catch (_: Exception) {
-                    // Ignore
-                }
+                } catch (_: Exception) {}
             }
         }
         remove(root)
@@ -226,15 +203,21 @@ class ConfigManager {
     @Synchronized
     fun save(auto: Boolean = false) {
         TemporaryBuffsParser.saveDurations()
-        lastSaveTime = System.currentTimeMillis()
-        val config = config ?: error("[SCT]: Cannot save null config.")
+
+        val config = config ?: run {
+            logger.error("[SCT]: Cannot save null config.")
+            throw IllegalStateException("Config is null")
+        }
+
+        val serializedConfig = gson.toJson(config)
+        if (auto && serializedConfig == savedConfig) return
 
         configDirectory.mkdirs()
         val unit = configDirectory.resolve("config.json.write")
 
         try {
             OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8).use { writer ->
-                writer.write(gson.toJson(config))
+                writer.write(serializedConfig)
             }
 
             if (!auto && configFile.exists()) {
@@ -269,8 +252,8 @@ class ConfigManager {
                     configFile.toPath(),
                     StandardCopyOption.REPLACE_EXISTING
                 )
-                return
             }
+            savedConfig = serializedConfig
         } catch (e: IOException) {
             unit.delete() // cleanup best effort
             logger.error("[SCT]: Could not save config", e)
