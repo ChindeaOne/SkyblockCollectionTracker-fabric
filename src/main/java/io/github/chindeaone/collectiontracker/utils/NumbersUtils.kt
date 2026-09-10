@@ -47,4 +47,32 @@ object NumbersUtils {
 
         return String.format("%.2f%s", num, UNITS[index])
     }
+
+    fun parseToSeconds(input: String): Long {
+        val regex = "(\\d+)([dhms])".toRegex()
+        val normalizedInput = input.lowercase().replace(" ", "")
+
+        var seconds = 0L
+        var found = false
+
+        for (match in regex.findAll(normalizedInput)) {
+            val (valueString, unitString) = match.destructured
+            val value = valueString.toLong()
+
+            seconds += when (unitString[0]) {
+                'd' -> value * 86400
+                'h' -> value * 3600
+                'm' -> value * 60
+                's' -> value
+                else -> 0
+            }
+            found = true
+        }
+
+        return if (found) {
+            seconds
+        } else {
+            normalizedInput.toLongOrNull() ?: -1
+        }
+    }
 }

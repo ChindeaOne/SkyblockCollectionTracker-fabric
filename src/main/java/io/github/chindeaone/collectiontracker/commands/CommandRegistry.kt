@@ -19,6 +19,7 @@ import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -81,7 +82,7 @@ object CommandRegistry {
             }
             // sct collections <page> or <category>
             .then(ClientCommands.argument("arg", StringArgumentType.word())
-                .suggests(CATEGORY_SUGGESTIONS)
+                .suggests(COLLECTION_LIST)
                 .executes {
                     val arg = StringArgumentType.getString(it, "arg")
                     // Try to parse as page number
@@ -108,28 +109,34 @@ object CommandRegistry {
             )
         )
 
-        // sct track <collection>
+        // sct track <collection(s)/skill> -> general command covering both collection and skill tracking
         .then(ClientCommands.literal("track")
             .executes {
-                ChatUtils.sendMessage("Usage: /sct track <collection>",true)
+                ChatUtils.sendMessage("Usage: /sct track <collection/skill>", true)
                 1
             }
-            .then(ClientCommands.argument("collection", StringArgumentType.greedyString())
-                .suggests(COLLECTION_SUGGESTIONS)
-                .executes { it ->
+            .then(ClientCommands.argument("targets", StringArgumentType.greedyString())
+                .suggests(COLLECTION_AND_SKILL_SUGGESTIONS)
+                .executes {
                     if (!canUseCommand()) return@executes 0
 
-                    val input = StringArgumentType.getString(it, "collection").trim()
-                    val collections = CollectionsManager.allCollections
-                        .sortedByDescending { it.length } // Sort by length to match longer names first
+                    val input = StringArgumentType.getString(it, "targets").trim()
+
+                    // only target is a skill
+                    if (SkillUtils.isValidSkill(input)) {
+                        SkillTracker.startTracking(input)
+                        return@executes 1
+                    }
+
+                    val collections = CollectionsManager.allCollections.sortedByDescending { collection -> collection.length }
                     val foundCollections = mutableListOf<String>()
 
                     var remaining = input
-                    while (remaining.isNotEmpty()) {
+                    while(remaining.isNotEmpty()) {
                         var found = false
 
                         for (coll in collections) {
-                            if (remaining.lowercase().startsWith(coll.lowercase())) {
+                            if (remaining.startsWith(coll, ignoreCase = true)) {
                                 foundCollections.add(coll)
                                 remaining = remaining.substring(coll.length).trim()
                                 found = true
@@ -145,6 +152,13 @@ object CommandRegistry {
                         }
                     }
 
+                    val containsSkill = input.split(' ').any { target -> SkillUtils.isValidSkill(target) }
+
+                    if (containsSkill) {
+                        ChatUtils.sendMessage("§cYou cannot track a skill and collections at the same time.")
+                        return@executes 1
+                    }
+
                     if (foundCollections.size > 1 || (foundCollections.size == 1 && foundCollections[0].equals("gemstone", ignoreCase = true))) {
                         CollectionTracker.startMultiTracking(foundCollections)
                     } else if (foundCollections.size == 1) {
@@ -157,98 +171,112 @@ object CommandRegistry {
             )
         )
 
-        // sct stop
+        // sct stop any tracker
         .then(ClientCommands.literal("stop")
             .executes {
-                if (MultiTrackingHandler.isMultiTracking) {
-                    MultiTrackingHandler.stopMultiTrackingManual()
-                } else {
-                    TrackingHandler.stopTrackingManual()
-                }
-               1
+                ChatUtils.sendMessage("Usage: /sct stop <collection/skill>", true)
+                1
             }
+            .then(ClientCommands.argument("type", StringArgumentType.word())
+                .suggests(TRACKING_SUGGESTIONS)
+                .executes {
+                    if (!canUseCommand()) return@executes 0
+
+                    val type = StringArgumentType.getString(it, "type").trim()
+                    when (type) {
+                        "collection" -> {
+                            when {
+                                MultiTrackingHandler.isMultiTracking -> MultiTrackingHandler.stopMultiTrackingManual()
+                                TrackingHandler.isTracking -> TrackingHandler.stopTrackingManual()
+                                else -> ChatUtils.sendMessage("§cNo collection is currently being tracked.", true)
+                            }
+                        }
+                        "skill" -> SkillTrackingHandler.stopTrackingManual()
+                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.", true)
+                    }
+                    1
+                }
+            )
         )
-        // sct pause
+        // sct pause any tracker
         .then(ClientCommands.literal("pause")
             .executes {
-                if (MultiTrackingHandler.isMultiTracking) {
-                    MultiTrackingHandler.pauseMultiTracking()
-                } else {
-                    TrackingHandler.pauseTracking()
-                }
+                ChatUtils.sendMessage("Usage: /sct pause <collection/skill>", true)
                 1
             }
+            .then(ClientCommands.argument("type", StringArgumentType.word())
+                .suggests(TRACKING_SUGGESTIONS)
+                .executes {
+                    if (!canUseCommand()) return@executes 0
+                    val type = StringArgumentType.getString(it, "type").trim()
+
+                    when (type) {
+                        "collection" -> {
+                            when {
+                                MultiTrackingHandler.isMultiTracking -> MultiTrackingHandler.pauseMultiTracking()
+                                TrackingHandler.isTracking -> TrackingHandler.pauseTracking()
+                                else -> ChatUtils.sendMessage("§cNo collection is currently being tracked.", true)
+                            }
+                        }
+                        "skill" -> SkillTrackingHandler.pauseTracking()
+                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.", true)
+                    }
+                    1
+                }
+            )
         )
 
-        // sct resume
+        // sct resume any tracker
         .then(ClientCommands.literal("resume")
             .executes {
-                if (MultiTrackingHandler.isMultiPaused) {
-                    MultiTrackingHandler.resumeMultiTracking()
-                } else {
-                    TrackingHandler.resumeTracking()
-                }
+                ChatUtils.sendMessage("Usage: /sct resume <collection/skill>", true)
                 1
             }
+            .then(ClientCommands.argument("type", StringArgumentType.word())
+                .suggests(TRACKING_SUGGESTIONS)
+                .executes {
+                    if (!canUseCommand()) return@executes 0
+
+                    val type = StringArgumentType.getString(it, "type").trim()
+                    when (type) {
+                        "collection" -> {
+                            when {
+                                MultiTrackingHandler.isMultiPaused -> MultiTrackingHandler.resumeMultiTracking()
+                                TrackingHandler.isPaused -> TrackingHandler.resumeTracking()
+                                else -> ChatUtils.sendMessage("§cNo collection is currently paused.", true)
+                            }
+                        }
+                        "skill" -> SkillTrackingHandler.resumeTracking()
+                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.", true)
+                    }
+                    1
+                }
+            )
         )
 
-        // sct restart
+        // sct restart any tracker
         .then(ClientCommands.literal("restart")
             .executes {
-                if (!canUseCommand()) return@executes 0
-
-                if (MultiTrackingHandler.isMultiTracking) {
-                    MultiTrackingHandler.restartMultiTracking()
-                } else {
-                    TrackingHandler.restartTracking()
-                }
+                ChatUtils.sendMessage("Usage: /sct restart <collection/skill>", true)
                 1
             }
-        )
-
-        // sct skill -> skill tracking commands
-        .then(ClientCommands.literal("skill")
-            // sct skill track <skillName>
-            .then(ClientCommands.literal("track")
+            .then(ClientCommands.argument("type", StringArgumentType.word())
+                .suggests(TRACKING_SUGGESTIONS)
                 .executes {
-                    ChatUtils.sendMessage("Usage: /sct skill track <skill>",true)
-                    1
-                }
-                .then(ClientCommands.argument("skillName", StringArgumentType.greedyString())
-                    .suggests(SKILL_LIST)
-                    .executes {
-                        if (!canUseCommand()) return@executes 0
+                    if (!canUseCommand()) return@executes 0
 
-                        SkillTracker.startTracking(StringArgumentType.getString(it, "skillName").trim())
-                        1
+                    val type = StringArgumentType.getString(it, "type").trim()
+                    when (type) {
+                        "collection" -> {
+                            when {
+                                MultiTrackingHandler.isMultiTracking -> MultiTrackingHandler.restartMultiTracking()
+                                TrackingHandler.isTracking -> TrackingHandler.restartTracking()
+                                else -> ChatUtils.sendMessage("§cNo collection is currently being tracked.")
+                            }
+                        }
+                        "skill" -> SkillTrackingHandler.restartTracking()
+                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.")
                     }
-                )
-            )
-            // sct skill stop
-            .then(ClientCommands.literal("stop")
-                .executes {
-                    SkillTrackingHandler.stopTrackingManual()
-                    1
-                }
-            )
-            // sct skill pause
-            .then(ClientCommands.literal("pause")
-                .executes {
-                    SkillTrackingHandler.pauseTracking()
-                    1
-                }
-            )
-            // sct skill resume
-            .then(ClientCommands.literal("resume")
-                .executes {
-                    SkillTrackingHandler.resumeTracking()
-                    1
-                }
-            )
-            // sct skill restart
-            .then(ClientCommands.literal("restart")
-                .executes {
-                    SkillTrackingHandler.restartTracking()
                     1
                 }
             )
@@ -500,7 +528,7 @@ object CommandRegistry {
                 .then(ClientCommands.argument("time", StringArgumentType.greedyString())
                     .executes {
                         val time = StringArgumentType.getString(it, "time")
-                        val seconds = parseToSeconds(time)
+                        val seconds = NumbersUtils.parseToSeconds(time)
 
                         if (seconds < 0) {
                             ChatUtils.sendMessage("§cInvalid time format. Use formats like '1h30m', '45s', or '90'.", true)
@@ -643,15 +671,13 @@ object CommandRegistry {
 //            )
 //        )
 
-        // sct commissions reset -> resets commissions tracker
-        .then(ClientCommands.literal("commissions")
-            .then(ClientCommands.literal("reset")
-                .executes {
-                    CommissionsTracker.reset()
-                    ChatUtils.sendMessage("§aCommissions tracker has been reset.", true)
-                    1
-                }
-            )
+        // sct resetCommissionTracker -> resets commissions tracker
+        .then(ClientCommands.literal("resetCommissionTracker")
+            .executes {
+                CommissionsTracker.reset()
+                ChatUtils.sendMessage("§aCommissions tracker has been reset.", true)
+                1
+            }
         )
 
         // sct token -> fetches a new token from the server
@@ -661,6 +687,10 @@ object CommandRegistry {
                 1
             }
         )
+    }
+
+    private val TRACKING_SUGGESTIONS: SuggestionProvider<FabricClientCommandSource> = { _, builder ->
+        builder.suggest("collection").suggest("skill").buildFuture()
     }
 
     private val COLLECTION_SUGGESTIONS: SuggestionProvider<FabricClientCommandSource> = { _, builder ->
@@ -700,7 +730,7 @@ object CommandRegistry {
         builder.buildFuture()
     }
 
-    private val CATEGORY_SUGGESTIONS: SuggestionProvider<FabricClientCommandSource> = { _, builder ->
+    private val COLLECTION_LIST: SuggestionProvider<FabricClientCommandSource> = { _, builder ->
         val arg = builder.remaining.lowercase()
         for (category in CollectionsManager.collections.keys) {
             if (category.lowercase().startsWith(arg)) {
@@ -773,50 +803,6 @@ object CommandRegistry {
                     lowerInput == "$name " || lowerInput.startsWith("$name ")
                 }
                 .maxByOrNull { it.length }
-    }
-
-    private fun parseToSeconds(input: String): Long {
-        val regex = "(\\d+)([dhms])".toRegex()
-        val input = input.lowercase().replace(" ", "")
-
-        var seconds = 0L
-        var found = false
-
-        for (match in regex.findAll(input)) {
-            val (valueString, unitString) = match.destructured
-            val value = valueString.toInt()
-            val unit = unitString[0]
-
-            when (unit) {
-                'd' -> seconds += value * 86400
-                'h' -> seconds += value * 3600
-                'm' -> seconds += value * 60
-                's' -> seconds += value
-            }
-            found = true
-        }
-
-        if (!found) return input.trim().toLongOrNull() ?: -1
-
-        return seconds
-    }
-
-    private fun parseAmount(amount: String): Long {
-        val input = amount.lowercase().trim()
-
-        if (input.matches("\\d+[kmb]".toRegex())) {
-            val number = input.dropLast(1).toLongOrNull() ?: return -1
-            val suffix = input.last()
-
-            return when (suffix) {
-                'k' -> number * 1_000L
-                'm' -> number * 1_000_000L
-                'b' -> number * 1_000_000_000L
-                else -> -1
-            }
-        }
-
-        return input.toLongOrNull() ?: -1
     }
 
     private fun canUseCommand(): Boolean {
