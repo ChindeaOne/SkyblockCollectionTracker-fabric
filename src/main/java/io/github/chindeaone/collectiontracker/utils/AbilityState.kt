@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
-class TimerState {
+class AbilityState {
 
     var endTimestamp = 0L
     var initialLag = 0L

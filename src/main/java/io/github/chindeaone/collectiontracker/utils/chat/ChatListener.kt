@@ -51,10 +51,10 @@ object ChatListener {
     private var expectingLotteryBuff = false
     private var expectingBeekeeper = false
 
-    private val pickaxeDuration = TimerState()
-    private val pickaxeCooldown = TimerState()
-    private val axeDuration = TimerState()
-    private val axeCooldown = TimerState()
+    private val pickaxeDuration = AbilityState()
+    private val pickaxeCooldown = AbilityState()
+    private val axeDuration = AbilityState()
+    private val axeCooldown = AbilityState()
 
     val finalCooldown: Double get() = pickaxeCooldown.remainingSeconds
     val finalDuration: Double get() = pickaxeDuration.remainingSeconds
@@ -160,7 +160,7 @@ object ChatListener {
         }
     }
 
-    private fun syncTimer(timer: TimerState, time: Long) {
+    private fun syncTimer(timer: AbilityState, time: Long) {
         val currentRemainingMs = (timer.remainingSeconds * 1000).toLong()
         val currentSeconds = currentRemainingMs / 1000
 
