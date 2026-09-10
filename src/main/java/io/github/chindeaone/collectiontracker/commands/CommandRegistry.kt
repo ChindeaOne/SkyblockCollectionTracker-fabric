@@ -20,6 +20,7 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
+import io.github.chindeaone.collectiontracker.utils.TimeUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -623,6 +624,34 @@ object CommandRegistry {
         .then(ClientCommands.literal("token")
             .executes {
                 ApiManager.fetchToken()
+                1
+            }
+        )
+
+        // sct sendTimer -> sends your current timer in party chat
+        .then(ClientCommands.literal("sendTimer")
+            .executes {
+                val timerOverlay = OverlayManager.getTimerOverlay() ?: return@executes 0
+                if (timerOverlay.hasEnded) {
+                    ChatUtils.sendMessage("§cTimer is not currently running!")
+                    return@executes 0
+                }
+
+                TimeUtils.sendTimerToParty(timerOverlay.getRemainingTimeInSeconds(), timerOverlay.isPaused)
+                1
+            }
+        )
+
+        // sct sendStopwatch -> sends your current stopwatch in party chat
+        .then(ClientCommands.literal("sendStopwatch")
+            .executes {
+                val stopwatchOverlay = OverlayManager.getStopwatchOverlay() ?: return@executes 0
+                if (!stopwatchOverlay.stopwatchRunning) {
+                    ChatUtils.sendMessage("§cStopwatch is not currently running!")
+                    return@executes 0
+                }
+
+                TimeUtils.sendStopwatchToParty(stopwatchOverlay.getElapsedTimeInSeconds(), stopwatchOverlay.stopwatchPaused)
                 1
             }
         )

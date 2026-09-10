@@ -1,21 +1,19 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightStopwatchPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.TimeUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 
 class StopwatchOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
 
-    private var stopwatchStart = 0L
+    private var stopwatchStartTime = 0L
     private var stopwatchElapsed = 0L
-    private var stopwatchRunning = false
-    private var stopwatchPaused = false
-
-    private var lastElapsedSeconds: Long = -1L
-    private var lastPaused: Boolean = false
-    private var lastRunning: Boolean = false
+    var stopwatchRunning = false
+    var stopwatchPaused = false
 
     override val overlayLabel: String = "Stopwatch Overlay"
 
@@ -42,13 +40,13 @@ class StopwatchOverlay : AbstractOverlay() {
             return
         }
 
-        stopwatchStart = System.currentTimeMillis()
+        stopwatchStartTime = System.currentTimeMillis()
         stopwatchElapsed = 0L
         stopwatchRunning = true
         stopwatchPaused = false
-        lastElapsedSeconds = -1L
 
         sendMessage("§aStopwatch started!", true)
+        TimeUtils.resetStopwatchNotifier()
     }
 
     fun stopStopwatch() {
@@ -57,14 +55,10 @@ class StopwatchOverlay : AbstractOverlay() {
             return
         }
 
-        val elapsed = if (stopwatchPaused)
-            stopwatchElapsed
-        else
-            stopwatchElapsed + (System.currentTimeMillis() - stopwatchStart)
+        val elapsed = (if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + (System.currentTimeMillis() - stopwatchStartTime)) / 1000L
+        sendMessage("§cStopwatch stopped at §e" + StringUtils.formatCompactTime(elapsed) + "§c!", true)
 
-        sendMessage("§cStopwatch stopped at §e" + StringUtils.formatCompactTime(elapsed / 1000L) + "§c!", true)
-
-        stopwatchStart = 0L
+        stopwatchStartTime = 0L
         stopwatchElapsed = 0L
         stopwatchRunning = false
         stopwatchPaused = false
@@ -78,14 +72,12 @@ class StopwatchOverlay : AbstractOverlay() {
         }
 
         if (!stopwatchPaused) {
-            stopwatchElapsed += System.currentTimeMillis() - stopwatchStart
+            stopwatchElapsed += System.currentTimeMillis() - stopwatchStartTime
             stopwatchPaused = true
-            lastElapsedSeconds = -1L
             sendMessage("§eStopwatch paused!", true)
         } else {
-            stopwatchStart = System.currentTimeMillis()
+            stopwatchStartTime = System.currentTimeMillis()
             stopwatchPaused = false
-            lastElapsedSeconds = -1L
             sendMessage("§aStopwatch resumed!", true)
         }
     }
@@ -98,20 +90,13 @@ class StopwatchOverlay : AbstractOverlay() {
             return
         }
 
-        val elapsed = if (stopwatchPaused)
-            stopwatchElapsed
-        else
-            stopwatchElapsed + (System.currentTimeMillis() - stopwatchStart)
+        if (ModLoader.clientTicks % 5L != 0L) return
 
-        val elapsedSeconds = elapsed / 1000L
-
-        if (cachedLines.isNotEmpty() && elapsedSeconds == lastElapsedSeconds && stopwatchPaused == lastPaused && stopwatchRunning == lastRunning) return
-
-        lastElapsedSeconds = elapsedSeconds
-        lastPaused = stopwatchPaused
-        lastRunning = stopwatchRunning
+        val elapsedSeconds = (if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + (System.currentTimeMillis() - stopwatchStartTime)) / 1000L
 
         val pauseText = if (stopwatchPaused) "§7 (Paused)" else ""
         cachedLines = listOf("§bStopwatch: §e" + StringUtils.formatCompactTime(elapsedSeconds) + pauseText)
     }
+
+    fun getElapsedTimeInSeconds(): Long = (if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + (System.currentTimeMillis() - stopwatchStartTime)) / 1000L
 }

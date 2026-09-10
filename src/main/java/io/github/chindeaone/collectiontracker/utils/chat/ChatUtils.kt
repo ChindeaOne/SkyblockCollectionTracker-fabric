@@ -43,6 +43,10 @@ object ChatUtils {
         sendMessage("", prefix = false)
     }
 
+    fun sendHypixelCommand(message: String) {
+        MinecraftUtils.player?.connection?.sendCommand("pc §6[SCT-$message")
+    }
+
     fun sendComponent(component: Component, prefix: Boolean = true, messageId: Int? = null) {
         MinecraftUtils.runOnClientThread {
             val finalComponent = if (prefix) {

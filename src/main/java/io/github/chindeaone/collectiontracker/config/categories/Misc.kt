@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.config.categories
 
 import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import io.github.chindeaone.collectiontracker.config.categories.party.PartyNotifierConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.notenoughupdates.moulconfig.annotations.*
@@ -63,4 +65,10 @@ class Misc {
 
     @Expose
     var titlePosition: Position = Position(0, 0)
+
+    @Expose
+    @ConfigOption(name = "Party Notifier Config", desc = "")
+    @SerializedName("partyNotifierConfig")
+    @Accordion
+    var partyNotifierConfig: PartyNotifierConfig = PartyNotifierConfig()
 }

@@ -38,6 +38,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.Mileston
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
+import io.github.chindeaone.collectiontracker.config.categories.party.PartyNotifierConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.notenoughupdates.moulconfig.ChromaColour
 
@@ -235,6 +236,13 @@ val titleDisplayTimer: Int get() = miscConfig.titleDisplayTimer
 val titleScale: Misc.TitleScale get() = miscConfig.titleScale
 val abilityCooldownOnly: Boolean get() = miscConfig.abilityCooldownOnly
 val showTimerTitle: Boolean get() = miscConfig.showTimerTitle
+
+// Party Notifier Accessors
+val partyNotifierConfig: PartyNotifierConfig get() = miscConfig.partyNotifierConfig
+val timerNotifier: Boolean get() = partyNotifierConfig.timerNotifier
+val timerNotifierInterval: Int get() = partyNotifierConfig.timerNotifierInterval
+val stopwatchNotifier: Boolean get() = partyNotifierConfig.stopwatchNotifier
+val stopwatchNotifierInterval: Int get() = partyNotifierConfig.stopwatchNotifierInterval
 
 /**
  * Accessors for configs
@@ -490,6 +498,14 @@ object ConfigAccess {
     fun getCustomPositionEntry(name: String): Int? {
         return customPositions[name.lowercase()]
     }
+
+    fun isTimerNotifierEnabled(): Boolean = timerNotifier
+
+    fun getTimerNotifierInterval(): Int = timerNotifierInterval
+
+    fun isStopwatchNotifierEnabled(): Boolean = stopwatchNotifier
+
+    fun getStopwatchNotifierInterval(): Int = stopwatchNotifierInterval
 }
 
 /**

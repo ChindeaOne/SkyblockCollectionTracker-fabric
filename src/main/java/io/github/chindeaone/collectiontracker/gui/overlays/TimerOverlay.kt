@@ -1,10 +1,12 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightTimerPosition
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTimerTitle
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.TimeUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
 import net.minecraft.network.chat.Component
@@ -14,11 +16,8 @@ class TimerOverlay : AbstractOverlay() {
 
     private var coleweightTimerEnd: Long = 0
     private var remainingTime: Long = 0
-    private var isPaused = false
-    private var hasEnded = true
-
-    private var lastRemainingSeconds: Long = -1L
-    private var lastPaused: Boolean = false
+    var isPaused = false
+    var hasEnded = true
 
     override val overlayLabel: String = "Timer Overlay"
 
@@ -50,9 +49,9 @@ class TimerOverlay : AbstractOverlay() {
         coleweightTimerEnd = System.currentTimeMillis() + duration * 1000L
         isPaused = false
         hasEnded = false
-        lastRemainingSeconds = -1L
 
         sendMessage("§aTimer set for ${StringUtils.formatCompactTime(duration)}!", true)
+        TimeUtils.resetTimerNotifier()
     }
 
     fun pauseTimer() {
@@ -63,12 +62,10 @@ class TimerOverlay : AbstractOverlay() {
         if (!isPaused && coleweightTimerEnd > System.currentTimeMillis()) {
             remainingTime = coleweightTimerEnd - System.currentTimeMillis()
             isPaused = true
-            lastRemainingSeconds = -1L
             sendMessage("§eTimer paused!", true)
         } else {
             coleweightTimerEnd = System.currentTimeMillis() + remainingTime
             isPaused = false
-            lastRemainingSeconds = -1L
             sendMessage("§aTimer resumed!", true)
         }
     }
@@ -81,15 +78,10 @@ class TimerOverlay : AbstractOverlay() {
             return
         }
 
+        if (ModLoader.clientTicks % 5L != 0L) return
+
         val now = System.currentTimeMillis()
         val remaining = (if (isPaused) remainingTime else coleweightTimerEnd - now) / 1000
-
-        if (cachedLines.isNotEmpty() && remaining == lastRemainingSeconds && isPaused == lastPaused) {
-            return
-        }
-
-        lastRemainingSeconds = remaining
-        lastPaused = isPaused
 
         if (remaining > 0) {
             val pauseTarget = if (isPaused) "§7 (Paused)" else ""
@@ -105,4 +97,6 @@ class TimerOverlay : AbstractOverlay() {
             cachedLines = emptyList()
         }
     }
+
+    fun getRemainingTimeInSeconds(): Long = (if (isPaused) remainingTime else (coleweightTimerEnd - System.currentTimeMillis())) / 1000
 }
