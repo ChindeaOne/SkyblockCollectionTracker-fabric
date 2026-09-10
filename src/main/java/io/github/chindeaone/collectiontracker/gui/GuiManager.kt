@@ -37,6 +37,14 @@ object GuiManager {
         screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
     }
 
+    fun openLeaderboardScreen() {
+        // TODO: create custom screen
+    }
+
+    fun openMilestonesScreen() {
+        // TODO: create custom screen
+    }
+
     private fun openScreen(createScreen: (AbstractContainerScreen<*>?) -> Screen) {
         OverlayManager.setGlobalRendering(false)
 

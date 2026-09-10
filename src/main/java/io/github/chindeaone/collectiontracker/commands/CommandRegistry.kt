@@ -6,7 +6,6 @@ import com.mojang.brigadier.suggestion.SuggestionProvider
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
-import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.gui.GuiManager
@@ -595,81 +594,21 @@ object CommandRegistry {
             )
         )
 
-        // sct setCustomPosition -> set custom position goal
-        .then(ClientCommands.literal("setCustomPosition")
+        // sct leaderboard -> open custom screen to set custom leaderboard positions for collections and skills
+        .then(ClientCommands.literal("leaderboard")
             .executes {
-                ChatUtils.sendMessage("§cUsage: /sct setCustomPosition <collection/skill name> <position>", true)
+                GuiManager.openLeaderboardScreen()
                 1
             }
-            .then(ClientCommands.argument("goal", StringArgumentType.greedyString())
-                .suggests(CUSTOM_GOAL_POSITION_SUGGESTIONS)
-                .executes {
-                    val input = StringArgumentType.getString(it, "goal").trim()
-
-                    val lastSpace = input.lastIndexOf(' ')
-                    if (lastSpace == -1) {
-                        ChatUtils.sendMessage("§cUsage: /sct setCustomPosition <collection/skill name> <position>", true)
-                        return@executes 1
-                    }
-
-                    val name = input.substring(0, lastSpace).trim()
-                    val positionStr = input.substring(lastSpace + 1).trim()
-
-                    val position = positionStr.toIntOrNull()
-
-                    if (position == null) {
-                        ChatUtils.sendMessage("§cInvalid position!", true)
-                        return@executes 1
-                    }
-
-                    if (position < 1) {
-                        ChatUtils.sendMessage("§cPosition must be at least 1!", true)
-                        return@executes 1
-                    }
-
-                    ConfigHelper.setCustomGoal(name, position)
-
-                    ChatUtils.sendMessage("§aCustom position set for $name at position $position", true)
-                    1
-                }
-            )
         )
 
-//        // sct setCustomGoalAmount -> set custom amount goal
-//        .then(ClientCommands.literal("setCustomGoalAmount")
-//            .executes {
-//                ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true)
-//                1
-//            }
-//            .then(ClientCommands.argument("goal", StringArgumentType.greedyString())
-//                .suggests(CUSTOM_GOAL_AMOUNT_SUGGESTIONS)
-//                .executes {
-//                    val input = StringArgumentType.getString(it, "goal").trim()
-//
-//                    val lastSpace = input.lastIndexOf(' ')
-//                    if (lastSpace == -1) {
-//                        ChatUtils.sendMessage("§cUsage: /sct setCustomGoalAmount <collection/skill name> <amount>", true)
-//                        return@executes 1
-//                    }
-//
-//                    val name = input.substring(0, lastSpace).trim()
-//                    val amountStr = input.substring(lastSpace + 1).trim()
-//
-//                    val amount = parseAmount(amountStr)
-//
-//                    if (amount < 0) {
-//                        ChatUtils.sendMessage("§cInvalid value!", true)
-//                        return@executes 1
-//                    }
-//
-//                    ConfigHelper.setCustomGoalType(LeaderboardConfig.CustomGoalType.AMOUNT)
-//                    ConfigHelper.setCustomGoal(name, null, amount)
-//
-//                    ChatUtils.sendMessage("§aCustom goal set for $name at amount $amountStr", true)
-//                    1
-//                }
-//            )
-//        )
+        // sct milestones -> open custom screen to set custom milestones for collections and skills
+        .then(ClientCommands.literal("milestones")
+            .executes {
+                GuiManager.openMilestonesScreen()
+                1
+            }
+        )
 
         // sct resetCommissionTracker -> resets commissions tracker
         .then(ClientCommands.literal("resetCommissionTracker")
@@ -764,17 +703,6 @@ object CommandRegistry {
         builder.buildFuture()
     }
 
-    private val CUSTOM_GOAL_POSITION_SUGGESTIONS: SuggestionProvider<FabricClientCommandSource> = { context, builder ->
-        val remaining = builder.remaining
-        val completedName = getCompletedGoalName(remaining)
-
-        if (completedName != null) {
-            builder.buildFuture()
-        }
-
-        COLLECTION_AND_SKILL_SUGGESTIONS.getSuggestions(context, builder)
-    }
-
     private val PLAYER_SUGGESTIONS: SuggestionProvider<FabricClientCommandSource> = { context, builder ->
         val remaining = builder.remaining.lowercase()
         for (playerName in context.source.onlinePlayerNames) {
@@ -783,26 +711,6 @@ object CommandRegistry {
             }
         }
         builder.buildFuture()
-    }
-
-    private fun getAllCollectionAndSkillNames(): List<String> {
-        val names = mutableListOf<String>()
-
-        names.addAll(CollectionsManager.allCollections)
-        names.addAll(SkillUtils.getDisplayNames())
-
-        return names.distinct()
-    }
-
-    private fun getCompletedGoalName(input: String): String? {
-        val lowerInput = input.lowercase()
-
-        return getAllCollectionAndSkillNames()
-                .filter {
-                    val name = it.lowercase()
-                    lowerInput == "$name " || lowerInput.startsWith("$name ")
-                }
-                .maxByOrNull { it.length }
     }
 
     private fun canUseCommand(): Boolean {
