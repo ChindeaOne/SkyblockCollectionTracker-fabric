@@ -37,7 +37,7 @@ object ConfigMigrator {
     }
 
     /**
-     * Preserve custom goal amounts set in the old config.
+     * Preserve previous custom goal amounts.
      * They now live in the milestone config.
      */
     private fun migrateToVersion2(config: JsonObject) {
@@ -53,7 +53,7 @@ object ConfigMigrator {
             ?.asJsonObject
             ?: return
 
-        val customPositions = JsonObject()
+        val leaderboardPositions = JsonObject()
 
         val milestonesConfig = tracking
             .getAsJsonObject("milestonesConfig")
@@ -70,23 +70,27 @@ object ConfigMigrator {
         for ((collection, value) in oldGoals.entrySet()) {
             val goal = value.asJsonObject
 
-            println("$collection: $goal")
-
             goal["position"]
                 ?.takeIf { !it.isJsonNull }
                 ?.let {
-                    customPositions.add(collection, it.deepCopy())
+                    leaderboardPositions.add(collection, it.deepCopy())
                 }
 
             goal["amount"]
                 ?.takeIf { !it.isJsonNull }
-                ?.let {
-                    milestones.add(collection, it.deepCopy())
+                ?.let { amount ->
+                    val milestone = JsonObject().apply {
+                        add("target", amount.deepCopy())
+                        addProperty("isTotal", true)
+                        addProperty("accumulated", 0L)
+                    }
+
+                    milestones.add(collection, milestone)
                 }
         }
 
-        if (customPositions.size() > 0) {
-            leaderboard.add("customPositions", customPositions)
+        if (leaderboardPositions.size() > 0) {
+            leaderboard.add("leaderboardPositions", leaderboardPositions)
         }
     }
 

@@ -19,6 +19,7 @@ import io.github.chindeaone.collectiontracker.config.categories.foraging.Beekeep
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
 import io.github.chindeaone.collectiontracker.config.categories.milestones.CollectionMilestonesConfig
+import io.github.chindeaone.collectiontracker.config.categories.milestones.Milestone
 import io.github.chindeaone.collectiontracker.config.categories.milestones.SkillMilestonesConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
@@ -201,8 +202,8 @@ val collectionLeaderboard: Boolean get() = leaderboardOverlay.collectionLeaderbo
 val skillLeaderboard: Boolean get() = leaderboardOverlay.skillLeaderboard
 val previousPosition: Boolean get() = leaderboardOverlay.previousPosition
 val includeWipedProfiles: Boolean get() = leaderboardOverlay.includeWipedProfiles
-val customPosition: Boolean get() = leaderboardOverlay.customPosition
-val customPositions: Map<String, Int> get() = leaderboardOverlay.customPositions
+val leaderboardPosition: Boolean get() = leaderboardOverlay.leaderboardPosition
+val leaderboardPositions: Map<String, Int> get() = leaderboardOverlay.leaderboardPositions
 
 // Multi Collection Tracking Config Accessors
 val multiCollectionOverlay: MultiCollectionConfig get() = trackingConfig.multiCollectionConfig
@@ -217,6 +218,7 @@ val enableTamingTracking: Boolean get() = skillConfig.enableTamingTracking
 
 // Milestones Config Accessors
 val milestonesConfig: MilestonesConfig get() = trackingConfig.milestonesConfig
+val milestones: Map<String, Milestone> get() = milestonesConfig.milestones
 // Collection Milestones
 val collectionMilestonesConfig: CollectionMilestonesConfig get() = milestonesConfig.collectionMilestonesConfig
 val collectionMilestones: Boolean get() = collectionMilestonesConfig.collectionMilestones
@@ -491,13 +493,13 @@ object ConfigAccess {
 
     fun isIncludeWipedProfilesEnabled(): Boolean = includeWipedProfiles
 
-    fun isCustomPositionEnabled(): Boolean = customPosition
+    fun isLeaderboardPositionEnabled(): Boolean = leaderboardPosition
 
-    fun getCustomPositions(): Map<String, Int> = customPositions
+    fun getLeaderboardPositions(): Map<String, Int> = leaderboardPositions
 
-    fun getCustomPositionEntry(name: String): Int? {
-        return customPositions[name.lowercase()]
-    }
+    fun getLeaderboardPositionEntry(name: String): Int? = leaderboardPositions[name]
+
+    fun getMilestones(): Map<String, Milestone> = milestones
 
     fun isTimerNotifierEnabled(): Boolean = timerNotifier
 
@@ -543,15 +545,6 @@ object ConfigHelper {
 
     fun disableSkillLeaderboardTracking() {
         leaderboardOverlay.skillLeaderboard = false
-    }
-
-    fun setCustomGoal(name: String, position: Int?) {
-        val lowercase = name.lowercase()
-        if (position == null) {
-            leaderboardOverlay.customPositions.remove(lowercase)
-        } else {
-            leaderboardOverlay.customPositions[lowercase] = position
-        }
     }
 
     fun setAbilityName(name: String) {
@@ -806,5 +799,13 @@ object ConfigHelper {
 
     fun setApiTracking(enabled: Boolean) {
         trackingConfig.apiTracking = enabled
+    }
+
+    fun saveMilestones(map: Map<String, Milestone>) {
+        milestonesConfig.milestones = map
+    }
+
+    fun saveLeaderboardPositions(map : Map<String, Int>) {
+        leaderboardOverlay.leaderboardPositions = map
     }
 }

@@ -41,12 +41,12 @@ class LeaderboardConfig {
 
     @Expose
     @ConfigOption(
-        name = "Enable Custom Position",
-        desc = "Enables a custom position for the leaderboard. This will show your progress towards the custom position instead of the next player on the leaderboard"
+        name = "Custom Leaderboard Positions",
+        desc = "Will show your progress towards the custom position instead of the next player on the leaderboard"
     )
     @ConfigEditorBoolean
-    var customPosition: Boolean = false
+    var leaderboardPosition: Boolean = false
 
     @Expose
-    var customPositions: MutableMap<String, Int> = mutableMapOf()
+    var leaderboardPositions: Map<String, Int> = emptyMap()
 }
