@@ -38,18 +38,22 @@ object CommandRegistry {
 
         // sct -> opens the config GUI
         sct.executes {
-            GuiManager.openConfigGui(null)
+            GuiManager.openConfigGui()
             1
         }
 
         // sct edit -> opens the position editor
         .then(ClientCommands.literal("edit")
             .executes {
+                if (!canUseCommand()) return@executes 0
+
                 GuiManager.openGuiPositionEditor()
                 1
             }
             .then(ClientCommands.literal("title")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     GuiManager.openGuiTitlePositionEditor()
                     1
                 }
@@ -128,7 +132,7 @@ object CommandRegistry {
                         return@executes 1
                     }
 
-                    val collections = CollectionsManager.allCollections.sortedByDescending { collection -> collection.length }
+                    val collections = CollectionsManager.collectionList.sortedByDescending { collection -> collection.length }
                     val foundCollections = mutableListOf<String>()
 
                     var remaining = input
@@ -208,8 +212,8 @@ object CommandRegistry {
                 .suggests(TRACKING_SUGGESTIONS)
                 .executes {
                     if (!canUseCommand()) return@executes 0
-                    val type = StringArgumentType.getString(it, "type").trim()
 
+                    val type = StringArgumentType.getString(it, "type").trim()
                     when (type) {
                         "collection" -> {
                             when {
@@ -397,23 +401,31 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("stop")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     ColeweightTrackingHandler.stopTrackingManual()
                     1
                 }
             )
             .then(ClientCommands.literal("pause")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     ColeweightTrackingHandler.pauseTracking()
                     1
                 }
             ).then(ClientCommands.literal("resume")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     ColeweightTrackingHandler.resumeTracking()
                     1
                 }
             )
             .then(ClientCommands.literal("restart")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     ColeweightTrackingHandler.restartTracking()
                     1
                 }
@@ -527,6 +539,8 @@ object CommandRegistry {
             .then(ClientCommands.literal("set")
                 .then(ClientCommands.argument("time", StringArgumentType.greedyString())
                     .executes {
+                        if (!canUseCommand()) return@executes 0
+
                         val time = StringArgumentType.getString(it, "time")
                         val seconds = NumbersUtils.parseToSeconds(time)
 
@@ -543,6 +557,8 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("pause")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     val timer = OverlayManager.getTimerOverlay()
                     timer?.pauseTimer()
                     1
@@ -550,6 +566,8 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("resume")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     val timer = OverlayManager.getTimerOverlay()
                     timer?.pauseTimer()
                     1
@@ -557,6 +575,8 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("stop")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     val timer = OverlayManager.getTimerOverlay()
                     timer?.setTimer(0)
                     1
@@ -567,6 +587,8 @@ object CommandRegistry {
         .then(ClientCommands.literal("stopwatch")
             .then(ClientCommands.literal("start")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     val stopwatch = OverlayManager.getStopwatchOverlay()
                     stopwatch?.startStopwatch()
                     1
@@ -574,6 +596,8 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("pause")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     val stopwatch = OverlayManager.getStopwatchOverlay()
                     stopwatch?.pauseStopwatch()
                     1
@@ -581,6 +605,8 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("resume")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     val stopwatch = OverlayManager.getStopwatchOverlay()
                     stopwatch?.pauseStopwatch()
                     1
@@ -588,6 +614,8 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("stop")
                 .executes {
+                    if (!canUseCommand()) return@executes 0
+
                     val stopwatch = OverlayManager.getStopwatchOverlay()
                     stopwatch?.stopStopwatch()
                     1
@@ -598,6 +626,8 @@ object CommandRegistry {
         // sct leaderboard -> open custom screen to set custom leaderboard positions for collections and skills
         .then(ClientCommands.literal("leaderboard")
             .executes {
+                if (!canUseCommand()) return@executes 0
+
                 GuiManager.openLeaderboardScreen()
                 1
             }
@@ -606,6 +636,8 @@ object CommandRegistry {
         // sct milestones -> open custom screen to set custom milestones for collections and skills
         .then(ClientCommands.literal("milestones")
             .executes {
+                if (!canUseCommand()) return@executes 0
+
                 GuiManager.openMilestonesScreen()
                 1
             }
@@ -614,6 +646,8 @@ object CommandRegistry {
         // sct resetCommissionTracker -> resets commissions tracker
         .then(ClientCommands.literal("resetCommissionTracker")
             .executes {
+                if (!canUseCommand()) return@executes 0
+
                 CommissionsTracker.reset()
                 ChatUtils.sendMessage("§aCommissions tracker has been reset.", true)
                 1
@@ -623,6 +657,8 @@ object CommandRegistry {
         // sct token -> fetches a new token from the server
         .then(ClientCommands.literal("token")
             .executes {
+                if (!canUseCommand()) return@executes 0
+
                 ApiManager.fetchToken()
                 1
             }
@@ -631,6 +667,8 @@ object CommandRegistry {
         // sct sendTimer -> sends your current timer in party chat
         .then(ClientCommands.literal("sendTimer")
             .executes {
+                if (!canUseCommand()) return@executes 0
+
                 val timerOverlay = OverlayManager.getTimerOverlay() ?: return@executes 0
                 if (timerOverlay.hasEnded) {
                     ChatUtils.sendMessage("§cTimer is not currently running!")
@@ -645,6 +683,8 @@ object CommandRegistry {
         // sct sendStopwatch -> sends your current stopwatch in party chat
         .then(ClientCommands.literal("sendStopwatch")
             .executes {
+                if (!canUseCommand()) return@executes 0
+
                 val stopwatchOverlay = OverlayManager.getStopwatchOverlay() ?: return@executes 0
                 if (!stopwatchOverlay.stopwatchRunning) {
                     ChatUtils.sendMessage("§cStopwatch is not currently running!")
@@ -685,7 +725,7 @@ object CommandRegistry {
             }
         }
 
-        for (c in CollectionsManager.allCollections) {
+        for (c in CollectionsManager.collectionList) {
             val matches = c
                 .lowercase()
                 .split("\\s+")
