@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.collections
 
-import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 
 object CollectionsManager {
     var collections = linkedMapOf<String, Set<String>>()
@@ -28,14 +28,8 @@ object CollectionsManager {
         return false
     }
 
-    val allCollections: MutableList<String>
-        get() {
-            val allCollections: MutableList<String> = mutableListOf()
-            for (collectionSet in collections.values) {
-                allCollections.addAll(collectionSet)
-            }
-            return allCollections
-        }
+    val collectionList: List<String>
+        get() = collections.values.flatten()
 
     fun isRiftCollection(collectionName: String): Boolean {
         return collections
@@ -46,13 +40,13 @@ object CollectionsManager {
     fun hasAnyRiftCollection(): Boolean {
         val riftCollections = collections.getOrDefault("Rift", mutableSetOf())
 
-        return collectionList.stream().anyMatch { o: String? -> riftCollections.contains(o) }
+        return CollectionTracker.collectionList.stream().anyMatch { o: String? -> riftCollections.contains(o) }
     }
 
     fun hasAllRiftCollections(): Boolean {
         val riftCollections = collections.getOrDefault("Rift", mutableSetOf())
 
-        return riftCollections.containsAll(collectionList)
+        return riftCollections.containsAll(CollectionTracker.collectionList)
     }
 
     fun resetCollections() {
