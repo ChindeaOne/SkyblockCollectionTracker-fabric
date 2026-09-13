@@ -115,7 +115,7 @@ object ApiManager {
         headers: Map<String, String>
     ): HttpRequest {
         val builder = HttpRequest.newBuilder(URI.create("$API_URL/$path"))
-            .timeout(Duration.ofSeconds(5))
+            .timeout(Duration.ofSeconds(15))
             .header("User-Agent", agent)
             .header("Accept", "application/json")
 
@@ -151,7 +151,7 @@ object ApiManager {
     }
 
     val HTTP_CLIENT: HttpClient = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofSeconds(5))
+        .connectTimeout(Duration.ofSeconds(15))
         .version(HttpClient.Version.HTTP_2)
         .build()
 }
