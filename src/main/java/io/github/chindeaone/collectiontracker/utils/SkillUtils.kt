@@ -25,6 +25,8 @@ object SkillUtils {
 
     fun getDisplayNames(): List<String> = Skills.entries.map { it.displayName }
 
+    val skillList: List<String> = Skills.entries.map { it.displayName.lowercase() }
+
     fun isValidSkill(skillName: String): Boolean = Skills.entries.any { it.displayName.equals(skillName, ignoreCase = true) }
 
     fun updateFromApi(apiValues: Map<String, Double>) {

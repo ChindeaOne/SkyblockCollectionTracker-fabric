@@ -32,7 +32,7 @@ object MinecraftUtils {
 
     val font get() = mc.font
 
-    val hideGui get() = mc./*? if 26.2 {*/ /*gui.hud.isHidden() */ /*?} else {*/options.hideGui /*?}*/
+    val hideGui get() = mc./*? if 26.2 {*/ /*gui.hud.isHidden()  *//*?} else {*/options.hideGui /*?}*/
 
     val isDebugHudVisible get() = mc.debugEntries.isOverlayVisible
 
