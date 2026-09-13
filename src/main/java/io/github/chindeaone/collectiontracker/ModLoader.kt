@@ -148,7 +148,7 @@ object ModLoader: ModInitializer {
             clientTicks++
 
             // Call every onTick here
-            SkyblockCollectionTracker.onClientTick(client)
+            SkyblockCollectionTracker.onClientTick()
             CommissionUtils.onClientTick(client)
             TabData.onClientTick(client)
             BlockWatcher.onClientTick(client)

@@ -9,7 +9,9 @@ import io.github.chindeaone.collectiontracker.config.ModConfig
 import io.github.chindeaone.collectiontracker.gui.overlays.ChangelogOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyTitle
+import io.github.chindeaone.collectiontracker.utils.rendering.screen.milestone.MilestoneScreen
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
+import io.github.chindeaone.collectiontracker.utils.rendering.screen.leaderboard.LeaderboardScreen
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
@@ -38,11 +40,11 @@ object GuiManager {
     }
 
     fun openLeaderboardScreen() {
-        // TODO: create custom screen
+        openScreen(::LeaderboardScreen)
     }
 
     fun openMilestonesScreen() {
-        // TODO: create custom screen
+        openScreen(::MilestoneScreen)
     }
 
     private fun openScreen(createScreen: (AbstractContainerScreen<*>?) -> Screen) {

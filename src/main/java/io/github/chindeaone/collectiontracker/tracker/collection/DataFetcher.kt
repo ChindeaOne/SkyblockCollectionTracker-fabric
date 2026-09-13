@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.gui.CustomCollectionScreen
+import io.github.chindeaone.collectiontracker.utils.rendering.screen.CustomCollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData

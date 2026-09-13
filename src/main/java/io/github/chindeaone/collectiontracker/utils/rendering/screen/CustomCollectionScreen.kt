@@ -1,10 +1,10 @@
-package io.github.chindeaone.collectiontracker.gui
+package io.github.chindeaone.collectiontracker.utils.rendering.screen
 
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
-import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -33,7 +33,7 @@ class CustomCollectionScreen(
 
         collectionList.forEachIndexed { index, s ->
             val yPos = startY + (index * 20)
-            val displayName = formatCollectionName(s)
+            val displayName = StringUtils.formatCollectionName(s)
             val box = CollectionEditBox(
                 width / 2 - 25,
                 yPos,
@@ -58,7 +58,7 @@ class CustomCollectionScreen(
                 ChatUtils.sendMessage("§eCustom collection values set:")
 
                 values.forEach { (name, value) ->
-                    val displayName = formatCollectionName(name).toColor()
+                    val displayName = StringUtils.formatCollectionName(name).toColor()
                     val formattedValue = NumbersUtils.formatNumber(value)
                     val component = Component.literal(" §7- §f").append(displayName).append(": §a$formattedValue")
                     ChatUtils.sendComponent(component, false)
@@ -88,7 +88,7 @@ class CustomCollectionScreen(
         )
 
         map.forEach { (name, box) ->
-            val displayName = formatCollectionName(name)
+            val displayName = StringUtils.formatCollectionName(name)
             context.text(
                 MinecraftUtils.font,
                 displayName,

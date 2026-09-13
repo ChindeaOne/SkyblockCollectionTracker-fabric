@@ -16,7 +16,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess.getGemstoneVar
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getStatsText
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTrackingOptions
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCollectionLeaderboardEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCustomPositionEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isLeaderboardPositionEnabled
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isPreviousPositionEnabled
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowExtraStats
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isUsingBazaar
@@ -64,7 +64,7 @@ object CollectionParser {
     private fun handleNextPosition(): String? {
         if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
-        if (isCustomPositionEnabled()) {
+        if (isLeaderboardPositionEnabled()) {
             if (TrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
             if (TrackingRates.isNextWiped) return "Custom Position (${TrackingRates.nextRankUsername}-wiped): ${formatNumber(TrackingRates.nextRankAmount)}"
             return "Custom Position (${TrackingRates.nextRankUsername}): ${formatNumber(TrackingRates.nextRankAmount)}"
@@ -78,7 +78,7 @@ object CollectionParser {
     private fun handleCollectionTillNextRank(): String? {
         if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
-        if (isCustomPositionEnabled()) {
+        if (isLeaderboardPositionEnabled()) {
             if (TrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
             return "Till Custom Position: ${formatNumber(TrackingRates.collectionTillNextRank)}"
         }
@@ -90,7 +90,7 @@ object CollectionParser {
     private fun handleEta(): String? {
         if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
-        if (isCustomPositionEnabled()) {
+        if (isLeaderboardPositionEnabled()) {
             if (TrackingRates.etaToNextRank == null) return "ETA to Custom Position: Calculating..."
             return "ETA to Custom Position: ${TrackingRates.etaToNextRank}"
         }
@@ -117,7 +117,7 @@ object CollectionParser {
     private fun handleMultiNextPosition(): String? {
         if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
-        if (isCustomPositionEnabled()) {
+        if (isLeaderboardPositionEnabled()) {
             if (MultiTrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
             if (MultiTrackingRates.isNextWiped) return "Custom Position (${MultiTrackingRates.nextRankUsername}-wiped): ${formatNumber(MultiTrackingRates.nextRankAmount)}"
             return "Custom Position (${MultiTrackingRates.nextRankUsername}): ${formatNumber(MultiTrackingRates.nextRankAmount)}"
@@ -131,7 +131,7 @@ object CollectionParser {
     private fun handleMultiCollectionTillNextRank(): String? {
         if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
-        if (isCustomPositionEnabled()) {
+        if (isLeaderboardPositionEnabled()) {
             if (MultiTrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
             return "Till Custom Position: ${formatNumber(MultiTrackingRates.collectionTillNextRank)}"
         }
@@ -143,7 +143,7 @@ object CollectionParser {
     private fun handleMultiEta(): String? {
         if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
-        if (isCustomPositionEnabled()) {
+        if (isLeaderboardPositionEnabled()) {
             if (MultiTrackingRates.etaToNextRank == null) return "ETA to Custom Position: Calculating..."
             return "ETA to Custom Position: ${MultiTrackingRates.etaToNextRank}"
         }
