@@ -54,6 +54,20 @@ enum class Formatting(private val code: Char, val format: ChatFormatting) {
     RESET('r', ChatFormatting.RESET);
 }
 
+enum class ScreenColors(val color: Int) {
+    SCREEN_BG(0xCC080808.toInt()),
+
+    BUTTON(0xFF444444.toInt()),
+    BUTTON_HOVER(0xFF777777.toInt()),
+
+    DROPDOWN_HOVER(0xFF303030.toInt()),
+    DROPDOWN(0xEE181818.toInt()),
+
+    PANEL_BG(0xEE101010.toInt()),
+    PANEL_BORDER(0xFF555555.toInt()),
+    PANEL_HEADER(0xFF333333.toInt()),
+}
+
 object ColorUtils {
     const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
     const val DUMMY_BG: Int = 0x80404040.toInt()
