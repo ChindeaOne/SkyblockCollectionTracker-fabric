@@ -35,27 +35,27 @@ object SkillTrackingRates {
     private const val THRESHOLD = 2 // Number of checks before considering AFK
 
     // Skill Leaderboard tracking data
-    @Volatile var skillCurrentRank: Int = -1
-    @Volatile var skillNextRankUsername: String? = null
-    @Volatile var skillNextRankAmount: Long = -1L
-    @Volatile var skillTillNextRank: Long = -1L
-    @Volatile var skillEtaToNextRank: String? = null
+    @Volatile var currentSkillRank: Int = -1
+    @Volatile var nextSkillRankUsername: String? = null
+    @Volatile var nextSkillRankAmount: Long = -1L
+    @Volatile var tillNextSkillRank: Long = -1L
+    @Volatile var etaToNextSkillRank: String? = null
     @Volatile var isNextSkillWiped: Boolean = false
-    @Volatile var skillPreviousRankUsername: String? = null
-    @Volatile var skillPreviousRankAmount: Long = -1L
-    @Volatile var skillAbovePreviousRankAmount: Long = -1L
+    @Volatile var previousSkillRankUsername: String? = null
+    @Volatile var previousSkillRankAmount: Long = -1L
+    @Volatile var abovePreviousSkillRankAmount: Long = -1L
     @Volatile var isPreviousSkillWiped: Boolean = false
 
     // Taming Leaderboard tracking data
-    @Volatile var tamingCurrentRank: Int = -1
-    @Volatile var tamingNextRankUsername: String? = null
-    @Volatile var tamingNextRankAmount: Long = -1L
-    @Volatile var tamingTillNextRank: Long = -1L
-    @Volatile var tamingEtaToNextRank: String? = null
+    @Volatile var currentTamingRank: Int = -1
+    @Volatile var nextTamingRankUsername: String? = null
+    @Volatile var nextTamingRankAmount: Long = -1L
+    @Volatile var tillNextTamingRank: Long = -1L
+    @Volatile var etaToNextTamingRank: String? = null
     @Volatile var isNextTamingWiped: Boolean = false
-    @Volatile var tamingPreviousRankUsername: String? = null
-    @Volatile var tamingPreviousRankAmount: Long = -1L
-    @Volatile var tamingAbovePreviousRankAmount: Long = -1L
+    @Volatile var previousTamingRankUsername: String? = null
+    @Volatile var previousTamingRankAmount: Long = -1L
+    @Volatile var abovePreviousTamingRankAmount: Long = -1L
     @Volatile var isPreviousTamingWiped: Boolean = false
 
     fun initTracking(level: Int, xp: Long) {
@@ -122,33 +122,33 @@ object SkillTrackingRates {
     fun updateSkillLeaderboardStats() {
         if (!isSkillLeaderboardEnabled()) return
 
-        skillCurrentRank = getPlayerRank(skillName, totalSkillXp)
+        currentSkillRank = getPlayerRank(skillName, totalSkillXp)
 
         val nextEntry = getNextRankEntryForSkill(skillName, totalSkillXp)
         if (nextEntry != null) {
-            skillNextRankUsername = nextEntry.username
-            skillNextRankAmount = nextEntry.amount
-            skillTillNextRank = skillNextRankAmount - totalSkillXp
+            nextSkillRankUsername = nextEntry.username
+            nextSkillRankAmount = nextEntry.amount
+            tillNextSkillRank = nextSkillRankAmount - totalSkillXp
             updateSkillEta()
             isNextSkillWiped = nextEntry.wiped
         } else {
-            skillNextRankUsername = null
-            skillNextRankAmount = -1L
-            skillTillNextRank = -1L
-            skillEtaToNextRank = null
+            nextSkillRankUsername = null
+            nextSkillRankAmount = -1L
+            tillNextSkillRank = -1L
+            etaToNextSkillRank = null
             isNextSkillWiped = false
         }
 
         val previousEntry = getPreviousRankEntryForSkill(skillName, totalSkillXp)
         if (previousEntry != null) {
-            skillPreviousRankUsername = previousEntry.username
-            skillPreviousRankAmount = previousEntry.amount
-            skillAbovePreviousRankAmount = totalSkillXp - skillPreviousRankAmount
+            previousSkillRankUsername = previousEntry.username
+            previousSkillRankAmount = previousEntry.amount
+            abovePreviousSkillRankAmount = totalSkillXp - previousSkillRankAmount
             isPreviousSkillWiped = previousEntry.wiped
         } else {
-            skillPreviousRankUsername = null
-            skillPreviousRankAmount = -1L
-            skillAbovePreviousRankAmount = -1L
+            previousSkillRankUsername = null
+            previousSkillRankAmount = -1L
+            abovePreviousSkillRankAmount = -1L
             isPreviousSkillWiped = false
         }
     }
@@ -156,52 +156,52 @@ object SkillTrackingRates {
     fun updateTamingLeaderboardStats() {
         if (!isSkillLeaderboardEnabled() || !isTamingTrackingEnabled()) return
 
-        tamingCurrentRank = getPlayerRank("Taming", tamingXp + tamingXpGained)
+        currentTamingRank = getPlayerRank("Taming", tamingXp + tamingXpGained)
 
         val nextEntry = getNextRankEntryForSkill("Taming", tamingXp + tamingXpGained)
         if (nextEntry != null) {
-            tamingNextRankUsername = nextEntry.username
-            tamingNextRankAmount = nextEntry.amount
-            tamingTillNextRank = tamingNextRankAmount - (tamingXp + tamingXpGained)
+            nextTamingRankUsername = nextEntry.username
+            nextTamingRankAmount = nextEntry.amount
+            tillNextTamingRank = nextTamingRankAmount - (tamingXp + tamingXpGained)
             updateTamingEta()
             isNextTamingWiped = nextEntry.wiped
         } else {
-            tamingNextRankUsername = null
-            tamingNextRankAmount = -1L
-            tamingTillNextRank = -1L
-            tamingEtaToNextRank = null
+            nextTamingRankUsername = null
+            nextTamingRankAmount = -1L
+            tillNextTamingRank = -1L
+            etaToNextTamingRank = null
             isNextTamingWiped = false
         }
 
         val previousEntry = getPreviousRankEntryForSkill("Taming", tamingXp + tamingXpGained)
         if (previousEntry != null) {
-            tamingPreviousRankUsername = previousEntry.username
-            tamingPreviousRankAmount = previousEntry.amount
-            tamingAbovePreviousRankAmount = (tamingXp + tamingXpGained) - tamingPreviousRankAmount
+            previousTamingRankUsername = previousEntry.username
+            previousTamingRankAmount = previousEntry.amount
+            abovePreviousTamingRankAmount = (tamingXp + tamingXpGained) - previousTamingRankAmount
             isPreviousTamingWiped = previousEntry.wiped
         } else {
-            tamingPreviousRankUsername = null
-            tamingPreviousRankAmount = -1L
-            tamingAbovePreviousRankAmount = -1L
+            previousTamingRankUsername = null
+            previousTamingRankAmount = -1L
+            abovePreviousTamingRankAmount = -1L
             isPreviousTamingWiped = false
         }
     }
 
     fun updateSkillEta() {
-        if (skillPerHour > 0 && skillTillNextRank > 0) {
-            val seconds = (skillTillNextRank / (skillPerHour / 3600.0)).toLong()
-            skillEtaToNextRank = StringUtils.formatCompactTime(seconds)
+        if (skillPerHour > 0 && tillNextSkillRank > 0) {
+            val seconds = (tillNextSkillRank / (skillPerHour / 3600.0)).toLong()
+            etaToNextSkillRank = StringUtils.formatCompactTime(seconds)
         } else {
-            skillEtaToNextRank = null
+            etaToNextSkillRank = null
         }
     }
 
     fun updateTamingEta() {
-        if (tamingPerHour > 0 && tamingTillNextRank > 0) {
-            val seconds = (tamingTillNextRank / (tamingPerHour / 3600.0)).toLong()
-            tamingEtaToNextRank = StringUtils.formatCompactTime(seconds)
+        if (tamingPerHour > 0 && tillNextTamingRank > 0) {
+            val seconds = (tillNextTamingRank / (tamingPerHour / 3600.0)).toLong()
+            etaToNextTamingRank = StringUtils.formatCompactTime(seconds)
         } else {
-            tamingEtaToNextRank = null
+            etaToNextTamingRank = null
         }
     }
 
@@ -223,16 +223,27 @@ object SkillTrackingRates {
         skillUnchangedStreak = 0
         tamingUnchangedStreak = 0
 
-        skillCurrentRank = -1
-        skillNextRankUsername = null
-        skillNextRankAmount = -1L
-        skillTillNextRank = -1L
-        skillEtaToNextRank = null
+        currentSkillRank = -1
+        nextSkillRankUsername = null
+        nextSkillRankAmount = -1L
+        tillNextSkillRank = -1L
+        etaToNextSkillRank = null
+        isNextSkillWiped = false
+        previousSkillRankUsername = null
+        previousSkillRankAmount = -1L
+        abovePreviousSkillRankAmount = -1L
+        isPreviousSkillWiped = false
 
-        tamingCurrentRank = -1
-        tamingNextRankUsername = null
-        tamingNextRankAmount = -1L
-        tamingTillNextRank = -1L
-        tamingEtaToNextRank = null
+        currentTamingRank = -1
+        nextTamingRankUsername = null
+        nextTamingRankAmount = -1L
+        tillNextTamingRank = -1L
+        etaToNextTamingRank = null
+        isNextTamingWiped = false
+
+        isPreviousTamingWiped = false
+        previousTamingRankUsername = null
+        previousTamingRankAmount = -1L
+        abovePreviousTamingRankAmount = -1L
     }
 }

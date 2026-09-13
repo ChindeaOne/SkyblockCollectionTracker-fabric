@@ -3,6 +3,8 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getSkillPosition
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isLeaderboardPositionEnabled
+import io.github.chindeaone.collectiontracker.config.ConfigAccess.isPreviousPositionEnabled
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.disableTamingTracking
@@ -73,22 +75,33 @@ class SkillOverlay : AbstractOverlay() {
         val currentTotalXp = SkillTrackingRates.totalSkillXp
         val currentSkillGained = SkillTrackingRates.skillXpGained
         val currentSkillPerHour = SkillTrackingRates.skillPerHour
-        val currentSkillRank = SkillTrackingRates.skillCurrentRank
-        val currentSkillNextUser = SkillTrackingRates.skillNextRankUsername
-        val currentSkillNextAmount = SkillTrackingRates.skillNextRankAmount
-        val currentSkillTillNext = SkillTrackingRates.skillTillNextRank
-        val currentSkillEta = SkillTrackingRates.skillEtaToNextRank
+        val currentSkillRank = SkillTrackingRates.currentSkillRank
+        val currentSkillNextUser = SkillTrackingRates.nextSkillRankUsername
+        val currentSkillNextAmount = SkillTrackingRates.nextSkillRankAmount
+        val currentSkillTillNext = SkillTrackingRates.tillNextSkillRank
+        val currentSkillEta = SkillTrackingRates.etaToNextSkillRank
+        val isNextSkillWiped = SkillTrackingRates.isNextSkillWiped
+        val previousSkillRankUsername = SkillTrackingRates.previousSkillRankUsername
+        val previousSkillRankAmount = SkillTrackingRates.previousSkillRankAmount
+        val abovePreviousSkillRankAmount = SkillTrackingRates.abovePreviousSkillRankAmount
+        val isPreviousSkillWiped = SkillTrackingRates.isPreviousSkillWiped
 
         val withTaming = isTamingTrackingEnabled() && currentSkill != "Taming"
         val currentTamingLvl = SkillTrackingRates.tamingLevel
         val currentTamingTotalXp = SkillTrackingRates.tamingXp + SkillTrackingRates.tamingXpGained
         val currentTamingGained = SkillTrackingRates.tamingXpGained
         val currentTamingPerHour = SkillTrackingRates.tamingPerHour
-        val currentTamingRank = SkillTrackingRates.tamingCurrentRank
-        val currentTamingNextUser = SkillTrackingRates.tamingNextRankUsername
-        val currentTamingNextAmount = SkillTrackingRates.tamingNextRankAmount
-        val currentTamingTillNext = SkillTrackingRates.tamingTillNextRank
-        val currentTamingEta = SkillTrackingRates.tamingEtaToNextRank
+        val currentTamingRank = SkillTrackingRates.currentTamingRank
+        val currentTamingNextUser = SkillTrackingRates.nextTamingRankUsername
+        val currentTamingNextAmount = SkillTrackingRates.nextTamingRankAmount
+        val currentTamingTillNext = SkillTrackingRates.tillNextTamingRank
+        val currentTamingEta = SkillTrackingRates.etaToNextTamingRank
+        val isNextTamingWiped = SkillTrackingRates.isNextTamingWiped
+        val previousTamingRankUsername = SkillTrackingRates.previousTamingRankUsername
+        val previousTamingRankAmount = SkillTrackingRates.previousTamingRankAmount
+        val abovePreviousTamingRankAmount = SkillTrackingRates.abovePreviousTamingRankAmount
+        val isPreviousTamingWiped = SkillTrackingRates.isPreviousTamingWiped
+
         val leaderboard = isSkillLeaderboardEnabled()
 
         val newSkillLines = mutableListOf<String>()
@@ -110,6 +123,11 @@ class SkillOverlay : AbstractOverlay() {
             currentSkillNextAmount,
             currentSkillTillNext,
             currentSkillEta,
+            isNextSkillWiped,
+            previousSkillRankUsername,
+            previousSkillRankAmount,
+            abovePreviousSkillRankAmount,
+            isPreviousSkillWiped,
             leaderboard
         )
         newSkillLines.add("Uptime: $currentUptime")
@@ -136,6 +154,11 @@ class SkillOverlay : AbstractOverlay() {
                 currentTamingNextAmount,
                 currentTamingTillNext,
                 currentTamingEta,
+                isNextTamingWiped,
+                previousTamingRankUsername,
+                previousTamingRankAmount,
+                abovePreviousTamingRankAmount,
+                isPreviousTamingWiped,
                 leaderboard
             )
         }
@@ -159,25 +182,56 @@ class SkillOverlay : AbstractOverlay() {
         nextAmount: Long,
         tillNext: Long,
         eta: String?,
+        isNextWiped: Boolean,
+        previousUser: String?,
+        previousAmount: Long,
+        abovePrevious: Long,
+        isPreviousWiped: Boolean,
         leaderboardEnabled: Boolean
     ) {
         if (!leaderboardEnabled) return
         if (rank == 1) return
 
+        val customPos = isLeaderboardPositionEnabled()
+        val posLabel = if (customPos) "Custom Position" else "Next Position"
+        val tillLabel = if (customPos) "Till Custom Position" else "Till Next Position"
+        val etaLabel = if (customPos) "ETA to Custom Position" else "ETA"
+
         list.add("")
 
         if (nextUser != null) {
-            list.add(String.format("Next Position (%s): %s", nextUser, formatNumber(nextAmount)))
-            list.add("Till Next Position: " + formatNumber(tillNext))
-            if (!eta.isNullOrEmpty()) {
-                list.add("ETA: $eta")
+            val wipedSuffix = if (isNextWiped) "-wiped" else ""
+            list.add("$posLabel ($nextUser$wipedSuffix): ${formatNumber(nextAmount)}")
+            if (tillNext == -1L) {
+                list.add("$tillLabel: Calculating...")
             } else {
-                list.add("ETA: Calculating...")
+                list.add("$tillLabel: " + formatNumber(tillNext))
+            }
+            if (!eta.isNullOrEmpty()) {
+                list.add("$etaLabel: $eta")
+            } else {
+                list.add("$etaLabel: Calculating...")
             }
         } else {
-            list.add("Next Position: Calculating...")
-            list.add("Till Next Position: Calculating...")
-            list.add("ETA: Calculating...")
+            list.add("$posLabel: Calculating...")
+            list.add("$tillLabel: Calculating...")
+            list.add("$etaLabel: Calculating...")
+        }
+
+        if (isPreviousPositionEnabled()) {
+            list.add("")
+            if (previousUser != null) {
+                val wipedSuffix = if (isPreviousWiped) "-wiped" else ""
+                list.add("Passed ($previousUser$wipedSuffix): ${formatNumber(previousAmount)}")
+            } else {
+                list.add("Passed: Calculating...")
+            }
+
+            if (abovePrevious == -1L) {
+                list.add("Difference: Calculating...")
+            } else {
+                list.add("Difference: " + formatNumber(abovePrevious))
+            }
         }
     }
 }

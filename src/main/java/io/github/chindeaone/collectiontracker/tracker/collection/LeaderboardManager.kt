@@ -120,8 +120,8 @@ object LeaderboardManager {
         }
 
         // Custom position
-        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomPositions().isEmpty()) {
-            val position = ConfigAccess.getCustomPositionEntry("gemstone")
+        if (ConfigAccess.isLeaderboardPositionEnabled() && !ConfigAccess.getLeaderboardPositions().isEmpty()) {
+            val position = ConfigAccess.getLeaderboardPositionEntry("gemstone")
 
             if (position != null) {
                 val playerEntry = getPlayerEntryRaw(amount)
@@ -144,8 +144,8 @@ object LeaderboardManager {
         }
 
         // Custom position
-        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomPositions().isEmpty()) {
-            val position = ConfigAccess.getCustomPositionEntry(skill)
+        if (ConfigAccess.isLeaderboardPositionEnabled() && !ConfigAccess.getLeaderboardPositions().isEmpty()) {
+            val position = ConfigAccess.getLeaderboardPositionEntry(skill.lowercase())
 
             if (position != null) {
                 val playerEntry = getPlayerEntry(skill, amount)
@@ -185,8 +185,8 @@ object LeaderboardManager {
 
     fun getNextRankEntry(): LeaderboardEntry? {
         // Custom position
-        if (ConfigAccess.isCustomPositionEnabled() && !ConfigAccess.getCustomPositions().isEmpty()) {
-            val position = ConfigAccess.getCustomPositionEntry(CollectionTracker.collection)
+        if (ConfigAccess.isLeaderboardPositionEnabled() && !ConfigAccess.getLeaderboardPositions().isEmpty()) {
+            val position = ConfigAccess.getLeaderboardPositionEntry(CollectionTracker.collection)
 
             if (position != null) {
                 val playerEntry = getPlayerEntryRaw(TrackingRates.collectionAmount)
