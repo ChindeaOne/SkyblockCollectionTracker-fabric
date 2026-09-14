@@ -106,9 +106,24 @@ object ChatUtils {
         sendComponent(component, prefix)
     }
 
+    fun sendHoverableCommandComponent(
+        text: Component,
+        hoverText: String,
+        command: String,
+        prefix: Boolean = true
+    ) {
+        val component = Component.empty().append(text)
+            .withStyle { style: Style? ->
+                (style ?: Style.EMPTY).withClickEvent(ClickEvent.RunCommand(command))
+                    .withHoverEvent(HoverEvent.ShowText(Component.literal(hoverText)))
+            }
+
+        sendComponent(component, prefix)
+    }
+
     fun sendClickableLinkComponent(
         text: String,
-        hover: String,
+        hoverText: String,
         url: String?
     ) {
         if (url == null) {
@@ -119,7 +134,7 @@ object ChatUtils {
         val clickableComponent = Component.literal(text)
             .withStyle { style: Style? ->
                 (style ?: Style.EMPTY).withClickEvent(ClickEvent.OpenUrl(URI.create(url)))
-                    .withHoverEvent(HoverEvent.ShowText(Component.literal(hover)))
+                    .withHoverEvent(HoverEvent.ShowText(Component.literal(hoverText)))
             }
 
         sendComponent(clickableComponent, prefix = true)

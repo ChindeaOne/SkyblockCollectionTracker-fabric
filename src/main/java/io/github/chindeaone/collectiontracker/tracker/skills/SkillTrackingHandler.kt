@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
 import io.github.chindeaone.collectiontracker.gui.OverlayManager.setSkillOverlayRendering
+import io.github.chindeaone.collectiontracker.gui.overlays.saveSkillMilestoneProgress
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.clearCache
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduleSkillFetch
@@ -164,6 +165,8 @@ object SkillTrackingHandler {
 
         isSkillMaxed = false
         setSkillOverlayRendering(false)
+
+        saveSkillMilestoneProgress()
 
         clearCache()
         clearAllCache()

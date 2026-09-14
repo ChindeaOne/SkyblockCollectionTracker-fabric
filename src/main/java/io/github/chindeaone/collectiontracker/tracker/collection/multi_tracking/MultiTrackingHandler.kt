@@ -9,6 +9,7 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackin
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
+import io.github.chindeaone.collectiontracker.gui.overlays.saveMilestonesProgress
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearCollectionCache
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
@@ -134,6 +135,8 @@ object MultiTrackingHandler  {
         } else {
             clearAllCache()
         }
+
+        saveMilestonesProgress(false)
 
         val now = System.currentTimeMillis()
         if (!restart) {

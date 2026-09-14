@@ -16,6 +16,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTracking
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.isUsingBazaar
 import io.github.chindeaone.collectiontracker.gui.OverlayManager.setTrackingOverlayRendering
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
+import io.github.chindeaone.collectiontracker.gui.overlays.saveMilestonesProgress
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearCollectionCache
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.fetchData
@@ -165,6 +166,8 @@ object TrackingHandler {
         } else {
             clearAllCache()
         }
+
+        saveMilestonesProgress(true)
 
         // Reset uptime
         val now = System.currentTimeMillis()

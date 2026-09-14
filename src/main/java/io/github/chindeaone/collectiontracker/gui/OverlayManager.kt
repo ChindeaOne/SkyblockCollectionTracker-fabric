@@ -35,23 +35,25 @@ object OverlayManager {
 
     fun overlayRegistration() {
         listOf(
-                CollectionOverlay(),
-                MultiCollectionOverlay(),
-                MiningStatsOverlay(),
-                CommissionsOverlay(),
-                SkillOverlay(),
-                ForagingStatsOverlay(),
-                SkyMallOverlay(),
-                LotteryOverlay(),
-                BeekeeperOverlay(),
-                PickaxeAbilityOverlay(),
-                AxeAbilityOverlay(),
-                DeployableOverlay(),
-                TemporaryBuffsOverlay(),
-                TitleOverlay(),
-                TimerOverlay(),
-                StopwatchOverlay(),
-                ColeweightOverlay()
+            CollectionOverlay(),
+            MultiCollectionOverlay(),
+            MiningStatsOverlay(),
+            CommissionsOverlay(),
+            SkillOverlay(),
+            ForagingStatsOverlay(),
+            SkyMallOverlay(),
+            LotteryOverlay(),
+            BeekeeperOverlay(),
+            PickaxeAbilityOverlay(),
+            AxeAbilityOverlay(),
+            DeployableOverlay(),
+            TemporaryBuffsOverlay(),
+            TitleOverlay(),
+            TimerOverlay(),
+            StopwatchOverlay(),
+            ColeweightOverlay(),
+            CollectionMilestoneOverlay(),
+            SkillMilestoneOverlay()
         ).forEach { add(it) }
     }
 

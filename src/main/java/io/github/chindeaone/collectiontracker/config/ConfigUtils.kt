@@ -219,6 +219,7 @@ val enableTamingTracking: Boolean get() = skillConfig.enableTamingTracking
 // Milestones Config Accessors
 val milestonesConfig: MilestonesConfig get() = trackingConfig.milestonesConfig
 val milestones: Map<String, Milestone> get() = milestonesConfig.milestones
+
 // Collection Milestones
 val collectionMilestonesConfig: CollectionMilestonesConfig get() = milestonesConfig.collectionMilestonesConfig
 val collectionMilestones: Boolean get() = collectionMilestonesConfig.collectionMilestones
@@ -284,6 +285,10 @@ object ConfigAccess {
     fun getColeweightStopwatchPosition(): Position = coleweightStopwatchPosition
 
     fun getColeweightTrackerPosition(): Position = coleweightTrackerPosition
+
+    fun getCollectionMilestonesPosition(): Position = collectionMilestonesPosition
+
+    fun getSkillMilestonesPosition(): Position = skillMilestonesPosition
 
     fun getUpdateStream(): About.UpdateStream = updateStream
 
@@ -508,6 +513,18 @@ object ConfigAccess {
     fun isStopwatchNotifierEnabled(): Boolean = stopwatchNotifier
 
     fun getStopwatchNotifierInterval(): Int = stopwatchNotifierInterval
+
+    fun isCollectionMilestonesEnabled(): Boolean = collectionMilestones
+
+    fun isCollectionMilestonesTitleNotificationEnabled(): Boolean = collectionMilestonesTitleNotification
+
+    fun isCollectionMilestonesSoundNotificationEnabled(): Boolean = collectionMilestonesSoundNotification
+
+    fun isSkillMilestonesEnabled(): Boolean = skillMilestones
+
+    fun isSkillMilestonesTitleNotificationEnabled(): Boolean = skillMilestonesTitleNotification
+
+    fun isSkillMilestonesSoundNotificationEnabled(): Boolean = skillMilestonesSoundNotification
 }
 
 /**

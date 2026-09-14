@@ -323,6 +323,38 @@ object RenderUtils {
         else -> AbilityTimes(0.0, 0.0, 0.0, 0.0)
     }
 
+    fun renderMilestoneStrings(context: GuiGraphicsExtractor, lines: List<String>, isCollection: Boolean = true) {
+        var y = 0
+
+        val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
+        val totalTextHeight = lines.size * font.lineHeight
+
+        val padding = 8
+        val overlayW = maxTextWidth + padding * 2
+        val overlayH = totalTextHeight + padding * 2
+
+        val radius = (overlayH / 12).coerceAtLeast(1)
+
+        drawLayeredOutline(
+            context = context,
+            x = -padding,
+            y = -padding,
+            width = overlayW,
+            height = overlayH,
+            radius = radius,
+            outlineShade = Colors.DARK_GRAY.color,
+            accentColor = Colors.GOLD.color
+        )
+
+        for (line in lines) {
+            val milestoneName = line.substringBefore(": ").trim()
+            val color = if (isCollection) ColorUtils.collectionColors[milestoneName.lowercase()] ?: Colors.GREEN.color else ColorUtils.skillColors[milestoneName] ?: Colors.GREEN.color
+
+            drawHelper(line, context, y, color)
+            y += font.lineHeight
+        }
+    }
+
     fun drawEditorHudText(context: GuiGraphicsExtractor, activePosition: Position?) {
         if (activePosition != null) {
             val x = ScaleUtils.mouseX + 12
@@ -519,6 +551,7 @@ object RenderUtils {
         context.fill(x2 - 1, y1, x2, y2, borderColor) // Right
     }
 
+    @Suppress("SameParameterValue")
     private fun drawRoundedRect(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
         if (radius <= 0) {
             context.fill(x, y, x + width, y + height, color)
