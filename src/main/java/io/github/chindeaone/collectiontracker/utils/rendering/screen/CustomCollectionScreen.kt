@@ -2,70 +2,58 @@ package io.github.chindeaone.collectiontracker.utils.rendering.screen
 
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
+import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
+import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseButton
+import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseListScreen
 import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 
 class CustomCollectionScreen(
     private val collectionList: List<String>,
     private val onCancel: Runnable? = null
-) : Screen(Component.literal("Enter custom collection value")) {
+) : BaseListScreen(null) {
 
     private val map = mutableMapOf<String, EditBox>()
     private var confirmed = false
 
-    override fun init() {
-        if (collectionList.isEmpty()) {
-            ChatUtils.sendMessage("§cNo collections to set custom values for.")
-            onClose()
-            return
-        }
+    override val screenTitle = Component.literal("Enter custom collection value")
 
-        val height = collectionList.size * 20
-        val startY = this.height / 2 - height / 2 - 20
+    override val entryCount: Int
+        get() = collectionList.size
 
-        collectionList.forEachIndexed { index, s ->
-            val yPos = startY + (index * 20)
-            val displayName = StringUtils.formatCollectionName(s)
-            val box = CollectionEditBox(
-                width / 2 - 25,
-                yPos,
-                100,
-                20,
-                Component.literal(displayName)
-            )
-            map[s] = box
-            addRenderableWidget(box)
-        }
-
-        val buttonY = startY + height + 10
+    override fun initButtons() {
         addRenderableWidget(
-            Button.builder(Component.literal("Confirm")) { _ ->
-                val values = map.mapValues { parseCustomValue(it.value.value) }
+            BaseButton(width / 2 - 40, panelBottom() - 30, 80, 20, { Component.literal("Confirm") }) {
+                val values = map.mapValues { NumbersUtils.parseValue(it.value.value) ?: 0L }
 
                 if (collectionList.size == 1 && !collectionList.contains("gemstone")) {
                     TrackingRates.setCollection(values.values.first())
                 } else {
                     MultiTrackingRates.setCollections(values)
                 }
+
                 ChatUtils.sendMessage("§eCustom collection values set:")
 
                 values.forEach { (name, value) ->
                     val displayName = StringUtils.formatCollectionName(name).toColor()
                     val formattedValue = NumbersUtils.formatNumber(value)
-                    val component = Component.literal(" §7- §f").append(displayName).append(": §a$formattedValue")
+                    val component = Component.literal(" §7- §f")
+                        .append(displayName)
+                        .append(": §a$formattedValue")
+
                     ChatUtils.sendComponent(component, false)
                 }
+
                 confirmed = true
                 onClose()
-            }.bounds(width / 2 - 100, buttonY, 200, 20).build()
+            }
         )
     }
 
@@ -76,71 +64,48 @@ class CustomCollectionScreen(
         super.onClose()
     }
 
-    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
-        extractMenuBackground(context)
-
-        context.centeredText(
-            MinecraftUtils.font,
-            title,
-            width / 2,
-            20,
-            0xFFFFFFFF.toInt()
-        )
+    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
+        super.extractRenderState(context, mouseX, mouseY, a)
 
         map.forEach { (name, box) ->
             val displayName = StringUtils.formatCollectionName(name)
             context.text(
                 MinecraftUtils.font,
                 displayName,
-                box.x - MinecraftUtils.font.width(name) - 10,
+                box.x - MinecraftUtils.font.width(displayName) - 10,
                 box.y + 5,
-                0xFFFFFFFF.toInt()
+                ColorUtils.collectionColors[name] ?: Colors.WHITE.color
             )
         }
-
-        super.extractRenderState(context, mouseX, mouseY, delta)
     }
 
-    override fun shouldCloseOnEsc(): Boolean = true
-
-    private fun parseCustomValue(value: String): Long {
-        val input = value.trim().lowercase()
-        if (input.isEmpty()) return 0L
-
-        val multiplier = when {
-            input.endsWith("k") -> 1_000L
-            input.endsWith("m") -> 1_000_000L
-            input.endsWith("b") -> 1_000_000_000L
-            else -> 1L
+    override fun rebuildEntryWidgets() {
+        if (collectionList.isEmpty()) {
+            ChatUtils.sendMessage("§cNo collections to set custom values for.")
+            onClose()
+            return
         }
 
-        val number = if (multiplier > 1L)
-            input.dropLast(1)
-        else {
-            input
-        }
+        map.clear()
 
-        return try {
-            (number.toDouble() * multiplier).toLong()
-        } catch (_: NumberFormatException) {
-            0L
-        }
-    }
+        collectionList.forEachIndexed { index, name ->
+            val y = contentTop + index * rowHeight - currentScrollOffset
 
-    class CollectionEditBox(
-        x: Int,
-        y: Int,
-        width: Int,
-        height: Int,
-        message: Component
-    ) : EditBox(MinecraftUtils.font, x, y, width, height, message) {
-
-        override fun insertText(input: String) {
-            val filtered = input.filter {
-                it.isDigit() || it == '.' || it == ',' || it.lowercaseChar() in listOf('k', 'm', 'b')
+            if (y + 10 < contentTop || y > contentBottom - 10) {
+                return@forEachIndexed
             }
 
-            super.insertText(filtered)
+            val displayName = StringUtils.formatCollectionName(name)
+
+            val box = createInputBox(
+                "",
+                width / 2 - 25,
+                y,
+                displayName
+            )
+
+            map[name] = box
+            addRenderableWidget(box)
         }
     }
 }
