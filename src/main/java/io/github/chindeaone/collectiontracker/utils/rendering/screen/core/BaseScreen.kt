@@ -84,7 +84,7 @@ open class BaseScreen(
         context.fill(right - 1, top, right, bottom, border)
 
         // header separator
-        context.fill(left, top + 35, right, top + 36, ScreenColors.PANEL_HEADER.color)
+        context.fill(left + 1, top + 35, right - 1, top + 36, ScreenColors.PANEL_HEADER.color)
     }
 
     private fun drawTitle(context: GuiGraphicsExtractor) {
