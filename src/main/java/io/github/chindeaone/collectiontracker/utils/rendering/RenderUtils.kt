@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils.rendering
 
-import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.ConfigAccess
@@ -444,33 +443,7 @@ object RenderUtils {
         context.pose().popMatrix()
     }
 
-    fun renderChangelog(context: GuiGraphicsExtractor, scrollOffset: Int) {
-        val rawNotes = RepoUtils.latestNotes ?: return
-        if (rawNotes.isEmpty()) return
-        val footerIndex = rawNotes.indexOf("**Full Changelog**")
-        val cleanNotes = if (footerIndex != -1) rawNotes.substring(0, footerIndex) else rawNotes
-
-        val screenWidth = context.guiWidth()
-        val screenHeight = context.guiHeight()
-
-        val overlayWidth = screenWidth / 2
-        val overlayHeight = (screenHeight * 0.75f).toInt()
-        val startX = (screenWidth - overlayWidth) / 2
-        val startY = (screenHeight - overlayHeight) / 2
-
-        drawRoundedRect(context, startX - 10, startY - 10, overlayWidth + 20, overlayHeight + 20, 8, -0x6f000000)
-
-        // Render current version first
-        SkyblockCollectionTracker.VERSION.let { version ->
-            context.centeredText(font, "Version: $version", screenWidth / 2, startY - 20, Colors.GREEN.color)
-        }
-
-        context.enableScissor(startX, startY, startX + overlayWidth, startY + overlayHeight)
-        renderChangelogLines(context, cleanNotes, startX, startY - scrollOffset, overlayWidth, startY, overlayHeight)
-        context.disableScissor()
-    }
-
-    private fun renderChangelogLines(context: GuiGraphicsExtractor, text: String, startX: Int, startY: Int, overlayWidth: Int, limitStartY: Int, limitHeight: Int) {
+    fun renderChangelogLines(context: GuiGraphicsExtractor, text: String, startX: Int, startY: Int, overlayWidth: Int, limitStartY: Int, limitHeight: Int) {
         val lines = text.split(Regex("\r?\n"))
         var currentY = startY
         val referenceRegex = Regex("""\(#\d+\)""")

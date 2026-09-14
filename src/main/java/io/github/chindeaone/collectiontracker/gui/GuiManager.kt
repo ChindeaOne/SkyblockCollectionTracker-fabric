@@ -6,7 +6,7 @@ package io.github.chindeaone.collectiontracker.gui
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.configManager
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.screenToOpen
 import io.github.chindeaone.collectiontracker.config.ModConfig
-import io.github.chindeaone.collectiontracker.gui.overlays.ChangelogOverlay
+import io.github.chindeaone.collectiontracker.utils.rendering.screen.ChangelogScreen
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyTitle
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.milestone.MilestoneScreen
@@ -61,7 +61,7 @@ object GuiManager {
     }
 
     fun openChangelog() {
-        openScreen(::ChangelogOverlay)
+        openScreen(::ChangelogScreen)
     }
 
     fun openGuiTitlePositionEditor() {
