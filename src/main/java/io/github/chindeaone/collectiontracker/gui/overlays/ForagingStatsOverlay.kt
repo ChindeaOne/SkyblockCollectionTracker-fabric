@@ -6,7 +6,7 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser
 
 class ForagingStatsOverlay : AbstractOverlay() {
-    private var lastLines: List<String> = emptyList()
+    private var cachedLines: List<String> = emptyList()
 
     override val overlayLabel: String = "Foraging Stats"
 
@@ -18,9 +18,9 @@ class ForagingStatsOverlay : AbstractOverlay() {
         if (!isEnabled) return
 
         val lines = lines
-        if (lines === lastLines) return
+        if (lines === cachedLines) return
 
-        lastLines = lines
+        cachedLines = lines
         super.updateDimensions()
     }
 

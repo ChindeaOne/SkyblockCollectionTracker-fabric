@@ -33,9 +33,7 @@ abstract class AbstractRotatingPerksOverlay: AbstractOverlay() {
 
     private fun updateLinesIfNeeded() {
         if (!isIslandAllowed) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 

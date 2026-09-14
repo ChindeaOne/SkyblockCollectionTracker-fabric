@@ -84,9 +84,7 @@ class StopwatchOverlay : AbstractOverlay() {
 
     private fun updateLinesIfNeeded() {
         if (!stopwatchRunning || !isEnabled) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 

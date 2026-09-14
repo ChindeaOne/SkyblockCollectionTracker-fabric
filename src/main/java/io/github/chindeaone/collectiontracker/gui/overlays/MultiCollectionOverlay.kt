@@ -57,9 +57,7 @@ class MultiCollectionOverlay : AbstractOverlay() {
 
     private fun updateLinesIfNeeded() {
         if (!isEnabled || !trackingDirty) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 

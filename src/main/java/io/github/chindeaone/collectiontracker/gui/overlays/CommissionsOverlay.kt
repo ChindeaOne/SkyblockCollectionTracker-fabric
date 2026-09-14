@@ -35,9 +35,7 @@ class CommissionsOverlay : AbstractOverlay() {
 
     private fun updateLinesIfNeeded() {
         if (!isEnabled) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 
@@ -45,9 +43,7 @@ class CommissionsOverlay : AbstractOverlay() {
 
         val commissions = CommissionWidget.commissions
         if (commissions.isEmpty()) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 

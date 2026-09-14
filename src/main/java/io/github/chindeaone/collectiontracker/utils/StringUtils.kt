@@ -109,8 +109,6 @@ object StringUtils {
         }
     }
 
-    fun formatValue(value: Long): String = NumbersUtils.formatValue(value)
-
     fun formatFloatOrPlaceholder(value: Float): String = if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
 
     fun formatNumberOrPlaceholder(value: Long): String = if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."

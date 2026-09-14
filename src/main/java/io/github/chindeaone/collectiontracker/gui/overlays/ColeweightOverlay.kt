@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightTrackerPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
@@ -17,7 +18,6 @@ import kotlin.concurrent.Volatile
 
 class ColeweightOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
-    private var lastFormattedTime: String = ""
 
     override val overlayLabel: String = "Coleweight Tracker"
 
@@ -48,6 +48,13 @@ class ColeweightOverlay : AbstractOverlay() {
         }
 
     private fun updateLinesIfNeeded() {
+        if (!isEnabled || !trackingDirty) {
+            cachedLines = emptyList()
+            return
+        }
+
+        if (ModLoader.clientTicks % 5L != 0L) return
+
         val lastUpdateTime = lastColeweightTime
         val timeAgo = if (lastUpdateTime > 0) {
             val totalSeconds = (System.currentTimeMillis() - lastUpdateTime) / 1000
@@ -55,10 +62,6 @@ class ColeweightOverlay : AbstractOverlay() {
         } else {
             ""
         }
-
-        if (cachedLines.isNotEmpty() && timeAgo == lastFormattedTime) return
-
-        lastFormattedTime = timeAgo
 
         val newLines = mutableListOf(
             "Coleweight: ${StringUtils.formatFloatOrPlaceholder(coleweightAmount)}",

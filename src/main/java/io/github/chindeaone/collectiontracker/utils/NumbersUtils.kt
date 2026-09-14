@@ -20,11 +20,7 @@ object NumbersUtils {
             return String.format(Locale.ROOT, "%,d", number)
         }
 
-        if (number < 1000) {
-            return number.toString()
-        }
-
-        return formatAbbreviated(number.toDouble())
+        return formatValue(number)
     }
 
     fun formatFloat(number: Float): String {

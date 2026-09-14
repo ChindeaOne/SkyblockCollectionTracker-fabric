@@ -60,9 +60,7 @@ class PickaxeAbilityOverlay : AbstractOverlay() {
 
     private fun updateLinesIfNeeded() {
         if (!isEnabled) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 

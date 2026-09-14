@@ -33,9 +33,7 @@ class DeployableOverlay : AbstractOverlay() {
 
     private fun updateLinesIfNeeded() {
         if (!isEnabled) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 
@@ -47,9 +45,7 @@ class DeployableOverlay : AbstractOverlay() {
         val currentBuffColor = buffColor
 
         if (currentBuff.isEmpty() || expireTime.isEmpty() || !currentNear) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 
@@ -57,9 +53,7 @@ class DeployableOverlay : AbstractOverlay() {
         try {
             timeLeft = expireTime.replace("s", "").toInt()
         } catch (_: NumberFormatException) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 

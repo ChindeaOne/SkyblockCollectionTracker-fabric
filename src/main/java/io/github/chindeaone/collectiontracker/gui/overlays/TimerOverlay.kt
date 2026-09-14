@@ -72,9 +72,7 @@ class TimerOverlay : AbstractOverlay() {
 
     private fun updateLinesIfNeeded() {
         if (hasEnded || !isEnabled) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-            }
+            cachedLines = emptyList()
             return
         }
 

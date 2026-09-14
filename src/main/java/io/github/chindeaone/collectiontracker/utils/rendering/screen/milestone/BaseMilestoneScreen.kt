@@ -7,7 +7,6 @@ import io.github.chindeaone.collectiontracker.config.categories.milestones.Miles
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
-import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseListScreen
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.Page
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -51,7 +50,7 @@ abstract class BaseMilestoneScreen(
         ConfigAccess.getMilestones().forEach { (name, milestone) ->
             val entry = Entry(
                 name,
-                StringUtils.formatValue(milestone.target),
+                NumbersUtils.formatValue(milestone.target),
                 milestone.isTotal
             )
 

@@ -59,11 +59,9 @@ class SkillOverlay : AbstractOverlay() {
 
     private fun updateLinesIfNeeded() {
         if (!isEnabled) {
-            if (cachedLines.isNotEmpty()) {
-                cachedLines = emptyList()
-                cachedSkillLines = emptyList()
-                cachedTamingLines = emptyList()
-            }
+            cachedLines = emptyList()
+            cachedSkillLines = emptyList()
+            cachedTamingLines = emptyList()
             return
         }
 
@@ -107,9 +105,7 @@ class SkillOverlay : AbstractOverlay() {
         val newSkillLines = mutableListOf<String>()
         var rankSuffix = ""
         if (leaderboard && currentSkillRank != -1) {
-            rankSuffix = if (currentSkillRank == 10001) {
-                " [Too low]"
-            } else " [#$currentSkillRank]"
+            rankSuffix = if (currentSkillRank == 10001) " [Too low]" else " [#$currentSkillRank]"
         }
         newSkillLines.add("$currentSkill Level: " + formatNumber(currentSkillLvl.toLong()) + rankSuffix)
         newSkillLines.add("Total $currentSkill XP: " + formatNumberOrPlaceholder(currentTotalXp))
@@ -138,9 +134,7 @@ class SkillOverlay : AbstractOverlay() {
         } else if (withTaming) {
             var tamingRankSuffix = ""
             if (leaderboard && currentTamingRank != -1) {
-                tamingRankSuffix = if (currentTamingRank == 10001) {
-                    " [Too low]"
-                } else " [#$currentTamingRank]"
+                tamingRankSuffix = if (currentTamingRank == 10001) " [Too low]" else " [#$currentTamingRank]"
             }
             newTamingLines.add("Taming Level: " + formatNumber(currentTamingLvl.toLong()) + tamingRankSuffix)
             newTamingLines.add("Total Taming XP: " + formatNumberOrPlaceholder(currentTamingTotalXp))
