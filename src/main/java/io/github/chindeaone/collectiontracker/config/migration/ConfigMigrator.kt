@@ -82,7 +82,7 @@ object ConfigMigrator {
                     val milestone = JsonObject().apply {
                         add("target", amount.deepCopy())
                         addProperty("isTotal", true)
-                        addProperty("accumulated", 0L)
+                        addProperty("progress", 0L)
                     }
 
                     milestones.add(collection, milestone)

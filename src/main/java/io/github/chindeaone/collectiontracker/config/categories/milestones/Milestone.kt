@@ -11,5 +11,5 @@ data class Milestone(
     var isTotal: Boolean = false,
 
     @field:Expose
-    var accumulated: Long = 0L
+    var progress: Long = 0L
 )

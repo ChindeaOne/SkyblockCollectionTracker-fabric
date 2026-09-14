@@ -96,22 +96,22 @@ abstract class BaseMilestoneScreen(
 
         val collectionMilestones = filledCollections.mapNotNull { entry ->
             NumbersUtils.parseValue(entry.value)?.let { target ->
-                val accumulated = currentMilestones[entry.name]?.accumulated ?: 0L
+                val progress = currentMilestones[entry.name]?.progress ?: 0L
                 entry.name to Milestone(
                     target = target,
                     isTotal = entry.isTotal,
-                    accumulated = if (entry.isTotal) 0L else accumulated
+                    progress = if (entry.isTotal) 0L else progress
                 )
             }
         }
 
         val skillMilestones = filledSkills.mapNotNull { entry ->
             NumbersUtils.parseValue(entry.value)?.let { target ->
-                val accumulated = currentMilestones[entry.name]?.accumulated ?: 0L
+                val progress = currentMilestones[entry.name]?.progress ?: 0L
                 entry.name to Milestone(
                     target = target,
                     isTotal = entry.isTotal,
-                    accumulated = if (entry.isTotal) 0L else accumulated
+                    progress = if (entry.isTotal) 0L else progress
                 )
             }
         }
