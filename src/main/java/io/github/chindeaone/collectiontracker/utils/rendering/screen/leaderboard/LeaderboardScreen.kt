@@ -24,10 +24,6 @@ class LeaderboardScreen(
             Page.SKILLS -> Component.literal("Skill Positions")
         }
 
-    override fun initContent() {
-        rebuildEntryWidgets()
-    }
-
     override fun rebuildEntryWidgets() {
         entryWidgets.clear()
 
@@ -61,7 +57,7 @@ class LeaderboardScreen(
                 updateEntry(index, name = it)
             }
 
-            val positionBox = createEditBox(entry.position, valueColumnX - 35, y).apply {
+            val positionBox = createInputBox(entry.position, valueColumnX - 35, y, "Position").apply {
                 setResponder { updateEntry(index, position = it) }
             }
 

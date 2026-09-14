@@ -27,6 +27,10 @@ abstract class BaseListScreen(
     private val maxScrollOffset: Int
         get() = ((entryCount * rowHeight) - visibleHeight).coerceAtLeast(0)
 
+    override fun initContent() {
+        rebuildEntryWidgets()
+    }
+
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
         if (mouseX >= panelLeft() && mouseX < panelRight() && mouseY >= contentTop && mouseY < contentBottom) {
             scrollOffset = (scrollOffset - scrollY.toInt() * 10).coerceIn(0, maxScrollOffset)

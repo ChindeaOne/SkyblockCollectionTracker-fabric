@@ -26,10 +26,6 @@ class MilestoneScreen(
             Page.SKILLS -> Component.literal("Skill Milestones")
         }
 
-    override fun initContent() {
-        rebuildEntryWidgets()
-    }
-
     override fun rebuildEntryWidgets() {
         entryWidgets.clear()
 
@@ -73,7 +69,7 @@ class MilestoneScreen(
                 updateEntry(index, name = it)
             }
 
-            val valueBox = createEditBox(entry.value, valueColumnX - 35, y).apply {
+            val valueBox = createInputBox(entry.value, valueColumnX - 35, y, "Milestone Value").apply {
                 setResponder { updateEntry(index, value = it) }
             }
 

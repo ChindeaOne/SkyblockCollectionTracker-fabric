@@ -5,14 +5,12 @@ import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.milestones.Milestone
 import io.github.chindeaone.collectiontracker.utils.Colors
-import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseListScreen
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.Page
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 
@@ -150,12 +148,6 @@ abstract class BaseMilestoneScreen(
     protected fun addNewEntry() {
         entries += Entry("", "", false)
     }
-
-    protected fun createEditBox(value: String, x: Int, y: Int): EditBox =
-        EditBox(MinecraftUtils.font, x, y, 70, 20, Component.literal("Milestone Value")).apply {
-            this.value = value
-            maxLength = 32
-        }
 
     protected fun drawHeaders(context: GuiGraphicsExtractor) {
         val y = panelTop() + 40

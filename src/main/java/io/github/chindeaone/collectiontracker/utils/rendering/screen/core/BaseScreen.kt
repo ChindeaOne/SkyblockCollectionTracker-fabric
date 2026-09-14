@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.ScreenColors
 import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
@@ -91,7 +92,7 @@ open class BaseScreen(
         context.text(font, screenTitle, width / 2 - font.width(screenTitle) / 2, panelTop() + 13, Colors.WHITE.color)
     }
 
-    private fun initButtons() {
+    protected open fun initButtons() {
         addRenderableWidget(
             BaseButton(width / 2 - 40, panelBottom() - 30, 80, 20, { Component.literal("Save") }) {
                 saveData()
@@ -127,6 +128,18 @@ open class BaseScreen(
 
         rebuildWidgets()
     }
+
+    protected open fun createInputBox(value: String, x: Int, y: Int, narrationText: String): EditBox =
+        object: EditBox(MinecraftUtils.font, x, y, 70, 20, Component.literal(narrationText)) {
+            override fun insertText(input: String) {
+                super.insertText(input.filter { isAllowedInput(it) })
+            }
+        }.apply {
+            this.value = value
+            maxLength = 32
+        }
+
+    private fun isAllowedInput(char: Char): Boolean = char.isDigit() || char in ".,kmbKMB"
 
     protected fun showError(message: String) {
         statusMessage = Component.literal("§c$message") to StatusType.ERROR
