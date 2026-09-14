@@ -8,8 +8,12 @@ import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
+import io.github.chindeaone.collectiontracker.gui.overlays.clearNotifiedMilestone
+import io.github.chindeaone.collectiontracker.gui.overlays.clearNotifiedSkillMilestone
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
@@ -631,16 +635,63 @@ object CommandRegistry {
                 GuiManager.openLeaderboardScreen()
                 1
             }
+            .then(ClientCommands.literal("remove")
+                .then(ClientCommands.argument("collection/skill", StringArgumentType.greedyString())
+                    .suggests(COLLECTION_AND_SKILL_SUGGESTIONS)
+                    .executes {
+                        if (!canUseCommand()) return@executes 0
+
+                        val target = StringArgumentType.getString(it, "collection/skill").trim()
+
+                        val leaderboardPositions = ConfigAccess.getLeaderboardPositions().toMutableMap()
+                        if (leaderboardPositions.remove(target) != null) {
+                            ConfigHelper.saveLeaderboardPositions(leaderboardPositions)
+                            ChatUtils.sendMessage("§aLeaderboard entry for '$target' has been removed.")
+                        } else {
+                            ChatUtils.sendMessage("§cNo leaderboard entry found for '$target'.")
+                        }
+                        1
+                    }
+                )
+            )
         )
 
         // sct milestones -> open custom screen to set custom milestones for collections and skills
-        .then(ClientCommands.literal("milestones")
+        .then(ClientCommands.literal("milestone")
             .executes {
                 if (!canUseCommand()) return@executes 0
 
                 GuiManager.openMilestonesScreen()
                 1
             }
+            .then(ClientCommands.literal("remove")
+                .then(ClientCommands.argument("collection/skill", StringArgumentType.greedyString())
+                    .suggests(COLLECTION_AND_SKILL_SUGGESTIONS)
+                    .executes {
+                        if (!canUseCommand()) return@executes 0
+
+                        val target = StringArgumentType.getString(it, "collection/skill").trim()
+                        val normalizedTarget = target.lowercase()
+
+                        val milestones = ConfigAccess.getMilestones().toMutableMap()
+
+                        if (milestones.remove(normalizedTarget) != null) {
+                            ConfigHelper.saveMilestones(milestones)
+
+                            if (CollectionsManager.isValidCollection(normalizedTarget)) {
+                                clearNotifiedMilestone(normalizedTarget)
+                            } else if (SkillUtils.isValidSkill(target)) {
+                                clearNotifiedSkillMilestone(normalizedTarget)
+                            }
+
+                            ChatUtils.sendMessage("§aMilestone entry for '$target' has been removed.")
+                        } else {
+                            ChatUtils.sendMessage("§cNo milestone entry found for '$target'.")
+                        }
+                        1
+                    }
+                )
+            )
         )
 
         // sct resetCommissionTracker -> resets commissions tracker

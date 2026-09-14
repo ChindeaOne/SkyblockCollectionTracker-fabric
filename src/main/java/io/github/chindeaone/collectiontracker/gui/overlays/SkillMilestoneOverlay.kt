@@ -133,7 +133,7 @@ class SkillMilestoneOverlay: AbstractOverlay() {
         ChatUtils.sendHoverableCommandComponent(
             message,
             "§cClick to remove this milestone",
-            "/sct milestones remove $name"
+            "/sct milestone remove $name"
         )
     }
 }
