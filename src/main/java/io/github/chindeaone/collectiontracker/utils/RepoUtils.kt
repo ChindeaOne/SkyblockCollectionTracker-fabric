@@ -15,6 +15,7 @@ object RepoUtils {
     @Volatile
     var latestBetaTag: String? = null
 
+    @Volatile
     var latestNotes: String? = null
 
     @Volatile
@@ -36,45 +37,20 @@ object RepoUtils {
         latestReleaseTag = normalizeTags(latestReleaseTag)
         latestBetaTag = normalizeTags(latestBetaTag)
 
-        val chosenTag = if (ConfigAccess.getUpdateStream() == About.UpdateStream.BETA) {
-            latestBetaTag
-        } else {
-            latestReleaseTag
-        }
+        val isBeta = ConfigAccess.getUpdateStream() == About.UpdateStream.BETA
 
-        val chosenNotes = if (ConfigAccess.getUpdateStream() == About.UpdateStream.BETA) {
-            latestBetaNotes
-        } else {
-            latestReleaseNotes
-        }
+        val chosenTag = if (isBeta) latestBetaTag else latestReleaseTag
+        val chosenNotes = if (isBeta) latestBetaNotes else latestReleaseNotes
 
-        if (chosenTag == null) {
-            latestVersion = null
-            latestNotes = null
+        latestNotes = chosenNotes
+        latestVersion = null
+
+        if (chosenTag == null || currentVersion == chosenTag) {
             return
         }
 
-        // If already on that same version -> no update
-        if (currentVersion == chosenTag) {
-            latestVersion = null
-            latestNotes = chosenNotes
-            return
-        }
-
-        // Prevent downgrades
-        val baseCompare = compareBaseVersion(chosenTag)
-
-        if (baseCompare > 0) {
-            // Target has higher major/minor/beta -> update
+        if (compareBaseVersion(chosenTag) >= 0) {
             latestVersion = chosenTag
-            latestNotes = chosenNotes
-        } else if (baseCompare == 0) {
-            latestVersion = chosenTag
-            latestNotes = chosenNotes
-        } else {
-            // Target is older -> don't update
-            latestVersion = null
-            latestNotes = null
         }
     }
 
