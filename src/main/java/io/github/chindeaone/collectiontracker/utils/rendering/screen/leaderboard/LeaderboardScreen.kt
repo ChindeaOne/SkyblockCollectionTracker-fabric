@@ -18,6 +18,8 @@ class LeaderboardScreen(
     private data class LeaderboardWidgets(val name: BaseDropdown, val position: EditBox, val remove: Button)
     private val entryWidgets = mutableListOf<LeaderboardWidgets>()
 
+    override val message: Component = Component.empty()
+
     override val screenTitle: Component
         get() = when (currentPage) {
             Page.COLLECTIONS -> Component.literal("Collection Positions")

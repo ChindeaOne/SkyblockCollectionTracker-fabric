@@ -28,7 +28,7 @@ class CollectionScreen(
 
     override val screenTitle = Component.literal("Collections")
 
-    private val message = Component.literal("ⓘ Couldn't reach Hypixel's API, so you have to set your collection values manually.")
+    override val message = Component.literal("ⓘ Couldn't reach Hypixel's API, so you have to set your collection values manually.")
 
     override fun initButtons() {
         addRenderableWidget(

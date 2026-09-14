@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.rendering.screen.core
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.network.chat.Component
 
 abstract class BaseListScreen(
     oldScreen: AbstractContainerScreen<*>?
@@ -12,6 +13,8 @@ abstract class BaseListScreen(
 
     override val contentHeight: Int
         get() = entryCount * rowHeight
+
+    protected abstract val message: Component
 
     override fun initContent() {
         rebuildEntryWidgets()

@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.rendering.screen.milestone
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseButton
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseDropdown
@@ -19,6 +20,8 @@ class MilestoneScreen(
 
     private data class MilestoneWidgets(val total: Button, val name: BaseDropdown, val value: EditBox, val remove: Button)
     private val entryWidgets = mutableListOf<MilestoneWidgets>()
+
+    override val message: Component = Component.literal("ⓘ `Total` means the milestone is based on your total collection/skill amount!")
 
     override val screenTitle: Component
         get() = when (currentPage) {
@@ -116,5 +119,7 @@ class MilestoneScreen(
         super.extractRenderState(context, mouseX, mouseY, a)
         drawHeaders(context)
         entryWidgets.forEach { it.name.renderDropdown(context, mouseX, mouseY) }
+
+        context.centeredText(MinecraftUtils.font, message, width / 2, panelBottom() + 2, Colors.GRAY.color)
     }
 }
