@@ -15,7 +15,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.Component
 
-class CustomCollectionScreen(
+class CollectionScreen(
     private val collectionList: List<String>,
     private val onCancel: Runnable? = null
 ) : BaseListScreen(null) {
@@ -23,10 +23,12 @@ class CustomCollectionScreen(
     private val map = mutableMapOf<String, EditBox>()
     private var confirmed = false
 
-    override val screenTitle = Component.literal("Enter custom collection value")
-
     override val entryCount: Int
         get() = collectionList.size
+
+    override val screenTitle = Component.literal("Collections")
+
+    private val message = Component.literal("ⓘ Couldn't reach Hypixel's API, so you have to set your collection values manually.")
 
     override fun initButtons() {
         addRenderableWidget(
@@ -77,6 +79,8 @@ class CustomCollectionScreen(
                 ColorUtils.collectionColors[name] ?: Colors.WHITE.color
             )
         }
+
+        context.centeredText(MinecraftUtils.font, message, width / 2, panelBottom() + 2, Colors.GRAY.color)
     }
 
     override fun rebuildEntryWidgets() {

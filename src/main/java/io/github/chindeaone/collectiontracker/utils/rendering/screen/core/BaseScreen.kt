@@ -89,7 +89,7 @@ open class BaseScreen(
 
     private fun drawTitle(context: GuiGraphicsExtractor) {
         if (screenTitle == Component.empty()) return
-        context.text(font, screenTitle, width / 2 - font.width(screenTitle) / 2, panelTop() + 13, Colors.WHITE.color)
+        context.centeredText(font, screenTitle, width / 2, panelTop() + 13, Colors.WHITE.color)
     }
 
     protected open fun initButtons() {

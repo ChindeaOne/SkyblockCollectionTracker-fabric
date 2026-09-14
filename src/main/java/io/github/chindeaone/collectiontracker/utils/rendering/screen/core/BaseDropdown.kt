@@ -81,7 +81,7 @@ open class BaseDropdown(
             val hovered = mouseX >= x && mouseX < x + width && mouseY >= entryY && mouseY < entryY + entryHeight
 
             context.fill(x, entryY, x + width, entryY + entryHeight, if (hovered) ScreenColors.DROPDOWN_HOVER.color else ScreenColors.DROPDOWN.color)
-            context.text(MinecraftUtils.font, Component.literal(entry), x + 5, entryY + (entryHeight - MinecraftUtils.font.lineHeight) / 2, Colors.WHITE.color)
+            context.text(MinecraftUtils.font, entry, x + 5, entryY + (entryHeight - MinecraftUtils.font.lineHeight) / 2, Colors.WHITE.color)
         }
     }
 
