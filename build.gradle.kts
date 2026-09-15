@@ -122,7 +122,7 @@ dependencies {
 
     implementation("com.terraformersmc:modmenu:${project.property("mod_menu_version")}")
 
-    implementation("maven.modrinth:l6YH9Als:J1GUYyGQ") // spark
+    implementation("maven.modrinth:l6YH9Als:RH6bRLqh") // spark
 
     shadowImpl("org.notenoughupdates.moulconfig:modern-${project.property("moulconfig_version")}") {
         exclude(group = "org.jetbrains.kotlin")
