@@ -7,4 +7,9 @@ object FarmingMapping {
         "The Farming Islands",
         "Garden"
     )
+
+    val farmingIslands = setOf(
+        "The Farming Islands",
+        "Garden"
+    )
 }

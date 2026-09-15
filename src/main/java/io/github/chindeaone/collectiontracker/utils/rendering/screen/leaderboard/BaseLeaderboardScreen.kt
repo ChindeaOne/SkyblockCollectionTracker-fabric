@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils.rendering.screen.leaderboard
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.leaderboardPositions
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
@@ -43,7 +43,7 @@ abstract class BaseLeaderboardScreen(
         collectionEntries.clear()
         skillEntries.clear()
 
-        ConfigAccess.getLeaderboardPositions().forEach { (name, position) ->
+        leaderboardPositions.forEach { (name, position) ->
             val entry = Entry(name, position.toString())
 
             if (CollectionsManager.isValidCollection(name)) {

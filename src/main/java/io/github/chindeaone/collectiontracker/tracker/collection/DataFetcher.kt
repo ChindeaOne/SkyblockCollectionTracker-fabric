@@ -6,7 +6,9 @@ import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.apiTracking
+import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
+import io.github.chindeaone.collectiontracker.config.includeWipedProfiles
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.CollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
@@ -47,7 +49,7 @@ object DataFetcher {
                 if (jsonData == null) {
                     logger.error("[SCT]: Failed to fetch data from the Hypixel API")
 
-                    if (ConfigAccess.isApiTrackingEnabled()) {
+                    if (apiTracking) {
                         CollectionTracker.cancelScheduledTask()
                     }
 
@@ -128,7 +130,7 @@ object DataFetcher {
     @OptIn(ExperimentalAtomicApi::class)
     fun fetchLeaderboardData(targetCollection: String): CompletableFuture<Void> {
         if (targetCollection.isEmpty()) return CompletableFuture.completedFuture(null)
-        if (!ConfigAccess.isCollectionLeaderboardEnabled()) return CompletableFuture.completedFuture(null)
+        if (!collectionLeaderboard) return CompletableFuture.completedFuture(null)
         if (!leaderboardFetchInProgress.compareAndSet(expectedValue = false, newValue = true)) return CompletableFuture.completedFuture(null)
 
         return try {
@@ -159,7 +161,7 @@ object DataFetcher {
                                 entryObject.get("username").asString,
                                 entryObject.get("rank").asInt,
                                 entryObject.get("amount").asLong,
-                                ConfigAccess.isIncludeWipedProfilesEnabled() && entryObject.get("wiped").asBoolean
+                                includeWipedProfiles && entryObject.get("wiped").asBoolean
                             )
                         )
                     }

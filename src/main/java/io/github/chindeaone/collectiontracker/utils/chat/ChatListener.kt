@@ -2,8 +2,22 @@ package io.github.chindeaone.collectiontracker.utils.chat
 
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.apiTracking
+import io.github.chindeaone.collectiontracker.config.attributeLevel
+import io.github.chindeaone.collectiontracker.config.coleweightRankingInChat
+import io.github.chindeaone.collectiontracker.config.cotfLevel
+import io.github.chindeaone.collectiontracker.config.cotmLevel
+import io.github.chindeaone.collectiontracker.config.disableBeekeeperChatMessages
+import io.github.chindeaone.collectiontracker.config.disableLotteryChatMessages
+import io.github.chindeaone.collectiontracker.config.disableSkyMallChatMessages
+import io.github.chindeaone.collectiontracker.config.enableBeekeeper
+import io.github.chindeaone.collectiontracker.config.enableLottery
+import io.github.chindeaone.collectiontracker.config.enableSkyMall
+import io.github.chindeaone.collectiontracker.config.farmingweightRankingInChat
+import io.github.chindeaone.collectiontracker.config.onlyOnFarmingIslands
+import io.github.chindeaone.collectiontracker.config.onlyOnMiningIslands
+import io.github.chindeaone.collectiontracker.config.serverLagProtection
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
@@ -14,9 +28,7 @@ import io.github.chindeaone.collectiontracker.utils.*
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
-import io.github.chindeaone.collectiontracker.utils.world.FarmingMapping
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
-import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
@@ -89,7 +101,7 @@ object ChatListener {
     fun sacksListener(component: Component) {
         if (!TrackingHandler.isTracking && !MultiTrackingHandler.isMultiTracking) return
         if (TrackingHandler.isPaused || MultiTrackingHandler.isMultiPaused) return
-        if (ConfigAccess.isApiTrackingEnabled()) return
+        if (apiTracking) return
 
         if (component.string.startsWith("[Sacks]")) parseSacksMessage(component)
     }
@@ -105,7 +117,7 @@ object ChatListener {
     }
 
     private fun setCooldownAttribute(text: String) {
-        if (ConfigAccess.hasCooldownAttributeMaxed()) return
+        if (attributeLevel == 10) return
 
         val value = Patterns.ATTRIBUTE.find(text.trimStart())?.groupValues?.get(1)
         if (value != null) {
@@ -147,7 +159,7 @@ object ChatListener {
     }
 
     private fun onCooldownListener(text: String) {
-        if (!ConfigAccess.isServerLagProtectionEnabled()) return
+        if (!serverLagProtection) return
 
         val match = Patterns.ON_COOLDOWN.find(text) ?: return
         val type = match.groupValues[1].trim()
@@ -193,7 +205,7 @@ object ChatListener {
     }
 
     private fun startAbilityTimeline(ability: String, snap: AbilityUtils.PickaxeAbilitySnapshot?) {
-        val cotm = ConfigAccess.getCotmLevel()
+        val cotm = cotmLevel
         val abilityLevel = if (cotm >= 2) 2 else 1
         val hasBlueCheese = snap?.hasBlueCheesePart == true
 
@@ -217,7 +229,7 @@ object ChatListener {
     }
 
     private fun startAxeAbilityTimeline(ability: String) {
-        val cotf = ConfigAccess.getCotfLevel()
+        val cotf = cotfLevel
         val abilityLevel = if (cotf >= 2) 2 else 1
 
         val finalCooldownSec = AbilityUtils.getBaseAxeCooldown(ability, abilityLevel).toDouble()
@@ -246,15 +258,15 @@ object ChatListener {
             }
             text.contains("Your Sky Mall buff changed!") -> {
                 expectingSkyMallBuff = true
-                return !ConfigAccess.isSkyMallEnabled()
+                return !enableSkyMall
             }
             text.contains("Your Lottery buff changed!") -> {
                 expectingLotteryBuff = true
-                return !ConfigAccess.isLotteryEnabled()
+                return !enableLottery
             }
             text.contains("Your Beekeeper buff changed") -> {
                 expectingBeekeeper = true
-                return !ConfigAccess.isBeekeeperEnabled()
+                return !enableBeekeeper
             }
             text.startsWith("New buff: ") -> {
                 val buffText = text.substringAfter("New buff: ").trim()
@@ -265,10 +277,10 @@ object ChatListener {
                     currentSkyMallBuff = compact
                     ConfigHelper.setLastSkyMallBuff(compact)
                     expectingSkyMallBuff = false
-                    if (ConfigAccess.isSkyMallChatMessagesDisabled()) return false // Don't render Sky Mall buff in chat, but update the buffs in overlay
+                    if (disableSkyMallChatMessages) return false // Don't render Sky Mall buff in chat, but update the buffs in overlay
 
                     // Compact messages if overlay is enabled
-                    if (ConfigAccess.isSkyMallEnabled()) {
+                    if (enableSkyMall) {
                         ChatUtils.sendMessage("§eNew §bSky Mall §ebuff§r: $compact", prefix = true)
                         return false
                     }
@@ -278,10 +290,10 @@ object ChatListener {
                     currentLotteryBuff = compact
                     ConfigHelper.setLastLotteryBuff(compact)
                     expectingLotteryBuff = false
-                    if (ConfigAccess.isLotteryChatMessagesDisabled()) return false // Don't render Lottery buff in chat, but update the buffs in overlay
+                    if (disableLotteryChatMessages) return false // Don't render Lottery buff in chat, but update the buffs in overlay
 
                     // Compact messages if overlay is enabled
-                    if (ConfigAccess.isLotteryEnabled()) {
+                    if (enableLottery) {
                         ChatUtils.sendMessage("§eNew §2Lottery §ebuff§r: $compact", prefix = true)
                         return false
                     }
@@ -291,9 +303,9 @@ object ChatListener {
                     currentBeekeeperBuff = compact
                     ConfigHelper.setLastBeekeeperBuff(compact)
                     expectingBeekeeper = false
-                    if (ConfigAccess.isBeekeeperChatMessagesDisabled()) return false
+                    if (disableBeekeeperChatMessages) return false
 
-                    if (ConfigAccess.isBeekeeperEnabled()) {
+                    if (enableBeekeeper) {
                         ChatUtils.sendMessage("§eNew §6Beekeeper §ebuff§r: $compact", prefix = true)
                         return false
                     }
@@ -344,11 +356,8 @@ object ChatListener {
     }
 
     fun coleweightHandle(message: Component): Component {
-        if (!ConfigAccess.isColeweightRankingInChat()) return message
-
-        if (ConfigAccess.isOnlyOnMiningIslands()) {
-            if (IslandTracker.currentMiningIsland in MiningMapping.miningIslands) return message
-        }
+        if (!coleweightRankingInChat) return message
+        if (onlyOnMiningIslands && !IslandTracker.isMiningIsland()) return message
 
         val text = message.string.removeColor()
         if (text.startsWith("[SCT]")) return message
@@ -363,11 +372,8 @@ object ChatListener {
     }
 
     fun farmingweightHandle(message: Component): Component {
-        if (!ConfigAccess.isFarmingweightRankingInChat()) return message
-
-        if (ConfigAccess.isOnlyOnFarmingIslands()) {
-            if (IslandTracker.currentForagingIsland in FarmingMapping.farmingAreas) return message
-        }
+        if (!farmingweightRankingInChat) return message
+        if (onlyOnFarmingIslands && !IslandTracker.isFarmingIsland()) return message
 
         val text = message.string.removeColor()
         if (text.startsWith("[SCT]")) return message

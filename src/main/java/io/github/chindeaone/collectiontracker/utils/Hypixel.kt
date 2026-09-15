@@ -15,9 +15,11 @@ import io.github.chindeaone.collectiontracker.api.serverapi.FetchRepoData
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
 import io.github.chindeaone.collectiontracker.updater.UpdaterManager
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.About
+import io.github.chindeaone.collectiontracker.config.hasCheckedUpdate
+import io.github.chindeaone.collectiontracker.config.updateStream
+import io.github.chindeaone.collectiontracker.config.updateType
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
@@ -117,9 +119,9 @@ object Hypixel {
         if (updateCheckPerformed) return
         updateCheckPerformed = true
 
-        logger.info("[SCT]: Update stream status: ${ConfigAccess.getUpdateStream()}")
+        logger.info("[SCT]: Update stream status: $updateStream")
 
-        if (ConfigAccess.getUpdateStream() == About.UpdateStream.NONE) {
+        if (updateStream == About.UpdateStream.NONE) {
             logger.info("[SCT]: Update stream is disabled.")
             return
         }
@@ -135,7 +137,7 @@ object Hypixel {
                 }
 
                 if (RepoUtils.latestVersion != null) {
-                    when (ConfigAccess.getUpdateType()) {
+                    when (updateType) {
                         About.UpdateType.AUTOMATIC -> {
                             ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e. It will be downloaded after closing the game.")
                             UpdaterManager.update()
@@ -150,7 +152,7 @@ object Hypixel {
                     logger.info("[SCT]: New version found: ${RepoUtils.latestVersion}")
                     ConfigHelper.disableUpdateChecks()
                 } else {
-                    if (!ConfigAccess.hasCheckedUpdate()) {
+                    if (!hasCheckedUpdate) {
                         ChatUtils.sendMessage("§aThe mod has been updated successfully.")
                         ChatUtils.sendCommandComponent("§eSee what changed here.", "/sct changelog")
                         ConfigHelper.enableUpdateChecks()

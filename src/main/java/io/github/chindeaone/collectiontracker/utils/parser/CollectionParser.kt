@@ -9,21 +9,21 @@ import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarPriceType
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getBazaarType
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getExtraStatsText
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getGemstoneVariant
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getStatsText
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTrackingOptions
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCollectionLeaderboardEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isLeaderboardPositionEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isPreviousPositionEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowExtraStats
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isUsingBazaar
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaarType
+import io.github.chindeaone.collectiontracker.config.bazaarPriceType
+import io.github.chindeaone.collectiontracker.config.bazaarType
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
+import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
+import io.github.chindeaone.collectiontracker.config.extraStatsText
+import io.github.chindeaone.collectiontracker.config.gemstoneVariant
+import io.github.chindeaone.collectiontracker.config.leaderboardPosition
+import io.github.chindeaone.collectiontracker.config.previousPosition
+import io.github.chindeaone.collectiontracker.config.showExtraStats
+import io.github.chindeaone.collectiontracker.config.statsText
+import io.github.chindeaone.collectiontracker.config.trackingOptions
+import io.github.chindeaone.collectiontracker.config.useBazaar
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.isEmpty
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
@@ -36,9 +36,9 @@ import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollection
 
 object CollectionParser {
     fun updateTrackingLines(list: MutableList<String>) {
-        if (getStatsText().isEmpty()) return
+        if (statsText.isEmpty()) return
 
-        for (id in getStatsText()) {
+        for (id in statsText) {
             when (id) {
                 CollectionConfig.OverlayText.COLLECTION -> addIfNotNull(list, handleCollection())
                 CollectionConfig.OverlayText.COLLECTION_SESSION -> addIfNotNull(list, handleCollectionSession())
@@ -50,7 +50,7 @@ object CollectionParser {
             }
         }
 
-        if (isCollectionLeaderboardEnabled()) {
+        if (collectionLeaderboard) {
             addIfNotNull(list, "")
             addIfNotNull(list, handleNextPosition())
             addIfNotNull(list, handleCollectionTillNextRank())
@@ -64,7 +64,7 @@ object CollectionParser {
     private fun handleNextPosition(): String? {
         if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
-        if (isLeaderboardPositionEnabled()) {
+        if (leaderboardPosition) {
             if (TrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
             if (TrackingRates.isNextWiped) return "Custom Position (${TrackingRates.nextRankUsername}-wiped): ${formatNumber(TrackingRates.nextRankAmount)}"
             return "Custom Position (${TrackingRates.nextRankUsername}): ${formatNumber(TrackingRates.nextRankAmount)}"
@@ -78,7 +78,7 @@ object CollectionParser {
     private fun handleCollectionTillNextRank(): String? {
         if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
-        if (isLeaderboardPositionEnabled()) {
+        if (leaderboardPosition) {
             if (TrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
             return "Till Custom Position: ${formatNumber(TrackingRates.collectionTillNextRank)}"
         }
@@ -90,7 +90,7 @@ object CollectionParser {
     private fun handleEta(): String? {
         if (isEmpty() || TrackingRates.playerCurrentRank == 1) return null
 
-        if (isLeaderboardPositionEnabled()) {
+        if (leaderboardPosition) {
             if (TrackingRates.etaToNextRank == null) return "ETA to Custom Position: Calculating..."
             return "ETA to Custom Position: ${TrackingRates.etaToNextRank}"
         }
@@ -100,7 +100,7 @@ object CollectionParser {
     }
 
     private fun handlePreviousPosition(): String? {
-        if (isEmpty() || !isPreviousPositionEnabled()) return null
+        if (isEmpty() || !previousPosition) return null
 
         if (TrackingRates.previousRankUsername == null) return "Passed: Calculating..."
         if (TrackingRates.isPreviousWiped) return "Passed (${TrackingRates.previousRankUsername}-wiped): ${formatNumber(TrackingRates.previousRankAmount)}"
@@ -108,7 +108,7 @@ object CollectionParser {
     }
 
     private fun handleCollectionAbovePreviousRank(): String? {
-        if (isEmpty() || !isPreviousPositionEnabled()) return null
+        if (isEmpty() || !previousPosition) return null
 
         if (TrackingRates.collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
         return "Difference: ${formatNumber(TrackingRates.collectionAbovePreviousRankAmount)}"
@@ -117,7 +117,7 @@ object CollectionParser {
     private fun handleMultiNextPosition(): String? {
         if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
-        if (isLeaderboardPositionEnabled()) {
+        if (leaderboardPosition) {
             if (MultiTrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
             if (MultiTrackingRates.isNextWiped) return "Custom Position (${MultiTrackingRates.nextRankUsername}-wiped): ${formatNumber(MultiTrackingRates.nextRankAmount)}"
             return "Custom Position (${MultiTrackingRates.nextRankUsername}): ${formatNumber(MultiTrackingRates.nextRankAmount)}"
@@ -131,7 +131,7 @@ object CollectionParser {
     private fun handleMultiCollectionTillNextRank(): String? {
         if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
-        if (isLeaderboardPositionEnabled()) {
+        if (leaderboardPosition) {
             if (MultiTrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
             return "Till Custom Position: ${formatNumber(MultiTrackingRates.collectionTillNextRank)}"
         }
@@ -143,7 +143,7 @@ object CollectionParser {
     private fun handleMultiEta(): String? {
         if (isEmpty() || MultiTrackingRates.playerCurrentRank == 1) return null
 
-        if (isLeaderboardPositionEnabled()) {
+        if (leaderboardPosition) {
             if (MultiTrackingRates.etaToNextRank == null) return "ETA to Custom Position: Calculating..."
             return "ETA to Custom Position: ${MultiTrackingRates.etaToNextRank}"
         }
@@ -153,7 +153,7 @@ object CollectionParser {
     }
 
     private fun handleMultiPreviousPosition(): String? {
-        if (isEmpty() || !isPreviousPositionEnabled()) return null
+        if (isEmpty() || !previousPosition) return null
 
         if (MultiTrackingRates.previousRankUsername == null) return "Passed: Calculating..."
         if (MultiTrackingRates.isPreviousWiped) return "Passed (${MultiTrackingRates.previousRankUsername}-wiped): ${formatNumber(MultiTrackingRates.previousRankAmount)}"
@@ -161,7 +161,7 @@ object CollectionParser {
     }
 
     private fun handleMultiCollectionAbovePreviousRank(): String? {
-        if (isEmpty() || !isPreviousPositionEnabled()) return null
+        if (isEmpty() || !previousPosition) return null
 
         if (MultiTrackingRates.collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
         return "Difference: ${formatNumber(MultiTrackingRates.collectionAbovePreviousRankAmount)}"
@@ -174,7 +174,7 @@ object CollectionParser {
     private fun handleCollection(): String? {
         if (CollectionsManager.collectionSource == "sacks") return null
         var rankSuffix = ""
-        if (isCollectionLeaderboardEnabled() && TrackingRates.playerCurrentRank != -1) {
+        if (collectionLeaderboard && TrackingRates.playerCurrentRank != -1) {
             rankSuffix = if (TrackingRates.playerCurrentRank == 10001) " [Too low]"
             else " [#${TrackingRates.playerCurrentRank}]"
         }
@@ -201,7 +201,7 @@ object CollectionParser {
 
         val hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0
 
-        if (!isUsingBazaar() && hasNpcPrice) {
+        if (!useBazaar && hasNpcPrice) {
             if (!TrackingRates.moneyMade.containsKey("NPC")) {
                 return "$/h (NPC): Calculating..."
             }
@@ -214,7 +214,7 @@ object CollectionParser {
             return "$/h (NPC): ${formatNumberOrPlaceholder(localMoneyPerHourNPC)}"
         }
 
-        if (!isUsingBazaar()) return null
+        if (!useBazaar) return null
 
         val localMoneyPerHour: Long
         val suffix = bazaarPriceTypeSuffix()
@@ -225,7 +225,7 @@ object CollectionParser {
             }
 
             "enchanted" -> {
-                if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) {
+                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
                     localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("Enchanted version$suffix", 0L)
                     return "$/h (Bazaar): ${formatNumberOrPlaceholder(localMoneyPerHour)}"
                 } else {
@@ -238,7 +238,7 @@ object CollectionParser {
             }
 
             "gemstone" -> {
-                localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("${getGemstoneVariant()}$suffix", 0L)
+                localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("${gemstoneVariant}$suffix", 0L)
                 return "$/h (Bazaar): ${formatNumberOrPlaceholder(localMoneyPerHour)}"
             }
 
@@ -251,7 +251,7 @@ object CollectionParser {
 
         val hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0
 
-        if (!isUsingBazaar() && hasNpcPrice) {
+        if (!useBazaar && hasNpcPrice) {
             if (!TrackingRates.moneyMade.containsKey("NPC")) {
                 return "$/h (NPC): Calculating..."
             }
@@ -264,7 +264,7 @@ object CollectionParser {
             return "$ made (NPC): ${formatNumberOrPlaceholder(localMoneyMadeNPC)}"
         }
 
-        if (!isUsingBazaar()) return null
+        if (!useBazaar) return null
 
         val localMoneyMade: Long
         val suffix = bazaarPriceTypeSuffix()
@@ -275,7 +275,7 @@ object CollectionParser {
             }
 
             "enchanted" -> {
-                if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) {
+                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
                     localMoneyMade = TrackingRates.moneyMade.getOrDefault("Enchanted version$suffix", 0L)
                     return "$ made (Bazaar): ${formatNumberOrPlaceholder(localMoneyMade)}"
                 } else {
@@ -288,7 +288,7 @@ object CollectionParser {
             }
 
             "gemstone" -> {
-                localMoneyMade = TrackingRates.moneyMade.getOrDefault("${getGemstoneVariant()}$suffix", 0L)
+                localMoneyMade = TrackingRates.moneyMade.getOrDefault("${gemstoneVariant}$suffix", 0L)
                 return "$ made (Bazaar): ${formatNumberOrPlaceholder(localMoneyMade)}"
             }
 
@@ -310,7 +310,7 @@ object CollectionParser {
     // Only if it has bazaar data and is enabled
     fun updateTrackingExtraLines(list: MutableList<String>) {
         list.add("§6§lExtra Stats:")
-        for (id in getExtraStatsText()) {
+        for (id in extraStatsText) {
             when (id) {
                 CollectionConfig.OverlayExtraText.BAZAAR_PRICE_TYPE -> addIfNotNull(list, handleBazaarPriceType())
                 CollectionConfig.OverlayExtraText.BAZAAR_ITEM -> addIfNotNull(list, handleBazaarItem())
@@ -320,7 +320,7 @@ object CollectionParser {
     }
 
     private fun handleBazaarPriceType(): String =
-        when (getBazaarPriceType()) {
+        when (bazaarPriceType) {
             Bazaar.BazaarPriceType.INSTANT_BUY -> "Price type: Instant Buy"
             Bazaar.BazaarPriceType.INSTANT_SELL -> "Price type: Instant Sell"
         }
@@ -328,7 +328,7 @@ object CollectionParser {
     private fun handleBazaarItem(): String? {
         when (collectionType) {
             "enchanted" -> {
-                if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) {
+                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
                     return "Bazaar item: ${formatBazaarItemName(BazaarCollectionsManager.enchantedRecipe.keys.iterator().next())}"
                 } else {
                     if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
@@ -337,7 +337,7 @@ object CollectionParser {
                     } else return "Bazaar item: ${formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keys.iterator().next())}"
                 }
             }
-            "gemstone" -> return "Bazaar variant: ${getGemstoneVariant()}"
+            "gemstone" -> return "Bazaar variant: $gemstoneVariant"
             else -> return null
         }
     }
@@ -345,9 +345,9 @@ object CollectionParser {
     private fun handleBazaarPrice(): String? {
         when (collectionType) {
             "enchanted" -> {
-                if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) {
+                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
                     val price =
-                        if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) BazaarPrices.enchantedInstantBuy else BazaarPrices.enchantedInstantSell
+                        if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) BazaarPrices.enchantedInstantBuy else BazaarPrices.enchantedInstantSell
                     if (price == 0f) {
                         return "Item price: Unknown price"
                     }
@@ -358,7 +358,7 @@ object CollectionParser {
                         return null
                     } else {
                         val price =
-                            if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) BazaarPrices.superEnchantedInstantBuy else BazaarPrices.superEnchantedInstantSell
+                            if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) BazaarPrices.superEnchantedInstantBuy else BazaarPrices.superEnchantedInstantSell
                         if (price == 0f) {
                             return "Item price: Unknown price"
                         }
@@ -368,8 +368,8 @@ object CollectionParser {
             }
 
             "gemstone" -> {
-                val price = if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) GemstonePrices.getInstantBuyPrice(getGemstoneVariant().toString())
-                else GemstonePrices.getInstantSellPrice(getGemstoneVariant().toString())
+                val price = if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) GemstonePrices.getInstantBuyPrice(gemstoneVariant.toString())
+                else GemstonePrices.getInstantSellPrice(gemstoneVariant.toString())
 
                 if (price == 0f) return "Variant price: Unknown price"
 
@@ -381,10 +381,11 @@ object CollectionParser {
     }
 
     fun updateMultiTrackingLines(list: MutableList<String>, expanded: MutableList<String>, showPrefixes: Boolean) {
+        val trackingOptions = trackingOptions
         for (coll in collectionList) {
             if ("gemstone" == coll) {
-                val mainExpanded = expanded.contains("gemstone") && getTrackingOptions() != MultiCollectionConfig.TrackingOptions.COLLECTION
-                val showingCollection = getTrackingOptions() == MultiCollectionConfig.TrackingOptions.COLLECTION
+                val mainExpanded = expanded.contains("gemstone") && trackingOptions != MultiCollectionConfig.TrackingOptions.COLLECTION
+                val showingCollection = trackingOptions == MultiCollectionConfig.TrackingOptions.COLLECTION
                 val prefix = if (showPrefixes && !showingCollection) (if (mainExpanded) "§e[-]§r " else "§e[+]§r ") else ""
 
                 if (mainExpanded) {
@@ -392,19 +393,17 @@ object CollectionParser {
 
                     GemstonePrices.multiGemstoneRecipes.forEach { (type: String?) ->
                         if (MultiTrackingRates.seenGemstones.contains(type)) {
-                            var line: String? = null
-                            when (getTrackingOptions()) {
-                                MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> line = handleCollectionPerHourMulti(type!!)
-                                MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> line = handleCollectionSessionMulti(type!!)
-                                MultiCollectionConfig.TrackingOptions.MONEY_RATE -> line = handleMoneyPerHourMulti(type!!)
-                                MultiCollectionConfig.TrackingOptions.MONEY_MADE -> line = handleMoneyMadeMulti(type!!)
-                                else -> {}
+                            val line = when (trackingOptions) {
+                                MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleCollectionPerHourMulti(type!!)
+                                MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleCollectionSessionMulti(type!!)
+                                MultiCollectionConfig.TrackingOptions.MONEY_RATE -> handleMoneyPerHourMulti(type!!)
+                                MultiCollectionConfig.TrackingOptions.MONEY_MADE -> handleMoneyMadeMulti(type!!)
                             }
-                            if (line != null) list.add("  $line")
+                            list.add("  $line")
                         }
                     }
                 } else {
-                    val line = when (getTrackingOptions()) {
+                    val line = when (trackingOptions) {
                         MultiCollectionConfig.TrackingOptions.COLLECTION -> handleCollectionMulti("gemstone")
                         MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleCollectionPerHourMulti("gemstone")
                         MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleCollectionSessionMulti("gemstone")
@@ -416,7 +415,7 @@ object CollectionParser {
                 continue
             }
 
-            val line = when (getTrackingOptions()) {
+            val line = when (trackingOptions) {
                 MultiCollectionConfig.TrackingOptions.COLLECTION -> handleCollectionMulti(coll)
                 MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleCollectionPerHourMulti(coll)
                 MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleCollectionSessionMulti(coll)
@@ -430,11 +429,13 @@ object CollectionParser {
 
         val suffix = bazaarPriceTypeSuffix()
         val typeKey = bazaarTypeKey()
-        val variant = getGemstoneVariant().toString()
+        val variant = gemstoneVariant.toString()
 
-        when (getTrackingOptions()) {
+        val useBazaar = useBazaar
+
+        when (trackingOptions) {
             MultiCollectionConfig.TrackingOptions.MONEY_RATE -> {
-                if (!isUsingBazaar()) {
+                if (!useBazaar) {
                     val total = MultiTrackingRates.moneyPerHourNPC.entries
                         .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
                         .sumOf { it.value }
@@ -451,7 +452,7 @@ object CollectionParser {
             }
 
             MultiCollectionConfig.TrackingOptions.MONEY_MADE -> {
-                if (!isUsingBazaar()) {
+                if (!useBazaar) {
                     val total = MultiTrackingRates.moneyMadeNPC.entries
                         .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
                         .sumOf { it.value }
@@ -472,7 +473,7 @@ object CollectionParser {
 
     private fun handleCollectionMulti(coll: String): String {
         var rankSuffix = ""
-        if ("gemstone" == coll && isCollectionLeaderboardEnabled() && MultiTrackingRates.playerCurrentRank != -1) {
+        if ("gemstone" == coll && collectionLeaderboard && MultiTrackingRates.playerCurrentRank != -1) {
             rankSuffix = if (MultiTrackingRates.playerCurrentRank == 10001) " [Too low]"
             else " [#${MultiTrackingRates.playerCurrentRank}]"
         }
@@ -495,9 +496,9 @@ object CollectionParser {
             "${formatCollectionName(coll)} Coll/h: Calculating..."
 
     private fun handleMoneyPerHourMulti(coll: String): String {
-        val useBazaar = isUsingBazaar()
+        val useBazaar = useBazaar
         val suffix = bazaarPriceTypeSuffix()
-        val variant = getGemstoneVariant().toString()
+        val variant = gemstoneVariant.toString()
 
         if ("gemstone" == coll) {
             var totalRate: Long = 0
@@ -515,7 +516,7 @@ object CollectionParser {
         if (!useBazaar) {
             var key: String = coll
             if (MultiTrackingRates.seenGemstones.contains(coll)) {
-                val variant = getGemstoneVariant().toString()
+                val variant = gemstoneVariant.toString()
                 key = (coll + "_" + variant).uppercase()
             }
 
@@ -555,9 +556,9 @@ object CollectionParser {
     }
 
     private fun handleMoneyMadeMulti(coll: String): String {
-        val useBazaar = isUsingBazaar()
+        val useBazaar = useBazaar
         val suffix = bazaarPriceTypeSuffix()
-        val variant = getGemstoneVariant().toString()
+        val variant = gemstoneVariant.toString()
 
         if ("gemstone" == coll) {
             var totalMoney: Long = 0
@@ -575,7 +576,7 @@ object CollectionParser {
         if (!useBazaar) {
             var key: String = coll
             if (MultiTrackingRates.seenGemstones.contains(coll)) {
-                val variant: String = getGemstoneVariant().toString()
+                val variant: String = gemstoneVariant.toString()
                 key = (coll + "_" + variant).uppercase()
             }
 
@@ -616,23 +617,22 @@ object CollectionParser {
 
     fun addToggleableSettingsLines(list: MutableList<String>) {
         list.add("")
-        val isUsingBazaar = isUsingBazaar()
-        if (isUsingBazaar) {
+        if (useBazaar) {
             list.add("§a[Bazaar Prices]")
             if (collectionList.contains("gemstone") || GemstonesManager.checkIfGemstone(collection)) {
-                list.add("§e[${getGemstoneVariant()}]")
+                list.add("§e[${gemstoneVariant}]")
             }
             if ("enchanted" == collectionType || CollectionsManager.multiCollectionTypes.containsValue("enchanted")) {
-                if (getBazaarType() == Bazaar.BazaarType.ENCHANTED_VERSION) {
+                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
                     list.add("§e[Enchanted version]")
                 } else {
                     list.add("§e[Super Enchanted version]")
                 }
             }
-            list.add("§e[Instant ${(if (getBazaarPriceType() == Bazaar.BazaarPriceType.INSTANT_BUY) "Buy" else "Sell")}]")
+            list.add("§e[Instant ${(if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) "Buy" else "Sell")}]")
             list.add("§e[NPC Prices]")
             if (TrackingHandler.isTracking) {
-                if (isShowExtraStats()) list.add("§a[Extra Stats]")
+                if (showExtraStats) list.add("§a[Extra Stats]")
                 else list.add("§e[Extra Stats]")
             }
         } else {
@@ -642,19 +642,19 @@ object CollectionParser {
     }
 
     fun bazaarPriceTypeSuffix(): String =
-        when (getBazaarPriceType()) {
+        when (bazaarPriceType) {
             Bazaar.BazaarPriceType.INSTANT_BUY -> "_INSTANT_BUY"
             Bazaar.BazaarPriceType.INSTANT_SELL -> "_INSTANT_SELL"
         }
 
     fun bazaarTypeKey(): String =
-        when (getBazaarType()) {
+        when (bazaarType) {
             Bazaar.BazaarType.ENCHANTED_VERSION -> "Enchanted version"
             Bazaar.BazaarType.SUPER_ENCHANTED_VERSION -> "Super Enchanted version"
         }
 
     private fun handleMultiLeaderboard(list: MutableList<String>) {
-        if (isCollectionLeaderboardEnabled()) {
+        if (collectionLeaderboard) {
             val tracked: MutableList<String> = collectionList
             if (tracked.size == 1 && tracked.contains("gemstone")) {
                 addIfNotNull(list, "")

@@ -8,8 +8,9 @@ import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightUtils
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.leaderboardPositions
+import io.github.chindeaone.collectiontracker.config.milestones
 import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.clearNotifiedMilestone
@@ -643,7 +644,7 @@ object CommandRegistry {
 
                         val target = StringArgumentType.getString(it, "collection/skill").trim()
 
-                        val leaderboardPositions = ConfigAccess.getLeaderboardPositions().toMutableMap()
+                        val leaderboardPositions = leaderboardPositions.toMutableMap()
                         if (leaderboardPositions.remove(target) != null) {
                             ConfigHelper.saveLeaderboardPositions(leaderboardPositions)
                             ChatUtils.sendMessage("§aLeaderboard entry for '$target' has been removed.")
@@ -673,7 +674,7 @@ object CommandRegistry {
                         val target = StringArgumentType.getString(it, "collection/skill").trim()
                         val normalizedTarget = target.lowercase()
 
-                        val milestones = ConfigAccess.getMilestones().toMutableMap()
+                        val milestones = milestones.toMutableMap()
 
                         if (milestones.remove(normalizedTarget) != null) {
                             ConfigHelper.saveMilestones(milestones)

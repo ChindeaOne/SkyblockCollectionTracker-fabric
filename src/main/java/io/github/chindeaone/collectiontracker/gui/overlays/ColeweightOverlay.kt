@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightTrackerPosition
+import io.github.chindeaone.collectiontracker.config.coleweightTrackerPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler.uptime
@@ -21,7 +21,7 @@ class ColeweightOverlay : AbstractOverlay() {
 
     override val overlayLabel: String = "Coleweight Tracker"
 
-    override val position: Position get() = getColeweightTrackerPosition()
+    override val position: Position get() = coleweightTrackerPosition
 
     override val isEnabled: Boolean get() = ColeweightTrackingHandler.isTracking
 

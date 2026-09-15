@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.commands
 
 import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.enableTamingTracking
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
@@ -35,7 +35,7 @@ object SkillTracker {
             SkillApiFetcher.fetchSkillsData()
                     .thenCompose { SkillFetcher.fetchSkillLeaderboardData(skillName) }
                     .thenCompose {
-                        if (ConfigAccess.isTamingTrackingEnabled()) SkillFetcher.fetchSkillLeaderboardData("Taming")
+                        if (enableTamingTracking) SkillFetcher.fetchSkillLeaderboardData("Taming")
                         else CompletableFuture.completedFuture(null)
                     }
                     .thenRun(SkillTrackingHandler::startTracking)

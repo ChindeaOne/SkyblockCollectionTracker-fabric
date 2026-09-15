@@ -1,9 +1,9 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getDeployablePosition
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isDeployableEnabled
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.deployablePosition
+import io.github.chindeaone.collectiontracker.config.enableDeployable
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser.buff
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser.buffColor
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser.isNear
@@ -14,9 +14,9 @@ class DeployableOverlay : AbstractOverlay() {
 
     override val overlayLabel: String = "Lantern Deployable"
 
-    override val position: Position get() = getDeployablePosition()
+    override val position: Position get() = deployablePosition
 
-    override val isEnabled: Boolean get() = isDeployableEnabled()
+    override val isEnabled: Boolean get() = enableDeployable
 
     override fun updateDimensions() {
         if (!isEnabled) return

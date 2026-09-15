@@ -1,8 +1,13 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import com.google.gson.JsonObject
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.dwarvenMetalRoutes
+import io.github.chindeaone.collectiontracker.config.enableDwarvenMetalRoutes
+import io.github.chindeaone.collectiontracker.config.enableMineshaftSpawnRoutes
+import io.github.chindeaone.collectiontracker.config.enablePureOresRoutes
+import io.github.chindeaone.collectiontracker.config.mineshaftSpawnRoutes
+import io.github.chindeaone.collectiontracker.config.pureOresRoutes
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentMiningIsland
@@ -67,7 +72,7 @@ object WaypointsUtils {
     fun updateCurrentIndex() {
         val category = currentCategory ?: return
         val list = waypointCategories[category] ?: return
-        val shouldCycle = category == ConfigAccess.getPureOresRoutes().type
+        val shouldCycle = category == pureOresRoutes.type
 
         while (currentIndex < list.size && isPlayerNear(list[currentIndex].second)) {
             currentIndex++
@@ -81,9 +86,9 @@ object WaypointsUtils {
     fun checkConfig() {
         if (currentMiningIsland == "Dwarven Mines") {
             val routes = listOf(
-                Triple(ConfigAccess.isMineshaftSpawnRoutesEnabled(), lastMineshaftEnabled, ConfigHelper::setMineshaftSpawnRoutesEnabled),
-                Triple(ConfigAccess.isDwarvenMetalRoutesEnabled(), lastMetalEnabled, ConfigHelper::setDwarvenMetalRoutesEnabled),
-                Triple(ConfigAccess.isPureOresRoutesEnabled(), lastOresEnabled, ConfigHelper::setPureOresRoutesEnabled)
+                Triple(enableMineshaftSpawnRoutes, lastMineshaftEnabled, ConfigHelper::setMineshaftSpawnRoutesEnabled),
+                Triple(enableDwarvenMetalRoutes, lastMetalEnabled, ConfigHelper::setDwarvenMetalRoutesEnabled),
+                Triple(enablePureOresRoutes, lastOresEnabled, ConfigHelper::setPureOresRoutesEnabled)
             )
 
             val selectedIndex = routes.indexOfFirst { it.first && !it.second }
@@ -96,14 +101,14 @@ object WaypointsUtils {
                 }
             }
 
-            lastMineshaftEnabled = ConfigAccess.isMineshaftSpawnRoutesEnabled()
-            lastMetalEnabled = ConfigAccess.isDwarvenMetalRoutesEnabled()
-            lastOresEnabled = ConfigAccess.isPureOresRoutesEnabled()
+            lastMineshaftEnabled = enableMineshaftSpawnRoutes
+            lastMetalEnabled = enableDwarvenMetalRoutes
+            lastOresEnabled = enablePureOresRoutes
 
             val category = when {
-                lastMineshaftEnabled -> ConfigAccess.getMineshaftSpawnRoutes().type
-                lastMetalEnabled -> ConfigAccess.getDwarvenMetalRoutes().type
-                lastOresEnabled -> ConfigAccess.getPureOresRoutes().type
+                lastMineshaftEnabled -> mineshaftSpawnRoutes.type
+                lastMetalEnabled -> dwarvenMetalRoutes.type
+                lastOresEnabled -> pureOresRoutes.type
                 else -> null
             }
 

@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.enableHeatmap
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
@@ -32,7 +32,7 @@ object DwarvenHeatmap {
     fun onClientTick(client: Minecraft) {
         if (ModLoader.clientTicks % 4L != 0L) return
 
-        if (!ConfigAccess.isHeatmapEnabled() || !ScoreboardUtils.isColdStatRelevant()) {
+        if (!enableHeatmap || !ScoreboardUtils.isColdStatRelevant()) {
             if (cachedHighlights.isNotEmpty()) cachedHighlights = emptyList()
             return
         }

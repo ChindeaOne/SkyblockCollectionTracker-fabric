@@ -3,8 +3,8 @@ package io.github.chindeaone.collectiontracker.tracker.skills
 import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher.fetchCollectionLeaderboard
 import io.github.chindeaone.collectiontracker.api.hypixelapi.SkillApiFetcher.fetchSkillsData
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isIncludeWipedProfilesEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
+import io.github.chindeaone.collectiontracker.config.includeWipedProfiles
+import io.github.chindeaone.collectiontracker.config.skillLeaderboard
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardEntry
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -66,7 +66,7 @@ object SkillFetcher {
 
     fun fetchSkillLeaderboardData(skillName: String): CompletableFuture<Void> {
         if (skillName.isEmpty()) return CompletableFuture.completedFuture(null)
-        if (!isSkillLeaderboardEnabled()) return CompletableFuture.completedFuture(null)
+        if (!skillLeaderboard) return CompletableFuture.completedFuture(null)
 
         val inProgress = skillLeaderboardFetchInProgress.computeIfAbsent(skillName.lowercase()) { `_`: String? -> AtomicBoolean(false) }
         if (!inProgress.compareAndSet(false, true)) return CompletableFuture.completedFuture(null)
@@ -99,7 +99,7 @@ object SkillFetcher {
                                 username,
                                 entryObject.get("rank").asInt,
                                 entryObject.get("amount").asLong,
-                                isIncludeWipedProfilesEnabled() && entryObject.get("wiped").asBoolean
+                                includeWipedProfiles && entryObject.get("wiped").asBoolean
                             )
                         )
                     }

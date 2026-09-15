@@ -1,10 +1,10 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getCommissionsPosition
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCommissionsOverlayEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCommissionsTrackingEnabled
+import io.github.chindeaone.collectiontracker.config.commissionsPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.enableCommissionsOverlay
+import io.github.chindeaone.collectiontracker.config.enableCommissionsTracking
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker.getCommissionsPerHour
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker.getCompletedCount
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker.getUptime
@@ -16,9 +16,9 @@ class CommissionsOverlay : AbstractOverlay() {
 
     override val overlayLabel: String = "Commissions"
 
-    override val position: Position get() = getCommissionsPosition()
+    override val position: Position get() = commissionsPosition
 
-    override val isEnabled: Boolean get() = isCommissionsOverlayEnabled()
+    override val isEnabled: Boolean get() = enableCommissionsOverlay
 
     override fun updateDimensions() {
         if (!isEnabled) return
@@ -47,7 +47,7 @@ class CommissionsOverlay : AbstractOverlay() {
             return
         }
 
-        val isTracking = isCommissionsTrackingEnabled()
+        val isTracking = enableCommissionsTracking
         val completed = getCompletedCount()
         val perHour = getCommissionsPerHour()
         val currentUptime = getUptime()

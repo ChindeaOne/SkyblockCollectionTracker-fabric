@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getAbilityPrecision
+import io.github.chindeaone.collectiontracker.config.precision
 
 object StringUtils {
 
@@ -96,7 +96,7 @@ object StringUtils {
     }
 
     fun formatTimeInSeconds(time: Double): String {
-        val precision = getAbilityPrecision()
+        val precision = precision
         val formatString = "%." + precision + "fs"
         return String.format(formatString, time)
     }

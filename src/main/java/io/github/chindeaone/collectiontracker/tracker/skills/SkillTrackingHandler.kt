@@ -2,8 +2,8 @@ package io.github.chindeaone.collectiontracker.tracker.skills
 
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
+import io.github.chindeaone.collectiontracker.config.enableTamingTracking
+import io.github.chindeaone.collectiontracker.config.skillLeaderboard
 import io.github.chindeaone.collectiontracker.gui.OverlayManager.setSkillOverlayRendering
 import io.github.chindeaone.collectiontracker.gui.overlays.saveSkillMilestoneProgress
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearAllCache
@@ -61,9 +61,9 @@ object SkillTrackingHandler {
         SkillTrackingRates.initTracking(skillLevel ?: 0, skillXp?.toLong() ?: 0L)
 
         SkillTrackingRates.updateSkillLeaderboardStats()
-        if (isTamingTrackingEnabled()) SkillTrackingRates.updateTamingLeaderboardStats()
+        if (enableTamingTracking) SkillTrackingRates.updateTamingLeaderboardStats()
 
-        if (!isSkillMaxed || isTamingTrackingEnabled()) {
+        if (!isSkillMaxed || enableTamingTracking) {
             // Track only via API
             scheduleSkillFetch(isSkillMaxed, skillXp?.toLong() ?: 0L, skillName)
         }
@@ -80,7 +80,7 @@ object SkillTrackingHandler {
 
         isTracking = true
         isPaused = false
-        leaderboardTrackingInitialized = isSkillLeaderboardEnabled()
+        leaderboardTrackingInitialized = skillLeaderboard
 
         startTime = now
         lastTime = 0

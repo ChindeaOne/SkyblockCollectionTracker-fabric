@@ -2,13 +2,13 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getSkillPosition
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isLeaderboardPositionEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isPreviousPositionEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.disableTamingTracking
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.enableTamingTracking
+import io.github.chindeaone.collectiontracker.config.leaderboardPosition
+import io.github.chindeaone.collectiontracker.config.previousPosition
+import io.github.chindeaone.collectiontracker.config.skillLeaderboard
+import io.github.chindeaone.collectiontracker.config.skillPosition
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
@@ -24,7 +24,7 @@ class SkillOverlay : AbstractOverlay() {
 
     override val overlayLabel: String = "Skill Tracker"
 
-    override val position: Position get() = getSkillPosition()
+    override val position: Position get() = skillPosition
 
     override val isEnabled: Boolean get() = SkillTrackingHandler.isTracking
 
@@ -39,7 +39,7 @@ class SkillOverlay : AbstractOverlay() {
                 context,
                 cachedSkillLines,
                 cachedTamingLines,
-                isTamingTrackingEnabled() && SkillTracker.skillName != "Taming"
+                enableTamingTracking && SkillTracker.skillName != "Taming"
             )
         }
     }
@@ -84,7 +84,7 @@ class SkillOverlay : AbstractOverlay() {
         val abovePreviousSkillRankAmount = SkillTrackingRates.abovePreviousSkillRankAmount
         val isPreviousSkillWiped = SkillTrackingRates.isPreviousSkillWiped
 
-        val withTaming = isTamingTrackingEnabled() && currentSkill != "Taming"
+        val withTaming = enableTamingTracking && currentSkill != "Taming"
         val currentTamingLvl = SkillTrackingRates.tamingLevel
         val currentTamingTotalXp = SkillTrackingRates.tamingXp + SkillTrackingRates.tamingXpGained
         val currentTamingGained = SkillTrackingRates.tamingXpGained
@@ -100,7 +100,7 @@ class SkillOverlay : AbstractOverlay() {
         val abovePreviousTamingRankAmount = SkillTrackingRates.abovePreviousTamingRankAmount
         val isPreviousTamingWiped = SkillTrackingRates.isPreviousTamingWiped
 
-        val leaderboard = isSkillLeaderboardEnabled()
+        val leaderboard = skillLeaderboard
 
         val newSkillLines = mutableListOf<String>()
         var rankSuffix = ""
@@ -186,7 +186,7 @@ class SkillOverlay : AbstractOverlay() {
         if (!leaderboardEnabled) return
         if (rank == 1) return
 
-        val customPos = isLeaderboardPositionEnabled()
+        val customPos = leaderboardPosition
         val posLabel = if (customPos) "Custom Position" else "Next Position"
         val tillLabel = if (customPos) "Till Custom Position" else "Till Next Position"
         val etaLabel = if (customPos) "ETA to Custom Position" else "ETA"
@@ -212,7 +212,7 @@ class SkillOverlay : AbstractOverlay() {
             list.add("$etaLabel: Calculating...")
         }
 
-        if (isPreviousPositionEnabled()) {
+        if (previousPosition) {
             list.add("")
             if (previousUser != null) {
                 val wipedSuffix = if (isPreviousWiped) "-wiped" else ""

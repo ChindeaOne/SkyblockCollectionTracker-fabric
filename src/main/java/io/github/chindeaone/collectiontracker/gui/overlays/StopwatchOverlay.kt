@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightStopwatchPosition
+import io.github.chindeaone.collectiontracker.config.coleweightStopwatchPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.TimeUtils
@@ -17,7 +17,7 @@ class StopwatchOverlay : AbstractOverlay() {
 
     override val overlayLabel: String = "Stopwatch Overlay"
 
-    override val position: Position get() = getColeweightStopwatchPosition()
+    override val position: Position get() = coleweightStopwatchPosition
 
     override val isEnabled: Boolean get() = stopwatchRunning
 

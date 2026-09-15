@@ -223,6 +223,142 @@ object ConfigCommandRegistry {
                             1
                         }
                 )
+                .then(
+                    ClientCommands.literal("toggleColeweightRankingInChat")
+                        .executes {
+                            val enabled = ConfigHelper.toggleColeweightRankingInChat()
+                            ChatUtils.sendMessage("§eColeweight ranking in chat " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleColeweightRankInNameTag")
+                        .executes {
+                            val enabled = ConfigHelper.toggleColeweightRankInNameTag()
+                            ChatUtils.sendMessage("§eColeweight rank in name tag " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleColeweightOnlyOnMiningIslands")
+                        .executes {
+                            val enabled = ConfigHelper.toggleColeweightOnlyOnMiningIslands()
+                            ChatUtils.sendMessage("§eColeweight rank in name tag in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleFarmingweightRankingInChat")
+                        .executes {
+                            val enabled = ConfigHelper.toggleFarmingweightRankingInChat()
+                            ChatUtils.sendMessage("§eFarmingweight ranking in chat " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleFarmingweightRankInNameTag")
+                        .executes {
+                            val enabled = ConfigHelper.toggleFarmingweightRankInNameTag()
+                            ChatUtils.sendMessage("§eFarmingweight rank in name tag " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleFarmingweightOnlyOnFarmingIslands")
+                        .executes {
+                            val enabled = ConfigHelper.toggleFarmingweightOnlyOnFarmingIslands()
+                            ChatUtils.sendMessage("§eFarmingweight rank in name tag in farming islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleHeatmap")
+                        .executes {
+                            val enabled = ConfigHelper.toggleHeatmap()
+                            ChatUtils.sendMessage("§eHeatmap " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleCollectionLeaderboard")
+                        .executes {
+                            val enabled = ConfigHelper.toggleCollectionLeaderboard()
+                            ChatUtils.sendMessage("§eCollection leaderboard " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleSkillLeaderboard")
+                        .executes {
+                            val enabled = ConfigHelper.toggleSkillLeaderboard()
+                            ChatUtils.sendMessage("§eSkill leaderboard " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleCollectionMilestones")
+                        .executes {
+                            val enabled = ConfigHelper.toggleCollectionMilestones()
+                            ChatUtils.sendMessage("§eCollection milestones " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleCollectionMilestonesTitleNotification")
+                        .executes {
+                            val enabled = ConfigHelper.toggleCollectionMilestonesTitleNotification()
+                            ChatUtils.sendMessage("§eCollection milestones title notification " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleCollectionMilestonesSoundNotification")
+                        .executes {
+                            val enabled = ConfigHelper.toggleCollectionMilestonesSoundNotification()
+                            ChatUtils.sendMessage("§eCollection milestones sound notification " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleSkillMilestones")
+                        .executes {
+                            val enabled = ConfigHelper.toggleSkillMilestones()
+                            ChatUtils.sendMessage("§eSkill milestones " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleSkillMilestonesTitleNotification")
+                        .executes {
+                            val enabled = ConfigHelper.toggleSkillMilestonesTitleNotification()
+                            ChatUtils.sendMessage("§eSkill milestones title notification " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleSkillMilestonesSoundNotification")
+                        .executes {
+                            val enabled = ConfigHelper.toggleSkillMilestonesSoundNotification()
+                            ChatUtils.sendMessage("§eSkill milestones sound notification " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleTimerNotifier")
+                        .executes {
+                            val enabled = ConfigHelper.toggleTimerNotifier()
+                            ChatUtils.sendMessage("§eTimer notifier " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
+                .then(
+                    ClientCommands.literal("toggleStopwatchNotifier")
+                        .executes {
+                            val enabled = ConfigHelper.toggleStopwatchNotifier()
+                            ChatUtils.sendMessage("§eStopwatch notifier " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            1
+                        }
+                )
         )
 
         dispatcher.register(sct)

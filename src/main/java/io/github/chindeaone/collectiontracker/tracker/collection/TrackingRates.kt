@@ -6,7 +6,7 @@ import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCollectionLeaderboardEnabled
+import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getNextRankEntry
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPlayerRank
@@ -188,7 +188,7 @@ object TrackingRates {
             CollectionOverlay.trackingDirty = true
         }
 
-        if (isCollectionLeaderboardEnabled()) updateLeaderboardStats()
+        if (collectionLeaderboard) updateLeaderboardStats()
     }
 
     private fun updateBazaarMaps(collectedSinceStart: Long, uptime: Long) {

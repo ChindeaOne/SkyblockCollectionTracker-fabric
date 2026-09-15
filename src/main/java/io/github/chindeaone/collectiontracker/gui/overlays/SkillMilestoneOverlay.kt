@@ -2,10 +2,14 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.milestones.Milestone
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.milestones
+import io.github.chindeaone.collectiontracker.config.skillMilestones
+import io.github.chindeaone.collectiontracker.config.skillMilestonesPosition
+import io.github.chindeaone.collectiontracker.config.skillMilestonesSoundNotification
+import io.github.chindeaone.collectiontracker.config.skillMilestonesTitleNotification
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
@@ -25,9 +29,9 @@ class SkillMilestoneOverlay: AbstractOverlay() {
 
     override val overlayLabel: String = "Skill Milestones Overlay"
 
-    override val position: Position get() = ConfigAccess.getSkillMilestonesPosition()
+    override val position: Position get() = skillMilestonesPosition
 
-    override val isEnabled: Boolean get() = SkillTrackingHandler.isTracking && ConfigAccess.isSkillMilestonesEnabled()
+    override val isEnabled: Boolean get() = SkillTrackingHandler.isTracking && skillMilestones
 
     private fun notificationTitle(name: String): Component = Component.literal("§6[§3§kd§6]")
         .append(Component.literal(" $name Milestone").withColor(ColorUtils.skillColors[name] ?: Colors.GREEN.color))
@@ -61,7 +65,7 @@ class SkillMilestoneOverlay: AbstractOverlay() {
 
         val skillName = SkillTracker.skillName
         val formatSkillName = skillName.lowercase()
-        val milestone = ConfigAccess.getMilestones()[formatSkillName]
+        val milestone = milestones[formatSkillName]
 
         if (milestone == null || !SkillUtils.isValidSkill(skillName)) {
             cachedLines = emptyList()
@@ -113,13 +117,13 @@ class SkillMilestoneOverlay: AbstractOverlay() {
     }
 
     private fun handleTitleNotification(name: String) {
-        if (ConfigAccess.isSkillMilestonesTitleNotificationEnabled()) {
+        if (skillMilestonesTitleNotification) {
             RenderUtils.showTitle(notificationTitle(name))
         }
     }
 
     private fun handleSoundNotification() {
-        if (ConfigAccess.isSkillMilestonesSoundNotificationEnabled()) {
+        if (skillMilestonesSoundNotification) {
             SoundUtils.playSound()
         }
     }
@@ -145,10 +149,10 @@ fun clearNotifiedSkillMilestone(name: String) {
 
 fun saveSkillMilestoneProgress() {
     val skillName = SkillTracker.skillName.lowercase()
-    val milestone = ConfigAccess.getMilestones()[skillName] ?: return
+    val milestone = milestones[skillName] ?: return
 
     if (milestone.isTotal) return
 
     milestone.progress += SkillTrackingRates.skillXpGained
-    ConfigHelper.saveMilestones(ConfigAccess.getMilestones())
+    ConfigHelper.saveMilestones(milestones)
 }

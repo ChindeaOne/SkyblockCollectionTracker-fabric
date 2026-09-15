@@ -1,7 +1,10 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.stopwatchNotifier
+import io.github.chindeaone.collectiontracker.config.stopwatchNotifierInterval
+import io.github.chindeaone.collectiontracker.config.timerNotifier
+import io.github.chindeaone.collectiontracker.config.timerNotifierInterval
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 
@@ -15,11 +18,11 @@ object TimeUtils {
 
         val now = System.currentTimeMillis()
 
-        if (ConfigAccess.isTimerNotifierEnabled()) {
+        if (timerNotifier) {
             val timerOverlay = OverlayManager.getTimerOverlay()
 
             if (timerOverlay != null && !timerOverlay.hasEnded) {
-                val interval = ConfigAccess.getTimerNotifierInterval() * 60_000L
+                val interval = timerNotifierInterval * 60_000L
 
                 if (now - lastTimerNotifier >= interval) {
                     lastTimerNotifier = now
@@ -28,11 +31,11 @@ object TimeUtils {
             }
         }
 
-        if (ConfigAccess.isStopwatchNotifierEnabled()) {
+        if (stopwatchNotifier) {
             val stopwatchOverlay = OverlayManager.getStopwatchOverlay()
 
             if (stopwatchOverlay != null && stopwatchOverlay.stopwatchRunning) {
-                val interval = ConfigAccess.getStopwatchNotifierInterval() * 60_000L
+                val interval = stopwatchNotifierInterval * 60_000L
 
                 if (now - lastStopwatchNotifier >= interval) {
                     lastStopwatchNotifier = now

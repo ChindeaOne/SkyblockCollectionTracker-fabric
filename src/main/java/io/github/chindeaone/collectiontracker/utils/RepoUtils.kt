@@ -2,8 +2,8 @@ package io.github.chindeaone.collectiontracker.utils
 
 import com.google.gson.JsonObject
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.categories.About
+import io.github.chindeaone.collectiontracker.config.updateStream
 
 object RepoUtils {
 
@@ -37,7 +37,7 @@ object RepoUtils {
         latestReleaseTag = normalizeTags(latestReleaseTag)
         latestBetaTag = normalizeTags(latestBetaTag)
 
-        val isBeta = ConfigAccess.getUpdateStream() == About.UpdateStream.BETA
+        val isBeta = updateStream == About.UpdateStream.BETA
 
         val chosenTag = if (isBeta) latestBetaTag else latestReleaseTag
         val chosenNotes = if (isBeta) latestBetaNotes else latestReleaseNotes

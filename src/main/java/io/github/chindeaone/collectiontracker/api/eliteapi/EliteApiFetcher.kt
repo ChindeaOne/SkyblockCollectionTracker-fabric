@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.api.eliteapi
 
 import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.includeWipedProfiles
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
@@ -149,7 +149,7 @@ object EliteApiFetcher {
     fun fetchCollectionLeaderboard(collection: String): CompletableFuture<String?> {
         return ApiManager.requestAsync("collection/leaderboard/${collection.replace(' ', '-')}", authHeaders(PlayerData.playerUUID, PlayerData.playerName).apply{
             remove("X-NAME")
-            put("X-CONTAINS-WIPED", if (ConfigAccess.isIncludeWipedProfilesEnabled()) "true" else "false")
+            put("X-CONTAINS-WIPED", if (includeWipedProfiles) "true" else "false")
         }).thenApply { response ->
                 when (response.statusCode()) {
                     200 -> response.body()

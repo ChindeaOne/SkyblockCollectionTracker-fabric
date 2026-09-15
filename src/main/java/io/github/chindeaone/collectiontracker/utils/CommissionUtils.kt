@@ -19,7 +19,10 @@
 
 package io.github.chindeaone.collectiontracker.utils
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.enableCommissionsKeybinds
+import io.github.chindeaone.collectiontracker.config.enableCommissionsOverlay
+import io.github.chindeaone.collectiontracker.config.enableCommissionsTracking
+import io.github.chindeaone.collectiontracker.config.keybindConfig
 import io.github.chindeaone.collectiontracker.mixins.AbstractContainerScreenAccessor
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
@@ -43,10 +46,10 @@ import java.util.*
 object CommissionUtils {
 
     private val keybinds: List<Int> get() = listOf(
-        ConfigAccess.getKeybindConfig().commission1,
-        ConfigAccess.getKeybindConfig().commission2,
-        ConfigAccess.getKeybindConfig().commission3,
-        ConfigAccess.getKeybindConfig().commission4
+        keybindConfig.commission1,
+        keybindConfig.commission2,
+        keybindConfig.commission3,
+        keybindConfig.commission4
     )
 
     private const val CLICK_DEBOUNCE_MS = 100L
@@ -140,7 +143,7 @@ object CommissionUtils {
 
         val wasCompleted = isCompletedCommission(clickedItem)
 
-        if (ConfigAccess.isCommissionsKeybindsEnabled()) {
+        if (enableCommissionsKeybinds) {
             gm.handleContainerInput(
                 screen.menu.containerId,
                 slotIndex,
@@ -152,7 +155,7 @@ object CommissionUtils {
             ContainerParser.wasDown.clear()
         }
 
-        if (wasCompleted && ConfigAccess.isCommissionsTrackingEnabled()) {
+        if (wasCompleted && enableCommissionsTracking) {
             CommissionsTracker.onCommissionClaimed()
         }
 
@@ -221,7 +224,7 @@ object CommissionUtils {
 
             if (!isNumberKey) return@AllowKeyPress true
             if (!shouldHandleCommissionTracking(container)) return@AllowKeyPress true
-            if (ConfigAccess.isCommissionsKeybindsEnabled()) return@AllowKeyPress false // block vanilla swapping
+            if (enableCommissionsKeybinds) return@AllowKeyPress false // block vanilla swapping
 
             val slot = getHoveredSlot(container) ?: return@AllowKeyPress true
 
@@ -278,13 +281,13 @@ object CommissionUtils {
     }
 
     private fun isCommissionScreen(screen: AbstractContainerScreen<*>): Boolean {
-        if (!ConfigAccess.isCommissionsOverlayEnabled()) return false
+        if (!enableCommissionsOverlay) return false
         return screen.title.string.contains("Commissions", ignoreCase = true)
     }
 
     private fun shouldBlockNumberKeys(screen: AbstractContainerScreen<*>): Boolean {
         if (!isCommissionScreen(screen)) return false
-        return ConfigAccess.isCommissionsKeybindsEnabled()
+        return enableCommissionsKeybinds
     }
 
     private fun shouldHandleCommissionTracking(screen: AbstractContainerScreen<*>): Boolean {

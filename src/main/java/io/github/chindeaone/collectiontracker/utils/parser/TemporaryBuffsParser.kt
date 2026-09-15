@@ -1,42 +1,46 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.refinedCacaoTime
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.fiestaFlaskTime
+import io.github.chindeaone.collectiontracker.config.filetTime
+import io.github.chindeaone.collectiontracker.config.powderPumpkinTime
+import io.github.chindeaone.collectiontracker.config.pristinePotatoTime
 import kotlin.time.Duration.Companion.hours
 
 object TemporaryBuffsParser {
 
     private val HOUR = 1.hours.inWholeMilliseconds
 
-    var refinedCacaoTime: Long = 0L
-    var filetTime: Long = 0L
-    var pristinePotatoTime: Long = 0L
-    var powderPumpkinTime: Long = 0L
-    var fiestaFlaskTime: Long = 0L
+    var refinedCacaoEndTime: Long = 0L
+    var filetEndTime: Long = 0L
+    var pristinePotatoEndTime: Long = 0L
+    var powderPumpkinEndTime: Long = 0L
+    var fiestaFlaskEndTime: Long = 0L
 
     fun loadDurations() {
         val now = System.currentTimeMillis()
-        refinedCacaoTime = now + ConfigAccess.getRefinedCacaoTime()
-        filetTime = now + ConfigAccess.getFiletTime()
-        pristinePotatoTime = now + ConfigAccess.getPristinePotatoTime()
-        powderPumpkinTime = now + ConfigAccess.getPowderPumpkinTime()
-        fiestaFlaskTime = now + ConfigAccess.getFiestaFlaskTime()
+        refinedCacaoEndTime = now + refinedCacaoTime
+        filetEndTime = now + filetTime
+        pristinePotatoEndTime = now + pristinePotatoTime
+        powderPumpkinEndTime = now + powderPumpkinTime
+        fiestaFlaskEndTime = now + fiestaFlaskTime
     }
 
     fun saveDurations() {
         val now = System.currentTimeMillis()
         ConfigHelper.setDuration(
-            refined = (refinedCacaoTime - now).coerceAtLeast(0L),
-            filet = (filetTime - now).coerceAtLeast(0L),
-            potato = (pristinePotatoTime - now).coerceAtLeast(0L),
-            pumpkin = (powderPumpkinTime - now).coerceAtLeast(0L),
-            fiesta = (fiestaFlaskTime - now).coerceAtLeast(0L)
+            refined = (refinedCacaoEndTime - now).coerceAtLeast(0L),
+            filet = (filetEndTime - now).coerceAtLeast(0L),
+            potato = (pristinePotatoEndTime - now).coerceAtLeast(0L),
+            pumpkin = (powderPumpkinEndTime - now).coerceAtLeast(0L),
+            fiesta = (fiestaFlaskEndTime - now).coerceAtLeast(0L)
         )
     }
 
     fun resetRefinedCacao() {
         ConfigHelper.setDuration(refined = HOUR)
-        refinedCacaoTime = System.currentTimeMillis() + HOUR
+        refinedCacaoEndTime = System.currentTimeMillis() + HOUR
     }
 
     fun resetConsumable(name: String?) {
@@ -44,19 +48,19 @@ object TemporaryBuffsParser {
         when (name) {
             "filet o' fortune" -> {
                 ConfigHelper.setDuration(filet = HOUR)
-                filetTime = now + HOUR
+                filetEndTime = now + HOUR
             }
             "chilled pristine potato" -> {
                 ConfigHelper.setDuration(potato = HOUR)
-                pristinePotatoTime = now + HOUR
+                pristinePotatoEndTime = now + HOUR
             }
             "powder pie" -> {
                 ConfigHelper.setDuration(pumpkin = HOUR)
-                powderPumpkinTime = now + HOUR
+                powderPumpkinEndTime = now + HOUR
             }
             "fiesta flask" -> {
                 ConfigHelper.setDuration(fiesta = HOUR)
-                fiestaFlaskTime = now + HOUR
+                fiestaFlaskEndTime = now + HOUR
             }
         }
     }

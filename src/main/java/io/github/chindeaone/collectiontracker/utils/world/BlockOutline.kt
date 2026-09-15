@@ -4,7 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.chindeaone.collectiontracker.api.waypointsapi.FetchWaypoints
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.drawLineToPrecisionMining
+import io.github.chindeaone.collectiontracker.config.enableDwarvenMetalRoutes
+import io.github.chindeaone.collectiontracker.config.enableMineshaftRoutes
+import io.github.chindeaone.collectiontracker.config.enableMineshaftSpawnRoutes
+import io.github.chindeaone.collectiontracker.config.enablePureOresRoutes
+import io.github.chindeaone.collectiontracker.config.heatmapOpacity
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
@@ -30,8 +35,8 @@ object BlockOutline {
         val currentIsland = IslandTracker.currentMiningIsland
         if (currentIsland != "Dwarven Mines" && currentIsland != "Mineshaft") return
 
-        if (currentIsland == "Dwarven Mines" && !ConfigAccess.isMineshaftSpawnRoutesEnabled() && !ConfigAccess.isDwarvenMetalRoutesEnabled() && !ConfigAccess.isPureOresRoutesEnabled()) return
-        if (currentIsland == "Mineshaft" && !ConfigAccess.isMineshaftRoutesEnabled()) return
+        if (currentIsland == "Dwarven Mines" && !enableMineshaftSpawnRoutes && !enableDwarvenMetalRoutes && !enablePureOresRoutes) return
+        if (currentIsland == "Mineshaft" && !enableMineshaftRoutes) return
 
         val camera = context.levelState().cameraRenderState
 
@@ -185,7 +190,7 @@ object BlockOutline {
         red: Float,
         green: Float,
         blue: Float,
-        alpha: Float = ConfigAccess.getHeatmapOpacity(),
+        alpha: Float = heatmapOpacity,
     ) {
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.HIGHLIGHT)
 
@@ -227,7 +232,7 @@ object BlockOutline {
         val b = color.blue / 255f
 
         drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, alpha)
-        if (ConfigAccess.isDrawLineToPrecisionMiningEnabled()) drawLineToBox(box, camera)
+        if (drawLineToPrecisionMining) drawLineToBox(box, camera)
     }
 
     private fun drawBox(

@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager
 import io.github.chindeaone.collectiontracker.utils.StringUtils
@@ -141,7 +141,7 @@ object MultiTrackingRates {
     }
 
     fun updateMultiLeaderboardStats() {
-        if (!ConfigAccess.isCollectionLeaderboardEnabled() || CollectionTracker.collectionList.size != 1 || !CollectionTracker.collectionList.contains("gemstone")) return
+        if (!collectionLeaderboard || CollectionTracker.collectionList.size != 1 || !CollectionTracker.collectionList.contains("gemstone")) return
 
         val currentGemstoneAmount = collectionAmounts["gemstone"] ?: 0L
         playerCurrentRank = LeaderboardManager.getPlayerRank(currentGemstoneAmount)

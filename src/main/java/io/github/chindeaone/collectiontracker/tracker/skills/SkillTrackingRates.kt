@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.tracker.skills
 
 import io.github.chindeaone.collectiontracker.commands.SkillTracker.skillName
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isSkillLeaderboardEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTamingTrackingEnabled
+import io.github.chindeaone.collectiontracker.config.enableTamingTracking
+import io.github.chindeaone.collectiontracker.config.skillLeaderboard
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getNextRankEntryForSkill
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPlayerRank
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPreviousRankEntryForSkill
@@ -63,7 +63,7 @@ object SkillTrackingRates {
         skillXp = xp
         totalSkillXp = xp
 
-        if (isTamingTrackingEnabled()) {
+        if (enableTamingTracking) {
             tamingLevel = SkillUtils.tamingLevel
             tamingXp = SkillUtils.tamingValue.toLong()
         }
@@ -120,7 +120,7 @@ object SkillTrackingRates {
     }
 
     fun updateSkillLeaderboardStats() {
-        if (!isSkillLeaderboardEnabled()) return
+        if (!skillLeaderboard) return
 
         currentSkillRank = getPlayerRank(skillName, totalSkillXp)
 
@@ -154,7 +154,7 @@ object SkillTrackingRates {
     }
 
     fun updateTamingLeaderboardStats() {
-        if (!isSkillLeaderboardEnabled() || !isTamingTrackingEnabled()) return
+        if (!skillLeaderboard || !enableTamingTracking) return
 
         currentTamingRank = getPlayerRank("Taming", tamingXp + tamingXpGained)
 

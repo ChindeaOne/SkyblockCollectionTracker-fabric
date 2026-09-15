@@ -1,9 +1,9 @@
 package io.github.chindeaone.collectiontracker.utils.rendering.screen.milestone
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.milestones.Milestone
+import io.github.chindeaone.collectiontracker.config.milestones
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
@@ -47,7 +47,7 @@ abstract class BaseMilestoneScreen(
         collectionEntries.clear()
         skillEntries.clear()
 
-        ConfigAccess.getMilestones().forEach { (name, milestone) ->
+        milestones.forEach { (name, milestone) ->
             val entry = Entry(
                 name,
                 NumbersUtils.formatValue(milestone.target),
@@ -91,7 +91,7 @@ abstract class BaseMilestoneScreen(
             return
         }
 
-        val currentMilestones = ConfigAccess.getMilestones()
+        val currentMilestones = milestones
 
         val collectionMilestones = filledCollections.mapNotNull { entry ->
             NumbersUtils.parseValue(entry.value)?.let { target ->

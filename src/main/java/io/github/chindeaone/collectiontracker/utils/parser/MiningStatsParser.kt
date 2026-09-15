@@ -1,6 +1,10 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.enableMiningStatsOverlay
+import io.github.chindeaone.collectiontracker.config.miningStatsOverlayInMiningIslandsOnly
+import io.github.chindeaone.collectiontracker.config.professionalMS
+import io.github.chindeaone.collectiontracker.config.showDetailedMiningFortune
+import io.github.chindeaone.collectiontracker.config.strongArmMS
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortune
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortuneValue
@@ -33,7 +37,7 @@ object MiningStatsParser {
         val formatted = mutableListOf<String>()
         if (raw.isEmpty()) return formatted
 
-        if (ConfigAccess.isMiningStatsOverlayEnabled() && ConfigAccess.isMiningStatsOverlayInMiningIslandsOnly() && !IslandTracker.isMiningIsland()) {
+        if (enableMiningStatsOverlay && miningStatsOverlayInMiningIslandsOnly&& !IslandTracker.isMiningIsland()) {
             return formatted
         }
 
@@ -126,8 +130,8 @@ object MiningStatsParser {
     private fun addMiningSpeedPerks(line: String, ctx: MiningContext) {
         val value = extractMiningSpeed(line)
 
-        val professional = ConfigAccess.getProfessionalMS()
-        val strongArm = ConfigAccess.getStrongArmMS()
+        val professional = professionalMS
+        val strongArm = strongArmMS
 
         val total = when (ctx.blockType) {
             "dwarven_metals" -> value + strongArm
@@ -203,7 +207,7 @@ private class MiningContext(
         val total = globalFortune + specificFortune
         if (total == 0) return ""
 
-        val showDetailed = ConfigAccess.isShowDetailedMiningFortune()
+        val showDetailed = showDetailedMiningFortune
 
         // Show specific fortune if available
         if (!specificFortuneName.isEmpty()) {

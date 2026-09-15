@@ -9,11 +9,11 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getGemstoneVariant
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isApiTrackingEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isCollectionLeaderboardEnabled
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTrackingRatesAtEndOfSession
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isUsingBazaar
+import io.github.chindeaone.collectiontracker.config.apiTracking
+import io.github.chindeaone.collectiontracker.config.collectionConfig
+import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
+import io.github.chindeaone.collectiontracker.config.gemstoneVariant
+import io.github.chindeaone.collectiontracker.config.useBazaar
 import io.github.chindeaone.collectiontracker.gui.OverlayManager.setTrackingOverlayRendering
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.saveMilestonesProgress
@@ -80,7 +80,7 @@ object TrackingHandler {
         fetchData(true)
 
         // Schedule API fetching
-        CollectionTracker.isApiTracking = isApiTrackingEnabled()
+        CollectionTracker.isApiTracking = apiTracking
 
         if (CollectionTracker.isApiTracking) {
             trackingTask = scheduler.scheduleWithFixedDelay({ fetchData(false) }, 5, 5, TimeUnit.MINUTES)
@@ -92,7 +92,7 @@ object TrackingHandler {
 
         isTracking = true
         isPaused = false
-        leaderboardTrackingInitialized = isCollectionLeaderboardEnabled()
+        leaderboardTrackingInitialized = collectionLeaderboard
 
         startTime = now
         lastTime = 0
@@ -157,7 +157,7 @@ object TrackingHandler {
     }
 
     private fun resetTrackingData(restart: Boolean) {
-        if (isShowTrackingRatesAtEndOfSession()) sendRates()
+        if (collectionConfig.showTrackingRatesAtEndOfSession) sendRates()
 
         resetVariables()
         // Clear cached data
@@ -309,7 +309,7 @@ object TrackingHandler {
         lines.add(Component.literal("   §aCollection tracked: §f").append(collectionDisplay.toColor()))
         lines.add(Component.literal("   §b${collectionDisplay} Made: §f${formatNumber(collectionMade)}   §bRate: §f${formatNumber(collectionPerHour)}/h"))
 
-        val useBazaar = isUsingBazaar()
+        val useBazaar = useBazaar
         val typeKey = CollectionParser.bazaarTypeKey()
         val suffix = CollectionParser.bazaarPriceTypeSuffix()
 
@@ -335,8 +335,10 @@ object TrackingHandler {
                 }
 
                 "gemstone" -> {
-                    val gMoney = moneyMade.getOrDefault("${getGemstoneVariant()}$suffix", 0L)
-                    val gRate = moneyPerHourBazaar.getOrDefault("${getGemstoneVariant()}$suffix", 0L)
+                    val gemstoneVariant = gemstoneVariant
+
+                    val gMoney = moneyMade.getOrDefault("$gemstoneVariant$suffix", 0L)
+                    val gRate = moneyPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
                     lines.add(Component.literal("   §6Money (Bazaar): §f$${formatNumber(gMoney)}  §6Rate: §f$${formatNumber(gRate)}/h"))
                 }
             }
@@ -397,8 +399,10 @@ object TrackingHandler {
                     }
 
                     "gemstone" -> {
-                        val low = lowestRatesPerHourBazaar.getOrDefault("${getGemstoneVariant()}$suffix", 0L)
-                        val high = highestRatesPerHourBazaar.getOrDefault("${getGemstoneVariant()}$suffix", 0L)
+                        val gemstoneVariant = gemstoneVariant
+
+                        val low = lowestRatesPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
+                        val high = highestRatesPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
 
                         lines.add(Component.literal("   §6Best money rate: §f$${formatNumber(high)}/h"))
                         lines.add(Component.literal("   §6Worst money rate: §f$${formatNumber(low)}/h"))

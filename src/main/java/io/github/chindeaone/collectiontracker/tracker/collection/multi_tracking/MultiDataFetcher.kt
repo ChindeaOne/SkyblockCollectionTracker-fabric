@@ -4,7 +4,7 @@ import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelApiFetcher
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.CollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiTracking
@@ -38,7 +38,7 @@ object MultiDataFetcher {
                 if (data == null) {
                     logger.error("[SCT]: Failed to fetch multi collection data from the Hypixel API.")
 
-                    if (ConfigAccess.isApiTrackingEnabled()) {
+                    if (apiTracking) {
                         CollectionTracker.cancelScheduledTask()
                     }
 

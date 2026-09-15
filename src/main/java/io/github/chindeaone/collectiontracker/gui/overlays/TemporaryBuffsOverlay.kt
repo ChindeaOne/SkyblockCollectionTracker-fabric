@@ -1,17 +1,16 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTempBuffPosition
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTempBuffExpiredTitle
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isTempBuffTrackerEnabled
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.enableTempBuffTracker
+import io.github.chindeaone.collectiontracker.config.showTempBuffExpiredTitle
+import io.github.chindeaone.collectiontracker.config.tempBuffPosition
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.fiestaFlaskTime
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.filetTime
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.powderPumpkinTime
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.pristinePotatoTime
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.refinedCacaoTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.fiestaFlaskEndTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.filetEndTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.powderPumpkinEndTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.pristinePotatoEndTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.refinedCacaoEndTime
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
 import net.minecraft.network.chat.Component
 
@@ -21,9 +20,9 @@ class TemporaryBuffsOverlay : AbstractOverlay() {
 
     override val overlayLabel: String = "Temporary Buffs"
 
-    override val position: Position get() = getTempBuffPosition()
+    override val position: Position get() = tempBuffPosition
 
-    override val isEnabled: Boolean get() = isTempBuffTrackerEnabled()
+    override val isEnabled: Boolean get() = enableTempBuffTracker
 
     override fun updateDimensions() {
         if (!isEnabled) return
@@ -49,11 +48,11 @@ class TemporaryBuffsOverlay : AbstractOverlay() {
         val now = System.currentTimeMillis()
         val newLines = mutableListOf<String>()
 
-        processBuff(newLines, "§6Refined Dark Cacao Truffle", refinedCacaoTime, now)
-        processBuff(newLines, "§9Filet O' Fortune", filetTime, now)
-        processBuff(newLines, "§5Chilled Pristine Potato", pristinePotatoTime, now)
-        processBuff(newLines, "§aPowder Pie", powderPumpkinTime, now)
-        processBuff(newLines, "§6Fiesta Flask", fiestaFlaskTime, now)
+        processBuff(newLines, "§6Refined Dark Cacao Truffle", refinedCacaoEndTime, now)
+        processBuff(newLines, "§9Filet O' Fortune", filetEndTime, now)
+        processBuff(newLines, "§5Chilled Pristine Potato", pristinePotatoEndTime, now)
+        processBuff(newLines, "§aPowder Pie", powderPumpkinEndTime, now)
+        processBuff(newLines, "§6Fiesta Flask", fiestaFlaskEndTime, now)
 
         cachedLines = newLines
     }
@@ -62,8 +61,8 @@ class TemporaryBuffsOverlay : AbstractOverlay() {
         val isActive = expireTime > now
         val wasActive = activeStates.getOrDefault(displayName, false)
 
-        if (wasActive && !isActive && isShowTempBuffExpiredTitle()) {
-            showTitle(Component.literal("$displayName §cExpired!"), getTitleDisplayTimer())
+        if (wasActive && !isActive && showTempBuffExpiredTitle) {
+            showTitle(Component.literal("$displayName §cExpired!"))
         }
         activeStates[displayName] = isActive
 

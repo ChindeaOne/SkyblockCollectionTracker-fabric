@@ -1,7 +1,9 @@
 package io.github.chindeaone.collectiontracker.tracker.collection
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.config.includeWipedProfiles
+import io.github.chindeaone.collectiontracker.config.leaderboardPosition
+import io.github.chindeaone.collectiontracker.config.leaderboardPositions
 
 object LeaderboardManager {
     @Volatile
@@ -120,8 +122,8 @@ object LeaderboardManager {
         }
 
         // Custom position
-        if (ConfigAccess.isLeaderboardPositionEnabled() && !ConfigAccess.getLeaderboardPositions().isEmpty()) {
-            val position = ConfigAccess.getLeaderboardPositionEntry("gemstone")
+        if (leaderboardPosition && !leaderboardPositions.isEmpty()) {
+            val position = leaderboardPositions["gemstone"]
 
             if (position != null) {
                 val playerEntry = getPlayerEntryRaw(amount)
@@ -144,8 +146,8 @@ object LeaderboardManager {
         }
 
         // Custom position
-        if (ConfigAccess.isLeaderboardPositionEnabled() && !ConfigAccess.getLeaderboardPositions().isEmpty()) {
-            val position = ConfigAccess.getLeaderboardPositionEntry(skill.lowercase())
+        if (leaderboardPosition && !leaderboardPositions.isEmpty()) {
+            val position = leaderboardPositions[skill.lowercase()]
 
             if (position != null) {
                 val playerEntry = getPlayerEntry(skill, amount)
@@ -185,8 +187,8 @@ object LeaderboardManager {
 
     fun getNextRankEntry(): LeaderboardEntry? {
         // Custom position
-        if (ConfigAccess.isLeaderboardPositionEnabled() && !ConfigAccess.getLeaderboardPositions().isEmpty()) {
-            val position = ConfigAccess.getLeaderboardPositionEntry(CollectionTracker.collection)
+        if (leaderboardPosition && !leaderboardPositions.isEmpty()) {
+            val position = leaderboardPositions[CollectionTracker.collection]
 
             if (position != null) {
                 val playerEntry = getPlayerEntryRaw(TrackingRates.collectionAmount)
@@ -233,7 +235,7 @@ object LeaderboardManager {
 
     fun findBinaryIndex(lb: List<LeaderboardEntry>, targetAmount: Long): Int {
         var index = lb.binarySearch(
-            LeaderboardEntry("", 0, targetAmount, ConfigAccess.isIncludeWipedProfilesEnabled()),
+            LeaderboardEntry("", 0, targetAmount, includeWipedProfiles),
             { a, b -> b.amount.compareTo(a.amount) })
 
         if (index < 0) {

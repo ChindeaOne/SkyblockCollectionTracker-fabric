@@ -1,7 +1,18 @@
 package io.github.chindeaone.collectiontracker.utils.tab
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.coleweightRankingInChat
+import io.github.chindeaone.collectiontracker.config.displayAxeAbility
+import io.github.chindeaone.collectiontracker.config.displayPickaxeAbility
+import io.github.chindeaone.collectiontracker.config.enableCommissionsOverlay
+import io.github.chindeaone.collectiontracker.config.enableDeployable
+import io.github.chindeaone.collectiontracker.config.enableForagingStatsOverlay
+import io.github.chindeaone.collectiontracker.config.enableLottery
+import io.github.chindeaone.collectiontracker.config.enableMineshaftRoutes
+import io.github.chindeaone.collectiontracker.config.enableMineshaftSpawnRoutes
+import io.github.chindeaone.collectiontracker.config.enableMiningStatsOverlay
+import io.github.chindeaone.collectiontracker.config.enableSkyMall
+import io.github.chindeaone.collectiontracker.config.farmingweightRankingInChat
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
@@ -38,18 +49,18 @@ object TabData {
             lastWorldSwitch = System.currentTimeMillis()
         }
 
-        if (!ConfigAccess.isMiningStatsOverlayEnabled() &&
-            !ConfigAccess.isCommissionsOverlayEnabled() &&
-            !ConfigAccess.isForagingStatsOverlayEnabled() &&
-            !ConfigAccess.isSkyMallEnabled() &&
-            !ConfigAccess.isLotteryEnabled() &&
-            !ConfigAccess.isPickaxeAbilityDisplayed() &&
-            !ConfigAccess.isAxeAbilityDisplayed() &&
-            !ConfigAccess.isMineshaftRoutesEnabled() &&
-            !ConfigAccess.isMineshaftSpawnRoutesEnabled() &&
-            !ConfigAccess.isDeployableEnabled() &&
-            !ConfigAccess.isColeweightRankingInChat() &&
-            !ConfigAccess.isFarmingweightRankingInChat()) return
+        if (!enableMiningStatsOverlay &&
+            !enableCommissionsOverlay &&
+            !enableForagingStatsOverlay &&
+            !enableSkyMall &&
+            !enableLottery &&
+            !displayPickaxeAbility &&
+            !displayAxeAbility &&
+            !enableMineshaftRoutes &&
+            !enableMineshaftSpawnRoutes &&
+            !enableDeployable &&
+            !coleweightRankingInChat &&
+            !farmingweightRankingInChat) return
 
         val newTab = readTab(client) ?: return
         if (newTab.isEmpty()) return

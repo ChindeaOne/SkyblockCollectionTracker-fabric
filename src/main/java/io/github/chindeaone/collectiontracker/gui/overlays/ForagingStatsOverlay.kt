@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getForagingStatsPosition
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isForagingStatsOverlayEnabled
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.enableForagingStatsOverlay
+import io.github.chindeaone.collectiontracker.config.foragingStatsPosition
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser
 
 class ForagingStatsOverlay : AbstractOverlay() {
@@ -10,9 +10,9 @@ class ForagingStatsOverlay : AbstractOverlay() {
 
     override val overlayLabel: String = "Foraging Stats"
 
-    override val position: Position get() = getForagingStatsPosition()
+    override val position: Position get() = foragingStatsPosition
 
-    override val isEnabled: Boolean get() = isForagingStatsOverlayEnabled()
+    override val isEnabled: Boolean get() = enableForagingStatsOverlay
 
     override fun updateDimensions() {
         if (!isEnabled) return

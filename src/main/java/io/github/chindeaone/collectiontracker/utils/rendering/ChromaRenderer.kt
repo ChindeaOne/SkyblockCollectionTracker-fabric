@@ -3,7 +3,8 @@ package io.github.chindeaone.collectiontracker.utils.rendering
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.systems.RenderPass
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.customCWColor
+import io.github.chindeaone.collectiontracker.config.customFWColor
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -18,8 +19,8 @@ object ChromaRenderer {
         val ticks = ModLoader.clientTicks + Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true)
 
         val rotation: Long = if (mode == 0) {
-            val cw = ConfigAccess.getCustomCWColor().timeForFullRotationInMillis.toLong()
-            if (cw > 0) cw else ConfigAccess.getCustomFWColor().timeForFullRotationInMillis.toLong()
+            val cw = customCWColor.timeForFullRotationInMillis.toLong()
+            if (cw > 0) cw else customFWColor.timeForFullRotationInMillis.toLong()
         } else {
             12000L
         }

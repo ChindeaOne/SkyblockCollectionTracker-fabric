@@ -2,9 +2,10 @@ package io.github.chindeaone.collectiontracker.utils.rendering
 
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.overlayTextColor
+import io.github.chindeaone.collectiontracker.config.titleDisplayTimer
+import io.github.chindeaone.collectiontracker.config.titlePosition
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils.font
@@ -57,7 +58,7 @@ object RenderUtils {
         }
     }
 
-    fun renderTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, withColor: Boolean) {
+    fun renderTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
 
         val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
@@ -69,7 +70,7 @@ object RenderUtils {
 
         val radius = (overlayH / 12).coerceAtLeast(1)
 
-        val color: Int = if (withColor) (ColorUtils.collectionColors[CollectionTracker.collection]) ?: Colors.GREEN.color else Colors.GREEN.color
+        val color: Int = if (overlayTextColor) (ColorUtils.collectionColors[CollectionTracker.collection]) ?: Colors.GREEN.color else Colors.GREEN.color
 
         if (color != Colors.GREEN.color) {
             drawLayeredOutline(
@@ -90,7 +91,7 @@ object RenderUtils {
         }
     }
 
-    fun renderMultiTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>, withColor: Boolean) {
+    fun renderMultiTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
 
         val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
@@ -100,6 +101,8 @@ object RenderUtils {
         val overlayW = maxTextWidth + padding * 2
         val overlayH = totalTextHeight + padding * 2
         val radius = (overlayH / 12).coerceAtLeast(1)
+
+        val withColor = overlayTextColor
 
         val color: Int = if (withColor) (ColorUtils.collectionColors["gemstone"]) ?: Colors.GREEN.color else Colors.GREEN.color
 
@@ -444,7 +447,7 @@ object RenderUtils {
         }
     }
 
-    fun showTitle(title: Component, duration: Long = getTitleDisplayTimer()) {
+    fun showTitle(title: Component, duration: Long = titleDisplayTimer) {
         if (titleQueue.isEmpty()) {
             titleQueue.add(QueuedTitle(title, System.currentTimeMillis() + duration))
         } else {
@@ -462,8 +465,8 @@ object RenderUtils {
     private fun renderTitle(context: GuiGraphicsExtractor, title: Component) {
         val screenWidth = context.guiWidth().toFloat()
         val screenHeight = context.guiHeight().toFloat()
-        val pos = ConfigAccess.getTitlePosition()
-        val scale = ConfigAccess.getTitleScale().scale * ScaleUtils.scale
+        val pos = titlePosition
+        val scale = pos.scale * ScaleUtils.scale
 
         val y = if (pos.y == 0) ((screenHeight - (pos.height * scale))/ 2f) else pos.y.toFloat()
         val yOffset = (pos.height - font.lineHeight) / 2f

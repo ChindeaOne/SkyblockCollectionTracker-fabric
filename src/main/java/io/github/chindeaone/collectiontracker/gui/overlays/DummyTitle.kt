@@ -1,8 +1,9 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.titlePosition
+import io.github.chindeaone.collectiontracker.config.titleScale
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
@@ -31,8 +32,8 @@ class DummyTitle(
 
         oldScreen?.extractRenderState(context, mouseX, mouseY, partialTicks)
 
-        val pos = ConfigAccess.getTitlePosition()
-        val totalScale = ConfigAccess.getTitleScale().scale * ScaleUtils.scale
+        val pos = titlePosition
+        val totalScale = titleScale.scale * ScaleUtils.scale
         if (pos.x == 0 && pos.y == 0) {
             val sw = (pos.width * totalScale).roundToInt()
             val sh = (pos.height * totalScale).roundToInt()
@@ -41,8 +42,7 @@ class DummyTitle(
             val centerY = (ScaleUtils.scaledHeight - sh) / 2
             ConfigHelper.setTitlePosition(centerX, centerY)
         }
-        val currentPos = ConfigAccess.getTitlePosition()
-        val displayPos = calculateDisplayPosition(currentPos, totalScale)
+        val displayPos = calculateDisplayPosition(pos, totalScale)
 
         RenderUtils.drawDummyFrame(context, displayPos, "Title Overlay")
 
@@ -54,8 +54,8 @@ class DummyTitle(
     override fun mouseClicked(event: MouseButtonEvent, doubled: Boolean): Boolean {
         val mx = event.x.toInt()
         val my = event.y.toInt()
-        val pos = ConfigAccess.getTitlePosition()
-        val totalScale = ConfigAccess.getTitleScale().scale * ScaleUtils.scale
+        val pos = titlePosition
+        val totalScale = titleScale.scale * ScaleUtils.scale
         val displayPos = calculateDisplayPosition(pos, totalScale)
 
         if (isMouseOver(mx, my, displayPos)) {
@@ -70,7 +70,7 @@ class DummyTitle(
 
     override fun mouseDragged(event: MouseButtonEvent, dragY: Double, e: Double): Boolean {
         if (dragging) {
-            val pos = ConfigAccess.getTitlePosition()
+            val pos = titlePosition
             ConfigHelper.setTitlePosition(pos.x, event.y.toInt() - dragOffsetY)
             return true
         }

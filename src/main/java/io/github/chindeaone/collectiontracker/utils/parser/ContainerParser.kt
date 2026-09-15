@@ -1,7 +1,13 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.cotfLevel
+import io.github.chindeaone.collectiontracker.config.cotmLevel
+import io.github.chindeaone.collectiontracker.config.enableBeekeeper
+import io.github.chindeaone.collectiontracker.config.enableLottery
+import io.github.chindeaone.collectiontracker.config.enableSkyMall
+import io.github.chindeaone.collectiontracker.config.professionalMS
+import io.github.chindeaone.collectiontracker.config.strongArmMS
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentBeekeeperBuff
@@ -79,10 +85,11 @@ object ContainerParser {
 
     private fun handleHotm(screen: AbstractContainerScreen<*>, client: Minecraft) {
         findCoreStack(screen).let { stack ->
-            if (ConfigAccess.getCotmLevel() == 10) return@let
+            val cotmLevel = cotmLevel
+            if (cotmLevel == 10) return@let
 
             val level = getTooltips(stack, client).getOrNull(1)?.split(" ")?.getOrNull(1)?.toIntOrNull() ?: return@let
-            if (level != ConfigAccess.getCotmLevel()) {
+            if (level != cotmLevel) {
                 ConfigHelper.setCotmLevel(level)
             }
         }
@@ -90,7 +97,7 @@ object ContainerParser {
         findBuffsStack(screen, "Sky Mall")?.let { stack ->
             val itemModel = stack.get(DataComponents.ITEM_MODEL)
 
-            if (itemModel == Identifier.withDefaultNamespace("coal") && ConfigAccess.isSkyMallEnabled()) {
+            if (itemModel == Identifier.withDefaultNamespace("coal") && enableSkyMall) {
                 currentSkyMallBuff = ""
                 ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
                 isPickaxeAbility = false
@@ -117,7 +124,7 @@ object ContainerParser {
                 ?.getOrNull(0)?.toIntOrNull()
                 ?: return@let
 
-            if (level != ConfigAccess.getProfessionalMS()) {
+            if (level != professionalMS) {
                 ConfigHelper.setProfessionalMS(level)
             }
         }
@@ -129,7 +136,7 @@ object ContainerParser {
                 ?.getOrNull(0)?.toIntOrNull()
                 ?: return@let
 
-            if (level != ConfigAccess.getStrongArmMS()) {
+            if (level != strongArmMS) {
                 ConfigHelper.setStrongArmMS(level)
             }
         }
@@ -140,10 +147,11 @@ object ContainerParser {
 
     private fun handleHotf(screen: AbstractContainerScreen<*>, client: Minecraft) {
         findCoreStack(screen).let { stack ->
-            if (ConfigAccess.getCotfLevel() == 5) return@let
+            val cotfLevel = cotfLevel
+            if (cotfLevel == 5) return@let
 
             val level = getTooltips(stack, client).getOrNull(1)?.split(" ")?.getOrNull(1)?.toIntOrNull() ?: return@let
-            if (level != ConfigAccess.getCotfLevel()) {
+            if (level != cotfLevel) {
                 ConfigHelper.setCotfLevel(level)
             }
         }
@@ -151,7 +159,7 @@ object ContainerParser {
         findBuffsStack(screen, "Lottery")?.let { stack ->
             val itemModel = stack.get(DataComponents.ITEM_MODEL)
 
-            if (itemModel == Identifier.withDefaultNamespace("pale_oak_button") && ConfigAccess.isLotteryEnabled()) {
+            if (itemModel == Identifier.withDefaultNamespace("pale_oak_button") && enableLottery) {
                 currentLotteryBuff = ""
                 ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
                 return@let
@@ -173,7 +181,7 @@ object ContainerParser {
 
             val itemModel = beekeeperStack.get(DataComponents.ITEM_MODEL)
 
-            if (itemModel == Identifier.withDefaultNamespace("pale_oak_button") && ConfigAccess.isBeekeeperEnabled()) {
+            if (itemModel == Identifier.withDefaultNamespace("pale_oak_button") && enableBeekeeper) {
                 currentBeekeeperBuff = ""
                 ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
                 return@let

@@ -60,6 +60,8 @@ object IslandTracker {
 
     fun isForagingIsland() = currentForagingIsland in ForagingMapping.foragingIslands
 
+    fun isFarmingIsland() = currentFarmingIsland in FarmingMapping.farmingIslands
+
     private fun updateRiftIsland(island: String) {
         val currentlyInRift = island.equals("The Rift", ignoreCase = true)
 

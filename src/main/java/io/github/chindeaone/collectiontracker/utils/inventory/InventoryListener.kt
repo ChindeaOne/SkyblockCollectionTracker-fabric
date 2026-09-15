@@ -3,7 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.inventory
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
@@ -54,7 +54,7 @@ object InventoryListener {
         }
 
         if (isTrackingPaused || isMultiTrackingPaused || !IslandTracker.isInRift) return
-        if (ConfigAccess.isApiTrackingEnabled()) return
+        if (apiTracking) return
 
         val player = client.player ?: return
         val inventory = player.inventory

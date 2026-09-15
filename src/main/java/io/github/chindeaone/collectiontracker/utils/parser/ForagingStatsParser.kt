@@ -1,7 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowDetailedForagingFortune
+import io.github.chindeaone.collectiontracker.config.enableForagingStatsOverlay
+import io.github.chindeaone.collectiontracker.config.foragingStatsOverlayInForagingIslandsOnly
+import io.github.chindeaone.collectiontracker.config.showDetailedForagingFortune
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser.lastDisplayedBeaconFortuneValue
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser.lastDisplayedFortuneColor
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser.lastDisplayedSpecificFortune
@@ -39,7 +40,7 @@ object ForagingStatsParser {
         val formatted = mutableListOf<String>()
         if (raw.isEmpty()) return formatted
 
-        if (ConfigAccess.isForagingStatsOverlayEnabled() && ConfigAccess.isForagingStatsOverlayInForagingIslandsOnly() && !IslandTracker.isForagingIsland()) {
+        if (enableForagingStatsOverlay && foragingStatsOverlayInForagingIslandsOnly && !IslandTracker.isForagingIsland()) {
             return formatted
         }
 
@@ -211,7 +212,7 @@ private class ForagingContext(
             return "§aForaging Fortune: §6$symbol$globalFortune"
         }
 
-        val showDetailed = isShowDetailedForagingFortune()
+        val showDetailed = showDetailedForagingFortune
 
         if (!specificFortuneName.isEmpty()) {
             var base = "§a$specificFortuneName: §6$symbol$total$stackDisplay"

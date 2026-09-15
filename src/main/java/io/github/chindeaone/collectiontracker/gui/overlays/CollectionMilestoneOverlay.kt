@@ -2,13 +2,17 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.milestones.Milestone
+import io.github.chindeaone.collectiontracker.config.collectionMilestones
+import io.github.chindeaone.collectiontracker.config.collectionMilestonesPosition
+import io.github.chindeaone.collectiontracker.config.collectionMilestonesSoundNotification
+import io.github.chindeaone.collectiontracker.config.collectionMilestonesTitleNotification
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
+import io.github.chindeaone.collectiontracker.config.milestones
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiTracking
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
@@ -27,9 +31,9 @@ class CollectionMilestoneOverlay: AbstractOverlay() {
 
     override val overlayLabel: String = "Collection Milestones Overlay"
 
-    override val position: Position get() = ConfigAccess.getCollectionMilestonesPosition()
+    override val position: Position get() = collectionMilestonesPosition
 
-    override val isEnabled: Boolean get() = (TrackingHandler.isTracking || MultiTrackingHandler.isMultiTracking) && ConfigAccess.isCollectionMilestonesEnabled()
+    override val isEnabled: Boolean get() = (isTracking || isMultiTracking) && collectionMilestones
 
     private fun notificationTitle(name: String): Component = Component.literal("§6[§3§kd§6]")
         .append(Component.literal(" ${StringUtils.formatCollectionName(name)} Milestone").withColor(ColorUtils.collectionColors[name] ?: Colors.GREEN.color))
@@ -61,7 +65,7 @@ class CollectionMilestoneOverlay: AbstractOverlay() {
 
         if (ModLoader.clientTicks % 5L != 0L) return
 
-        val milestones = ConfigAccess.getMilestones().filterKeys { CollectionsManager.isValidCollection(it) }
+        val milestones = milestones.filterKeys { CollectionsManager.isValidCollection(it) }
 
         if (!initialized) {
             initializeCompletedMilestones(milestones)
@@ -70,8 +74,8 @@ class CollectionMilestoneOverlay: AbstractOverlay() {
 
         cachedLines = milestones.map { (name, milestone) ->
             when {
-                TrackingHandler.isTracking -> handleSoloTracking(name, milestone)
-                MultiTrackingHandler.isMultiTracking -> handleMultiTracking(name, milestone)
+                isTracking -> handleSoloTracking(name, milestone)
+                isMultiTracking -> handleMultiTracking(name, milestone)
                 else -> ""
             }
         }
@@ -89,11 +93,11 @@ class CollectionMilestoneOverlay: AbstractOverlay() {
 
     private fun getCurrentAmount(name: String, milestone: Milestone): Long {
         return when {
-            TrackingHandler.isTracking && milestone.isTotal -> TrackingRates.collectionAmount
-            TrackingHandler.isTracking -> milestone.progress + TrackingRates.collectionMade
+            isTracking && milestone.isTotal -> TrackingRates.collectionAmount
+            isTracking -> milestone.progress + TrackingRates.collectionMade
 
-            MultiTrackingHandler.isMultiTracking && milestone.isTotal -> MultiTrackingRates.collectionAmounts[name] ?: 0L
-            MultiTrackingHandler.isMultiTracking -> milestone.progress + (MultiTrackingRates.collectionMade[name] ?: 0L)
+            isMultiTracking && milestone.isTotal -> MultiTrackingRates.collectionAmounts[name] ?: 0L
+            isMultiTracking -> milestone.progress + (MultiTrackingRates.collectionMade[name] ?: 0L)
 
             else -> milestone.progress
         }
@@ -130,13 +134,13 @@ class CollectionMilestoneOverlay: AbstractOverlay() {
     }
 
     private fun handleTitleNotification(name: String) {
-        if (ConfigAccess.isCollectionMilestonesTitleNotificationEnabled()) {
+        if (collectionMilestonesTitleNotification) {
             RenderUtils.showTitle(notificationTitle(name))
         }
     }
 
     private fun handleSoundNotification() {
-        if (ConfigAccess.isCollectionMilestonesSoundNotificationEnabled()) {
+        if (collectionMilestonesSoundNotification) {
             SoundUtils.playSound()
         }
     }
@@ -161,7 +165,7 @@ fun clearNotifiedMilestone(name: String) {
 }
 
 fun saveMilestonesProgress(isSoloTracker: Boolean) {
-    val milestones = ConfigAccess.getMilestones()
+    val milestones = milestones
 
     milestones.forEach { (name, milestone) ->
         if (!milestone.isTotal) {

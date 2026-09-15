@@ -1,10 +1,9 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getColeweightTimerPosition
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.getTitleDisplayTimer
-import io.github.chindeaone.collectiontracker.config.ConfigAccess.isShowTimerTitle
+import io.github.chindeaone.collectiontracker.config.coleweightTimerPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.showTimerTitle
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.TimeUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
@@ -21,7 +20,7 @@ class TimerOverlay : AbstractOverlay() {
 
     override val overlayLabel: String = "Timer Overlay"
 
-    override val position: Position get() = getColeweightTimerPosition()
+    override val position: Position get() = coleweightTimerPosition
 
     override val isEnabled: Boolean get() = !hasEnded
 
@@ -86,9 +85,9 @@ class TimerOverlay : AbstractOverlay() {
             val timeFormat = StringUtils.formatCompactTime(remaining)
             cachedLines = listOf("§bTimer: §e$timeFormat$pauseTarget")
         } else {
-            if (isShowTimerTitle()) {
+            if (showTimerTitle) {
                 val title = "§6[§3§kd§6] §b§lTimer Finished! §6[§3§kd§6]"
-                showTitle(Component.literal(title), getTitleDisplayTimer())
+                showTitle(Component.literal(title))
             }
             sendMessage("§cTimer finished!", true)
             hasEnded = true

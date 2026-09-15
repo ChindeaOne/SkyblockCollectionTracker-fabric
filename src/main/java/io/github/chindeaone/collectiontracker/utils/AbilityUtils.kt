@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.attributeLevel
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping.miningIslands
 
@@ -151,8 +151,8 @@ object AbilityUtils {
             cooldown *= (1.0 - (snap.fuelTank.cooldownReduction))
         }
 
-        if (ConfigAccess.hasCooldownAttribute()) {
-            cooldown *= (1.0 - ConfigAccess.getAttributeLevel() / 100f)
+        if (attributeLevel > 0) {
+            cooldown *= (1.0 - attributeLevel / 100f)
         }
 
         // Sky Mall

@@ -4,7 +4,8 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.deployableOutOfRangeWarning
+import io.github.chindeaone.collectiontracker.config.showDeployableTitle
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
@@ -112,7 +113,7 @@ object DeployableParser {
     }
 
     private fun notifyExpiration() {
-        if (!ConfigAccess.isShowDeployableTitle()) return
+        if (!showDeployableTitle) return
         val message = Component.literal("$buffColor$buff §cExpired!")
         RenderUtils.showTitle(message)
     }
@@ -130,7 +131,7 @@ object DeployableParser {
     }
 
     private fun notifyOutOfRange() {
-        if (!ConfigAccess.isDeployableOutOfRangeWarningEnabled()) return
+        if (!deployableOutOfRangeWarning) return
 
         val message = Component.literal("$buffColor$buff §cOut of range!")
         RenderUtils.showTitle(message)

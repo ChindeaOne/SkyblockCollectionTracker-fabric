@@ -2,8 +2,11 @@ package io.github.chindeaone.collectiontracker.utils
 
 import com.google.gson.JsonObject
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.customCWColor
+import io.github.chindeaone.collectiontracker.config.customFWColor
+import io.github.chindeaone.collectiontracker.config.enableCustomCWColor
+import io.github.chindeaone.collectiontracker.config.enableCustomFWColor
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
 import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -133,9 +136,7 @@ object ColorUtils {
     }
 
     fun getCWRankColor(rank: Int, isMe: Boolean, playerName: String): ChromaColour {
-        if (isMe && ConfigAccess.isCustomCwColorEnabled()) {
-            return ConfigAccess.getCustomCWColor()
-        }
+        if (isMe && enableCustomCWColor) return customCWColor
 
         if (!playerName.isEmpty()) {
             val hexString = ConfigHelper.getColeweightColor(playerName)
@@ -162,8 +163,8 @@ object ColorUtils {
     }
 
     fun getFWRankColor(rank: Int, isMe: Boolean, playerName: String): ChromaColour {
-        if (isMe && ConfigAccess.isCustomFWColorEnabled()) {
-            return ConfigAccess.getCustomFWColor()
+        if (isMe && enableCustomFWColor) {
+            return customFWColor
         }
 
         if (!playerName.isEmpty()) {

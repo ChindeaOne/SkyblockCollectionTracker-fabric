@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.updater
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
 import io.github.chindeaone.collectiontracker.config.categories.About
+import io.github.chindeaone.collectiontracker.config.updateStream
 import io.github.chindeaone.modrinthautoupdater.UpdateContext
 import io.github.chindeaone.modrinthautoupdater.UpdateSetup
 import io.github.chindeaone.modrinthautoupdater.UpdateTarget
@@ -31,7 +31,7 @@ object UpdaterManager {
     }
 
     private fun setUpdateStream(): String {
-        val currentStream = ConfigAccess.getUpdateStream()
+        val currentStream = updateStream
         return when (currentStream) {
             About.UpdateStream.RELEASE -> "release"
             About.UpdateStream.BETA -> "beta"

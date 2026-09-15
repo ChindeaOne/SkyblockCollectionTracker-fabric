@@ -6,7 +6,13 @@ import io.github.chindeaone.collectiontracker.collections.CollectionsManager.has
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.apiTracking
+import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
+import io.github.chindeaone.collectiontracker.config.gemstoneVariant
+import io.github.chindeaone.collectiontracker.config.multiDetailedSummary
+import io.github.chindeaone.collectiontracker.config.multiTrackingSummary
+import io.github.chindeaone.collectiontracker.config.summaryStats
+import io.github.chindeaone.collectiontracker.config.useBazaar
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.saveMilestonesProgress
@@ -54,7 +60,7 @@ object MultiTrackingHandler  {
         // Always do initial fetch
         MultiDataFetcher.fetchMultiCollectionData()
 
-        if (ConfigAccess.isApiTrackingEnabled()) {
+        if (apiTracking) {
             trackingTask = scheduler.scheduleWithFixedDelay(
                 { MultiDataFetcher.fetchMultiCollectionData(false) }, 5, 5, TimeUnit.MINUTES)
         }
@@ -67,7 +73,7 @@ object MultiTrackingHandler  {
 
         isMultiTracking = true
         isMultiPaused = false
-        leaderboardTrackingInitialized = ConfigAccess.isCollectionLeaderboardEnabled()
+        leaderboardTrackingInitialized = collectionLeaderboard
     }
 
     fun stopMultiTrackingManual() {
@@ -127,7 +133,7 @@ object MultiTrackingHandler  {
     }
 
     private fun resetMultiTrackingData(restart: Boolean) {
-        if (ConfigAccess.isMultiTrackingSummaryEnabled()) sendMultiRates()
+        if (multiTrackingSummary) sendMultiRates()
 
         resetVariables()
         if (restart) {
@@ -279,11 +285,11 @@ object MultiTrackingHandler  {
 
         val lines = mutableListOf<Component>()
 
-        val useBazaar = ConfigAccess.isUsingBazaar()
+        val useBazaar = useBazaar
         val allRiftCollections = CollectionsManager.hasAllRiftCollections()
         val useMotes = !useBazaar && allRiftCollections
 
-        val variant = ConfigAccess.getGemstoneVariant().toString()
+        val variant = gemstoneVariant.toString()
         val suffix = CollectionParser.bazaarPriceTypeSuffix()
         val bazaarSuffix = if (useBazaar) if (suffix.contains("BUY")) "Instant Buy" else "Instant Sell" else ""
         val typeKey = CollectionParser.bazaarTypeKey()
@@ -298,6 +304,8 @@ object MultiTrackingHandler  {
 
         val trackedCollections = CollectionTracker.collectionList
         val collectionLines = mutableListOf<Component>()
+
+        val summaryStatsName = summaryStats.name
 
         // Non gemstone collections
         for (coll in trackedCollections) {
@@ -332,7 +340,7 @@ object MultiTrackingHandler  {
 
             val line = Component.literal("   ").append(formattedName).append("§r: ")
 
-            when (ConfigAccess.getSummaryStats().name) {
+            when (summaryStatsName) {
                 "COLLECTION" -> line.append("§f${formatNumber(collectionMade)} §7(${formatNumber(collectionRate)}/h)")
 
                 "MONEY" -> {
@@ -389,7 +397,7 @@ object MultiTrackingHandler  {
 
                 val line = Component.literal("    - ").append(formattedName).append(": ")
 
-                when (ConfigAccess.getSummaryStats().name) {
+                when (summaryStatsName) {
                     "COLLECTION" -> line.append("§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)")
 
                     "MONEY" -> line.append("§a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
@@ -404,7 +412,7 @@ object MultiTrackingHandler  {
             totalMoneyRate += totalGemstoneMoneyRate
         }
 
-        if (ConfigAccess.getSummaryStats().name == "MONEY" || ConfigAccess.getSummaryStats().name == "BOTH") {
+        if (summaryStatsName == "MONEY" || summaryStatsName == "BOTH") {
             if (totalMoneyMade > 0) {
                 val totalLine = Component.literal("   ")
 
@@ -424,7 +432,7 @@ object MultiTrackingHandler  {
         if (trackedCollections.contains("gemstone")) {
             val summaryLine = Component.literal("   §dGemstones (${variant.lowercase()}): ")
 
-            when (ConfigAccess.getSummaryStats().name) {
+            when (summaryStatsName) {
                 "COLLECTION" -> {
                     val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
                     val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
@@ -446,7 +454,7 @@ object MultiTrackingHandler  {
 
             lines.add(summaryLine)
 
-            if (ConfigAccess.isMultiDetailedSummaryEnabled()) lines.addAll(gemstoneLines)
+            if (multiDetailedSummary) lines.addAll(gemstoneLines)
         }
 
         lines.add(Component.empty())

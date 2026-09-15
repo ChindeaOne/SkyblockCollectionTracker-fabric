@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.enablePrecisionMiningHighlight
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleOptions
@@ -18,7 +18,7 @@ object PrecisionMining {
     private var activeParticlePos: Vec3? = null
 
     fun render(context: LevelRenderContext) {
-        if (!ConfigAccess.isPrecisionMiningHighlightEnabled()) return
+        if (!enablePrecisionMiningHighlight) return
         if (BlockWatcher.precisionMiningBlockType.isEmpty()) {
             isLooking = false
             activeParticlePos = null

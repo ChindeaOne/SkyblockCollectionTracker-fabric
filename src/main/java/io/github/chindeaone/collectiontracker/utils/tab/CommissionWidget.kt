@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.utils.tab
 
-import io.github.chindeaone.collectiontracker.config.ConfigAccess
+import io.github.chindeaone.collectiontracker.config.completionTitle
+import io.github.chindeaone.collectiontracker.config.enableCommissionsOverlay
+import io.github.chindeaone.collectiontracker.config.newCommissionTitle
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser.ActiveCommission
@@ -26,7 +28,7 @@ object CommissionWidget {
         commissions[index] = updated
 
         if (!updated.isNew) return
-        if (!ConfigAccess.isNewCommissionTitleEnabled()) return
+        if (!newCommissionTitle) return
 
         val color = updated.type.color ?: Colors.YELLOW.color
 
@@ -44,7 +46,7 @@ object CommissionWidget {
 
         active.progress = "DONE"
 
-        if (!ConfigAccess.isCompletionTitleEnabled()) return
+        if (!completionTitle) return
 
         val color = active.type.color ?: Colors.GREEN.color
 
@@ -56,7 +58,7 @@ object CommissionWidget {
     }
 
     fun onTabUpdate() {
-        if (!ConfigAccess.isCommissionsOverlayEnabled()) {
+        if (!enableCommissionsOverlay) {
             commissions.clear()
             return
         }

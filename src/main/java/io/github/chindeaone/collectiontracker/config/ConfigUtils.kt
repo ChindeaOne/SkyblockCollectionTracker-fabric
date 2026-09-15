@@ -91,6 +91,7 @@ val completionTitle: Boolean get() = commissionsConfig.completionTitle
 val newCommissionTitle: Boolean get() = commissionsConfig.newCommissionTitle
 val enableCommissionsTracking: Boolean get() = commissionsConfig.enableCommissionsTracking
 val keybindConfig: KeybindConfig get() = commissionsConfig.keybindConfig
+val enableCommissionsKeybinds: Boolean get() = keybindConfig.enableCommissionsKeybinds
 val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
@@ -190,11 +191,13 @@ val enableCustomFWColor: Boolean get() = farmingweightColorConfig.enableCustomCo
 
 // Collection Tracking Config Accessors
 val trackingConfig: Tracking get() = modConfig.tracking
+val apiTracking: Boolean get() = trackingConfig.apiTracking
+val overlayTextColor: Boolean get() = trackingConfig.overlayTextColor
+val explicitValues: Boolean get() = trackingConfig.explicitValues
 val collectionConfig: CollectionConfig get() = trackingConfig.collectionConfig
 val statsText: List<CollectionConfig.OverlayText> get() = collectionConfig.statsText
 val extraStatsText: List<CollectionConfig.OverlayExtraText> get() = collectionConfig.extraStatsText
 val showExtraStats: Boolean get() = collectionConfig.showExtraStats
-val explicitValues: Boolean get() = trackingConfig.explicitValues
 
 // Leaderboard Tracking Config Accessors
 val leaderboardOverlay: LeaderboardConfig get() = trackingConfig.leaderboardConfig
@@ -235,9 +238,10 @@ val skillMilestonesSoundNotification: Boolean get() = skillMilestonesConfig.skil
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
 val precision: Int get() = miscConfig.abilityPrecision
-val titleDisplayTimer: Int get() = miscConfig.titleDisplayTimer
+val titleDisplayTimer: Long get() = miscConfig.titleDisplayTimer * 1000L
 val titleScale: Misc.TitleScale get() = miscConfig.titleScale
 val abilityCooldownOnly: Boolean get() = miscConfig.abilityCooldownOnly
+val serverLagProtection: Boolean get() = miscConfig.serverLagProtection
 val showTimerTitle: Boolean get() = miscConfig.showTimerTitle
 
 // Party Notifier Accessors
@@ -252,279 +256,11 @@ val stopwatchNotifierInterval: Int get() = partyNotifierConfig.stopwatchNotifier
  */
 object ConfigAccess {
 
-    fun getTrackingPosition(): Position = trackingPosition
-
-    fun getMiningStatsPosition(): Position = miningStatsPosition
-
-    fun getForagingStatsPosition(): Position = foragingStatsPosition
-
-    fun getCommissionsPosition(): Position = commissionsPosition
-
-    fun getSkyMallPosition(): Position = skyMallPosition
-
-    fun getLotteryPosition(): Position = lotteryPosition
-
-    fun getBeekeeperPosition(): Position = beekeeperPosition
-
-    fun getSkillPosition(): Position = skillPosition
-
-    fun getPickaxeAbilityPosition(): Position = pickaxeAbilityPosition
-
-    fun getAxeAbilityPosition(): Position = axeAbilityPosition
-
-    fun getDeployablePosition(): Position = deployablePosition
-
-    fun getTempBuffPosition(): Position = tempBuffPosition
-
-    fun getTitlePosition(): Position = titlePosition
-
-    fun getMultiOverlayPosition(): Position = multiOverlayPosition
-
-    fun getColeweightTimerPosition(): Position = coleweightTimerPosition
-
-    fun getColeweightStopwatchPosition(): Position = coleweightStopwatchPosition
-
-    fun getColeweightTrackerPosition(): Position = coleweightTrackerPosition
-
-    fun getCollectionMilestonesPosition(): Position = collectionMilestonesPosition
-
-    fun getSkillMilestonesPosition(): Position = skillMilestonesPosition
-
-    fun getUpdateStream(): About.UpdateStream = updateStream
-
-    fun getUpdateType(): About.UpdateType = updateType
-
-    fun getKeybindConfig(): KeybindConfig = keybindConfig
-
-    fun getBazaarType(): Bazaar.BazaarType = bazaarType
-
-    fun getGemstoneVariant(): Bazaar.GemstoneVariant = gemstoneVariant
-
-    fun isUsingBazaar(): Boolean = useBazaar
-
-    fun hasCheckedUpdate(): Boolean = hasCheckedUpdate
-
-    fun isApiTrackingEnabled(): Boolean = trackingConfig.apiTracking
-
-    fun isOverlayTextColorEnabled(): Boolean = trackingConfig.overlayTextColor
-
-    fun isShowTrackingRatesAtEndOfSession(): Boolean = collectionConfig.showTrackingRatesAtEndOfSession
-
-    fun isCommissionsOverlayEnabled(): Boolean = enableCommissionsOverlay
-
-    fun isCompletionTitleEnabled(): Boolean = completionTitle
-
-    fun isNewCommissionTitleEnabled(): Boolean = newCommissionTitle
-
-    fun isCommissionsTrackingEnabled(): Boolean = enableCommissionsTracking
-
-    fun isCommissionsKeybindsEnabled(): Boolean = keybindConfig.enableCommissionsKeybinds
-
-    fun isMiningStatsOverlayEnabled(): Boolean = enableMiningStatsOverlay
-
-    fun isMiningStatsOverlayInMiningIslandsOnly(): Boolean = miningStatsOverlayInMiningIslandsOnly
-
-    fun getStatsText(): List<CollectionConfig.OverlayText> = statsText
-
-    fun isShowExtraStats(): Boolean = showExtraStats
-
-    fun getExtraStatsText(): List<CollectionConfig.OverlayExtraText> = extraStatsText
-
-    fun isExplicitValues(): Boolean = explicitValues
-
-    fun isTamingTrackingEnabled(): Boolean = enableTamingTracking
-
-    fun getBazaarPriceType(): Bazaar.BazaarPriceType = bazaarPriceType
-
-    fun isColeweightRankingInChat(): Boolean = coleweightRankingInChat
-
     @JvmStatic
     fun isColeweightRankInNameTag(): Boolean = coleweightRankInNameTag
 
-    fun isOnlyOnMiningIslands(): Boolean = onlyOnMiningIslands
-
-    fun isCustomCwColorEnabled(): Boolean = enableCustomCWColor
-
-    fun getCustomCWColor(): ChromaColour = customCWColor
-
-    fun isFarmingweightRankingInChat(): Boolean = farmingweightRankingInChat
-
     @JvmStatic
     fun isFarmingweightRankInNameTag(): Boolean = farmingweightRankInNameTag
-
-    fun isOnlyOnFarmingIslands(): Boolean = onlyOnFarmingIslands
-
-    fun isCustomFWColorEnabled(): Boolean = enableCustomFWColor
-
-    fun getCustomFWColor(): ChromaColour = customFWColor
-
-    fun isShowDetailedMiningFortune(): Boolean = showDetailedMiningFortune
-
-    fun getProfessionalMS(): Int = professionalMS
-
-    fun getStrongArmMS(): Int = strongArmMS
-
-    fun isForagingStatsOverlayEnabled(): Boolean = enableForagingStatsOverlay
-
-    fun isForagingStatsOverlayInForagingIslandsOnly(): Boolean = foragingStatsOverlayInForagingIslandsOnly
-
-    fun isShowDetailedForagingFortune(): Boolean = showDetailedForagingFortune
-
-    fun getCotmLevel(): Int = cotmLevel
-
-    fun isSkyMallEnabled(): Boolean = enableSkyMall
-
-    fun isSkyMallChatMessagesDisabled(): Boolean = disableSkyMallChatMessages
-
-    fun isLotteryEnabled(): Boolean = enableLottery
-
-    fun isLotteryChatMessagesDisabled(): Boolean = disableLotteryChatMessages
-
-    fun isBeekeeperEnabled(): Boolean = enableBeekeeper
-
-    fun isBeekeeperChatMessagesDisabled(): Boolean = disableBeekeeperChatMessages
-
-    fun isSkyMallInMiningIslandsOnly(): Boolean = skyMallInMiningIslandsOnly
-
-    fun isLotteryInForagingIslandsOnly(): Boolean = lotteryInForagingIslandsOnly
-
-    fun isBeekeeperInForagingIslandsOnly(): Boolean = beekeeperInForagingIslandsOnly
-
-    fun isPickaxeAbilityDisplayed(): Boolean = displayPickaxeAbility
-
-    fun getPickaxeAbilityDisplayIndicator(): Misc.AbilityDisplayIndicator = pickaxeAbilityDisplayIndicator
-
-    fun getPickaxeAbilityName(): String = abilityName
-
-    fun hasCooldownAttribute(): Boolean = getAttributeLevel() > 0
-
-    fun hasCooldownAttributeMaxed(): Boolean = getAttributeLevel() == 10
-
-    fun getAttributeLevel(): Int = attributeLevel
-
-    fun getLastSkyMallBuff(): String = lastSkyMallBuff
-
-    fun getLastLotteryBuff(): String = lastLotteryBuff
-
-    fun getLastBeekeeperBuff(): String = lastBeekeeperBuff
-
-    fun isAxeAbilityDisplayed(): Boolean = displayAxeAbility
-
-    fun getAxeAbilityDisplayIndicator(): Misc.AbilityDisplayIndicator = axeAbilityDisplayIndicator
-
-    fun getAxeAbilityName(): String = abilityNameAxe
-
-    fun getCotfLevel(): Int = cotfLevel
-
-    fun getAbilityPrecision(): Int = precision
-
-    fun getTitleDisplayTimer(): Long = titleDisplayTimer * 1000L
-
-    fun isShowPickaxeReadyAbilityTitle(): Boolean = showPickaxeReadyAbilityTitle
-
-    fun isShowPickaxeExpiredAbilityTitle(): Boolean = showPickaxeExpiredAbilityTitle
-
-    fun isShowAxeReadyAbilityTitle(): Boolean = showAxeReadyAbilityTitle
-
-    fun isShowAxeExpiredAbilityTitle(): Boolean = showAxeExpiredAbilityTitle
-
-    fun getTitleScale(): Misc.TitleScale = titleScale
-
-    fun isPickaxeAbilityInMiningIslandsOnly(): Boolean = pickaxeAbilityInMiningIslandsOnly
-
-    fun isAxeAbilityInForagingIslandsOnly(): Boolean = axeAbilityInForagingIslandsOnly
-
-    fun isAbilityCooldownOnly(): Boolean = abilityCooldownOnly
-
-    fun isServerLagProtectionEnabled(): Boolean = miscConfig.serverLagProtection
-
-    fun isShowTimerTitle(): Boolean = showTimerTitle
-
-    fun isDeployableEnabled(): Boolean = enableDeployable
-
-    fun isShowDeployableTitle(): Boolean = showDeployableTitle
-
-    fun isDeployableOutOfRangeWarningEnabled(): Boolean = deployableOutOfRangeWarning
-
-    fun isMineshaftRoutesEnabled(): Boolean = enableMineshaftRoutes
-
-    fun isMineshaftSpawnRoutesEnabled(): Boolean = enableMineshaftSpawnRoutes
-
-    fun getMineshaftSpawnRoutes(): MineshaftRoutes.MineshaftSpawnRoutes = mineshaftSpawnRoutes
-
-    fun isDwarvenMetalRoutesEnabled(): Boolean = enableDwarvenMetalRoutes
-
-    fun getDwarvenMetalRoutes(): DwarvenMetalsRoutes.DwarvenMetalRoutes = dwarvenMetalRoutes
-
-    fun isPureOresRoutesEnabled(): Boolean = enablePureOresRoutes
-
-    fun getPureOresRoutes(): PureOresRoutes.PureOreRoutes = pureOresRoutes
-
-    fun isTempBuffTrackerEnabled(): Boolean = enableTempBuffTracker
-
-    fun isShowTempBuffExpiredTitle(): Boolean = showTempBuffExpiredTitle
-
-    fun getRefinedCacaoTime(): Long = refinedCacaoTime
-
-    fun getFiletTime(): Long = filetTime
-
-    fun getPristinePotatoTime(): Long = pristinePotatoTime
-
-    fun getPowderPumpkinTime(): Long = powderPumpkinTime
-
-    fun getFiestaFlaskTime(): Long = fiestaFlaskTime
-
-    fun isHeatmapEnabled(): Boolean = enableHeatmap
-
-    fun getHeatmapOpacity(): Float = heatmapOpacity
-
-    fun isPrecisionMiningHighlightEnabled(): Boolean = enablePrecisionMiningHighlight
-
-    fun isDrawLineToPrecisionMiningEnabled(): Boolean = drawLineToPrecisionMining
-
-    fun getTrackingOptions(): MultiCollectionConfig.TrackingOptions = trackingOptions
-
-    fun isMultiTrackingSummaryEnabled(): Boolean = multiTrackingSummary
-
-    fun isMultiDetailedSummaryEnabled(): Boolean = multiDetailedSummary
-
-    fun getSummaryStats(): MultiCollectionConfig.SummaryStats = summaryStats
-
-    fun isCollectionLeaderboardEnabled(): Boolean = collectionLeaderboard
-
-    fun isSkillLeaderboardEnabled(): Boolean = skillLeaderboard
-
-    fun isPreviousPositionEnabled(): Boolean = previousPosition
-
-    fun isIncludeWipedProfilesEnabled(): Boolean = includeWipedProfiles
-
-    fun isLeaderboardPositionEnabled(): Boolean = leaderboardPosition
-
-    fun getLeaderboardPositions(): Map<String, Int> = leaderboardPositions
-
-    fun getLeaderboardPositionEntry(name: String): Int? = leaderboardPositions[name]
-
-    fun getMilestones(): Map<String, Milestone> = milestones
-
-    fun isTimerNotifierEnabled(): Boolean = timerNotifier
-
-    fun getTimerNotifierInterval(): Int = timerNotifierInterval
-
-    fun isStopwatchNotifierEnabled(): Boolean = stopwatchNotifier
-
-    fun getStopwatchNotifierInterval(): Int = stopwatchNotifierInterval
-
-    fun isCollectionMilestonesEnabled(): Boolean = collectionMilestones
-
-    fun isCollectionMilestonesTitleNotificationEnabled(): Boolean = collectionMilestonesTitleNotification
-
-    fun isCollectionMilestonesSoundNotificationEnabled(): Boolean = collectionMilestonesSoundNotification
-
-    fun isSkillMilestonesEnabled(): Boolean = skillMilestones
-
-    fun isSkillMilestonesTitleNotificationEnabled(): Boolean = skillMilestonesTitleNotification
-
-    fun isSkillMilestonesSoundNotificationEnabled(): Boolean = skillMilestonesSoundNotification
 }
 
 /**
@@ -724,6 +460,91 @@ object ConfigHelper {
     fun toggleBeekeeperChatMessages(): Boolean {
         beekeeperConfig.disableBeekeeperChatMessages = !disableBeekeeperChatMessages
         return disableBeekeeperChatMessages
+    }
+
+    fun toggleColeweightRankingInChat(): Boolean {
+        coleweightConfig.coleweightRankingInChat = !coleweightRankingInChat
+        return coleweightConfig.coleweightRankingInChat
+    }
+
+    fun toggleColeweightRankInNameTag(): Boolean {
+        coleweightConfig.coleweightRankInNameTag = !coleweightRankInNameTag
+        return coleweightConfig.coleweightRankInNameTag
+    }
+
+    fun toggleColeweightOnlyOnMiningIslands(): Boolean {
+        coleweightConfig.onlyOnMiningIslands = !onlyOnMiningIslands
+        return coleweightConfig.onlyOnMiningIslands
+    }
+
+    fun toggleFarmingweightRankingInChat(): Boolean {
+        farmingweightConfig.farmingweightRankingInChat = !farmingweightRankingInChat
+        return farmingweightConfig.farmingweightRankingInChat
+    }
+
+    fun toggleFarmingweightRankInNameTag(): Boolean {
+        farmingweightConfig.farmingweightRankInNameTag = !farmingweightRankInNameTag
+        return farmingweightConfig.farmingweightRankInNameTag
+    }
+
+    fun toggleFarmingweightOnlyOnFarmingIslands(): Boolean {
+        farmingweightConfig.onlyOnFarmingIslands = !onlyOnFarmingIslands
+        return farmingweightConfig.onlyOnFarmingIslands
+    }
+
+    fun toggleHeatmap(): Boolean {
+        heatmapConfig.enableHeatmap = !enableHeatmap
+        return heatmapConfig.enableHeatmap
+    }
+
+    fun toggleCollectionLeaderboard(): Boolean {
+        leaderboardOverlay.collectionLeaderboard = !collectionLeaderboard
+        return leaderboardOverlay.collectionLeaderboard
+    }
+
+    fun toggleSkillLeaderboard(): Boolean {
+        leaderboardOverlay.skillLeaderboard = !skillLeaderboard
+        return leaderboardOverlay.skillLeaderboard
+    }
+
+    fun toggleCollectionMilestones(): Boolean {
+        collectionMilestonesConfig.collectionMilestones = !collectionMilestones
+        return collectionMilestonesConfig.collectionMilestones
+    }
+
+    fun toggleCollectionMilestonesTitleNotification(): Boolean {
+        collectionMilestonesConfig.collectionMilestonesTitleNotification = !collectionMilestonesTitleNotification
+        return collectionMilestonesConfig.collectionMilestonesTitleNotification
+    }
+
+    fun toggleCollectionMilestonesSoundNotification(): Boolean {
+        collectionMilestonesConfig.collectionMilestonesSoundNotification = !collectionMilestonesSoundNotification
+        return collectionMilestonesConfig.collectionMilestonesSoundNotification
+    }
+
+    fun toggleSkillMilestones(): Boolean {
+        skillMilestonesConfig.skillMilestones = !skillMilestones
+        return skillMilestonesConfig.skillMilestones
+    }
+
+    fun toggleSkillMilestonesTitleNotification(): Boolean {
+        skillMilestonesConfig.skillMilestonesTitleNotification = !skillMilestonesTitleNotification
+        return skillMilestonesConfig.skillMilestonesTitleNotification
+    }
+
+    fun toggleSkillMilestonesSoundNotification(): Boolean {
+        skillMilestonesConfig.skillMilestonesSoundNotification = !skillMilestonesSoundNotification
+        return skillMilestonesConfig.skillMilestonesSoundNotification
+    }
+
+    fun toggleTimerNotifier(): Boolean {
+        partyNotifierConfig.timerNotifier = !timerNotifier
+        return partyNotifierConfig.timerNotifier
+    }
+
+    fun toggleStopwatchNotifier(): Boolean {
+        partyNotifierConfig.stopwatchNotifier = !stopwatchNotifier
+        return partyNotifierConfig.stopwatchNotifier
     }
 
     fun setAxeAbilityName(name: String) {

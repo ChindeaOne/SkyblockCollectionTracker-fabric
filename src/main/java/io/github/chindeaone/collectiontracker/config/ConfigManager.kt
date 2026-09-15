@@ -179,9 +179,9 @@ class ConfigManager {
     }
 
     fun loadFromConfig() {
-        val lastSkyMallBuff = ConfigAccess.getLastSkyMallBuff()
-        val lastLotteryBuff = ConfigAccess.getLastLotteryBuff()
-        val lastBeekeeperBuff = ConfigAccess.getLastBeekeeperBuff()
+        val lastSkyMallBuff = lastSkyMallBuff
+        val lastLotteryBuff = lastLotteryBuff
+        val lastBeekeeperBuff = lastBeekeeperBuff
 
         if (lastSkyMallBuff.isNotBlank()) {
             ChatListener.currentSkyMallBuff = lastSkyMallBuff
