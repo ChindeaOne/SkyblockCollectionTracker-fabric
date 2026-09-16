@@ -141,16 +141,14 @@ kotlin {
 }
 
 tasks.processResources {
-    val expandProps = buildMap {
-        put("version", project.version)
-        put("minecraft_version", sc.current.version)
-    }
+    val expandProps = mapOf(
+        "version" to project.version,
+        "minecraft_version" to sc.current.version
+    )
 
-    expandProps.forEach { (key, value) ->
-        inputs.property(key, value)
-    }
+    inputs.properties(expandProps)
 
-    filesMatching(listOf("fabric.mod.json")) {
+    filesMatching("fabric.mod.json") {
         expand(expandProps)
     }
 }
