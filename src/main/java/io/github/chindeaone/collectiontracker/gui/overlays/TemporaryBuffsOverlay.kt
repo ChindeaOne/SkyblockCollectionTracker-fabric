@@ -45,19 +45,20 @@ class TemporaryBuffsOverlay : AbstractOverlay() {
 
         if (ModLoader.clientTicks % 5L != 0L) return
 
-        val now = System.currentTimeMillis()
         val newLines = mutableListOf<String>()
 
-        processBuff(newLines, "§6Refined Dark Cacao Truffle", refinedCacaoEndTime, now)
-        processBuff(newLines, "§9Filet O' Fortune", filetEndTime, now)
-        processBuff(newLines, "§5Chilled Pristine Potato", pristinePotatoEndTime, now)
-        processBuff(newLines, "§aPowder Pie", powderPumpkinEndTime, now)
-        processBuff(newLines, "§6Fiesta Flask", fiestaFlaskEndTime, now)
+        processBuff(newLines, "§6Refined Dark Cacao Truffle", refinedCacaoEndTime)
+        processBuff(newLines, "§9Filet O' Fortune", filetEndTime)
+        processBuff(newLines, "§5Chilled Pristine Potato", pristinePotatoEndTime)
+        processBuff(newLines, "§aPowder Pie", powderPumpkinEndTime)
+        processBuff(newLines, "§6Fiesta Flask", fiestaFlaskEndTime)
 
         cachedLines = newLines
     }
 
-    private fun processBuff(lines: MutableList<String>, displayName: String, expireTime: Long, now: Long) {
+    private fun processBuff(lines: MutableList<String>, displayName: String, expireTime: Long) {
+        val now = System.currentTimeMillis()
+
         val isActive = expireTime > now
         val wasActive = activeStates.getOrDefault(displayName, false)
 
