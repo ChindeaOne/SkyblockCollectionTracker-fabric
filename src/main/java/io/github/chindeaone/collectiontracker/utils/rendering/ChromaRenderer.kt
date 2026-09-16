@@ -1,13 +1,13 @@
 package io.github.chindeaone.collectiontracker.utils.rendering
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice
-import com.mojang.blaze3d.systems.RenderPass
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.customCWColor
 import io.github.chindeaone.collectiontracker.config.customFWColor
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import net.minecraft.client.Minecraft
 import java.awt.Color
+import com.mojang.blaze3d.buffers.GpuBufferSlice
+import com.mojang.blaze3d.systems.RenderPass
 
 object ChromaRenderer {
 
