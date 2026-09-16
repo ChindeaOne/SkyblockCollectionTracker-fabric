@@ -15,7 +15,7 @@ object DwarvenHeatmap {
     private data class HeatmapHighlight(val pos: BlockPos, val r: Float, val g: Float, val b: Float)
 
     private val trackedBlocks = setOf(
-        Blocks./*? if 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/,
+        Blocks./*? if >= 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/,
         Blocks.SMOOTH_RED_SANDSTONE,
         Blocks.TERRACOTTA,
         Blocks.INFESTED_COBBLESTONE,
@@ -74,7 +74,7 @@ object DwarvenHeatmap {
     private fun priorityColor(block: Block): Triple<Float, Float, Float> {
         return when (block) {
             Blocks.SMOOTH_RED_SANDSTONE, Blocks.CLAY -> Triple(0f / 255f, 100f / 255f, 0f / 255f)
-            Blocks./*? if 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/ -> Triple(144f / 255f, 238f / 255f, 144f / 255f)
+            Blocks./*? if >= 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/ -> Triple(144f / 255f, 238f / 255f, 144f / 255f)
             else -> Triple(0f / 255f, 255f / 255f, 0f / 255f)
         }
     }
@@ -84,7 +84,7 @@ object DwarvenHeatmap {
 
         fun isNotSolid(pos: BlockPos): Boolean {
             val state = world.getBlockState(pos)
-            return state.isAir || state.block == Blocks.SNOW || state.block == Blocks./*? if 26.2 {*/ /*CARPET.lightGray *//*?} else {*/ LIGHT_GRAY_CARPET /*?}*/
+            return state.isAir || state.block == Blocks.SNOW || state.block == Blocks./*? if >= 26.2 {*/ /*CARPET.lightGray *//*?} else {*/ LIGHT_GRAY_CARPET /*?}*/
         }
 
         if (isNotSolid(pos.above())) return true
