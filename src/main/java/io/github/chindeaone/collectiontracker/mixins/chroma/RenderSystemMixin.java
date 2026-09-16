@@ -1,11 +1,13 @@
 package io.github.chindeaone.collectiontracker.mixins.chroma;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
 import org.spongepowered.asm.mixin.Mixin;
+//? if 26.1 {
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
+//? }
 
 @Mixin(RenderSystem.class)
 public class RenderSystemMixin {
