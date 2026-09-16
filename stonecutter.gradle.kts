@@ -5,6 +5,12 @@ plugins {
 
 stonecutter active "26.1"
 
+stonecutter handlers {
+    configure("fsh", "fsh") {
+        commenter = line("//")
+    }
+}
+
 stonecutter {
     parameters {
         replacements {
@@ -34,7 +40,10 @@ stonecutter {
                     "Lcom/mojang/renderpearl/api/commands/RenderPass;setPipeline(Lcom/mojang/renderpearl/api/pipeline/CompiledRenderPipeline;)V",
                     "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
                 )
+
+                replace("#include", "#moj_import")
             }
         }
+        filters.include("**/*.fsh", "**/*.vsh")
     }
 }
