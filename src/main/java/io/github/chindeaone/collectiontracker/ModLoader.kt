@@ -155,7 +155,7 @@ object ModLoader: ModInitializer {
             DwarvenHeatmap.onClientTick(client)
             ScoreboardUtils.onClientTick(client)
             DeployableParser.onClientTick(client)
-            InventoryListener.onClientTick(client)
+            InventoryListener.onClientTick()
             ConfigStateUtils.onClientTick()
             ContainerParser.onClientTick(client)
             MiningStatsParser.onClientTick()

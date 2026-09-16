@@ -9,11 +9,11 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
-import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
@@ -28,17 +28,17 @@ object InventoryListener {
 
     private var pendingConsumable: HandItemState? = null
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         if (ModLoader.clientTicks % 4L != 0L) return
 
-        if (/*? if 26.2 {*/ /*client.gui.screen() *//*?} else {*/ client.screen /*?}*/ != null) {
+        if (MinecraftUtils.screen != null) {
             lastInventoryState.clear()
             slotMatchHits.clear()
             slotSkipMap.clear()
             return
         }
 
-        checkIfConsumableConsumed(client)
+        checkIfConsumableConsumed()
 
         val isTracking = TrackingHandler.isTracking
         val isMultiTracking = MultiTrackingHandler.isMultiTracking
@@ -56,7 +56,7 @@ object InventoryListener {
         if (isTrackingPaused || isMultiTrackingPaused || !IslandTracker.isInRift) return
         if (apiTracking) return
 
-        val player = client.player ?: return
+        val player = MinecraftUtils.player ?: return
         val inventory = player.inventory
         val now = System.currentTimeMillis()
 
@@ -185,7 +185,7 @@ object InventoryListener {
             else -> 1
         }
 
-    private fun checkIfConsumableConsumed(client: Minecraft) =
+    private fun checkIfConsumableConsumed() =
         pendingConsumable?.let { pending ->
             val now = System.currentTimeMillis()
 
@@ -194,7 +194,7 @@ object InventoryListener {
                 return@let
             }
 
-            val player = client.player ?: return@let
+            val player = MinecraftUtils.player ?: return@let
             val currentStack = player.inventory.getItem(pending.slot)
 
             if (currentStack.isEmpty || currentStack.count < pending.count) {
