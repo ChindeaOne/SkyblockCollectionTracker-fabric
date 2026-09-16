@@ -19,10 +19,9 @@ object MultiTrackingRates {
     val collectionAmounts = ConcurrentHashMap<String, Long>()
     val collectionPerHour = ConcurrentHashMap<String, Long>()
     val collectionMade = ConcurrentHashMap<String, Long>()
-    val collectionSinceLast = ConcurrentHashMap<String, Long>()
     val sessionStartCollections = ConcurrentHashMap<String, Long>()
-    val lastCollectionTimes = ConcurrentHashMap<String, Long>()
     val lastApiCollections = ConcurrentHashMap<String, Long>()
+    @Volatile var lastCollectionUpdate: Long = -1L
 
     // Track seen gemstones to only render them if they've been received from chat
     val seenGemstones: MutableSet<String> = ConcurrentHashMap.newKeySet()
@@ -54,7 +53,7 @@ object MultiTrackingRates {
 
         for ((coll, value) in values) {
             lastApiCollections[coll] = value
-            lastCollectionTimes[coll] = now
+            lastCollectionUpdate = now
             if (sessionStartCollections.getOrDefault(coll, -1L) == -1L) {
                 sessionStartCollections[coll] = value
 
@@ -110,10 +109,8 @@ object MultiTrackingRates {
 
     private fun updateValues(coll: String, currentCollection: Long, sinceLast: Long) {
         val uptime = MultiTrackingHandler.multiUptimeInSeconds
-        val now = System.currentTimeMillis()
 
-        collectionSinceLast[coll] = sinceLast
-        if (sinceLast > 0)  lastCollectionTimes[coll] = now
+        if (sinceLast > 0) lastCollectionUpdate = System.currentTimeMillis()
 
         val sessionStart = sessionStartCollections.getOrDefault(coll, currentCollection)
         val collectedSinceStart = currentCollection - sessionStart

@@ -18,6 +18,9 @@ import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverla
 import io.github.chindeaone.collectiontracker.gui.overlays.saveMilestonesProgress
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearCollectionCache
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.lastCollectionUpdate
+import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -172,15 +175,14 @@ object MultiTrackingHandler  {
         }
 
         clearMaps()
+        lastCollectionUpdate = 0
     }
 
     fun clearMaps() {
         MultiTrackingRates.collectionAmounts.clear()
         MultiTrackingRates.collectionPerHour.clear()
         MultiTrackingRates.collectionMade.clear()
-        MultiTrackingRates.collectionSinceLast.clear()
         MultiTrackingRates.sessionStartCollections.clear()
-        MultiTrackingRates.lastCollectionTimes.clear()
         MultiTrackingRates.lastApiCollections.clear()
         MultiTrackingRates.moneyPerHourNPC.clear()
         MultiTrackingRates.moneyMadeNPC.clear()
@@ -430,7 +432,7 @@ object MultiTrackingHandler  {
         lines.addAll(collectionLines)
 
         if (trackedCollections.contains("gemstone")) {
-            val summaryLine = Component.literal("   §dGemstones (${variant.lowercase()}): ")
+            val summaryLine = Component.literal("   Gemstones (${variant.lowercase()}): ").withColor(ColorUtils.collectionColors["gemstone"] ?: Colors.LIGHT_PURPLE.color)
 
             when (summaryStatsName) {
                 "COLLECTION" -> {

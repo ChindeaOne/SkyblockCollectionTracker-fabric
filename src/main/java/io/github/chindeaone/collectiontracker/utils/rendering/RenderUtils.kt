@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.utils.rendering
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.config.enableTamingTracking
 import io.github.chindeaone.collectiontracker.config.overlayTextColor
 import io.github.chindeaone.collectiontracker.config.titleDisplayTimer
 import io.github.chindeaone.collectiontracker.config.titlePosition
@@ -104,9 +105,9 @@ object RenderUtils {
 
         val withColor = overlayTextColor
 
-        val color: Int = if (withColor) (ColorUtils.collectionColors["gemstone"]) ?: Colors.GREEN.color else Colors.GREEN.color
+        val outlineColor: Int = if (CollectionTracker.collectionList.size == 1) ColorUtils.collectionColors["gemstone"] ?: Colors.BLACK.color else Colors.BLACK.color
 
-        if (color != Colors.GREEN.color) {
+        if (withColor) {
             drawLayeredOutline(
                 context = context,
                 x = -padding,
@@ -115,7 +116,7 @@ object RenderUtils {
                 height = overlayH,
                 radius = radius,
                 outlineShade = Colors.DARK_GRAY.color,
-                accentColor = color
+                accentColor = outlineColor
             )
         }
 
@@ -124,33 +125,29 @@ object RenderUtils {
             if (withColor) {
                 val splitIndex = line.indexOf(": ")
                 if (splitIndex != -1) {
-                    val prefix = line.substring(0, splitIndex)
-                    // Check prefixes
-                    val delimiters = arrayOf(" collection", " $/h", " $ made", " Coll/h", " Motes")
-                    var foundCollName = prefix
+                    val collectionName = line.substringBefore(": ")
                         .replace("§e[+]§r ", "")
                         .replace("§e[-]§r ", "")
-
-                    for (delim in delimiters) {
-                        if (foundCollName.contains(delim)) {
-                            foundCollName = foundCollName.substring(0, foundCollName.indexOf(delim))
-                            break
+                        .lowercase()
+                        .trimEnd()
+                        .let { name ->
+                            listOf(" collection", " $/h", " $ made", " coll/h", " motes")
+                                .find(name::endsWith)
+                                ?.let(name::removeSuffix)
+                                ?: name
                         }
-                    }
 
-                    if (foundCollName.contains("Next Position") ||
-                        foundCollName.contains("Till Next Position") ||
-                        foundCollName.contains("ETA") ||
-                        foundCollName.contains("Passed") ||
-                        foundCollName.contains("Difference") ||
-                        foundCollName.contains("Gemstones") ||
-                        foundCollName.contains("Custom")) {
-                        color = ColorUtils.collectionColors["gemstone"] ?: Colors.GREEN.color
-                    } else if (foundCollName.contains(" ")) { // all gemstones when it's expanded
-                        val firstWord = foundCollName.trim().substringBefore(' ').lowercase()
-                        color = ColorUtils.collectionColors[firstWord.trim()] ?: Colors.GREEN.color
-                    } else {
-                        color = ColorUtils.collectionColors[foundCollName.lowercase().trim()] ?: Colors.GREEN.color
+                    when {
+                        collectionName.startsWith(" ") -> { // all gemstones when it's expanded
+                            val firstWord = collectionName.trimStart().substringBefore(' ')
+                            color = ColorUtils.collectionColors[firstWord] ?: Colors.GREEN.color
+                        }
+                        collectionName.contains("gemstone") || CollectionTracker.collectionList.size == 1 -> {
+                            color = ColorUtils.collectionColors["gemstone"] ?: Colors.GREEN.color
+                        }
+                        else -> {
+                            color = ColorUtils.collectionColors[collectionName] ?: Colors.GREEN.color
+                        }
                     }
                 }
             }
@@ -160,7 +157,7 @@ object RenderUtils {
         }
     }
 
-    fun renderSkillStringsWithTaming(context: GuiGraphicsExtractor, lines: List<String>, tamingLines: List<String>, withTaming: Boolean) {
+    fun renderSkillStringsWithTaming(context: GuiGraphicsExtractor, lines: List<String>, tamingLines: List<String>) {
         var y = 0
 
         val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
@@ -169,13 +166,13 @@ object RenderUtils {
             y += font.lineHeight
         }
 
-        if (withTaming) {
+        if (!enableTamingTracking || SkillTracker.skillName == "Taming") return
+
+        y += font.lineHeight
+        val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: Colors.GREEN.color
+        for (line in tamingLines) {
+            drawHelper(line, context, y, tamingColor)
             y += font.lineHeight
-            val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: Colors.GREEN.color
-            for (line in tamingLines) {
-                drawHelper(line, context, y, tamingColor)
-                y += font.lineHeight
-            }
         }
     }
 

@@ -439,6 +439,7 @@ object CollectionParser {
                     val total = MultiTrackingRates.moneyPerHourNPC.entries
                         .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
                         .sumOf { it.value }
+                    list.add("")
                     if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes/h: ${formatNumber(total)}")
                     else list.add("§eOverall $/h (NPC): ${formatNumber(total)}")
                 } else {
@@ -456,6 +457,7 @@ object CollectionParser {
                     val total = MultiTrackingRates.moneyMadeNPC.entries
                         .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
                         .sumOf { it.value }
+                    list.add("")
                     if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes made: ${formatNumber(total)}")
                     else list.add("§eOverall $ made (NPC): ${formatNumber(total)}")
                 } else {
@@ -469,6 +471,9 @@ object CollectionParser {
             }
             else -> {}
         }
+
+        list.add("")
+        list.add(handleMultiCollectionSinceLastTimer())
     }
 
     private fun handleCollectionMulti(coll: String): String {
@@ -615,6 +620,26 @@ object CollectionParser {
         }
     }
 
+    private fun handleMultiLeaderboard(list: MutableList<String>) {
+        if (collectionLeaderboard) {
+            val tracked: MutableList<String> = collectionList
+            if (tracked.size == 1 && tracked.contains("gemstone")) {
+                addIfNotNull(list, "")
+                addIfNotNull(list, handleMultiNextPosition())
+                addIfNotNull(list, handleMultiCollectionTillNextRank())
+                addIfNotNull(list, handleMultiEta())
+                addIfNotNull(list, "")
+                addIfNotNull(list, handleMultiPreviousPosition())
+                addIfNotNull(list, handleMultiCollectionAbovePreviousRank())
+            }
+        }
+    }
+
+    private fun handleMultiCollectionSinceLastTimer(): String {
+        val totalSeconds: Long = (System.currentTimeMillis() - MultiTrackingRates.lastCollectionUpdate) / 1000
+        return "Last updated: ${StringUtils.formatCompactTime(totalSeconds)} ago"
+    }
+
     fun addToggleableSettingsLines(list: MutableList<String>) {
         list.add("")
         if (useBazaar) {
@@ -652,19 +677,4 @@ object CollectionParser {
             Bazaar.BazaarType.ENCHANTED_VERSION -> "Enchanted version"
             Bazaar.BazaarType.SUPER_ENCHANTED_VERSION -> "Super Enchanted version"
         }
-
-    private fun handleMultiLeaderboard(list: MutableList<String>) {
-        if (collectionLeaderboard) {
-            val tracked: MutableList<String> = collectionList
-            if (tracked.size == 1 && tracked.contains("gemstone")) {
-                addIfNotNull(list, "")
-                addIfNotNull(list, handleMultiNextPosition())
-                addIfNotNull(list, handleMultiCollectionTillNextRank())
-                addIfNotNull(list, handleMultiEta())
-                addIfNotNull(list, "")
-                addIfNotNull(list, handleMultiPreviousPosition())
-                addIfNotNull(list, handleMultiCollectionAbovePreviousRank())
-            }
-        }
-    }
 }
