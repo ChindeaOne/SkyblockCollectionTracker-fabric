@@ -19,7 +19,6 @@ import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.concurrent.Volatile
 import kotlin.math.roundToInt
 
@@ -65,7 +64,7 @@ class CollectionOverlay : AbstractOverlay() {
         TrackingRates.updateRates()
 
         val uptime = TrackingHandler.uptime
-        val isChatOpened = MinecraftUtils.screen is ChatScreen
+        val isChatOpened = MinecraftUtils.isChatScreenOpen()
         val showExtra = showExtraStats
 
         val main = mutableListOf<String>()

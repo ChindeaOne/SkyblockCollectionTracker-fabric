@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.config.enableLottery
 import io.github.chindeaone.collectiontracker.config.enableSkyMall
 import io.github.chindeaone.collectiontracker.config.professionalMS
 import io.github.chindeaone.collectiontracker.config.strongArmMS
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentBeekeeperBuff
@@ -70,7 +71,7 @@ object ContainerParser {
     fun onClientTick(client: Minecraft) {
         val screen = currentHotxScreen ?: return
 
-        if (client./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ !== screen) {
+        if (MinecraftUtils.screen !== screen) {
             currentHotxScreen = null
             currentHotxType = null
             return

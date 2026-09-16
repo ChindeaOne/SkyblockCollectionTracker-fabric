@@ -13,6 +13,7 @@ import io.github.chindeaone.collectiontracker.config.enableMineshaftSpawnRoutes
 import io.github.chindeaone.collectiontracker.config.enableMiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.enableSkyMall
 import io.github.chindeaone.collectiontracker.config.farmingweightRankingInChat
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
@@ -78,7 +79,7 @@ object TabData {
         val player = client.player ?: return null
         val connection = player.connection
 
-        val tabOverlay = client.gui /*? if 26.2 {*/ /*.hud *//*?}*/.tabList
+        val tabOverlay = MinecraftUtils.tabList
 
         val result = connection.onlinePlayers
             .sortedWith(TAB_COMPARATOR)
