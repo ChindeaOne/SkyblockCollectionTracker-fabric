@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
@@ -36,6 +37,7 @@ object ConfigStateUtils {
         checkSkyMallPerk()
         checkLotteryPerk()
         checkBeekeeperPerk()
+        checkTamingTracking()
         WaypointsUtils.checkConfig()
     }
 
@@ -72,24 +74,24 @@ object ConfigStateUtils {
 
         if (!BazaarCollectionsManager.hasBazaarData && useBazaar) {
             ConfigHelper.disableBazaar()
-            sendMessage("§cYou cannot use Bazaar prices for this collection!", true)
+            sendMessage("§cYou cannot use Bazaar prices for this collection!")
         }
 
         if (!BazaarCollectionsManager.hasBazaarData && showExtraStats) {
             ConfigHelper.disableExtraStats()
-            sendMessage("§cNo Bazaar data available for extra stats!", true)
+            sendMessage("§cNo Bazaar data available for extra stats!")
             return
         }
 
         if (CollectionsManager.collectionType == "normal" && showExtraStats) {
             ConfigHelper.disableExtraStats()
-            sendMessage("§cExtra stats are redundant here!", true)
+            sendMessage("§cExtra stats are redundant here!")
             return
         }
 
         if (showExtraStats && !useBazaar) {
             ConfigHelper.disableExtraStats()
-            sendMessage("§cDisabled extra stats since you don't use Bazaar prices!", true)
+            sendMessage("§cDisabled extra stats since you don't use Bazaar prices!")
         }
     }
 
@@ -98,7 +100,7 @@ object ConfigStateUtils {
 
         if (!BazaarCollectionsManager.hasBazaarData && useBazaar) {
             ConfigHelper.disableBazaar()
-            sendMessage("§cYou cannot use Bazaar prices for this collection!", true)
+            sendMessage("§cYou cannot use Bazaar prices for this collection!")
         }
     }
 
@@ -106,12 +108,12 @@ object ConfigStateUtils {
         if (!SkillTrackingHandler.isTracking) return
 
         if (skillLeaderboard && !SkillTrackingHandler.leaderboardTrackingInitialized) {
-            sendMessage("§cCan't enable skill leaderboard mid tracking. Enable this before tracking a skill!", true)
+            sendMessage("§cCan't enable skill leaderboard mid tracking. Enable this before tracking a skill!")
             ConfigHelper.disableSkillLeaderboardTracking()
         }
 
         if (enableTamingTracking && SkillTrackingHandler.uptimeInSeconds > 1 && SkillTrackingRates.tamingXp == 0L) {
-            sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!", true)
+            sendMessage("§cCan't enable taming mid tracking. Enable this before tracking a skill!")
             ConfigHelper.disableTamingTracking()
         }
     }
@@ -120,7 +122,7 @@ object ConfigStateUtils {
         if (ChatListener.currentSkyMallBuff.isEmpty()) {
             if (enableSkyMall) {
                 ConfigHelper.disableSkyMall()
-                sendMessage("§cYou don't have the Sky Mall perk unlocked.", true)
+                sendMessage("§cYou don't have the Sky Mall perk unlocked.")
             }
         }
     }
@@ -129,7 +131,7 @@ object ConfigStateUtils {
         if (ChatListener.currentLotteryBuff.isEmpty()) {
             if (enableLottery) {
                 ConfigHelper.disableLottery()
-                sendMessage("§cYou don't have the Lottery perk unlocked.", true)
+                sendMessage("§cYou don't have the Lottery perk unlocked.")
             }
         }
     }
@@ -138,8 +140,16 @@ object ConfigStateUtils {
         if (ChatListener.currentBeekeeperBuff.isEmpty()) {
             if (enableBeekeeper) {
                 ConfigHelper.disableBeekeeper()
-                sendMessage("§cYou don't have the Beekeeper perk unlocked.", true)
+                sendMessage("§cYou don't have the Beekeeper perk unlocked.")
             }
+        }
+    }
+
+    private fun checkTamingTracking() {
+        if (!SkillTrackingHandler.isTracking) return
+
+        if (enableTamingTracking && SkillTracker.skillName == "Taming") {
+            ConfigHelper.disableTamingTracking()
         }
     }
 }
