@@ -19,6 +19,7 @@
 
 package io.github.chindeaone.collectiontracker.utils
 
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.chindeaone.collectiontracker.config.enableCommissionsKeybinds
 import io.github.chindeaone.collectiontracker.config.enableCommissionsOverlay
 import io.github.chindeaone.collectiontracker.config.enableCommissionsTracking
@@ -40,8 +41,9 @@ import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import java.util.Collections
+import java.util.WeakHashMap
 import org.lwjgl.glfw.GLFW
-import java.util.*
 
 object CommissionUtils {
 
@@ -188,13 +190,13 @@ object CommissionUtils {
 
     private fun isKeyDown(client: Minecraft, keyCode: Int): Boolean {
         if (keyCode == 0) return false
-        val window = client.window.handle()
+        val window = client.window
 
         return if (keyCode < 0) {
             val mouseButton = keyCode + 100
-            GLFW.glfwGetMouseButton(window, mouseButton) == GLFW.GLFW_PRESS
+            GLFW.glfwGetMouseButton(window.handle(), mouseButton) == GLFW.GLFW_PRESS
         } else {
-            GLFW.glfwGetKey(window, keyCode) == GLFW.GLFW_PRESS
+            InputConstants.isKeyDown(window, keyCode)
         }
     }
 
@@ -220,7 +222,7 @@ object CommissionUtils {
             val container = s as? AbstractContainerScreen<*> ?: return@AllowKeyPress true
 
             val keyCode = event.key
-            val isNumberKey = keyCode in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
+            val isNumberKey = keyCode in InputConstants.KEY_1..InputConstants.KEY_9
 
             if (!isNumberKey) return@AllowKeyPress true
             if (!shouldHandleCommissionTracking(container)) return@AllowKeyPress true
@@ -244,7 +246,7 @@ object CommissionUtils {
             if (!shouldBlockNumberKeys(container)) return@AllowKeyRelease true
 
             val keyCode = event.key
-            keyCode !in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9
+            keyCode !in InputConstants.KEY_1..InputConstants.KEY_9
         })
 
         // this handles mouse click
@@ -253,7 +255,8 @@ object CommissionUtils {
             val container = s as? AbstractContainerScreen<*> ?: return@BeforeMouseClick
 
             if (!shouldHandleCommissionTracking(container)) return@BeforeMouseClick
-            if (event.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT) return@BeforeMouseClick
+
+            if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) return@BeforeMouseClick
 
             val slot = getHoveredSlot(
                 container,
