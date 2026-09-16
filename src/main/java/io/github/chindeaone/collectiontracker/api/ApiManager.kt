@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.api
 
-import com.mojang.authlib.minecraft.MinecraftSessionService
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -24,7 +23,7 @@ object ApiManager {
 
     private val logger: Logger = LogManager.getLogger(ApiManager::class.java)
 
-    val session: MinecraftSessionService get() = Minecraft.getInstance().services().sessionService()
+    val session get() = Minecraft.getInstance().services().sessionService()
 
     val agent: String get() = "$AGENT_BASE/${SkyblockCollectionTracker.VERSION}"
 
