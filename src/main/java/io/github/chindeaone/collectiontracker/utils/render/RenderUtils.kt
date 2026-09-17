@@ -96,7 +96,7 @@ object RenderUtils {
                         .lowercase()
                         .trimEnd()
                         .let { name ->
-                            listOf(" collection", " $/h", " $ made", " coll/h", " motes")
+                            listOf(" $/h (bazaar)", " $/h (npc)", " $ made (bazaar)", " $ made (npc)", " coll/h", " motes/h", " motes made", " (session)")
                                 .find(name::endsWith)
                                 ?.let(name::removeSuffix)
                                 ?: name
@@ -129,7 +129,7 @@ object RenderUtils {
         val outlineColor: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
 
         if (withColor) {
-            drawLayeredOutline(context, lines + tamingLines, outlineColor)
+            drawLayeredOutline(context, lines + "" + tamingLines, outlineColor)
         }
 
         val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
