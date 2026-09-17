@@ -5,12 +5,15 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.changeBazaarPrice
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaar
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaarType
+import io.github.chindeaone.collectiontracker.config.bazaarConfig
 import io.github.chindeaone.collectiontracker.config.bazaarPriceType
 import io.github.chindeaone.collectiontracker.config.bazaarType
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
+import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.gemstoneVariant
 import io.github.chindeaone.collectiontracker.config.multiOverlayPosition
+import io.github.chindeaone.collectiontracker.config.trackingOptions
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
@@ -107,8 +110,8 @@ class MultiCollectionOverlay : AbstractOverlay() {
         }
 
         when {
-            line == "§e[Bazaar Prices]" -> setBazaar(true)
-            line == "§e[NPC Prices]" -> setBazaar(false)
+            line.contains("Stats") -> cycleStats()
+            line.contains("Prices") -> setBazaar(!bazaarConfig.useBazaar)
             line.contains(gemstoneVariant.toString()) -> cycleGemstoneVariant()
             line.contains("version") -> changeEnchantedType()
             line.contains("Instant") -> changeBazaarPriceType()
@@ -131,11 +134,18 @@ class MultiCollectionOverlay : AbstractOverlay() {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
     }
 
+    private fun cycleStats() {
+        val options = MultiCollectionConfig.TrackingOptions.entries
+        val currentStat = trackingOptions
+        val nextIndex = (currentStat.ordinal + 1) % options.size
+        ConfigHelper.setMultiTrackingOption(options[nextIndex])
+    }
+
     private fun cycleGemstoneVariant() {
-        val variants: Array<Bazaar.GemstoneVariant> = Bazaar.GemstoneVariant.entries.toTypedArray()
+        val variants = Bazaar.GemstoneVariant.entries
         val current = gemstoneVariant
-        val nextOrdinal = (current.ordinal + 1) % variants.size
-        ConfigHelper.setGemstoneVariant(variants[nextOrdinal])
+        val nextIndex = (current.ordinal + 1) % variants.size
+        ConfigHelper.setGemstoneVariant(variants[nextIndex])
     }
 
     private fun changeEnchantedType() {

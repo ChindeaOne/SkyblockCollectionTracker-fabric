@@ -25,6 +25,7 @@ import io.github.chindeaone.collectiontracker.config.statsText
 import io.github.chindeaone.collectiontracker.config.trackingOptions
 import io.github.chindeaone.collectiontracker.config.useBazaar
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.isEmpty
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
@@ -655,7 +656,13 @@ object CollectionParser {
                 }
             }
             list.add("§e[Instant ${(if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) "Buy" else "Sell")}]")
-            list.add("${(if (showExtraStats) "§a" else "§e")}[Extra Stats]")
+
+            if (TrackingHandler.isTracking) {
+                list.add("${(if (showExtraStats) "§a" else "§e")}[Extra Stats]")
+            } else {
+                val option = trackingOptions.toString()
+                list.add("§e[$option Stats]")
+            }
         }
     }
 

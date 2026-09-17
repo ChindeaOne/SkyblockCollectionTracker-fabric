@@ -587,6 +587,10 @@ object ConfigHelper {
         bazaarConfig.useBazaar = enabled
     }
 
+    fun setMultiTrackingOption(option: MultiCollectionConfig.TrackingOptions) {
+        multiCollectionOverlay.trackingOptions = option
+    }
+
     fun setGemstoneVariant(variant: Bazaar.GemstoneVariant) {
         bazaarConfig.gemstoneVariant = variant
     }
