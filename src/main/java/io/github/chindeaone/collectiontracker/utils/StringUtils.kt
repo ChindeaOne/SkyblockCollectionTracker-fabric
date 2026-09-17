@@ -166,7 +166,7 @@ object StringUtils {
             // Beekeeper buffs
             "Honeyhives refill" in message -> {
                 val pct = percentRegex.find(message)?.value
-                "§a$pct Faster §6Honeyhives"
+                "§a$pct §6Honeyhives Refill"
             }
             "Critters" in message -> {
                 val pct = percentRegex.find(message)?.value
