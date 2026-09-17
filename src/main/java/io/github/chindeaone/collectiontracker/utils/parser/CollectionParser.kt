@@ -238,7 +238,7 @@ object CollectionParser {
             }
 
             "gemstone" -> {
-                localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("${gemstoneVariant}$suffix", 0L)
+                localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
                 return "$/h (Bazaar): ${formatNumberOrPlaceholder(localMoneyPerHour)}"
             }
 
@@ -288,7 +288,7 @@ object CollectionParser {
             }
 
             "gemstone" -> {
-                localMoneyMade = TrackingRates.moneyMade.getOrDefault("${gemstoneVariant}$suffix", 0L)
+                localMoneyMade = TrackingRates.moneyMade.getOrDefault("$gemstoneVariant$suffix", 0L)
                 return "$ made (Bazaar): ${formatNumberOrPlaceholder(localMoneyMade)}"
             }
 
@@ -410,7 +410,7 @@ object CollectionParser {
                         MultiCollectionConfig.TrackingOptions.MONEY_RATE -> handleMoneyPerHourMulti("gemstone")
                         MultiCollectionConfig.TrackingOptions.MONEY_MADE -> handleMoneyMadeMulti("gemstone")
                     }
-                    list.add("${prefix}$line")
+                    list.add("$prefix$line")
                 }
                 continue
             }
