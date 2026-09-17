@@ -119,29 +119,24 @@ object ConfigStateUtils {
     }
 
     private fun checkSkyMallPerk() {
-        if (ChatListener.currentSkyMallBuff.isEmpty()) {
-            if (enableSkyMall) {
-                ConfigHelper.disableSkyMall()
-                sendMessage("§cYou don't have the Sky Mall perk unlocked.")
-            }
+        if (ChatListener.currentSkyMallBuff.isEmpty() && enableSkyMall) {
+            ConfigHelper.disableSkyMall()
+            sendMessage("§cYou don't have the Sky Mall perk unlocked.")
         }
     }
 
     private fun checkLotteryPerk() {
-        if (ChatListener.currentLotteryBuff.isEmpty()) {
-            if (enableLottery) {
-                ConfigHelper.disableLottery()
-                sendMessage("§cYou don't have the Lottery perk unlocked.")
-            }
+        if (ChatListener.currentLotteryBuff.isEmpty() && enableLottery) {
+            ConfigHelper.disableLottery()
+            sendMessage("§cYou don't have the Lottery perk unlocked.")
+
         }
     }
 
     private fun checkBeekeeperPerk() {
-        if (ChatListener.currentBeekeeperBuff.isEmpty()) {
-            if (enableBeekeeper) {
-                ConfigHelper.disableBeekeeper()
-                sendMessage("§cYou don't have the Beekeeper perk unlocked.")
-            }
+        if (ChatListener.currentBeekeeperBuff.isEmpty() && enableBeekeeper) {
+            ConfigHelper.disableBeekeeper()
+            sendMessage("§cYou don't have the Beekeeper perk unlocked.")
         }
     }
 

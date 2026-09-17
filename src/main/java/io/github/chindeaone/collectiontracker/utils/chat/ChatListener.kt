@@ -325,15 +325,15 @@ object ChatListener {
                 ConfigHelper.setProfessionalMS(0)
                 ConfigHelper.setLastSkyMallBuff("")
 
-                currentSkyMallBuff = ""
+                currentSkyMallBuff = "§cUnknown"
                 isPickaxeAbility = false
             }
             text.startsWith("You have reset your Heart of the Forest", ignoreCase = true) -> {
                 ConfigHelper.setLastLotteryBuff("")
                 ConfigHelper.setLastBeekeeperBuff("")
 
-                currentLotteryBuff = ""
-                currentBeekeeperBuff = ""
+                currentLotteryBuff = "§cUnknown"
+                currentBeekeeperBuff = "§cUnknown"
             }
         }
     }
