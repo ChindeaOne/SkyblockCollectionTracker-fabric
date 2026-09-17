@@ -5,7 +5,7 @@ import io.github.chindeaone.collectiontracker.gui.GuiManager.getEditorInstance
 import io.github.chindeaone.collectiontracker.gui.GuiManager.openEditor
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.roundToInt

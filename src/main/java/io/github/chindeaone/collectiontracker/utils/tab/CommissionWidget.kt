@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser.ActiveCommission
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
 

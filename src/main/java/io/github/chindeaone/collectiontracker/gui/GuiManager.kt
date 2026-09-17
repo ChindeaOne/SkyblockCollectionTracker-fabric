@@ -6,12 +6,12 @@ package io.github.chindeaone.collectiontracker.gui
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.configManager
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker.screenToOpen
 import io.github.chindeaone.collectiontracker.config.ModConfig
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.ChangelogScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.ChangelogScreen
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.DummyTitle
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.milestone.MilestoneScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.milestone.MilestoneScreen
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.leaderboard.LeaderboardScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.leaderboard.LeaderboardScreen
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor

@@ -12,8 +12,8 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatNumberOrPlaceholder
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderSkillStringsWithTaming
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.drawOverlayFrame
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderSkillStringsWithTaming
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class SkillOverlay : AbstractOverlay() {

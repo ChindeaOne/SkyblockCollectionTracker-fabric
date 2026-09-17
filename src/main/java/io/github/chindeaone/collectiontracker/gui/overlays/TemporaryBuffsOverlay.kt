@@ -11,7 +11,7 @@ import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.powderPumpkinEndTime
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.pristinePotatoEndTime
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.refinedCacaoEndTime
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
 import net.minecraft.network.chat.Component
 
 class TemporaryBuffsOverlay : AbstractOverlay() {

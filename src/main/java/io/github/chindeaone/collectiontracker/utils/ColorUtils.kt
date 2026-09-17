@@ -8,7 +8,7 @@ import io.github.chindeaone.collectiontracker.config.customFWColor
 import io.github.chindeaone.collectiontracker.config.enableCustomCWColor
 import io.github.chindeaone.collectiontracker.config.enableCustomFWColor
 import io.github.chindeaone.collectiontracker.farmingweight.FarmingweightManager
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText
+import io.github.chindeaone.collectiontracker.utils.render.ChromaText
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component

@@ -12,7 +12,7 @@ import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrack
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.lastColeweightTime
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatFloat
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.concurrent.Volatile
 

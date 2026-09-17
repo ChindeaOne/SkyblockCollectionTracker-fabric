@@ -20,7 +20,7 @@ import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.SoundUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 

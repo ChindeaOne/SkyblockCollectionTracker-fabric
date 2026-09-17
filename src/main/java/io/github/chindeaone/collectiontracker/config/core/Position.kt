@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.config.core
 
 import com.google.gson.annotations.Expose
-import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils.scaledHeight
-import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils.scaledWidth
+import io.github.chindeaone.collectiontracker.utils.render.ScaleUtils.scaledHeight
+import io.github.chindeaone.collectiontracker.utils.render.ScaleUtils.scaledWidth
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import java.lang.reflect.Field
 import kotlin.math.roundToInt

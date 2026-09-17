@@ -12,8 +12,8 @@ import io.github.chindeaone.collectiontracker.config.enablePureOresRoutes
 import io.github.chindeaone.collectiontracker.config.heatmapOpacity
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines
-import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
+import io.github.chindeaone.collectiontracker.utils.render.CustomPipelines
+import io.github.chindeaone.collectiontracker.utils.render.WorldRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.font.TextRenderable

@@ -17,7 +17,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.concurrent.Volatile

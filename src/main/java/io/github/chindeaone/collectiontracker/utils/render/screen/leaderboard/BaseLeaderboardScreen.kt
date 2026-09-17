@@ -6,8 +6,8 @@ import io.github.chindeaone.collectiontracker.config.leaderboardPositions
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseListScreen
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.Page
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseListScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.Page
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component

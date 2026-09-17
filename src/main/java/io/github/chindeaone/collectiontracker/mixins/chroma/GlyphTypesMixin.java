@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.mixins.chroma;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText;
+import io.github.chindeaone.collectiontracker.utils.render.ChromaText;
 import net.minecraft.client.gui.font.GlyphRenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;

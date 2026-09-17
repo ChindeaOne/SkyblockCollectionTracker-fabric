@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.deployableOutOfRangeWarning
 import io.github.chindeaone.collectiontracker.config.showDeployableTitle
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos

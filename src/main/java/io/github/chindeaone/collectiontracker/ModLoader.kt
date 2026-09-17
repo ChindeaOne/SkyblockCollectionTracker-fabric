@@ -43,7 +43,7 @@ object ModLoader: ModInitializer {
 
     override fun onInitialize() {
         eventRegistration()
-        _root_ide_package_.io.github.chindeaone.collectiontracker.utils.render.CustomPipelines.register()
+        CustomPipelines.register()
 
         SkyblockCollectionTracker.init()
 

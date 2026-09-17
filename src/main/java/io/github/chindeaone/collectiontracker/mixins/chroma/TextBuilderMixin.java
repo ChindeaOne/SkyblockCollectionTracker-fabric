@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.mixins.chroma;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText;
+import io.github.chindeaone.collectiontracker.utils.render.ChromaText;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.TextRenderable.Styled;
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance;

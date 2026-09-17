@@ -3,9 +3,9 @@ package io.github.chindeaone.collectiontracker.utils.render.screen
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.RepoUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.ScaleUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseScrollableScreen
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.render.ScaleUtils
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseScrollableScreen
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component

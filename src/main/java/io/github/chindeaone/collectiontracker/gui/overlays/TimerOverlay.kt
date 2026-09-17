@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.config.showTimerTitle
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.TimeUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
 import net.minecraft.network.chat.Component
 
 class TimerOverlay : AbstractOverlay() {

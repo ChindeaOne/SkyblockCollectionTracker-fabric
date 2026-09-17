@@ -9,7 +9,7 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collect
 import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
 import io.github.chindeaone.collectiontracker.config.includeWipedProfiles
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.CollectionScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.CollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData

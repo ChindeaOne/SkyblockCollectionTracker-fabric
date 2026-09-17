@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.mixins;
 
 //? if 26.2
-//import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
-import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer;
+//import io.github.chindeaone.collectiontracker.utils.render.ChromaRenderer;
+import io.github.chindeaone.collectiontracker.utils.render.WorldRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

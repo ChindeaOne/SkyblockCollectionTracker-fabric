@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.config.categories.*
 import io.github.chindeaone.collectiontracker.utils.Colors
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText
+import io.github.chindeaone.collectiontracker.utils.render.ChromaText
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
 import io.github.notenoughupdates.moulconfig.annotations.Accordion

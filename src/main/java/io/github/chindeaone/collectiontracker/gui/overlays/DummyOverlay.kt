@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen

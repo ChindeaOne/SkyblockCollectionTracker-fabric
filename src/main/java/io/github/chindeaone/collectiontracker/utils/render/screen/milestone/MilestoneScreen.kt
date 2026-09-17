@@ -4,9 +4,9 @@ import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseButton
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseDropdown
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.Page
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseButton
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseDropdown
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.Page
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox

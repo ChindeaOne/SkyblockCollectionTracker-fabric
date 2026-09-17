@@ -8,8 +8,8 @@ import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseButton
-import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseListScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseButton
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseListScreen
 import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.EditBox

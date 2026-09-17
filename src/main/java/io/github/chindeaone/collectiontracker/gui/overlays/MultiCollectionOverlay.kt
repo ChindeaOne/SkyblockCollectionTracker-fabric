@@ -16,8 +16,8 @@ import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.drawOverlayFrame
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderMultiTrackingStringsWithColor
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.drawOverlayFrame
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderMultiTrackingStringsWithColor
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.concurrent.Volatile

@@ -10,9 +10,9 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
 //?}
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText;
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
-import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines;
+import io.github.chindeaone.collectiontracker.utils.render.ChromaText;
+import io.github.chindeaone.collectiontracker.utils.render.ChromaRenderer;
+import io.github.chindeaone.collectiontracker.utils.render.CustomPipelines;
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.renderer.state.gui.GlyphRenderState;

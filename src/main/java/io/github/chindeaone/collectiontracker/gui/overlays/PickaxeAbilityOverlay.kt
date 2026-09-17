@@ -14,9 +14,9 @@ import io.github.chindeaone.collectiontracker.config.showPickaxeReadyAbilityTitl
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalCooldown
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalDuration
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderCooldownBar
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.renderCooldownCircle
-import io.github.chindeaone.collectiontracker.utils.rendering.RenderUtils.showTitle
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderCooldownBar
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderCooldownCircle
+import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
