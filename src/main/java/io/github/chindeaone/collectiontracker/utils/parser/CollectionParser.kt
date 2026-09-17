@@ -462,7 +462,7 @@ object CollectionParser {
                     else list.add("§eOverall $ made (NPC): ${formatNumber(total)}")
                 } else {
                     val total = MultiTrackingRates.moneyMadeBazaar.entries
-                        .filter { (key, value) -> value > 0 && (key.contains('_') && key.endsWith("_$variant")) }
+                        .filter { (key, value) -> value > 0 && (key.endsWith(suffix)) }
                         .filter { (key) -> key.contains("_normal") || key.contains("_$typeKey") || key.contains("_$variant") }
                         .sumOf { it.value }
                     list.add("")
@@ -483,9 +483,9 @@ object CollectionParser {
             else " [#${MultiTrackingRates.playerCurrentRank}]"
         }
         return if (MultiTrackingRates.collectionAmounts.getOrDefault(coll, -1L) >= 0)
-            "${formatCollectionName(coll)} : ${formatNumber(MultiTrackingRates.collectionAmounts.getOrDefault(coll, 0L))}$rankSuffix"
+            "${formatCollectionName(coll)}: ${formatNumber(MultiTrackingRates.collectionAmounts.getOrDefault(coll, 0L))}$rankSuffix"
         else
-            "${formatCollectionName(coll)} : Calculating..."
+            "${formatCollectionName(coll)}: Calculating..."
     }
 
     private fun handleCollectionSessionMulti(coll: String): String =
@@ -550,7 +550,7 @@ object CollectionParser {
                 var rate: Long = 0
                 when (type) {
                     "normal" -> rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault("${actualColl}_normal$suffix", 0L)
-                    "enchanted" -> rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault("${actualColl}_enchanted_${bazaarTypeKey()}$suffix", 0L)
+                    "enchanted" -> rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault("${actualColl}_${bazaarTypeKey()}$suffix", 0L)
                 }
 
                 return "${formatCollectionName(coll)} $/h (Bazaar): ${formatNumberOrPlaceholder(rate)}"
@@ -587,7 +587,7 @@ object CollectionParser {
 
             val npcMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(key, -1L)
             if (CollectionsManager.isRiftCollection(coll)) {
-                return "${formatCollectionName(coll)} $ Motes made: ${formatNumberOrPlaceholder(npcMoney)}"
+                return "${formatCollectionName(coll)} Motes made: ${formatNumberOrPlaceholder(npcMoney)}"
             }
             return "${formatCollectionName(coll)} $ made (NPC): ${formatNumberOrPlaceholder(npcMoney)}"
         } else {
@@ -610,7 +610,7 @@ object CollectionParser {
                 var money: Long = 0
                 when (type) {
                     "normal" -> money = MultiTrackingRates.moneyMadeBazaar.getOrDefault("${actualColl}_normal$suffix", 0L)
-                    "enchanted" -> money = MultiTrackingRates.moneyMadeBazaar.getOrDefault("${actualColl}_enchanted_${bazaarTypeKey()}$suffix", 0L)
+                    "enchanted" -> money = MultiTrackingRates.moneyMadeBazaar.getOrDefault("${actualColl}_${bazaarTypeKey()}$suffix", 0L)
                 }
 
                 return "${formatCollectionName(coll)} $ made (Bazaar): ${formatNumberOrPlaceholder(money)}"
