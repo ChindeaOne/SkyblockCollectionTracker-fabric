@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.config.enableMineshaftRoutes
 import io.github.chindeaone.collectiontracker.config.enableMineshaftSpawnRoutes
 import io.github.chindeaone.collectiontracker.config.enablePureOresRoutes
 import io.github.chindeaone.collectiontracker.config.heatmapOpacity
+import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
@@ -52,21 +53,21 @@ object BlockOutline {
         if (currentIndex >= 2) {
             val (label, pos) = allWaypoints[currentIndex - 2]
             renderBlockOutline(pos, camera, 1f, 0f)
-            renderText(pos, label, camera, 0xFFFF0000.toInt())
+            renderText(pos, label, camera, Colors.RED.color)
         }
 
         // previous waypoint -> yellow (only if we have approached at least 1)
         if (currentIndex >= 1 && currentIndex - 1 < allWaypoints.size) {
             val (label, pos) = allWaypoints[currentIndex - 1]
             renderBlockOutline(pos, camera, 1f, 1f)
-            renderText(pos, label, camera, 0xFFFFFF00.toInt())
+            renderText(pos, label, camera, Colors.YELLOW.color)
         }
 
         // current target waypoint -> green
         if (currentIndex < allWaypoints.size) {
             val (label, pos) = allWaypoints[currentIndex]
             renderBlockOutline(pos, camera, 0f, 1f)
-            renderText(pos, label, camera, 0xFF00FF00.toInt())
+            renderText(pos, label, camera, Colors.GREEN.color)
             drawLinetoBlock(pos, camera)
         }
     }
@@ -79,9 +80,7 @@ object BlockOutline {
     ) {
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
 
-        val matrix = Matrix4f().apply {
-                translate((pos.x - camera.pos.x).toFloat(), (pos.y - camera.pos.y).toFloat(), (pos.z - camera.pos.z).toFloat())
-        }
+        val matrix = Matrix4f().translate((pos.x - camera.pos.x).toFloat(), (pos.y - camera.pos.y).toFloat(), (pos.z - camera.pos.z).toFloat())
 
         val vertices = arrayOf(
             floatArrayOf(0f, 0f, 0f), floatArrayOf(1f, 0f, 0f), floatArrayOf(1f, 1f, 0f), floatArrayOf(0f, 1f, 0f),
@@ -103,13 +102,13 @@ object BlockOutline {
             val edgeNormal = Vector3f(v2f).sub(v1f).normalize()
 
             vc.addVertex(matrix, v1[0], v1[1], v1[2])
-                .setColor(r, g, 0f, 1f)
+                .setColor(r, g, 0f, 0.75f)
                 .setNormal(edgeNormal.x(), edgeNormal.y(), edgeNormal.z())
-                .setLineWidth(2f)
+                .setLineWidth(1f)
             vc.addVertex(matrix, v2[0], v2[1], v2[2])
-                .setColor(r, g, 0f, 1f)
+                .setColor(r, g, 0f, 0.75f)
                 .setNormal(edgeNormal.x(), edgeNormal.y(), edgeNormal.z())
-                .setLineWidth(2f)
+                .setLineWidth(1f)
         }
     }
 
@@ -118,12 +117,11 @@ object BlockOutline {
         text: String,
         camera: CameraRenderState,
         color: Int
-    ){
-        val matrix = Matrix4f().apply {
-            translate(((pos.x  + 0.5 - camera.pos.x).toFloat()), ((pos.y + 2.25 - camera.pos.y).toFloat()), ((pos.z + 0.5 - camera.pos.z).toFloat()))
-            rotate(camera.orientation)
-            scale(0.03f, -0.03f, 0.03f)
-        }
+    ) {
+        val matrix = Matrix4f()
+            .translate(((pos.x  + 0.5 - camera.pos.x).toFloat()), ((pos.y + 2.25 - camera.pos.y).toFloat()), ((pos.z + 0.5 - camera.pos.z).toFloat()))
+            .rotate(camera.orientation)
+            .scale(0.03f, -0.03f, 0.03f)
 
         val fr = MinecraftUtils.font
         val offset = -fr.width(text) / 2f
@@ -162,26 +160,24 @@ object BlockOutline {
         val sx = (forward.x() * 0.5f)
         val sy = (forward.y() * 0.5f)
         val sz = (forward.z() * 0.5f)
-        val ex = (blockPos.x + 0.5 - camera.pos.x).toFloat()
-        val ey = (blockPos.y + 1.0 - camera.pos.y).toFloat()
-        val ez = (blockPos.z + 0.5 - camera.pos.z).toFloat()
+        val ex = (blockPos.x + 0.5f - camera.pos.x).toFloat()
+        val ey = (blockPos.y + 0.5f - camera.pos.y).toFloat()
+        val ez = (blockPos.z + 0.5f - camera.pos.z).toFloat()
 
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
 
-        val matrix = Matrix4f().apply {
-            translate(sx, sy, sz)
-        }
+        val matrix = Matrix4f().translate(sx, sy, sz)
         val normal = Vector3f(ex - sx, ey - sy, ez - sz).normalize()
 
         vc.addVertex(matrix, sx, sy, sz)
-            .setColor(0f, 1f, 0f, 1f)
+            .setColor(0f, 1f, 0f, 0.75f)
             .setNormal(normal.x(), normal.y(), normal.z())
-            .setLineWidth(2f)
+            .setLineWidth(1f)
 
         vc.addVertex(matrix, ex, ey, ez)
-            .setColor(0f, 1f, 0f, 1f)
+            .setColor(0f, 1f, 0f, 0.75f)
             .setNormal(normal.x(), normal.y(), normal.z())
-            .setLineWidth(2f)
+            .setLineWidth(1f)
     }
 
     fun renderBlockHighlight(
@@ -201,9 +197,7 @@ object BlockOutline {
         val maxY = minY + 1f + 0.002f
         val maxZ = minZ + 1f + 0.002f
 
-        val posMatrix = Matrix4f().apply {
-            translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
-        }
+        val posMatrix = Matrix4f().translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
 
         drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha)
     }
@@ -216,9 +210,7 @@ object BlockOutline {
     ) {
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.HIGHLIGHT)
 
-        val posMatrix = Matrix4f().apply {
-            translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
-        }
+        val posMatrix = Matrix4f().translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
 
         val minX = box.minX.toFloat()
         val minY = box.minY.toFloat()
@@ -242,7 +234,7 @@ object BlockOutline {
         maxX: Float, maxY: Float, maxZ: Float,
         red: Float, green: Float, blue: Float, alpha: Float
     ) {
-        val lineWidth = 2f
+        val lineWidth = 1f
 
         // front (+Z)
         vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
@@ -299,19 +291,18 @@ object BlockOutline {
         val ey = ((box.minY + box.maxY) / 2 - camera.pos.y).toFloat()
         val ez = ((box.minZ + box.maxZ) / 2 - camera.pos.z).toFloat()
 
-        val matrix = Matrix4f().apply {
-            translate(sx, sy, sz)
-        }
+        val matrix = Matrix4f().translate(sx, sy, sz)
+
         val normal = Vector3f(ex - sx, ey - sy, ez - sz).normalize()
 
         vc.addVertex(matrix, sx, sy, sz)
-            .setColor(0f, 1f, 0f, 1f)
+            .setColor(0f, 1f, 0f, 0.75f)
             .setNormal(normal.x(), normal.y(), normal.z())
-            .setLineWidth(2f)
+            .setLineWidth(1f)
 
         vc.addVertex(matrix, ex, ey, ez)
-            .setColor(0f, 1f, 0f, 1f)
+            .setColor(0f, 1f, 0f, 0.75f)
             .setNormal(normal.x(), normal.y(), normal.z())
-            .setLineWidth(2f)
+            .setLineWidth(1f)
     }
 }
