@@ -44,6 +44,13 @@ object WaypointsUtils {
         OPAL_1, OPAL_C;
     }
 
+    private data class RouteState(
+        val enabled: Boolean,
+        val wasEnabled: Boolean,
+        val disable: () -> Unit,
+        val category: String
+    )
+
     fun setWaypoints(data: JsonObject) {
         waypointCategories.clear()
         data.keySet().forEach { categoryName ->
@@ -84,42 +91,60 @@ object WaypointsUtils {
     }
 
     fun checkConfig() {
-        if (currentMiningIsland == "Dwarven Mines") {
-            val routes = listOf(
-                Triple(enableMineshaftSpawnRoutes, lastMineshaftEnabled, ConfigHelper::setMineshaftSpawnRoutesEnabled),
-                Triple(enableDwarvenMetalRoutes, lastMetalEnabled, ConfigHelper::setDwarvenMetalRoutesEnabled),
-                Triple(enablePureOresRoutes, lastOresEnabled, ConfigHelper::setPureOresRoutesEnabled)
+        when {
+            currentMiningIsland == "Dwarven Mines" -> checkDwarvenRoutes()
+            currentMiningIsland != "Mineshaft" -> currentCategory = null
+        }
+    }
+
+    fun checkDwarvenRoutes() {
+        val routes = arrayOf(
+            RouteState(
+                enableMineshaftSpawnRoutes,
+                lastMineshaftEnabled,
+                { ConfigHelper.setMineshaftSpawnRoutesEnabled(false) },
+                mineshaftSpawnRoutes.type
+            ),
+            RouteState(
+                enableDwarvenMetalRoutes,
+                lastMetalEnabled,
+                { ConfigHelper.setDwarvenMetalRoutesEnabled(false) },
+                dwarvenMetalRoutes.type
+            ),
+            RouteState(
+                enablePureOresRoutes,
+                lastOresEnabled,
+                { ConfigHelper.setPureOresRoutesEnabled(false) },
+                pureOresRoutes.type
             )
+        )
 
-            val selectedIndex = routes.indexOfFirst { it.first && !it.second }
+        val enabledIndex = routes.indexOfFirst {
+            it.enabled && !it.wasEnabled
+        }
 
-            if (selectedIndex != -1) {
-                val otherEnabled = routes.indices.any { it != selectedIndex && routes[it].second }
-                if (otherEnabled) {
-                    ChatUtils.sendMessage("§cCannot enable another route. Disable the current one first.", true)
-                    routes[selectedIndex].third(false)
-                }
+        if (enabledIndex != -1) {
+            val otherEnabled = routes.withIndex().any {
+                it.index != enabledIndex && it.value.wasEnabled
             }
 
-            lastMineshaftEnabled = enableMineshaftSpawnRoutes
-            lastMetalEnabled = enableDwarvenMetalRoutes
-            lastOresEnabled = enablePureOresRoutes
-
-            val category = when {
-                lastMineshaftEnabled -> mineshaftSpawnRoutes.type
-                lastMetalEnabled -> dwarvenMetalRoutes.type
-                lastOresEnabled -> pureOresRoutes.type
-                else -> null
+            if (otherEnabled) {
+                ChatUtils.sendMessage("§cCannot enable another route. Disable the current one first.")
+                routes[enabledIndex].disable()
             }
+        }
 
-            if (category != null) {
-                selectCategory(category)
-            } else {
-                currentCategory = null
-                reset()
-            }
-        } else if (currentMiningIsland != "Mineshaft") {
+        lastMineshaftEnabled = enableMineshaftSpawnRoutes
+        lastMetalEnabled = enableDwarvenMetalRoutes
+        lastOresEnabled = enablePureOresRoutes
+
+        val activeRoute = routes.firstOrNull { it.enabled }
+
+        if (activeRoute != null) {
+            selectCategory(activeRoute.category)
+        } else {
             currentCategory = null
+            reset()
         }
     }
 
