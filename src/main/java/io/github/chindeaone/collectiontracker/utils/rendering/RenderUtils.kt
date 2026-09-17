@@ -41,7 +41,7 @@ object RenderUtils {
         val radius = (totalBoxHeight / 4).coerceAtMost(6)
 
         drawOverlayFrame(context, pos) {
-            drawRoundedRect(context, 0, -yPadding, pos.width, totalBoxHeight, radius, ColorUtils.DUMMY_BG)
+            drawRoundedRect(context, pos.width, totalBoxHeight, radius)
 
             val overlayText = Component.literal(label).withColor(Colors.GREEN.color)
             val textScale = 0.8f
@@ -62,28 +62,11 @@ object RenderUtils {
     fun renderTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
 
-        val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
-        val totalTextHeight = lines.size * font.lineHeight
-
-        val padding = 8
-        val overlayW = maxTextWidth + padding * 2
-        val overlayH = totalTextHeight + padding * 2
-
-        val radius = (overlayH / 12).coerceAtLeast(1)
-
+        val withColor = overlayTextColor
         val color: Int = if (overlayTextColor) (ColorUtils.collectionColors[CollectionTracker.collection]) ?: Colors.GREEN.color else Colors.GREEN.color
 
-        if (color != Colors.GREEN.color) {
-            drawLayeredOutline(
-                context = context,
-                x = -padding,
-                y = -padding,
-                width = overlayW,
-                height = overlayH,
-                radius = radius,
-                outlineShade = Colors.DARK_GRAY.color,
-                accentColor = color
-            )
+        if (withColor) {
+            drawLayeredOutline(context, lines, color)
         }
 
         for (line in lines) {
@@ -95,29 +78,11 @@ object RenderUtils {
     fun renderMultiTrackingStringsWithColor(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
 
-        val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
-        val totalTextHeight = lines.size * font.lineHeight
-
-        val padding = 8
-        val overlayW = maxTextWidth + padding * 2
-        val overlayH = totalTextHeight + padding * 2
-        val radius = (overlayH / 12).coerceAtLeast(1)
-
         val withColor = overlayTextColor
-
         val outlineColor: Int = if (CollectionTracker.collectionList.size == 1) ColorUtils.collectionColors["gemstone"] ?: Colors.BLACK.color else Colors.BLACK.color
 
         if (withColor) {
-            drawLayeredOutline(
-                context = context,
-                x = -padding,
-                y = -padding,
-                width = overlayW,
-                height = overlayH,
-                radius = radius,
-                outlineShade = Colors.DARK_GRAY.color,
-                accentColor = outlineColor
-            )
+            drawLayeredOutline(context, lines, outlineColor)
         }
 
         for (line in lines) {
@@ -160,6 +125,13 @@ object RenderUtils {
     fun renderSkillStringsWithTaming(context: GuiGraphicsExtractor, lines: List<String>, tamingLines: List<String>) {
         var y = 0
 
+        val withColor = overlayTextColor
+        val outlineColor: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
+
+        if (withColor) {
+            drawLayeredOutline(context, lines + tamingLines, outlineColor)
+        }
+
         val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
         for (line in lines) {
             drawHelper(line, context, y, color)
@@ -168,8 +140,9 @@ object RenderUtils {
 
         if (!enableTamingTracking || SkillTracker.skillName == "Taming") return
 
-        y += font.lineHeight
         val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: Colors.GREEN.color
+
+        y += font.lineHeight
         for (line in tamingLines) {
             drawHelper(line, context, y, tamingColor)
             y += font.lineHeight
@@ -196,60 +169,55 @@ object RenderUtils {
     }
 
     fun renderCooldownCircle(context: GuiGraphicsExtractor, ability: String) {
-        val centerX = ScaleUtils.scaledWidth / 2f - 1f
-        val centerY = ScaleUtils.scaledHeight / 2f - 1f
+        val cx = (ScaleUtils.scaledWidth / 2f - 1f).roundToInt()
+        val cy = (ScaleUtils.scaledHeight / 2f - 1f).roundToInt()
 
         val (cooldown, duration, maxCooldown, maxDuration) = getAbilityTimes(ability)
 
         when {
-            cooldown <= 0.0 -> {
-                drawArc(context, centerX, centerY, -90f, 360f, Colors.GREEN.color)
-            }
+            cooldown <= 0.0 -> drawArc(context, cx, cy, -90f, 360f, Colors.GREEN.color)
 
             duration > 0.0 -> {
                 val progress = (duration / maxDuration).coerceIn(0.0, 1.0)
+
                 val sweep = (360 * progress).toFloat()
                 val start = -90f + (360f - sweep)
 
-                drawArc(context, centerX, centerY, start, sweep, Colors.GREEN.color)
+                drawArc(context, cx, cy, start, sweep, Colors.GREEN.color)
             }
 
             else -> {
                 val progress = (1.0 - cooldown / maxCooldown).coerceIn(0.0, 1.0)
 
-                drawArc(context, centerX, centerY, -90f, (-360 * progress).toFloat(), Colors.RED.color)
+                drawArc(context, cx, cy, -90f, (-360 * progress).toFloat(), Colors.RED.color)
             }
         }
     }
 
     fun renderCooldownBar(context: GuiGraphicsExtractor, ability: String) {
-        val centerX = ScaleUtils.scaledWidth / 2f - 1f
-        val centerY = ScaleUtils.scaledHeight / 2f - 1f + 8f
+        val centerX = (ScaleUtils.scaledWidth / 2f - 1f).roundToInt()
+        val centerY = (ScaleUtils.scaledHeight / 2f - 1f + 8f).roundToInt()
 
         val (cooldown, duration, maxCooldown, maxDuration) = getAbilityTimes(ability)
 
         when {
-            cooldown <= 0.0 -> {
-                drawBar(context, centerX, centerY, 11f, 2f, 1f, Colors.GREEN.color)
-            }
+            cooldown <= 0.0 -> drawBar(context, centerX, centerY, 1f, Colors.GREEN.color)
 
             duration > 0.0 -> {
                 val progress = (duration / maxDuration).coerceIn(0.0, 1.0).toFloat()
-                drawBar(context, centerX, centerY, 11f, 2f, progress, Colors.GREEN.color)
+                drawBar(context, centerX, centerY, progress, Colors.GREEN.color)
             }
 
             else -> {
                 val progress = (1.0 - cooldown / maxCooldown).coerceIn(0.0, 1.0).toFloat()
-                drawBar(context, centerX, centerY, 11f, 2f, progress, Colors.RED.color)
+                drawBar(context, centerX, centerY, progress, Colors.RED.color)
             }
         }
     }
 
-    private fun drawArc(context: GuiGraphicsExtractor, centerX: Float, centerY: Float, direction: Float, sweepAngle: Float, color: Int) {
+    private fun drawArc(context: GuiGraphicsExtractor, cx: Int, cy: Int, direction: Float, sweepAngle: Float, color: Int) {
         if (sweepAngle == 0f) return
 
-        val cx = centerX.roundToInt()
-        val cy = centerY.roundToInt()
         val count = arcPixels.size
         val startIdx = (normalizeAngle(direction + 90f) / 360f * count).toInt()
         val steps = (abs(sweepAngle) / 360f * count).toInt().coerceAtLeast(1)
@@ -268,30 +236,31 @@ object RenderUtils {
 
     private fun normalizeAngle(angle: Float): Float = ((angle % 360f) + 360f) % 360f
 
-    private val arcPixels: List<Pair<Int, Int>> = buildList {
-        var last: Pair<Int, Int>? = null
+    private val arcPixels: List<Pair<Int, Int>> =
+        buildList {
+            var last: Pair<Int, Int>? = null
 
-        for (deg in 0..360) {
-            val angle = Math.toRadians((deg - 90).toDouble())
-            val point = (6f * cos(angle).toFloat()).roundToInt() to (6f * sin(angle).toFloat()).roundToInt()
+            for (deg in 0..360) {
+                val angle = Math.toRadians((deg - 90).toDouble())
+                val point = (6f * cos(angle).toFloat()).roundToInt() to (6f * sin(angle).toFloat()).roundToInt()
 
-            if (point != last) {
-                add(point)
-                last = point
+                if (point != last) {
+                    add(point)
+                    last = point
+                }
             }
         }
-    }
 
-    @Suppress("SameParameterValue")
-    private fun drawBar(context: GuiGraphicsExtractor, centerX: Float, centerY: Float, width: Float, height: Float, progress: Float, color: Int) {
-        val halfWidth = width / 2f
-        val halfHeight = height / 2f
+    private fun drawBar(context: GuiGraphicsExtractor, centerX: Int, centerY: Int, progress: Float, color: Int) {
+        val left = centerX - 5
+        val top = centerY - 1
+        val right = centerX + 5
+        val bottom = centerY + 1
 
-        val left = (centerX - halfWidth).roundToInt()
-        val top = (centerY - halfHeight).roundToInt()
-        val bottom = (centerY + halfHeight).roundToInt()
+        val clampedProgress = progress.coerceIn(0f, 1f)
+        val progressWidth = ((right - left) * clampedProgress).roundToInt()
 
-        val progressWidth = (width * progress).roundToInt()
+        context.fill(left - 1, top - 1, right + 1, bottom + 1, Colors.DARK_GRAY.color)
 
         if (progressWidth > 0) {
             context.fill(left, top, left + progressWidth, bottom, color)
@@ -326,25 +295,7 @@ object RenderUtils {
     fun renderMilestoneStrings(context: GuiGraphicsExtractor, lines: List<String>, isCollection: Boolean = true) {
         var y = 0
 
-        val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
-        val totalTextHeight = lines.size * font.lineHeight
-
-        val padding = 8
-        val overlayW = maxTextWidth + padding * 2
-        val overlayH = totalTextHeight + padding * 2
-
-        val radius = (overlayH / 12).coerceAtLeast(1)
-
-        drawLayeredOutline(
-            context = context,
-            x = -padding,
-            y = -padding,
-            width = overlayW,
-            height = overlayH,
-            radius = radius,
-            outlineShade = Colors.DARK_GRAY.color,
-            accentColor = Colors.GOLD.color
-        )
+        drawLayeredOutline(context, lines, Colors.GOLD.color)
 
         for (line in lines) {
             val milestoneName = line.substringBefore(": ").trim()
@@ -551,8 +502,11 @@ object RenderUtils {
         context.fill(x2 - 1, y1, x2, y2, borderColor) // Right
     }
 
-    @Suppress("SameParameterValue")
-    private fun drawRoundedRect(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
+    private fun drawRoundedRect(context: GuiGraphicsExtractor, width: Int, height: Int, radius: Int) {
+        val x = 0
+        val y = -4
+        val color = ColorUtils.DUMMY_BG
+
         if (radius <= 0) {
             context.fill(x, y, x + width, y + height, color)
             return
@@ -592,16 +546,25 @@ object RenderUtils {
         }
     }
 
-    @Suppress("SameParameterValue")
-    private fun drawLayeredOutline(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, radius: Int, outlineShade: Int, accentColor: Int) {
+    private fun drawLayeredOutline(context: GuiGraphicsExtractor, lines: List<String>, color: Int) {
+        val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
+        val totalTextHeight = lines.size * font.lineHeight
+
+        val padding = 8
+        val width= maxTextWidth + padding * 2
+        val height = totalTextHeight + padding * 2
+        val x = -padding
+        val y = -padding
+
+        val radius = (height / 12).coerceAtLeast(1)
         val baseR = radius.coerceAtMost(width / 2).coerceAtMost(height / 2)
 
         if (baseR >= 3) {
-            drawOverlayOutline(context, x, y, width, height, baseR, outlineShade) // outer layer
-            drawOverlayOutline(context, x + 1, y + 1, width - 2, height - 2, baseR - 1, accentColor) // middle layer
-            drawOverlayOutline(context, x + 2, y + 2, width - 4, height - 4, baseR - 2, outlineShade) // inner layer
+            drawOverlayOutline(context, x, y, width, height, baseR, Colors.DARK_GRAY.color) // outer layer
+            drawOverlayOutline(context, x + 1, y + 1, width - 2, height - 2, baseR - 1, color) // middle layer
+            drawOverlayOutline(context, x + 2, y + 2, width - 4, height - 4, baseR - 2, Colors.DARK_GRAY.color) // inner layer
         } else {
-            drawOverlayOutline(context, x, y, width, height, baseR, outlineShade)
+            drawOverlayOutline(context, x, y, width, height, baseR, Colors.DARK_GRAY.color)
         }
     }
 
