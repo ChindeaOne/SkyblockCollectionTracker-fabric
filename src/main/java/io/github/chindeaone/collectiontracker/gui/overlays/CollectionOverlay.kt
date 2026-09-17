@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper.changeBazaarPr
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaar
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaarType
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.setShowExtraStats
+import io.github.chindeaone.collectiontracker.config.bazaarConfig
 import io.github.chindeaone.collectiontracker.config.bazaarPriceType
 import io.github.chindeaone.collectiontracker.config.bazaarType
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
@@ -81,21 +82,19 @@ class CollectionOverlay : AbstractOverlay() {
             if (isChatOpened) CollectionParser.addToggleableSettingsLines(extra)
         }
 
-        val combined = mutableListOf<String>()
-        combined.addAll(main)
-        if (showExtra && extra.isNotEmpty()) {
-            combined.add("") // add separator line
-            combined.addAll(extra)
+        cachedLines = buildList {
+            addAll(main)
+            if (showExtra && isChatOpened) {
+                add("") // add separator line
+                addAll(extra)
+            }
         }
-
-        cachedLines = combined
     }
 
     override fun handleLineAction(line: String) {
         when {
-            line == "§e[Bazaar Prices]" -> setBazaar(true)
-            line == "§e[NPC Prices]" -> setBazaar(false)
-            line == "§e[Extra Stats]" -> setShowExtraStats(!showExtraStats)
+            line.contains("Prices") -> setBazaar(!bazaarConfig.useBazaar)
+            line.contains("Extra") -> setShowExtraStats(!showExtraStats)
             line.contains(gemstoneVariant.toString()) -> cycleGemstoneVariant()
             line.contains("version") -> changeEnchantedType()
             line.contains("Instant") -> changeBazaarPriceType()

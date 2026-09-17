@@ -25,7 +25,6 @@ import io.github.chindeaone.collectiontracker.config.statsText
 import io.github.chindeaone.collectiontracker.config.trackingOptions
 import io.github.chindeaone.collectiontracker.config.useBazaar
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.isEmpty
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
@@ -642,10 +641,11 @@ object CollectionParser {
 
     fun addToggleableSettingsLines(list: MutableList<String>) {
         list.add("")
+        list.add("§e${(if (useBazaar) "[Bazaar Prices]" else "[NPC Prices]")}")
+
         if (useBazaar) {
-            list.add("§a[Bazaar Prices]")
             if (collectionList.contains("gemstone") || GemstonesManager.checkIfGemstone(collection)) {
-                list.add("§e[${gemstoneVariant}]")
+                list.add("§e[$gemstoneVariant]")
             }
             if ("enchanted" == collectionType || CollectionsManager.multiCollectionTypes.containsValue("enchanted")) {
                 if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
@@ -655,14 +655,7 @@ object CollectionParser {
                 }
             }
             list.add("§e[Instant ${(if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) "Buy" else "Sell")}]")
-            list.add("§e[NPC Prices]")
-            if (TrackingHandler.isTracking) {
-                if (showExtraStats) list.add("§a[Extra Stats]")
-                else list.add("§e[Extra Stats]")
-            }
-        } else {
-            list.add("§e[Bazaar Prices]")
-            list.add("§a[NPC Prices]")
+            list.add("${(if (showExtraStats) "§a" else "§e")}[Extra Stats]")
         }
     }
 
