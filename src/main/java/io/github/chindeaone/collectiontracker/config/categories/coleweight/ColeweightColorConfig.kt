@@ -19,7 +19,7 @@ class ColeweightColorConfig {
     @Expose
     @ConfigOption(
         name = "Custom Rank Color",
-        desc = "§eNote: If both Coleweight and Farming Weight use animated chroma, Coleweight determines the animation speed."
+        desc = "§eNote: If both Coleweight and Farming Weight use animated chroma, Coleweight takes animation speed priority."
     )
     @ConfigEditorColour
     var customColor: ChromaColour = fromStaticRGB(0, 0, 0, 0)

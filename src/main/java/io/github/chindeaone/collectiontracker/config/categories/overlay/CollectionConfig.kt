@@ -54,7 +54,7 @@ class CollectionConfig {
     @Expose
     @ConfigOption(
         name = "Overlay Extra Text",
-        desc = "Drag the lines of text to change the appearance of the extra stats of the overlay.\n§eDoesn't work if 'Extra Stats' is disabled!"
+        desc = "Drag the lines of text to change the appearance of the extra stats of the overlay.\n§eNote: Doesn't work if 'Extra Stats' is disabled!"
     )
     @ConfigEditorDraggableList
     var extraStatsText: MutableList<OverlayExtraText> = mutableListOf(

@@ -17,7 +17,7 @@ class HeatmapConfig {
     @Expose
     @ConfigOption(
         name = "Heatmap Opacity",
-        desc = "Adjust the opacity of the heatmap overlay. (0.0 - fully transparent, 1.0 - fully opaque)"
+        desc = "Adjust the opacity of the heatmap overlay.\n§eNote: 0.0 - fully transparent, 1.0 - fully opaque."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.1f)
     var heatmapOpacity: Float = 1f

@@ -1,6 +1,8 @@
 package io.github.chindeaone.collectiontracker.config.categories.coleweight
 
 import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import io.github.chindeaone.collectiontracker.config.categories.party.PartyNotifierConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -39,6 +41,12 @@ class ColeweightConfig {
     @ConfigOption(name = "Precision Mining", desc = "")
     @Accordion
     var precisionMiningConfig: PrecisionMiningConfig = PrecisionMiningConfig()
+
+    @Expose
+    @ConfigOption(name = "Party Notifier Config", desc = "")
+    @SerializedName("partyNotifierConfig")
+    @Accordion
+    var partyNotifierConfig: PartyNotifierConfig = PartyNotifierConfig()
 
     @Expose
     var coleweightTimerPosition: Position = Position(300, 200)

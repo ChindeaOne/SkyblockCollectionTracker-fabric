@@ -16,7 +16,7 @@ class PrecisionMiningConfig {
     @Expose
     @ConfigOption(
         name = "Line to Precision Mining",
-        desc = "Draws a line to the highlighted particles.\n§eOnly works if Precision Mining Highlight is enabled."
+        desc = "Draws a line to the highlighted particles.\n§eNote: Only works if Precision Mining Highlight is enabled."
     )
     @ConfigEditorBoolean
     var drawLineToPrecisionMining: Boolean = false

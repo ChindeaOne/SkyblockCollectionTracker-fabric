@@ -10,7 +10,7 @@ class SkillConfig {
     @Expose
     @ConfigOption(
         name = "Enable Taming Tracking",
-        desc = "Toggles additional tracking for Taming.\n§eWon't work if you enable mid tracking!"
+        desc = "Toggles additional tracking for Taming."
     )
     @ConfigEditorBoolean
     var enableTamingTracking: Boolean = false

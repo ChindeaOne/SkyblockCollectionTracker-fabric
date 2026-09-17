@@ -45,5 +45,5 @@ class Bazaar {
     @Expose
     @ConfigOption(name = "Gemstone Variant", desc = "Select the variant you want to use for pricing.")
     @ConfigEditorDropdown
-    var gemstoneVariant: GemstoneVariant = GemstoneVariant.FINE // Default to FINE variant
+    var gemstoneVariant: GemstoneVariant = GemstoneVariant.FINE // Default to FINE
 }

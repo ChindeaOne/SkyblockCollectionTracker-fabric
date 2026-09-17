@@ -245,7 +245,7 @@ val serverLagProtection: Boolean get() = miscConfig.serverLagProtection
 val showTimerTitle: Boolean get() = miscConfig.showTimerTitle
 
 // Party Notifier Accessors
-val partyNotifierConfig: PartyNotifierConfig get() = miscConfig.partyNotifierConfig
+val partyNotifierConfig: PartyNotifierConfig get() = coleweightConfig.partyNotifierConfig
 val timerNotifier: Boolean get() = partyNotifierConfig.timerNotifier
 val timerNotifierInterval: Int get() = partyNotifierConfig.timerNotifierInterval
 val stopwatchNotifier: Boolean get() = partyNotifierConfig.stopwatchNotifier

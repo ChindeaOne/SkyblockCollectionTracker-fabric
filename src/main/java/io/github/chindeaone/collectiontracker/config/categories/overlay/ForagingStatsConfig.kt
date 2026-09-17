@@ -10,7 +10,7 @@ class ForagingStatsConfig {
     @Expose
     @ConfigOption(
         name = "Foraging Stats Overlay",
-        desc = "Toggles an overlay for foraging stats.\n§eYour foraging stats stats (e.g. Foraging Fortune, Sweep etc.) must be §bvisible§e in the Stats widget for this to work."
+        desc = "Toggles an overlay for foraging stats.\n§eNote: Your foraging stats (e.g. Foraging Fortune, Sweep etc.) must be §bvisible§e in the Stats tab widget!"
     )
     @ConfigEditorBoolean
     var enableForagingStatsOverlay: Boolean = false

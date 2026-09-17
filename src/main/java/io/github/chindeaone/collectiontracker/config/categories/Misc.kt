@@ -1,8 +1,6 @@
 package io.github.chindeaone.collectiontracker.config.categories
 
 import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
-import io.github.chindeaone.collectiontracker.config.categories.party.PartyNotifierConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.notenoughupdates.moulconfig.annotations.*
@@ -35,7 +33,7 @@ class Misc {
     @Expose
     @ConfigOption(
         name = "Title Scale",
-        desc = "Change the scale of titles.\n§eSmall = 0.5x, Medium = 1x, Large = 2x, Huge = 3x"
+        desc = "Change the scale of titles.\n§eNote: Small = 0.5x, Medium = 1x, Large = 2x, Huge = 3x"
     )
     @ConfigEditorDropdown
     var titleScale: TitleScale = TitleScale.MEDIUM // Default to MEDIUM
@@ -53,7 +51,7 @@ class Misc {
     @Expose
     @ConfigOption(
         name = "Server Lag Protection",
-        desc = "Prevents ability timers from counting down during server lag.\n§eMight desync timers if you swap lobbies a lot!"
+        desc = "Prevents ability timers from counting down during server lag.\n§eNote: Might desync timers if you swap lobbies a lot!"
     )
     @ConfigEditorBoolean
     var serverLagProtection: Boolean = false
@@ -65,10 +63,4 @@ class Misc {
 
     @Expose
     var titlePosition: Position = Position(0, 0)
-
-    @Expose
-    @ConfigOption(name = "Party Notifier Config", desc = "")
-    @SerializedName("partyNotifierConfig")
-    @Accordion
-    var partyNotifierConfig: PartyNotifierConfig = PartyNotifierConfig()
 }
