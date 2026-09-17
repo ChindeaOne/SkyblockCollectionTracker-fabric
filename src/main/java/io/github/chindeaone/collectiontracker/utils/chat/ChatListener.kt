@@ -106,6 +106,7 @@ object ChatListener {
         if (component.string.startsWith("[Sacks]")) parseSacksMessage(component)
     }
 
+    @JvmStatic
     fun skillListener(text: String) {
         if (!SkillTrackingHandler.isTracking) return
         val cleanText = text.removeColor()

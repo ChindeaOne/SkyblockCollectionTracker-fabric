@@ -63,13 +63,8 @@ object ModLoader: ModInitializer {
         }
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
-        ClientReceiveMessageEvents.GAME.register { message, actionBar ->
+        ClientReceiveMessageEvents.GAME.register { message, _ ->
             if (!HypixelUtils.isInSkyblock) return@register
-
-            if (actionBar) {
-                ChatListener.skillListener(message.toString())
-                return@register
-            }
 
             ChatListener.onChatMessage(message)
         }

@@ -2,9 +2,11 @@ package io.github.chindeaone.collectiontracker.mixins;
 
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils;
 import io.github.chindeaone.collectiontracker.utils.ServerTickUtils;
+import io.github.chindeaone.collectiontracker.utils.chat.ChatListener;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,5 +24,10 @@ public class ClientPacketListenerMixin {
     @Inject(method = "handleLogin", at = @At("RETURN"))
     private void sct$onLogin(ClientboundLoginPacket packet, CallbackInfo ci) {
         ServerTickUtils.reset();
+    }
+
+    @Inject(method = "handleSystemChat", at = @At("RETURN"))
+    private void sct$onSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
+        ChatListener.skillListener(packet.content().toString());
     }
 }
