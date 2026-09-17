@@ -24,12 +24,29 @@ class BaseButton(
         context.fill(x + width - 1, y, x + width, y + height, border)
 
         val label = labelProvider()
-        context.centeredText(
-            MinecraftUtils.font,
-            label,
-            x + width / 2,
-            y + (height - MinecraftUtils.font.lineHeight) / 2,
-            Colors.WHITE.color
-        )
+
+        if (label.string == "✓") {
+            context.pose().pushMatrix()
+            context.pose().translate(x + width / 2f, y + height / 2f)
+            context.pose().scale(1.5f, 1f)
+
+            context.centeredText(
+                MinecraftUtils.font,
+                label,
+                0,
+                - MinecraftUtils.font.lineHeight / 2,
+                Colors.WHITE.color
+            )
+
+            context.pose().popMatrix()
+        } else {
+            context.centeredText(
+                MinecraftUtils.font,
+                label,
+                x + width / 2,
+                y + (height - MinecraftUtils.font.lineHeight) / 2,
+                Colors.WHITE.color
+            )
+        }
     }
 }

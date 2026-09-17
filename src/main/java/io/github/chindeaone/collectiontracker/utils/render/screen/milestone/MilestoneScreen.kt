@@ -21,7 +21,7 @@ class MilestoneScreen(
     private data class MilestoneWidgets(val total: Button, val name: BaseDropdown, val value: EditBox, val remove: Button)
     private val entryWidgets = mutableListOf<MilestoneWidgets>()
 
-    override val message: Component = Component.literal("ⓘ `Total` means the milestone is based on your total collection/skill amount!")
+    override val message: Component = Component.literal("ⓘ Check `Total` on a milestone to set it as the total collection or skill xp, rather than an amount to obtain.")
 
     override val screenTitle: Component
         get() = when (currentPage) {
