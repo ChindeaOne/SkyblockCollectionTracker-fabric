@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering
+package io.github.chindeaone.collectiontracker.utils.render
 
 import net.minecraft.client.Minecraft
 

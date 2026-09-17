@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering.screen.core
+package io.github.chindeaone.collectiontracker.utils.render.screen.core
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 

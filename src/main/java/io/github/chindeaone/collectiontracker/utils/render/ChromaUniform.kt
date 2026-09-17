@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering
+package io.github.chindeaone.collectiontracker.utils.render
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder

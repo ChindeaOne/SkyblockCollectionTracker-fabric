@@ -20,10 +20,10 @@ import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
 import io.github.chindeaone.collectiontracker.utils.tab.TabData
 import io.github.chindeaone.collectiontracker.utils.world.BlockOutline
 import io.github.chindeaone.collectiontracker.utils.world.BlockWatcher
-import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines
+import io.github.chindeaone.collectiontracker.utils.render.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.world.DwarvenHeatmap
 import io.github.chindeaone.collectiontracker.utils.world.PrecisionMining
-import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer
+import io.github.chindeaone.collectiontracker.utils.render.WorldRenderer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -43,7 +43,7 @@ object ModLoader: ModInitializer {
 
     override fun onInitialize() {
         eventRegistration()
-        CustomPipelines.register()
+        _root_ide_package_.io.github.chindeaone.collectiontracker.utils.render.CustomPipelines.register()
 
         SkyblockCollectionTracker.init()
 

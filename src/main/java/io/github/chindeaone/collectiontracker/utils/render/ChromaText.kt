@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering
+package io.github.chindeaone.collectiontracker.utils.render
 
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance

@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering.screen.core
+package io.github.chindeaone.collectiontracker.utils.render.screen.core
 
 import io.github.chindeaone.collectiontracker.gui.OverlayManager
 import io.github.chindeaone.collectiontracker.utils.Colors

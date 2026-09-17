@@ -1,6 +1,8 @@
-package io.github.chindeaone.collectiontracker.utils.rendering.screen.leaderboard
+package io.github.chindeaone.collectiontracker.utils.render.screen.milestone
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseButton
 import io.github.chindeaone.collectiontracker.utils.rendering.screen.core.BaseDropdown
@@ -12,18 +14,19 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
 
-class LeaderboardScreen(
+class MilestoneScreen(
     oldScreen: AbstractContainerScreen<*>?
-): BaseLeaderboardScreen(oldScreen) {
-    private data class LeaderboardWidgets(val name: BaseDropdown, val position: EditBox, val remove: Button)
-    private val entryWidgets = mutableListOf<LeaderboardWidgets>()
+): BaseMilestoneScreen(oldScreen) {
 
-    override val message: Component = Component.empty()
+    private data class MilestoneWidgets(val total: Button, val name: BaseDropdown, val value: EditBox, val remove: Button)
+    private val entryWidgets = mutableListOf<MilestoneWidgets>()
+
+    override val message: Component = Component.literal("ⓘ `Total` means the milestone is based on your total collection/skill amount!")
 
     override val screenTitle: Component
         get() = when (currentPage) {
-            Page.COLLECTIONS -> Component.literal("Collection Positions")
-            Page.SKILLS -> Component.literal("Skill Positions")
+            Page.COLLECTIONS -> Component.literal("Collection Milestones")
+            Page.SKILLS -> Component.literal("Skill Milestones")
         }
 
     override fun rebuildEntryWidgets() {
@@ -48,6 +51,16 @@ class LeaderboardScreen(
                 return@forEachIndexed
             }
 
+            val totalButton = BaseButton(
+                totalColumnX - 8,
+                y + 2,
+                16,
+                16,
+                { if (entry.isTotal) Component.literal("✓").withColor(Colors.GREEN.color) else Component.empty() }
+            ) {
+                updateEntry(index, isTotal = !entries[index].isTotal)
+            }
+
             val nameDropdown = BaseDropdown(
                 nameColumnX - 55,
                 y,
@@ -59,8 +72,8 @@ class LeaderboardScreen(
                 updateEntry(index, name = it)
             }
 
-            val positionBox = createInputBox(entry.position, valueColumnX - 35, y, "Position").apply {
-                setResponder { updateEntry(index, position = it) }
+            val valueBox = createInputBox(entry.value, valueColumnX - 35, y, "Milestone Value").apply {
+                setResponder { updateEntry(index, value = it) }
             }
 
             val removeButton = BaseButton(actionColumnX - 8, y + 2, 16, 16, { Component.literal("-") }) {
@@ -68,12 +81,13 @@ class LeaderboardScreen(
                 rebuildWidgets()
             }
 
-            entryWidgets += LeaderboardWidgets(nameDropdown, positionBox, removeButton)
+            entryWidgets += MilestoneWidgets(totalButton, nameDropdown, valueBox, removeButton)
         }
 
         entryWidgets.forEach { widgets ->
+            addRenderableWidget(widgets.total)
             addRenderableWidget(widgets.name)
-            addRenderableWidget(widgets.position)
+            addRenderableWidget(widgets.value)
             addRenderableWidget(widgets.remove)
         }
     }
@@ -105,5 +119,7 @@ class LeaderboardScreen(
         super.extractRenderState(context, mouseX, mouseY, a)
         drawHeaders(context)
         entryWidgets.forEach { it.name.renderDropdown(context, mouseX, mouseY) }
+
+        context.centeredText(MinecraftUtils.font, message, width / 2, panelBottom() + 2, Colors.GRAY.color)
     }
 }

@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering
+package io.github.chindeaone.collectiontracker.utils.render
 
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.SkillTracker

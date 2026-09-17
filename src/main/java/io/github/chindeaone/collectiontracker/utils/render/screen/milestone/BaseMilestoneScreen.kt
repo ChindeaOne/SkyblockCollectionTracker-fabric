@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering.screen.milestone
+package io.github.chindeaone.collectiontracker.utils.render.screen.milestone
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.config.ConfigHelper

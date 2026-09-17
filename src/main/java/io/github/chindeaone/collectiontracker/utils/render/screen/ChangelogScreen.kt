@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering.screen
+package io.github.chindeaone.collectiontracker.utils.render.screen
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.utils.Colors

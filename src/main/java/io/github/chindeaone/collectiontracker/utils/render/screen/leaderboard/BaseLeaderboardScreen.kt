@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.utils.rendering.screen.leaderboard
+package io.github.chindeaone.collectiontracker.utils.render.screen.leaderboard
 
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
