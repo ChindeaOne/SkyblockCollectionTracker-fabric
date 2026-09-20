@@ -25,7 +25,7 @@ object SkyblockCollectionTracker {
         )
 
         Runtime.getRuntime().addShutdownHook(
-            Thread { ApiManager.removePlayer() }
+            Thread { ApiManager.markPlayerOffline() }
         )
     }
 

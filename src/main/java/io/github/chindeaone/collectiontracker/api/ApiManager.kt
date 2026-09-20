@@ -52,8 +52,9 @@ object ApiManager {
     }
 
     // tell the backend this player is no longer online
-    fun removePlayer() {
+    fun markPlayerOffline() {
         if (TokenManager.token == null) return
+
         try {
             val headers = mapOf(
                 "Authorization" to "Bearer ${TokenManager.token}",
@@ -61,7 +62,6 @@ object ApiManager {
             )
 
             invalidateSession("player-logout", headers)
-            logger.info("[SCT]: Successfully invalidated session on the backend")
         } catch (e: Exception) {
             logger.error("[SCT]: Failed to invalidate session on the backend: ${e.message}", e)
         }
@@ -70,13 +70,13 @@ object ApiManager {
     // manual fetch
     fun fetchToken() {
         if (TokenManager.token != null) {
-            sendMessage("§cToken already exists.", true)
+            sendMessage("§cToken already exists.")
             return
         }
 
         val now = System.currentTimeMillis()
         if (now - lastTokenRequest < 1.minutes.inWholeMilliseconds) {
-            sendMessage("§cPlease wait before requesting a new token.", true)
+            sendMessage("§cPlease wait before requesting a new token.")
             return
         }
         lastTokenRequest = now
