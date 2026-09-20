@@ -381,7 +381,7 @@ object RenderUtils {
     }
 
     private fun drawHelper(line: String, context: GuiGraphicsExtractor, y: Int, prefixColor: Int) {
-        val splitIndex = line.lastIndexOf(": ")
+        val splitIndex = line.indexOf(": ")
         if (splitIndex != -1) {
             val prefix = line.substring(0, splitIndex)
             val numberPart = line.substring(splitIndex)
