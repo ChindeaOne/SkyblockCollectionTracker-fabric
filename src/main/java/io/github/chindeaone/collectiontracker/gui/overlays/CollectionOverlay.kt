@@ -79,12 +79,12 @@ class CollectionOverlay : AbstractOverlay() {
         val extra = mutableListOf<String>()
         if (showExtra) {
             CollectionParser.updateTrackingExtraLines(extra)
-            if (isChatOpened) CollectionParser.addToggleableSettingsLines(extra)
+            CollectionParser.addToggleableSettingsLines(extra)
         }
 
         cachedLines = buildList {
             addAll(main)
-            if (showExtra && isChatOpened) {
+            if (showExtra) {
                 add("") // add separator line
                 addAll(extra)
             }
