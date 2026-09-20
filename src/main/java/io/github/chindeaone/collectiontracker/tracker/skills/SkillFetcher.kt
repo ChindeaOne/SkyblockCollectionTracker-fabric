@@ -143,7 +143,6 @@ object SkillFetcher {
 
     fun clearCache() {
         cacheTimestamps.clear()
-        leaderboardCacheTimestamps.clear()
         skillLeaderboardFetchInProgress.clear()
         logger.info("[SCT]: All skill data caches have been cleared.")
     }

@@ -6,7 +6,6 @@ import io.github.chindeaone.collectiontracker.config.enableTamingTracking
 import io.github.chindeaone.collectiontracker.config.skillLeaderboard
 import io.github.chindeaone.collectiontracker.gui.OverlayManager.setSkillOverlayRendering
 import io.github.chindeaone.collectiontracker.gui.overlays.saveSkillMilestoneProgress
-import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.clearCache
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduleSkillFetch
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduler
@@ -117,9 +116,6 @@ object SkillTrackingHandler {
 
         if (!server) {
             logger.info("[SCT]: Tracking stopped because player disconnected from the server.")
-        } else if (SkillTrackingRates.afk) {
-            sendMessage("§cYou have been marked as AFK. Stopping the tracker.", true)
-            logger.info("[SCT]: Tracking stopped because the player went AFK or the API server is down")
         } else {
             sendMessage("§cAPI server is down. Stopping the skill tracker.", true)
             logger.info("[SCT]: Skill tracking stopped because the API server is down.")
@@ -169,7 +165,6 @@ object SkillTrackingHandler {
         saveSkillMilestoneProgress()
 
         clearCache()
-        clearAllCache()
         SkillTrackingRates.resetSession()
     }
 

@@ -6,7 +6,6 @@ import io.github.chindeaone.collectiontracker.config.skillLeaderboard
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getNextRankEntryForSkill
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPlayerRank
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPreviousRankEntryForSkill
-import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.stopTracking
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler.uptimeInSeconds
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
@@ -20,19 +19,11 @@ object SkillTrackingRates {
     @Volatile var skillXpGained: Long = 0L
     @Volatile var skillPerHour: Long = 0L
 
-    private var lastXpGained = 0L
     var tamingLevel: Int = 0 // session start level and api level
 
     @Volatile var tamingXp: Long = 0 // session start xp and api xp
     @Volatile var tamingXpGained: Long = 0L
     @Volatile var tamingPerHour: Long = 0L
-
-    private var lastTamingXpGained = 0L
-
-    var afk: Boolean = false
-    private var skillUnchangedStreak = 0
-    private var tamingUnchangedStreak = 0
-    private const val THRESHOLD = 2 // Number of checks before considering AFK
 
     // Skill Leaderboard tracking data
     @Volatile var currentSkillRank: Int = -1
@@ -72,21 +63,6 @@ object SkillTrackingRates {
     fun calculateSkillRates(value: Long) {
         skillXpGained = value - (skillXp - (if (SkillTrackingHandler.isSkillMaxed) SkillUtils.getMaxXpForSkill(skillName) else 0L)) // total gained since tracking started
 
-        // AFK detection (API calls only)
-        if (!SkillTrackingHandler.isSkillMaxed) {
-            if (lastXpGained != skillXpGained) {
-                lastXpGained = skillXpGained
-                skillUnchangedStreak = 0
-                afk = false
-            } else {
-                skillUnchangedStreak++
-                if (skillUnchangedStreak >= THRESHOLD) {
-                    afk = true
-                    stopTracking()
-                    return
-                }
-            }
-        }
         val uptime = uptimeInSeconds
         skillPerHour = if (uptime > 0) floor(skillXpGained / (uptime / 3600.0)).toLong() else 0
         totalSkillXp = skillXp + skillXpGained
@@ -97,20 +73,6 @@ object SkillTrackingRates {
 
     fun calculateTamingRates(value: Long) {
         tamingXpGained = value - tamingXp // total gained since tracking started
-
-        // AFK detection (API calls only)
-        if (lastTamingXpGained != tamingXpGained) {
-            lastTamingXpGained = tamingXpGained
-            tamingUnchangedStreak = 0
-            afk = false
-        } else {
-            tamingUnchangedStreak++
-            if (tamingUnchangedStreak >= THRESHOLD) {
-                afk = true
-                stopTracking()
-                return
-            }
-        }
 
         val uptime = uptimeInSeconds
         tamingPerHour = if (uptime > 0) floor(tamingXpGained / (uptime / 3600.0)).toLong() else 0
@@ -216,12 +178,6 @@ object SkillTrackingRates {
         tamingXp = 0L
         tamingXpGained = 0L
         tamingPerHour = 0L
-
-        lastXpGained = 0L
-        lastTamingXpGained = 0L
-        afk = false
-        skillUnchangedStreak = 0
-        tamingUnchangedStreak = 0
 
         currentSkillRank = -1
         nextSkillRankUsername = null
