@@ -44,7 +44,7 @@ object ChatUtils {
     }
 
     fun sendHypixelCommand(message: String) {
-        MinecraftUtils.player?.connection?.sendCommand("pc §6[SCT-$message")
+        MinecraftUtils.player?.connection?.sendCommand("pc $message")
     }
 
     fun sendComponent(component: Component, prefix: Boolean = true, messageId: Int? = null) {

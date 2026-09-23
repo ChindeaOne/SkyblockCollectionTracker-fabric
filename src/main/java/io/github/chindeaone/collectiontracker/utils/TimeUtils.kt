@@ -46,12 +46,12 @@ object TimeUtils {
     }
 
     fun sendTimerToParty(time: Long, isPaused: Boolean) {
-        val message = "Timer] §eTime left: ${StringUtils.formatCompactTime(time)}${if (isPaused) " §c(Paused)" else ""}"
+        val message = "[SCT-Timer] Time left: ${StringUtils.formatCompactTime(time)}${if (isPaused) " (Paused)" else ""}"
         ChatUtils.sendHypixelCommand(message)
     }
 
     fun sendStopwatchToParty(time: Long, isPaused: Boolean) {
-        val message = "Stopwatch] §eElapsed time: ${StringUtils.formatCompactTime(time)}${if (isPaused) " §c(Paused)" else ""}"
+        val message = "[SCT-Stopwatch] Elapsed time: ${StringUtils.formatCompactTime(time)}${if (isPaused) " (Paused)" else ""}"
         ChatUtils.sendHypixelCommand(message)
     }
 
