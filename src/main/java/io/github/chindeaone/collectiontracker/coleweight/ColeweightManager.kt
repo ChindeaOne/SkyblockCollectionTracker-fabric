@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.coleweight
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 
@@ -23,11 +24,17 @@ object ColeweightManager {
     }
 
     fun updateColeweightLb(data: String, isTop: Boolean) {
-        val arr = JsonParser.parseString(data).asJsonArray
-        val list = arr.map { el ->
+        val rootElem = JsonParser.parseString(data)
+        val entries = when {
+            rootElem.isJsonObject -> rootElem.asJsonObject.getAsJsonArray("entries") ?: JsonArray()
+            rootElem.isJsonArray -> rootElem.asJsonArray
+            else -> JsonArray()
+        }
+
+        val list = entries.map { el ->
             val obj = el.asJsonObject
-            val name = obj.get("name")?.asString ?: ""
-            val cw = obj.get("coleweight")?.asFloat ?: 0f
+            val name = obj.get("username")?.asString ?: ""
+            val cw = obj.get("weight")?.asFloat ?: 0f
             ColeweightPlayer(name, cw)
         }
 

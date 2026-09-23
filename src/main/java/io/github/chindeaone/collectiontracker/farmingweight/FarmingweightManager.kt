@@ -28,9 +28,7 @@ object FarmingweightManager {
         val list = entries.mapNotNull { el ->
             if (!el.isJsonObject) return@mapNotNull null
             val obj = el.asJsonObject
-            val name = obj.get("username")?.asString
-                ?: obj.get("name")?.asString
-                ?: return@mapNotNull null
+            val name = obj.get("username")?.asString ?: ""
             val weight = obj.get("weight")?.asFloat ?: 0f
             FarmingweightPlayer(name, weight)
         }
