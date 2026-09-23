@@ -81,7 +81,7 @@ object LeaderboardManager {
 
         val index = findBinaryIndex(lb, amount)
         if (index < lb.size - 1) {
-            return lb[index + 1]
+            return lb[index]
         }
 
         return null
@@ -109,7 +109,7 @@ object LeaderboardManager {
 
         val index = findBinaryIndex(lb, amount)
         if (index < lb.size - 1) {
-            return lb[index + 1]
+            return lb[index]
         }
 
         return null
