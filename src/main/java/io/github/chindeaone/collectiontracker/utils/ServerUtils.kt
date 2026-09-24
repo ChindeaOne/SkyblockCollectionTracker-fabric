@@ -24,7 +24,7 @@ object ServerUtils {
     private val logger: Logger = LogManager.getLogger(ServerUtils::class.java)
 
     fun startCheckingServer () {
-        fixedRateTimer(name = "sct-server-status", initialDelay = CHECK_INTERVAL, period = CHECK_INTERVAL) {
+        fixedRateTimer(name = "sct-server-status", daemon = true, initialDelay = CHECK_INTERVAL, period = CHECK_INTERVAL) {
             checkServerStatusPeriodically()
         }
     }
