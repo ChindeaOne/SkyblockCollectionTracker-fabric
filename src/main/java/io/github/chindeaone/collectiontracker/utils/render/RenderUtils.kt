@@ -18,7 +18,6 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 object RenderUtils {
 
@@ -26,13 +25,12 @@ object RenderUtils {
     private val titleQueue = ArrayDeque<QueuedTitle>()
 
     fun drawOverlayFrame(context: GuiGraphicsExtractor, pos: Position, drawContext: Runnable) {
-        context.pose().pushMatrix()
-        context.pose().translate(pos.x.toFloat(), pos.y.toFloat())
-        context.pose().scale(pos.scale, pos.scale)
+        context.pushPopMatrix {
+            context.translate(pos.x, pos.y)
+            context.scale(pos.scale, pos.scale)
 
-        drawContext.run()
-
-        context.pose().popMatrix()
+            drawContext.run()
+        }
     }
 
     fun drawDummyFrame(context: GuiGraphicsExtractor, pos: Position, label: String) {
@@ -41,7 +39,7 @@ object RenderUtils {
         val radius = (totalBoxHeight / 4).coerceAtMost(6)
 
         drawOverlayFrame(context, pos) {
-            drawRoundedRect(context, pos.width, totalBoxHeight, radius)
+            context.drawRoundedRect(pos.width, totalBoxHeight, radius)
 
             val overlayText = Component.literal(label).withColor(Colors.GREEN.color)
             val textScale = 0.8f
@@ -52,10 +50,10 @@ object RenderUtils {
             val xPos = (pos.width / 2f) / textScale
             val yPos = (centerYInBox - yPadding * textScale) / textScale
 
-            context.pose().pushMatrix()
-            context.pose().scale(textScale, textScale)
-            context.centeredText(font, overlayText, xPos.toInt(), yPos.toInt(), Colors.WHITE.color)
-            context.pose().popMatrix()
+            context.pushPopMatrix {
+                context.scale(textScale, textScale)
+                context.centeredText(font, overlayText, xPos.toInt(), yPos.toInt(), Colors.WHITE.color)
+            }
         }
     }
 
@@ -329,18 +327,6 @@ object RenderUtils {
     }
 
     fun drawEditorHudTitle(context: GuiGraphicsExtractor, pos: Position?) {
-        val textScale = 0.75f
-        val resizeText = Component.literal("").withColor(Colors.GREEN.color)
-
-        val textWidth = font.width(resizeText)
-        val textX = (context.guiWidth() / 2f) - (textWidth * textScale / 2f)
-        val textY = 10f
-
-        context.pose().pushMatrix()
-        context.pose().scale(textScale, textScale)
-        context.text(font, resizeText, (textX / textScale).toInt(), (textY / textScale).toInt(), Colors.WHITE.color, true)
-        context.pose().popMatrix()
-
         if (pos != null) {
             val x = ScaleUtils.mouseX + 12
             val y = ScaleUtils.mouseY - 12
@@ -362,22 +348,22 @@ object RenderUtils {
         val lines = font.split(positionText, 1000)
         val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
 
-        val positionWidth = maxTextWidth * textScale
-        val maxHeight = (lines.size * font.lineHeight + (lines.size - 1) * space) * textScale
+        val positionWidth = (maxTextWidth * textScale).toInt()
+        val maxHeight = ((lines.size * font.lineHeight + (lines.size - 1) * space) * textScale).toInt()
 
-        val positionY = (y.toFloat()).coerceIn(8f, context.guiHeight() - maxHeight - padding * 2 - 8f)
-        val positionX = (x.toFloat()).coerceIn(8f, context.guiWidth() - positionWidth - padding * 2 - 8f)
+        val positionX = x.coerceIn(8, ScaleUtils.scaledWidth - positionWidth - padding * 2 - 8)
+        val positionY = y.coerceIn(8, ScaleUtils.scaledHeight - maxHeight - padding * 2 - 8)
 
-        drawTooltipBox(context, positionX, positionY, positionWidth, maxHeight)
+        context.drawTooltipBox(positionX, positionY, positionWidth, maxHeight)
 
-        context.pose().pushMatrix()
-        context.pose().translate(positionX, positionY)
-        context.pose().scale(textScale, textScale)
-        lines.forEachIndexed { index, line ->
-            val yOffset = index * (font.lineHeight + space)
-            context.text(font, line, 0, yOffset, Colors.YELLOW.color, true)
+        context.pushPopMatrix {
+            context.translate(positionX, positionY)
+            context.scale(textScale, textScale)
+            lines.forEachIndexed { index, line ->
+                val yOffset = index * (font.lineHeight + space)
+                context.text(font, line, 0, yOffset, Colors.YELLOW.color, true)
+            }
         }
-        context.pose().popMatrix()
     }
 
     private fun drawHelper(line: String, context: GuiGraphicsExtractor, y: Int, prefixColor: Int) {
@@ -419,11 +405,11 @@ object RenderUtils {
         val y = if (pos.y == 0) ((screenHeight - (pos.height * scale))/ 2f) else pos.y.toFloat()
         val yOffset = (pos.height - font.lineHeight) / 2f
 
-        context.pose().pushMatrix()
-        context.pose().translate(screenWidth / 2f, y)
-        context.pose().scale(scale, scale)
-        context.centeredText(font, title, 0, yOffset.toInt(), Colors.WHITE.color)
-        context.pose().popMatrix()
+        context.pushPopMatrix {
+            context.translate(screenWidth / 2f, y)
+            context.scale(scale, scale)
+            context.centeredText(font, title, 0, yOffset.toInt(), Colors.WHITE.color)
+        }
     }
 
     fun renderChangelogLines(context: GuiGraphicsExtractor, text: String, startX: Int, startY: Int, overlayWidth: Int, limitStartY: Int, limitHeight: Int) {
@@ -488,64 +474,6 @@ object RenderUtils {
         return totalHeight
     }
 
-    private fun drawTooltipBox(context: GuiGraphicsExtractor, x: Float, y: Float, width: Float, height: Float, padding: Float = 4f, borderColor: Int = Colors.GRAY.color) {
-        val x1 = (x - padding).toInt()
-        val y1 = (y - padding).toInt()
-        val x2 = (x + width + padding).toInt()
-        val y2 = (y + height + padding).toInt()
-
-        context.fill(x1, y1, x2, y2, 0x90000000.toInt())
-
-        context.fill(x1, y1, x2, y1 + 1, borderColor) // Top
-        context.fill(x1, y2 - 1, x2, y2, borderColor) // Bottom
-        context.fill(x1, y1, x1 + 1, y2, borderColor) // Left
-        context.fill(x2 - 1, y1, x2, y2, borderColor) // Right
-    }
-
-    private fun drawRoundedRect(context: GuiGraphicsExtractor, width: Int, height: Int, radius: Int) {
-        val x = 0
-        val y = -4
-        val color = ColorUtils.DUMMY_BG
-
-        if (radius <= 0) {
-            context.fill(x, y, x + width, y + height, color)
-            return
-        }
-
-        val r = radius.coerceAtMost(width / 2).coerceAtMost(height / 2)
-        val alpha = (color shr 24 and 0xFF)
-        val rgb = color and 0xFFFFFF
-
-        // main
-        context.fill(x + r, y, x + width - r, y + r, color)
-        context.fill(x, y + r, x + width, y + height - r, color)
-        context.fill(x + r, y + height - r, x + width - r, y + height, color)
-
-        // corners with AA
-        for (cx in 0 until r) {
-            for (cy in 0 until r) {
-                val dx = (r - cx - 0.5)
-                val dy = (r - cy - 0.5)
-                val dist = sqrt(dx * dx + dy * dy)
-
-                val currAlpha = when {
-                    dist < r - 1.0 -> alpha // fully opaque
-                    dist < r -> ((r - dist) * alpha).toInt()
-                    else -> 0
-                }
-
-                if (currAlpha > 0) {
-                    val newColor = (currAlpha shl 24) or rgb
-
-                    context.fill(x + cx, y + cy, x + cx + 1, y + cy + 1, newColor) // top left
-                    context.fill(x + width - cx - 1, y + cy, x + width - cx, y + cy + 1, newColor) // top right
-                    context.fill(x + cx, y + height - cy - 1, x + cx + 1, y + height - cy, newColor) // bottom left
-                    context.fill(x + width - cx - 1, y + height - cy - 1, x + width - cx, y + height - cy, newColor) // bottom right
-                }
-            }
-        }
-    }
-
     private fun drawLayeredOutline(context: GuiGraphicsExtractor, lines: List<String>, color: Int) {
         val maxTextWidth = lines.maxOfOrNull { font.width(it) } ?: 0
         val totalTextHeight = lines.size * font.lineHeight
@@ -560,36 +488,11 @@ object RenderUtils {
         val baseR = radius.coerceAtMost(width / 2).coerceAtMost(height / 2)
 
         if (baseR >= 3) {
-            drawOverlayOutline(context, x, y, width, height, baseR, Colors.DARK_GRAY.color) // outer layer
-            drawOverlayOutline(context, x + 1, y + 1, width - 2, height - 2, baseR - 1, color) // middle layer
-            drawOverlayOutline(context, x + 2, y + 2, width - 4, height - 4, baseR - 2, Colors.DARK_GRAY.color) // inner layer
+            context.drawRoundedOutline(x, y, width, height, baseR, Colors.DARK_GRAY.color) // outer layer
+            context.drawRoundedOutline(x + 1, y + 1, width - 2, height - 2, baseR - 1, color) // middle layer
+            context.drawRoundedOutline(x + 2, y + 2, width - 4, height - 4, baseR - 2, Colors.DARK_GRAY.color) // inner layer
         } else {
-            drawOverlayOutline(context, x, y, width, height, baseR, Colors.DARK_GRAY.color)
-        }
-    }
-
-    private fun drawOverlayOutline(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Int) {
-        if (width <= 0 || height <= 0) return
-        val r = radius.coerceIn(0, 3).coerceAtMost(width / 2).coerceAtMost(height / 2)
-
-        if (r <= 0) {
-            context.fill(x, y, x + width, y + 1, color) // top
-            context.fill(x, y + height - 1, x + width, y + height, color) // bottom
-            context.fill(x, y + 1, x + 1, y + height - 1, color) // left
-            context.fill(x + width - 1, y + 1, x + width, y + height - 1, color) // right
-            return
-        }
-        context.fill(x + r, y, x + width - r, y + 1, color) // top
-        context.fill(x + r, y + height - 1, x + width - r, y + height, color) // bottom
-        context.fill(x, y + r, x + 1, y + height - r, color) // left
-        context.fill(x + width - 1, y + r, x + width, y + height - r, color) // right
-
-        for (i in 1 until r) {
-            val offset = r - i
-            context.fill(x + i, y + offset, x + i + 1, y + offset + 1, color) // top-left
-            context.fill(x + width - i - 1, y + offset, x + width - i, y + offset + 1, color) // top-right
-            context.fill(x + i, y + height - offset - 1, x + i + 1, y + height - offset, color) // bottom-left
-            context.fill(x + width - i - 1, y + height - offset - 1, x + width - i, y + height - offset, color) // bottom-right
+            context.drawRoundedOutline(x, y, width, height, baseR, Colors.DARK_GRAY.color)
         }
     }
 }
