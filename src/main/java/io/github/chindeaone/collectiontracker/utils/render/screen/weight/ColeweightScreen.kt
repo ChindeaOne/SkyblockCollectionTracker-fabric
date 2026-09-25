@@ -2,9 +2,6 @@ package io.github.chindeaone.collectiontracker.utils.render.screen.weight
 
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
-import io.github.chindeaone.collectiontracker.utils.Colors
-import io.github.chindeaone.collectiontracker.utils.ScreenColors
-import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 
@@ -24,24 +21,13 @@ class ColeweightScreen(
         get() = contentTop + verticalGap
 
     private val secondY: Int
-        get() = firstY + sectionHeight + 2 * verticalGap
+        get() = firstY + widgetHeight + 2 * verticalGap
 
     private val storage
         get() = ColeweightManager.storage
 
-    override fun renderWeightSections(context: GuiGraphicsExtractor) {
-        for (section in weightSections) {
-            val percentage = section.total / storage.coleweight * 100f
-
-            val component = Component.literal("%.2f (%.2f%%)".format(section.total, percentage))
-
-            context.fill(section.x, section.y, section.x + sectionWidth, section.y + sectionHeight, ScreenColors.BUTTON_HOVER.color)
-
-            val centerX = section.x + sectionWidth / 2
-            context.centeredText(font, Component.literal(section.title), centerX, section.y + 6, Colors.WHITE.color)
-            context.centeredText(font, component, centerX, section.y + 6 + font.lineHeight, Colors.WHITE.color)
-        }
-    }
+    override val weight: Float
+        get() = storage.coleweight
 
     override fun addLeftWidgets() {
         addWeightSection(
