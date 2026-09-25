@@ -22,14 +22,14 @@ class DummyOverlay(
         MinecraftUtils.setScreen(oldScreen)
     }
 
-    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
         if (!OverlayManager.isInEditorMode()) {
             return
         }
 
         extractMenuBackground(context)
 
-        oldScreen?.extractRenderState(context, mouseX, mouseY, partialTicks)
+        oldScreen?.extractRenderState(context, mouseX, mouseY, a)
 
         var hovered: AbstractOverlay? = null
         // Draw all dummies

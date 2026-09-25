@@ -27,10 +27,10 @@ class DummyTitle(
         MinecraftUtils.setScreen(oldScreen)
     }
 
-    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
         extractMenuBackground(context)
 
-        oldScreen?.extractRenderState(context, mouseX, mouseY, partialTicks)
+        oldScreen?.extractRenderState(context, mouseX, mouseY, a)
 
         val pos = titlePosition
         val totalScale = titleScale.scale * ScaleUtils.scale
