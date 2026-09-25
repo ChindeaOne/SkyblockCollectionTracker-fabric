@@ -76,6 +76,7 @@ object ColorUtils {
     const val DUMMY_BG: Int = 0x80404040.toInt()
     const val TOOLTIP_BG: Int = 0x90000000.toInt()
     const val COLEWEIGHT: Int = 0xFF7FB4DB.toInt()
+    const val FARMINGWEIGHT: Int = 0xFF58CF30.toInt()
 
     val GRADIENT_START_COLOR: Color = Color(255, 212, 71)
     val GRADIENT_END_COLOR: Color = Color(255, 159, 46)
