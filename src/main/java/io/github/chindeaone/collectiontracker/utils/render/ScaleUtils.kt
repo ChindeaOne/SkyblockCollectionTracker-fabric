@@ -1,17 +1,17 @@
 package io.github.chindeaone.collectiontracker.utils.render
 
-import net.minecraft.client.Minecraft
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 
 object ScaleUtils {
 
-    private val mc = Minecraft.getInstance()
-    private val mouse = mc.mouseHandler
+    private val window = MinecraftUtils.window
+    private val mouseHandler = MinecraftUtils.mouseHandler
 
-    val height get() = mc.window.height
-    val width get() = mc.window.width
-    val scale get() = mc.window.guiScale
-    val scaledHeight get() = mc.window.guiScaledHeight
-    val scaledWidth get() = mc.window.guiScaledWidth
-    val mouseX: Int get() = (mouse.xpos() * scaledWidth / width).toInt()
-    val mouseY: Int get() =(mouse.ypos() * scaledHeight / height).toInt()
+    val height get() = window.height
+    val width get() = window.width
+    val scale get() = window.guiScale
+    val scaledHeight get() = window.guiScaledHeight
+    val scaledWidth get() = window.guiScaledWidth
+    val mouseX: Int get() = (mouseHandler.xpos() * scaledWidth / width).toInt()
+    val mouseY: Int get() =(mouseHandler.ypos() * scaledHeight / height).toInt()
 }

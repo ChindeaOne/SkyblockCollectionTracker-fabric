@@ -18,7 +18,13 @@ object MinecraftUtils {
 
     val gameMode get() = mc.gameMode
 
+    val services get() = mc.services()
+
     val gui get() = mc.gui /*? if 26.2 {*/ /*.hud *//*?}*/
+
+    val window get() = mc.window
+
+    val mouseHandler get() = mc.mouseHandler
 
     val chat get() = gui.chat
 
@@ -53,6 +59,4 @@ object MinecraftUtils {
             mc.execute(action)
         }
     }
-
-
 }

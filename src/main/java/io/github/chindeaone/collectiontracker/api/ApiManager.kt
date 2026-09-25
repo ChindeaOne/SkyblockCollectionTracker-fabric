@@ -2,9 +2,9 @@ package io.github.chindeaone.collectiontracker.api
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
-import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.net.URI
@@ -23,7 +23,7 @@ object ApiManager {
 
     private val logger: Logger = LogManager.getLogger(ApiManager::class.java)
 
-    val session get() = Minecraft.getInstance().services().sessionService()
+    val session get() = MinecraftUtils.services.sessionService()
 
     val agent: String get() = "$AGENT_BASE/${SkyblockCollectionTracker.VERSION}"
 
