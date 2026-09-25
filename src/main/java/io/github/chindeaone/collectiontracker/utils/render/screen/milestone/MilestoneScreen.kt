@@ -33,7 +33,7 @@ class MilestoneScreen(
         entryWidgets.clear()
 
         addRenderableWidget(
-            BaseButton(actionColumnX - 8, panelTop() + 38, 16, 16, { Component.literal("+") }) {
+            BaseButton(actionColumnX - 8, panelTop + 38, 16, 16, { Component.literal("+") }) {
                 addNewEntry()
                 rebuildWidgets()
             }
@@ -120,6 +120,6 @@ class MilestoneScreen(
         drawHeaders(context)
         entryWidgets.forEach { it.name.renderDropdown(context, mouseX, mouseY) }
 
-        context.centeredText(MinecraftUtils.font, message, width / 2, panelBottom() + 2, Colors.GRAY.color)
+        context.centeredText(MinecraftUtils.font, message, width / 2, panelBottom + 2, Colors.GRAY.color)
     }
 }

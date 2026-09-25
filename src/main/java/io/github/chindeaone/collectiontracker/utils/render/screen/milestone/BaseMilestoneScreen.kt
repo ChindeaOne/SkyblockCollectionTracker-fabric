@@ -32,16 +32,16 @@ abstract class BaseMilestoneScreen(
         get() = entries.size
 
     protected val totalColumnX: Int
-        get() = panelLeft() + (panelWidth * 0.15f).toInt()
+        get() = panelLeft + (panelWidth * 0.15f).toInt()
 
     protected val nameColumnX: Int
-        get() = panelLeft() + (panelWidth * 0.40f).toInt()
+        get() = panelLeft + (panelWidth * 0.40f).toInt()
 
     protected val valueColumnX: Int
-        get() = panelLeft() + (panelWidth * 0.65f).toInt()
+        get() = panelLeft + (panelWidth * 0.65f).toInt()
 
     protected val actionColumnX: Int
-        get() = panelLeft() + (panelWidth * 0.85f).toInt()
+        get() = panelLeft + (panelWidth * 0.85f).toInt()
 
     override fun loadData() {
         collectionEntries.clear()
@@ -149,7 +149,7 @@ abstract class BaseMilestoneScreen(
     }
 
     protected fun drawHeaders(context: GuiGraphicsExtractor) {
-        val y = panelTop() + 40
+        val y = panelTop + 40
         val headerName = if (currentPage == Page.COLLECTIONS) "Collection Name" else "Skill Name"
 
         context.centeredText(font, Component.literal("Total"), totalColumnX, y, Colors.WHITE.color)

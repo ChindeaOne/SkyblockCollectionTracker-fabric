@@ -72,7 +72,5 @@ object ChromaText {
         }
     }
 
-    fun prefixStyle(): Style {
-        return Style.EMPTY.withColor(PREFIX_TEXT)
-    }
+    fun prefixStyle(): Style = Style.EMPTY.withColor(PREFIX_TEXT)
 }

@@ -31,13 +31,13 @@ abstract class BaseLeaderboardScreen(
         get() = entries.size
 
     protected val nameColumnX: Int
-        get() = panelLeft() + (panelWidth * 0.25f).toInt()
+        get() = panelLeft + (panelWidth * 0.25f).toInt()
 
     protected val valueColumnX: Int
-        get() = panelLeft() + (panelWidth * 0.5f).toInt()
+        get() = panelLeft + (panelWidth * 0.5f).toInt()
 
     protected val actionColumnX: Int
-        get() = panelLeft() + (panelWidth * 0.7f).toInt()
+        get() = panelLeft + (panelWidth * 0.7f).toInt()
 
     override fun loadData() {
         collectionEntries.clear()
@@ -124,7 +124,7 @@ abstract class BaseLeaderboardScreen(
     }
 
     protected fun drawHeaders(context: GuiGraphicsExtractor) {
-        val y = panelTop() + 40
+        val y = panelTop + 40
         val headerName = if (currentPage == Page.COLLECTIONS) "Collection Name" else "Skill Name"
 
         context.centeredText(font, Component.literal(headerName), nameColumnX, y, Colors.WHITE.color)

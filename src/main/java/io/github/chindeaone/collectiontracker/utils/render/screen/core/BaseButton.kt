@@ -3,6 +3,9 @@ package io.github.chindeaone.collectiontracker.utils.render.screen.core
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.ScreenColors
+import io.github.chindeaone.collectiontracker.utils.render.pushPopMatrix
+import io.github.chindeaone.collectiontracker.utils.render.scale
+import io.github.chindeaone.collectiontracker.utils.render.translate
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.network.chat.Component
@@ -17,28 +20,23 @@ class BaseButton(
 ) : Button.Plain(x, y, width, height, Component.empty(), onPress, DEFAULT_NARRATION) {
 
     override fun extractContents(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
-        val border = if (isHovered) ScreenColors.BUTTON_HOVER.color else ScreenColors.BUTTON.color
-        context.fill(x, y, x + width, y + 1, border)
-        context.fill(x, y + height - 1, x + width, y + height, border)
-        context.fill(x, y, x + 1, y + height, border)
-        context.fill(x + width - 1, y, x + width, y + height, border)
+        drawButtonOutline(context)
 
         val label = labelProvider()
 
         if (label.string == "✓") {
-            context.pose().pushMatrix()
-            context.pose().translate(x + width / 2f, y + height / 2f)
-            context.pose().scale(1.5f, 1f)
+            context.pushPopMatrix {
+                context.translate(x + width / 2f, y + height / 2f)
+                context.scale(1.5f, 1f)
 
-            context.centeredText(
-                MinecraftUtils.font,
-                label,
-                0,
-                - MinecraftUtils.font.lineHeight / 2,
-                Colors.WHITE.color
-            )
-
-            context.pose().popMatrix()
+                context.centeredText(
+                    MinecraftUtils.font,
+                    label,
+                    0,
+                    - MinecraftUtils.font.lineHeight / 2,
+                    Colors.WHITE.color
+                )
+            }
         } else {
             context.centeredText(
                 MinecraftUtils.font,
@@ -48,5 +46,13 @@ class BaseButton(
                 Colors.WHITE.color
             )
         }
+    }
+
+    private fun drawButtonOutline(context: GuiGraphicsExtractor) {
+        val border = if (isHovered) ScreenColors.BUTTON_HOVER.color else ScreenColors.BUTTON.color
+        context.fill(x, y, x + width, y + 1, border)
+        context.fill(x, y + height - 1, x + width, y + height, border)
+        context.fill(x, y, x + 1, y + height, border)
+        context.fill(x + width - 1, y, x + width, y + height, border)
     }
 }

@@ -30,7 +30,7 @@ class LeaderboardScreen(
         entryWidgets.clear()
 
         addRenderableWidget(
-            BaseButton(actionColumnX - 8, panelTop() + 38, 16, 16, { Component.literal("+") }) {
+            BaseButton(actionColumnX - 8, panelTop + 38, 16, 16, { Component.literal("+") }) {
                 addNewEntry()
                 rebuildWidgets()
             }

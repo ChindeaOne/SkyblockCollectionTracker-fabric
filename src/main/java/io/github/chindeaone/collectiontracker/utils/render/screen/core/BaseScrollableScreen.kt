@@ -4,15 +4,15 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 
 abstract class BaseScrollableScreen(
     oldScreen: AbstractContainerScreen<*>?
-): BaseScreen(oldScreen) {
+): BaseInteractableScreen(oldScreen) {
 
     private var scrollOffset = 0
 
     protected val contentTop: Int
-        get() = panelTop() + 60
+        get() = panelTop + 60
 
     protected val contentBottom: Int
-        get() = panelBottom() - 40
+        get() = panelBottom - 40
 
     private val visibleHeight: Int
         get() = contentBottom - contentTop
@@ -26,7 +26,7 @@ abstract class BaseScrollableScreen(
         get() = (contentHeight  - visibleHeight).coerceAtLeast(0)
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
-        if (mouseX >= panelLeft() && mouseX < panelRight() && mouseY >= contentTop && mouseY < contentBottom) {
+        if (mouseX >= panelLeft && mouseX < panelRight && mouseY >= contentTop && mouseY < contentBottom) {
             scrollOffset = (scrollOffset - scrollY.toInt() * 10).coerceIn(0, maxScrollOffset)
 
             rebuildWidgets()

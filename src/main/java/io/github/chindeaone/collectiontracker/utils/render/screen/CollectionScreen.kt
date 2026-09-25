@@ -32,7 +32,7 @@ class CollectionScreen(
 
     override fun initButtons() {
         addRenderableWidget(
-            BaseButton(width / 2 - 40, panelBottom() - 30, 80, 20, { Component.literal("Confirm") }) {
+            BaseButton(width / 2 - 40, panelBottom - 30, 80, 20, { Component.literal("Confirm") }) {
                 val values = map.mapValues { NumbersUtils.parseValue(it.value.value) ?: 0L }
 
                 if (collectionList.size == 1 && !collectionList.contains("gemstone")) {
@@ -80,7 +80,7 @@ class CollectionScreen(
             )
         }
 
-        context.centeredText(MinecraftUtils.font, message, width / 2, panelBottom() + 2, Colors.GRAY.color)
+        context.centeredText(MinecraftUtils.font, message, width / 2, panelBottom + 2, Colors.GRAY.color)
     }
 
     override fun rebuildEntryWidgets() {
