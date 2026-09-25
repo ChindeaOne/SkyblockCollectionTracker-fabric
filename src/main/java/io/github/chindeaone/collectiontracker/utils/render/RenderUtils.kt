@@ -149,7 +149,7 @@ object RenderUtils {
 
     fun renderColeweightStrings(context: GuiGraphicsExtractor, lines: List<String>) {
         var y = 0
-        val color = ColorUtils.SILVER_BLUE
+        val color = ColorUtils.COLEWEIGHT
 
         for (line in lines) {
             drawHelper(line, context, y, color)

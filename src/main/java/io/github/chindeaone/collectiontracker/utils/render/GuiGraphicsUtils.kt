@@ -28,7 +28,7 @@ fun GuiGraphicsExtractor.drawTooltipBox(x: Int, y: Int, width: Int, height: Int)
 
     val color = Colors.GRAY.color
 
-    fill(x1, y1, x2, y2, 0x90000000.toInt())
+    fill(x1, y1, x2, y2, ColorUtils.TOOLTIP_BG)
 
     fill(x1, y1, x2, y1 + 1, color) // Top
     fill(x1, y2 - 1, x2, y2, color) // Bottom
