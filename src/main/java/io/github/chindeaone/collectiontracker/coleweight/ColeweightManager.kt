@@ -9,18 +9,23 @@ object ColeweightManager {
     @Volatile
     var storage: ColeweightStorage = ColeweightStorage()
 
-    fun updateColeweight(data: String) {
+    @Volatile
+    var loadedPlayer: String? = null
+
+    fun updateColeweight(data: String, playerName: String) {
         val root = JsonParser.parseString(data).asJsonObject
 
         storage = storage.copy(
             coleweight = if (root.has("coleweight")) root.get("coleweight").asFloat else 0f,
             rank = if (root.has("rank")) root.get("rank").asInt else 0,
             percentage = if (root.has("percentile")) root.get("percentile").asFloat else 0f,
-            experience = parseDetail("experience", root),
-            powder = parseDetail("powder", root),
-            collection = parseDetail("collection", root),
-            miscellaneous = parseDetail("miscellaneous", root)
+            experience = parseMap("experience", root),
+            powder = parseMap("powder", root),
+            collection = parseMap("collection", root),
+            miscellaneous = parseMap("miscellaneous", root)
         )
+
+        loadedPlayer = playerName
     }
 
     fun updateColeweightLb(data: String, isTop: Boolean) {
@@ -50,7 +55,7 @@ object ColeweightManager {
         }
     }
 
-    private fun parseDetail(name: String, root: JsonObject): Map<String, Float> {
+    private fun parseMap(name: String, root: JsonObject): Map<String, Float> {
         if (!root.has(name)) return emptyMap()
 
         val obj = root.getAsJsonObject(name)

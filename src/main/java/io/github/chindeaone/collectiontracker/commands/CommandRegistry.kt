@@ -295,35 +295,35 @@ object CommandRegistry {
         .then(ClientCommands.literal("cw")
             // sct cw -> shows player's coleweight
             .executes {
-                ColeweightUtils.getColeweight(PlayerData.playerName)
+                ColeweightUtils.getColeweight(sendInChat = true)
                 1
             }
             // sct cw find <player> -> shows specified player(or local player)'s coleweight
             .then(ClientCommands.literal("find")
                 .executes {
-                    ColeweightUtils.getColeweight(PlayerData.playerName)
+                    ColeweightUtils.getColeweight(sendInChat = true)
                     1
                 }
                 .then(ClientCommands.argument("player", StringArgumentType.string())
                     .suggests(PLAYER_SUGGESTIONS)
                     .executes {
                         val playerName = StringArgumentType.getString(it, "player").trim()
-                        ColeweightUtils.getColeweight(playerName)
+                        ColeweightUtils.getColeweight(playerName, sendInChat = true)
                         1
                     }
                 )
             )
-            .then(ClientCommands.literal("detailed")
+            // sct cw profile <player> -> shows specified player(or local player)'s coleweight profile
+            .then(ClientCommands.literal("profile")
                 .executes {
-                    val playerName = PlayerData.playerName
-                    ColeweightUtils.getColeweightDetailed(playerName)
+                    ColeweightUtils.showColeweightProfile()
                     1
                 }
                 .then(ClientCommands.argument("player", StringArgumentType.string())
                     .suggests(PLAYER_SUGGESTIONS)
                     .executes {
                         val playerName = StringArgumentType.getString(it, "player").trim()
-                        ColeweightUtils.getColeweightDetailed(playerName)
+                        ColeweightUtils.showColeweightProfile(playerName)
                         1
                     }
                 )
@@ -440,19 +440,34 @@ object CommandRegistry {
         // sct fw -> shows player's farming weight
         .then(ClientCommands.literal("fw")
             .executes {
-                FarmingweightUtils.getFarmingweight(PlayerData.playerName)
+                FarmingweightUtils.getFarmingweightRank(PlayerData.playerName)
                 1
             }
             .then(ClientCommands.literal("find")
                 .executes {
-                    FarmingweightUtils.getFarmingweight(PlayerData.playerName)
+                    FarmingweightUtils.getFarmingweightRank(PlayerData.playerName)
                     1
                 }
                 .then(ClientCommands.argument("player", StringArgumentType.string())
                     .suggests(PLAYER_SUGGESTIONS)
                     .executes {
                         val playerName = StringArgumentType.getString(it, "player").trim()
-                        FarmingweightUtils.getFarmingweight(playerName)
+                        FarmingweightUtils.getFarmingweightRank(playerName)
+                        1
+                    }
+                )
+            )
+            // sct fw profile <player> -> shows specified player(or local player)'s farming weight profile
+            .then(ClientCommands.literal("profile")
+                .executes {
+                    FarmingweightUtils.showFarmingweightProfile()
+                    1
+                }
+                .then(ClientCommands.argument("player", StringArgumentType.string())
+                    .suggests(PLAYER_SUGGESTIONS)
+                    .executes {
+                        val playerName = StringArgumentType.getString(it, "player").trim()
+                        FarmingweightUtils.showFarmingweightProfile(playerName)
                         1
                     }
                 )

@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.coleweight
 
 import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
@@ -14,29 +15,35 @@ object ColeweightUtils {
     private var lastPlayer: String? = null
     private const val COOLDOWN_DURATION = 5 * 60 * 1000L // 5 minutes cd
 
-    fun getColeweight(playerName: String, detailed: Boolean = false) {
-        val msg = if (detailed) "detailed Coleweight" else "Coleweight"
-        ChatUtils.sendMessage("§aFetching $msg for $playerName ...", true)
+    fun getColeweight(playerName: String = PlayerData.playerName, sendInChat: Boolean = true) {
+        if (sendInChat) {
+            ChatUtils.sendMessage("§aFetching Coleweight for $playerName ...", true)
 
-        if (isPlayerCached(playerName)) {
-            displayColeweight(playerName, ColeweightManager.storage, detailed)
-            return
+            if (isPlayerCached(playerName)) {
+                displayColeweight(playerName, ColeweightManager.storage)
+                return
+            }
         }
 
         ColeweightFetcher.fetchColeweightData(playerName, PlayerData.playerUUID)
             .thenAccept { body ->
                 if (body == null) return@thenAccept
 
-                ColeweightManager.updateColeweight(body)
+                ColeweightManager.updateColeweight(body, playerName)
 
                 playerCooldowns[playerName] = System.currentTimeMillis()
                 lastPlayer = playerName
-                displayColeweight(playerName, ColeweightManager.storage, detailed)
+
+                if (sendInChat) {
+                    displayColeweight(playerName, ColeweightManager.storage)
+                }
             }
     }
 
-    fun getColeweightDetailed(playerName: String) {
-        getColeweight(playerName, true)
+    fun showColeweightProfile(playerName: String = PlayerData.playerName) {
+        getColeweight(playerName, sendInChat = false)
+
+        GuiManager.openColeweightScreen(playerName)
     }
 
     private fun isPlayerCached(name: String): Boolean {
@@ -45,8 +52,8 @@ object ColeweightUtils {
     }
 
     fun getColeweightLeaderboard(position: Int) {
-        if (position > 5000) {
-            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 5000.", true)
+        if (position > 10_000) {
+            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 10000.", true)
             return
         }
 
@@ -60,22 +67,11 @@ object ColeweightUtils {
             }
     }
 
-    private fun displayColeweight(playerName: String, storage: ColeweightStorage, detailed: Boolean = false) {
+    private fun displayColeweight(playerName: String, storage: ColeweightStorage) {
         val isMe = playerName.equals(PlayerData.playerName, ignoreCase = true)
         val rankComponent = getRankComponent(storage.rank, isMe, playerName)
 
         val fullMessage = Component.empty().append(rankComponent).append(" §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
-
-        if (detailed) {
-            fullMessage.append("\n§6Experience:")
-            storage.experience.forEach { (k, v) -> fullMessage.append("\n  §e$k: §b$v") }
-            fullMessage.append("\n§6Powder:")
-            storage.powder.forEach { (k, v) -> fullMessage.append("\n  §e$k: §b$v") }
-            fullMessage.append("\n§6Collection:")
-            storage.collection.forEach { (k, v) -> fullMessage.append("\n  §e$k: §b$v") }
-            fullMessage.append("\n§6Miscellaneous:")
-            storage.miscellaneous.forEach { (k, v) -> fullMessage.append("\n  §e$k: §b$v") }
-        }
 
         ChatUtils.sendComponent(fullMessage, true)
     }

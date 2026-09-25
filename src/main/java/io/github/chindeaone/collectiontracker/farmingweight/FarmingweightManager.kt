@@ -1,20 +1,39 @@
 package io.github.chindeaone.collectiontracker.farmingweight
 
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 object FarmingweightManager {
 
     @Volatile
     var storage: FarmingweightStorage = FarmingweightStorage()
 
-    fun updateFarmingweight(data: String) {
+    @Volatile
+    var loadedPlayer: String? = null
+
+    fun updateFarmingweightRank(data: String) {
         val root = JsonParser.parseString(data).asJsonObject
 
         storage = storage.copy(
             weight = root.get("weight")?.asFloat ?: 0f,
             rank = root.get("rank")?.asInt ?: 0
         )
+    }
+
+    fun updateFarmingweightData(data: String, playerName: String) {
+        val root = JsonParser.parseString(data).asJsonObject
+
+        storage = storage.copy(
+            weight = root.get("weight")?.asFloat ?: 0f,
+            rank = root.get("rank")?.asInt ?: 0,
+            cropWeight = parseMap("cropWeight", root),
+            bonusWeight = parseMap("bonusWeight", root)
+        )
+
+        loadedPlayer = playerName
     }
 
     fun updateFarmingweightLb(data: String, isTop: Boolean) {
@@ -43,6 +62,18 @@ object FarmingweightManager {
         } else {
             storage.copy(tempLeaderboard = list)
         }
+    }
+
+    private fun parseMap(name: String, root: JsonObject): Map<String, Float> {
+        if (!root.has(name)) return emptyMap()
+
+        val obj = root.getAsJsonObject(name)
+        val entries = mutableMapOf<String, Float>()
+
+        for ((k, v) in obj.entrySet()) {
+            entries[k] = v.asFloat
+        }
+        return entries
     }
 
     fun updateFarmingweightTopColors(data: String) {

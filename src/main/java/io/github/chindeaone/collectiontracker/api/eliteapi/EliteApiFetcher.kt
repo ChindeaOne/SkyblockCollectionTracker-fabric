@@ -19,8 +19,8 @@ object EliteApiFetcher {
     @Volatile
     var hasFarmingweightTopColors = false
 
-    fun fetchFarmingweightData(playerName: String, uuid: String): CompletableFuture<String?> {
-        return ApiManager.requestAsync("farmingweight", authHeaders(uuid, playerName))
+    fun fetchFarmingweightRank(playerName: String, uuid: String): CompletableFuture<String?> {
+        return ApiManager.requestAsync("farmingweight/rank", authHeaders(uuid, playerName))
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -46,6 +46,37 @@ object EliteApiFetcher {
             }
             .exceptionally {
                 logger.error("[SCT]: Error fetching Farming Weight.", it)
+                null
+            }
+    }
+
+    fun fetchFarmingweightProfile(playerName: String, uuid: String): CompletableFuture<String?> {
+        return ApiManager.requestAsync("farmingweight/profile", authHeaders(uuid, playerName))
+            .thenApply { response ->
+                when (response.statusCode()) {
+                    200 -> {
+                        val body = response.body()
+
+                        if (body.isNullOrBlank()) {
+                            ChatUtils.sendMessage("§cCouldn't find $playerName's Farming Weight profile.")
+                            logger.warn("[SCT]: Empty response for $playerName")
+                            null
+                        } else body
+                    }
+                    429 -> {
+                        ChatUtils.sendMessage("§cRate limit exceeded for $playerName's Farming Weight profile.")
+                        logger.warn("[SCT]: Rate limit exceeded for $playerName")
+                        null
+                    }
+                    else -> {
+                        ChatUtils.sendMessage("§cError fetching Farming Weight profile for $playerName.")
+                        logger.warn("[SCT]: Error fetching Farming Weight profile for $playerName: HTTP ${response.statusCode()}")
+                        null
+                    }
+                }
+            }
+            .exceptionally {
+                logger.error("[SCT]: Error fetching Farming Weight profile.", it)
                 null
             }
     }

@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.farmingweight
 
 import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
@@ -14,12 +15,7 @@ object FarmingweightUtils {
     private var lastPlayer: String? = null
     private const val COOLDOWN_DURATION = 5 * 60 * 1000L
 
-    private fun isPlayerCached(name: String): Boolean {
-        val lastFetch = playerCooldowns[name] ?: 0L
-        return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
-    }
-
-    fun getFarmingweight(playerName: String) {
+    fun getFarmingweightRank(playerName: String) {
         ChatUtils.sendMessage("§aFetching Farming Weight for $playerName ...", true)
 
         if (isPlayerCached(playerName)) {
@@ -27,10 +23,10 @@ object FarmingweightUtils {
             return
         }
 
-        EliteApiFetcher.fetchFarmingweightData(playerName, PlayerData.playerUUID).thenAccept { body ->
+        EliteApiFetcher.fetchFarmingweightRank(playerName, PlayerData.playerUUID).thenAccept { body ->
                 if (body == null) return@thenAccept
 
-                FarmingweightManager.updateFarmingweight(body)
+                FarmingweightManager.updateFarmingweightRank(body)
 
                 playerCooldowns[playerName] = System.currentTimeMillis()
                 lastPlayer = playerName
@@ -38,8 +34,30 @@ object FarmingweightUtils {
             }
     }
 
+    fun getFarmingweightProfile(playerName: String) {
+        EliteApiFetcher.fetchFarmingweightProfile(playerName, PlayerData.playerUUID).thenAccept { body ->
+            if (body == null) return@thenAccept
+
+            FarmingweightManager.updateFarmingweightData(body, playerName)
+
+            playerCooldowns[playerName] = System.currentTimeMillis()
+            lastPlayer = playerName
+        }
+    }
+
+    fun showFarmingweightProfile(playerName: String = PlayerData.playerName) {
+        getFarmingweightProfile(playerName)
+
+        GuiManager.openFarmingweightScreen(playerName)
+    }
+
+    private fun isPlayerCached(name: String): Boolean {
+        val lastFetch = playerCooldowns[name] ?: 0L
+        return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
+    }
+
     fun getFarmingweightLeaderboard(position: Int) {
-        if (position > 100000) {
+        if (position > 100_000) {
             ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 100000.", true)
             return
         }
@@ -82,9 +100,7 @@ object FarmingweightUtils {
         }
     }
 
-    fun getRankComponent(rank: Int, isMe: Boolean, playerName: String): Component {
-        return rank.toFWRankComponent(isMe, playerName)
-    }
+    fun getRankComponent(rank: Int, isMe: Boolean, playerName: String): Component = rank.toFWRankComponent(isMe, playerName)
 
     @JvmStatic
     fun getRankComponent(playerName: String): Component? {

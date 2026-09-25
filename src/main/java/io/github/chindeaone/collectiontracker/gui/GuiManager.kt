@@ -12,6 +12,8 @@ import io.github.chindeaone.collectiontracker.gui.overlays.DummyTitle
 import io.github.chindeaone.collectiontracker.utils.render.screen.milestone.MilestoneScreen
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.render.screen.leaderboard.LeaderboardScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.weight.ColeweightScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.weight.FarmingweightScreen
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
@@ -37,6 +39,14 @@ object GuiManager {
 
     fun openEditor(editor: MoulConfigEditor<*>) {
         screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
+    }
+
+    fun openColeweightScreen(playerName: String) {
+        openScreen { oldScreen -> ColeweightScreen(oldScreen, playerName) }
+    }
+
+    fun openFarmingweightScreen(playerName: String) {
+        openScreen { oldScreen -> FarmingweightScreen(oldScreen, playerName) }
     }
 
     fun openLeaderboardScreen() {
