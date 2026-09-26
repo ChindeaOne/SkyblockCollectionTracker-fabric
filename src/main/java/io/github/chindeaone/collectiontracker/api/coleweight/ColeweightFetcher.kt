@@ -18,7 +18,7 @@ object ColeweightFetcher {
     var hasColeweightTopColors = false
 
     fun fetchColeweightData(playerName: String, uuid: String): CompletableFuture<String?> {
-        return ApiManager.requestAsync("coleweight", authHeaders(uuid, playerName))
+        return ApiManager.requestAsync("${ApiManager.API_URL}/coleweight", authHeaders(uuid, playerName))
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -48,7 +48,7 @@ object ColeweightFetcher {
     }
 
     fun fetchColeweightLeaderboard(): CompletableFuture<String?> {
-        return ApiManager.requestAsync("coleweight/lb")
+        return ApiManager.requestAsync("${ApiManager.API_URL}/coleweight/lb")
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -71,7 +71,7 @@ object ColeweightFetcher {
     }
 
     fun fetchColeweightLbTop1k() {
-        ApiManager.requestAsync("coleweight/top1k")
+        ApiManager.requestAsync("${ApiManager.API_URL}/coleweight/top1k")
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -98,7 +98,7 @@ object ColeweightFetcher {
     }
 
     fun setGlobalColor(playerName: String, uuid: String, color: String): CompletableFuture<Boolean> {
-        return ApiManager.postAsync("coleweight/color", authHeaders(uuid, playerName).apply {
+        return ApiManager.postAsync("${ApiManager.API_URL}/coleweight/color", authHeaders(uuid, playerName).apply {
             remove("X-NAME")
             put("X-COLOR", color)
         }).thenApply { response ->
@@ -116,7 +116,7 @@ object ColeweightFetcher {
     }
 
     fun fetchColeweightTopColors() {
-        ApiManager.requestAsync("coleweight/colors")
+        ApiManager.requestAsync("${ApiManager.API_URL}/coleweight/colors")
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {

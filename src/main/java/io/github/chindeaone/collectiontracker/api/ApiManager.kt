@@ -85,35 +85,32 @@ object ApiManager {
     }
 
     fun requestAsync(
-        path: String,
+        url: String,
         headers: Map<String, String> = emptyMap()
     ): CompletableFuture<HttpResponse<String>> {
-        val request = buildRequest(path, "GET", headers)
+        val request = buildRequest(url, "GET", headers)
         return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
     }
 
     fun postAsync(
-        path: String,
+        url: String,
         headers: Map<String, String> = emptyMap()
     ): CompletableFuture<HttpResponse<String>> {
-        val request = buildRequest(path, "POST", headers)
+        val request = buildRequest(url, "POST", headers)
         return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
     }
 
-    fun invalidateSession(
-        path: String,
-        headers: Map<String, String> = emptyMap()
-    ) {
-        val request = buildRequest(path, "POST", headers)
+    fun invalidateSession(url: String, headers: Map<String, String> = emptyMap()) {
+        val request = buildRequest(url, "POST", headers)
         HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
     }
 
     private fun buildRequest(
-        path: String,
+        url: String,
         method: String,
         headers: Map<String, String>
     ): HttpRequest {
-        val builder = HttpRequest.newBuilder(URI.create("$API_URL/$path"))
+        val builder = HttpRequest.newBuilder(URI.create(url))
             .timeout(Duration.ofSeconds(15))
             .header("User-Agent", agent)
             .header("Accept", "application/json")
@@ -133,7 +130,7 @@ object ApiManager {
 
     fun checkServer(): CompletableFuture<Boolean> {
         val request = HttpRequest.newBuilder(URI.create("$API_URL/status"))
-            .timeout(Duration.ofSeconds(3))
+            .timeout(Duration.ofSeconds(10))
             .header("User-Agent", agent)
             .HEAD()
             .build()

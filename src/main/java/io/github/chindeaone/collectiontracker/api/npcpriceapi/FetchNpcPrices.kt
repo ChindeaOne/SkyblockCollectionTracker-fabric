@@ -14,7 +14,7 @@ object FetchNpcPrices {
     var hasNpcPrice: Boolean = false
 
     fun fetchPrices() {
-        ApiManager.requestAsync("npc")
+        ApiManager.requestAsync("${ApiManager.API_URL}/npc")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val prices = Gson().fromJson<Map<String, Int>>(

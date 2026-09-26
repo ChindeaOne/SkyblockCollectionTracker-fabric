@@ -14,7 +14,7 @@ object FetchVersions {
     var hasVersions = false
 
     fun fetchVersions() {
-        ApiManager.requestAsync("versions")
+        ApiManager.requestAsync("${ApiManager.API_URL}/versions")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val jsonObject = JsonParser.parseString(response.body()).asJsonObject

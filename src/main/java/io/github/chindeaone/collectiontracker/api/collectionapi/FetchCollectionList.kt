@@ -14,7 +14,7 @@ object FetchCollectionList {
     var hasCollectionList: Boolean = false
 
     fun fetchCollectionList() {
-        ApiManager.requestAsync("collections")
+        ApiManager.requestAsync("${ApiManager.API_URL}/collections")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val json = JsonParser.parseString(response.body()).asJsonObject

@@ -13,7 +13,7 @@ object FetchRepoData {
     private val logger: Logger = LogManager.getLogger(FetchRepoData::class.java)
 
     fun checkGithubReleases(): CompletableFuture<Void> {
-        return ApiManager.requestAsync("github", mapOf("X-MINECRAFT-VERSION" to SkyblockCollectionTracker.MC_VERSION))
+        return ApiManager.requestAsync("${ApiManager.API_URL}/github", mapOf("X-MINECRAFT-VERSION" to SkyblockCollectionTracker.MC_VERSION))
             .thenAccept { response ->
                 val status = response.statusCode()
                 if (status != 200) {

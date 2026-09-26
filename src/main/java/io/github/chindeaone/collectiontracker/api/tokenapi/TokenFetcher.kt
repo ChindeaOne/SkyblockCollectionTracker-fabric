@@ -26,7 +26,7 @@ object TokenFetcher {
                 "X-SERVER-ID" to serverId
             )
 
-            ApiManager.requestAsync("token", headers)
+            ApiManager.requestAsync("${ApiManager.API_URL}/token", headers)
                 .thenApply { response ->
                     if (response.statusCode() != 200) {
                         logger.error("[SCT]: Failed to fetch token, response code: ${response.statusCode()}")

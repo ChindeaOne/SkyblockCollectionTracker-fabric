@@ -15,7 +15,7 @@ object HypixelApiFetcher {
     private val logger: Logger = LogManager.getLogger(HypixelApiFetcher::class.java)
 
     fun fetchJsonData(collection: String): CompletableFuture<String?> {
-        return ApiManager.requestAsync("hypixelapi", headers(collection, CollectionsManager.collectionSource ?: ""))
+        return ApiManager.requestAsync("${ApiManager.API_URL}/hypixelapi", headers(collection, CollectionsManager.collectionSource ?: ""))
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> response.body()
@@ -39,7 +39,7 @@ object HypixelApiFetcher {
     }
 
     fun fetchMultiJsonData(): CompletableFuture<String?> {
-        return ApiManager.requestAsync("hypixelapi", headers(CollectionTracker.collectionList.joinToString(), CollectionsManager.multiCollectionSource.joinToString()))
+        return ApiManager.requestAsync("${ApiManager.API_URL}/hypixelapi", headers(CollectionTracker.collectionList.joinToString(), CollectionsManager.multiCollectionSource.joinToString()))
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> response.body()

@@ -13,7 +13,7 @@ object FetchWaypoints {
     var hasWaypoints: Boolean = false
 
     fun fetchWaypoints() {
-        ApiManager.requestAsync("waypoints")
+        ApiManager.requestAsync("${ApiManager.API_URL}/waypoints")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val json = JsonParser.parseString(response.body()).asJsonObject

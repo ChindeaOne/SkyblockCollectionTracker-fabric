@@ -81,7 +81,7 @@ object FetchBazaarPrice {
 
     private fun requestHelper(collection: String) =
         ApiManager.requestAsync(
-            "bazaar",
+            "${ApiManager.API_URL}/bazaar",
             mapOf(
                 "Authorization" to "Bearer ${TokenManager.token}",
                 "X-UUID" to PlayerData.playerUUID,

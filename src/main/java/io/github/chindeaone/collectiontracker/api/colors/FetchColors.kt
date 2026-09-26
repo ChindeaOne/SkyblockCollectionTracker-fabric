@@ -13,7 +13,7 @@ object FetchColors {
     var hasColors: Boolean = false
 
     fun fetchColorsData() {
-        ApiManager.requestAsync("collection-colors")
+        ApiManager.requestAsync("${ApiManager.API_URL}/collection-colors")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val json = JsonParser.parseString(response.body()).asJsonObject

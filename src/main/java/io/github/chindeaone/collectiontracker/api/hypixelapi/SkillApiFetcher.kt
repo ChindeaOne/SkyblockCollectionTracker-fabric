@@ -17,7 +17,7 @@ object SkillApiFetcher {
     private val logger: Logger = LogManager.getLogger(SkillApiFetcher::class.java)
 
     fun fetchSkillsData(): CompletableFuture<Void> {
-        return ApiManager.requestAsync("skills", headers())
+        return ApiManager.requestAsync("${ApiManager.API_URL}/skills", headers())
             .thenAccept { response ->
                 when (response.statusCode()) {
                     200 -> processSkillsResponse(response)

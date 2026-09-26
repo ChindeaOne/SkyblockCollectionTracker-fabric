@@ -13,7 +13,7 @@ object FetchGemstoneList {
     var hasGemstoneList: Boolean = false
 
     fun fetchGemstoneList() {
-        ApiManager.requestAsync("gemstones")
+        ApiManager.requestAsync("${ApiManager.API_URL}/gemstones")
             .thenAccept { response ->
                 if (response.statusCode() == 200) {
                     val json = JsonParser.parseString(response.body()).asJsonObject

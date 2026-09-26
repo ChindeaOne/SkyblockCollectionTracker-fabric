@@ -20,7 +20,7 @@ object EliteApiFetcher {
     var hasFarmingweightTopColors = false
 
     fun fetchFarmingweightRank(playerName: String, uuid: String): CompletableFuture<String?> {
-        return ApiManager.requestAsync("farmingweight/rank", authHeaders(uuid, playerName))
+        return ApiManager.requestAsync("${ApiManager.API_URL}/farmingweight/rank", authHeaders(uuid, playerName))
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -51,7 +51,7 @@ object EliteApiFetcher {
     }
 
     fun fetchFarmingweightProfile(playerName: String, uuid: String): CompletableFuture<String?> {
-        return ApiManager.requestAsync("farmingweight/profile", authHeaders(uuid, playerName))
+        return ApiManager.requestAsync("${ApiManager.API_URL}/farmingweight/profile", authHeaders(uuid, playerName))
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -82,7 +82,7 @@ object EliteApiFetcher {
     }
 
     fun fetchFarmingweightLeaderboard(): CompletableFuture<String?> {
-        return ApiManager.requestAsync("farmingweight/lb")
+        return ApiManager.requestAsync("${ApiManager.API_URL}/farmingweight/lb")
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -105,7 +105,7 @@ object EliteApiFetcher {
     }
 
     fun fetchFarmingweightLbTop1k() {
-        ApiManager.requestAsync("farmingweight/top1k")
+        ApiManager.requestAsync("${ApiManager.API_URL}/farmingweight/top1k")
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -132,7 +132,7 @@ object EliteApiFetcher {
     }
 
     fun setGlobalColor(playerName: String, uuid: String, color: String): CompletableFuture<Boolean> {
-        return ApiManager.postAsync("farmingweight/color", authHeaders(uuid, playerName).apply {
+        return ApiManager.postAsync("${ApiManager.API_URL}/farmingweight/color", authHeaders(uuid, playerName).apply {
             remove("X-NAME")
             put("X-COLOR", color)
         }).thenApply { response ->
@@ -150,7 +150,7 @@ object EliteApiFetcher {
     }
 
     fun fetchFarmingweightTopColors() {
-        ApiManager.requestAsync("farmingweight/colors")
+        ApiManager.requestAsync("${ApiManager.API_URL}/farmingweight/colors")
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -178,7 +178,7 @@ object EliteApiFetcher {
     }
 
     fun fetchCollectionLeaderboard(collection: String): CompletableFuture<String?> {
-        return ApiManager.requestAsync("collection/leaderboard/${collection.replace(' ', '-')}", authHeaders(PlayerData.playerUUID, PlayerData.playerName).apply{
+        return ApiManager.requestAsync("${ApiManager.API_URL}/collection/leaderboard/${collection.replace(' ', '-')}", authHeaders(PlayerData.playerUUID, PlayerData.playerName).apply{
             remove("X-NAME")
             put("X-CONTAINS-WIPED", if (includeWipedProfiles) "true" else "false")
         }).thenApply { response ->
