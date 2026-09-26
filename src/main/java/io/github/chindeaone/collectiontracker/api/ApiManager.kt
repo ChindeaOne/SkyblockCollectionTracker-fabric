@@ -156,7 +156,7 @@ object ApiManager {
                     logger.debug("[SCT]: Failed server check.", ex)
                     false
                 } else {
-                    resp.statusCode() == 200
+                    resp.statusCode() == 200 || resp.statusCode() == 429
                 }
             }
     }
