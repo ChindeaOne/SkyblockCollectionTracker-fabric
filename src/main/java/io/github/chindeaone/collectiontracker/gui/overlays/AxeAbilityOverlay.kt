@@ -1,6 +1,5 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
-import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.abilityCooldownOnly
 import io.github.chindeaone.collectiontracker.config.abilityNameAxe
 import io.github.chindeaone.collectiontracker.config.axeAbilityDisplayIndicator
@@ -63,8 +62,6 @@ class AxeAbilityOverlay : AbstractOverlay() {
             return
         }
 
-        if (ModLoader.clientTicks % 5L != 0L) return
-
         val abilityName = abilityNameAxe
         val cooldown = finalCooldown
         val active = finalDuration
@@ -94,13 +91,12 @@ class AxeAbilityOverlay : AbstractOverlay() {
             }
         }
 
-        val status = if (!abilityCooldownOnly && active > 0) {
-            "§a" + StringUtils.formatTimeInSeconds(active)
-        } else if (cooldown > 0) {
-            "§c" + StringUtils.formatTimeInSeconds(cooldown)
-        } else {
-            "§aReady!"
+        val status = when {
+            !abilityCooldownOnly && active > 0 -> "§a" + StringUtils.formatTimeInSeconds(active)
+            cooldown > 0 -> "§c" + StringUtils.formatTimeInSeconds(cooldown)
+            else -> "§aReady!"
         }
+
         cachedLines = listOf("§e$displayName CD: $status") // Credit to Ninjune for Coleweight's formatting
     }
 }
