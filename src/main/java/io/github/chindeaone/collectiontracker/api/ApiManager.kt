@@ -61,7 +61,7 @@ object ApiManager {
                 "X-NAME" to PlayerData.cachedName
             )
 
-            invalidateSession("player-logout", headers)
+            invalidateSession("${API_URL}/player-logout", headers)
         } catch (e: Exception) {
             logger.error("[SCT]: Failed to invalidate session on the backend: ${e.message}", e)
         }
