@@ -34,6 +34,10 @@ object MinecraftUtils {
 
     val profileId get() = user.profileId
 
+    val playerSkinRenderCache get() = mc.playerSkinRenderCache()
+
+    val entityRenderDispatcher get() = mc.entityRenderDispatcher
+
     val accessToken get() = user.accessToken
 
     val font get() = mc.font

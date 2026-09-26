@@ -1,11 +1,15 @@
 package io.github.chindeaone.collectiontracker.utils.render.screen.weight
 
+import com.mojang.authlib.GameProfile
+import io.github.chindeaone.collectiontracker.api.ApiManager
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.ScreenColors
 import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseScrollableScreen
 import io.github.chindeaone.collectiontracker.utils.render.screen.core.LoadingWidget
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.PlayerMannequinWidget
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.layouts.FrameLayout
+import net.minecraft.client.gui.layouts.LinearLayout
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 
@@ -30,7 +34,14 @@ abstract class BaseWeightScreen(
     protected val rightX: Int
         get() = centeredInColumn(1)
 
+    private val centeredInPanel: Int
+        get() = panelLeft + (panelWidth - mannequinWidth) / 2
+
+    private val mannequinWidth = 160
+    private val mannequinHeight = 250
+
     private var profileLoaded = false
+    private var gameProfileLoaded = false
 
     protected open fun isProfileInit(): Boolean = false
 
@@ -40,12 +51,35 @@ abstract class BaseWeightScreen(
         super.initContent()
         profileLoaded = isProfileInit()
 
-        if (!profileLoaded) {
+        if (!profileLoaded && !gameProfileLoaded) {
             showLoading()
             return
         }
 
         rebuildEntryWidgets()
+        loadGameProfile()
+    }
+
+    private fun loadGameProfile() {
+        ApiManager.fetchGameProfile(playerName).thenAccept { profile ->
+            if (profile == null) return@thenAccept
+            gameProfileLoaded = true
+
+            minecraft.execute {
+                val player = getPlayerDisplay(profile)
+                player.arrangeElements()
+                player.visitWidgets(this::addRenderableWidget)
+            }
+        }
+    }
+
+    private fun getPlayerDisplay(profile: GameProfile): LinearLayout {
+        val playerWidget = PlayerMannequinWidget(profile, mannequinWidth, mannequinHeight)
+
+        return LinearLayout.vertical().apply {
+            x = centeredInPanel
+            addChild(playerWidget)
+        }
     }
 
     private fun rebuildEntryWidgets() {
@@ -93,11 +127,6 @@ abstract class BaseWeightScreen(
         }
     }
 
-    protected fun centeredInColumn(column: Int): Int {
-        val columnLeft = panelLeft + column * columnWidth
-        return columnLeft + (columnWidth - widgetWidth) / 2
-    }
-
     protected open fun addLeftWidgets() {}
     protected open fun addRightWidgets() {}
 
@@ -106,6 +135,11 @@ abstract class BaseWeightScreen(
     }
 
     override fun initButtons() {}
+
+    protected fun centeredInColumn(column: Int): Int {
+        val columnLeft = panelLeft + column * columnWidth
+        return columnLeft + (columnWidth - widgetWidth) / 2
+    }
 
     override fun onClose() {
         weightWidgets.clear()

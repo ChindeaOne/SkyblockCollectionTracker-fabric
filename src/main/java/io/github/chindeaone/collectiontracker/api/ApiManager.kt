@@ -1,10 +1,12 @@
 package io.github.chindeaone.collectiontracker.api
 
+import com.mojang.authlib.GameProfile
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import net.minecraft.util.Util
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.net.URI
@@ -82,6 +84,19 @@ object ApiManager {
         lastTokenRequest = now
 
         CompletableFuture.runAsync { authenticateMojang(true) }
+    }
+
+    fun fetchGameProfile(username: String): CompletableFuture<GameProfile?> {
+        if (username == PlayerData.playerName) {
+            return CompletableFuture.completedFuture(
+                session.fetchProfile(PlayerData.profileId, true)?.profile
+            )
+        }
+
+        return CompletableFuture.supplyAsync(
+            { MinecraftUtils.services.profileResolver.fetchByName(username).orElse(null) },
+            Util.nonCriticalIoPool()
+        )
     }
 
     fun requestAsync(
