@@ -185,7 +185,7 @@ class ConfigManager {
 
         if (lastSkyMallBuff.isNotBlank()) {
             ChatListener.currentSkyMallBuff = lastSkyMallBuff
-            if (lastSkyMallBuff.contains("Cooldown")) ChatListener.isPickaxeAbility = true
+            if (lastSkyMallBuff.contains("Pickaxe")) ChatListener.isPickaxeAbility = true
             logger.info("[SCT]: Loaded last SkyMall buff from config: {}", lastSkyMallBuff)
         }
         if (lastLotteryBuff.isNotBlank()) {
