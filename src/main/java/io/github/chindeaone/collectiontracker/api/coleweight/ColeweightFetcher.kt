@@ -70,8 +70,8 @@ object ColeweightFetcher {
             }
     }
 
-    fun fetchColeweightLbTop1k() {
-        ApiManager.requestAsync("${ApiManager.API_URL}/coleweight/top1k")
+    fun fetchColeweightLbTop() {
+        ApiManager.requestAsync("${ApiManager.API_URL}/coleweight/top")
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -90,6 +90,8 @@ object ColeweightFetcher {
             }.thenAccept { body ->
                 if (body != null) {
                     ColeweightManager.updateColeweightLb(body, true)
+                    hasColeweightLb = true
+                    logger.info("[SCT]: Successfully fetched Coleweight top 1k.")
                 }
             }.exceptionally {
                 logger.error("[SCT]: Error fetching Coleweight top 1k.", it)

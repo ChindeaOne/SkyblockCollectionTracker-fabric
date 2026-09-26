@@ -169,9 +169,9 @@ object Hypixel {
         if (!FetchGemstoneList.hasGemstoneList) FetchGemstoneList.fetchGemstoneList()
         if (!FetchColors.hasColors) FetchColors.fetchColorsData()
         if (!FetchWaypoints.hasWaypoints) FetchWaypoints.fetchWaypoints()
-        if (!ColeweightFetcher.hasColeweightLb) ColeweightFetcher.fetchColeweightLbTop1k()
+        if (!ColeweightFetcher.hasColeweightLb) ColeweightFetcher.fetchColeweightLbTop()
         if (!ColeweightFetcher.hasColeweightTopColors) ColeweightFetcher.fetchColeweightTopColors()
-        if (!EliteApiFetcher.hasFarmingweightLb) EliteApiFetcher.fetchFarmingweightLbTop1k()
+        if (!EliteApiFetcher.hasFarmingweightLb) EliteApiFetcher.fetchFarmingweightLbTop()
         if (!EliteApiFetcher.hasFarmingweightTopColors) EliteApiFetcher.fetchFarmingweightTopColors()
         if (!FetchVersions.hasVersions) FetchVersions.fetchVersions()
     }

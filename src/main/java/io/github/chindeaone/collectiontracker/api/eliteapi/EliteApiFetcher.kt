@@ -104,8 +104,8 @@ object EliteApiFetcher {
             }
     }
 
-    fun fetchFarmingweightLbTop1k() {
-        ApiManager.requestAsync("${ApiManager.API_URL}/farmingweight/top1k")
+    fun fetchFarmingweightLbTop() {
+        ApiManager.requestAsync("${ApiManager.API_URL}/farmingweight/top")
             .thenApply { response ->
                 when (response.statusCode()) {
                     200 -> {
@@ -124,6 +124,8 @@ object EliteApiFetcher {
             .thenAccept { body ->
                 if (body != null) {
                     FarmingweightManager.updateFarmingweightLb(body, true)
+                    hasFarmingweightLb = true
+                    logger.info("[SCT]: Successfully fetched Farming Weight top 1k.")
                 }
             }.exceptionally { e ->
                 logger.error("[SCT]: Error fetching Farming Weight leaderboard.", e)
