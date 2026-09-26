@@ -6,17 +6,15 @@ import io.github.chindeaone.collectiontracker.config.enableTempBuffTracker
 import io.github.chindeaone.collectiontracker.config.showTempBuffExpiredTitle
 import io.github.chindeaone.collectiontracker.config.tempBuffPosition
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.fiestaFlaskEndTime
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.filetEndTime
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.powderPumpkinEndTime
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.pristinePotatoEndTime
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.refinedCacaoEndTime
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.TemporaryBuff
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
 import net.minecraft.network.chat.Component
+import java.util.EnumMap
 
 class TemporaryBuffsOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
-    private val activeStates: MutableMap<String, Boolean> = mutableMapOf()
+    private val activeStates = EnumMap<TemporaryBuff, Boolean>(TemporaryBuff::class.java)
 
     override val overlayLabel: String = "Temporary Buffs"
 
@@ -47,30 +45,31 @@ class TemporaryBuffsOverlay : AbstractOverlay() {
 
         val newLines = mutableListOf<String>()
 
-        processBuff(newLines, "§6Refined Dark Cacao Truffle", refinedCacaoEndTime)
-        processBuff(newLines, "§9Filet O' Fortune", filetEndTime)
-        processBuff(newLines, "§5Chilled Pristine Potato", pristinePotatoEndTime)
-        processBuff(newLines, "§aPowder Pie", powderPumpkinEndTime)
-        processBuff(newLines, "§6Fiesta Flask", fiestaFlaskEndTime)
+        TemporaryBuff.entries.forEach { buff ->
+            processBuff(newLines, buff)
+        }
 
         cachedLines = newLines
     }
 
-    private fun processBuff(lines: MutableList<String>, displayName: String, expireTime: Long) {
+    private fun processBuff(lines: MutableList<String>, buff: TemporaryBuff) {
         val now = System.currentTimeMillis()
+        val expireTime = TemporaryBuffsParser.getEndTime(buff)
 
         val isActive = expireTime > now
-        val wasActive = activeStates.getOrDefault(displayName, false)
+        val wasActive = activeStates.getOrDefault(buff, false)
 
         if (wasActive && !isActive && showTempBuffExpiredTitle) {
-            showTitle(Component.literal("$displayName §cExpired!"))
+            showTitle(Component.literal("${buff.overlayName} §cExpired!"))
         }
-        activeStates[displayName] = isActive
+
+        activeStates[buff] = isActive
 
         if (isActive) {
             val diff = expireTime - now
             val formattedTime = StringUtils.formatCompactTime(diff / 1000)
-            lines.add("$displayName §e$formattedTime")
+
+            lines.add("${buff.overlayName} §e$formattedTime")
         }
     }
 }

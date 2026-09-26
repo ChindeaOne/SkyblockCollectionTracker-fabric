@@ -41,6 +41,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCol
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
 import io.github.chindeaone.collectiontracker.config.categories.party.PartyNotifierConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.TemporaryBuff
 import io.github.notenoughupdates.moulconfig.ChromaColour
 
 /**
@@ -121,11 +122,6 @@ val enablePureOresRoutes: Boolean get() = pureOresRoutesConfig.enablePureOresRou
 val pureOresRoutes: PureOresRoutes.PureOreRoutes get() = pureOresRoutesConfig.selectedPureOresRoute
 val enableTempBuffTracker: Boolean get() = temporaryBuffsConfig.enableTempBuffTracker
 val showTempBuffExpiredTitle: Boolean get() = temporaryBuffsConfig.showTempBuffExpiredTitle
-val refinedCacaoTime: Long get() = temporaryBuffsConfig.refinedCacaoTime
-val filetTime: Long get() = temporaryBuffsConfig.filetTime
-val pristinePotatoTime: Long get() = temporaryBuffsConfig.pristinePotatoTime
-val powderPumpkinTime: Long get() = temporaryBuffsConfig.powderPumpkinTime
-val fiestaFlaskTime: Long get() = temporaryBuffsConfig.fiestaFlaskTime
 
 // Coleweight Config Accessors
 val coleweightConfig: ColeweightConfig get() = miningConfig.coleweightConfig
@@ -261,6 +257,16 @@ object ConfigAccess {
 
     @JvmStatic
     fun isFarmingweightRankInNameTag(): Boolean = farmingweightRankInNameTag
+
+    fun getDuration(buff: TemporaryBuff): Long {
+        return when (buff) {
+            TemporaryBuff.REFINED_CACAO -> temporaryBuffsConfig.refinedCacaoTime
+            TemporaryBuff.FILET_O_FORTUNE -> temporaryBuffsConfig.filetTime
+            TemporaryBuff.CHILLED_PRISTINE_POTATO -> temporaryBuffsConfig.pristinePotatoTime
+            TemporaryBuff.POWDER_PIE -> temporaryBuffsConfig.powderPumpkinTime
+            TemporaryBuff.FIESTA_FLASK -> temporaryBuffsConfig.fiestaFlaskTime
+        }
+    }
 }
 
 /**
@@ -551,12 +557,14 @@ object ConfigHelper {
         axeAbilityConfig.abilityNameAxe = name
     }
 
-    fun setDuration(refined: Long = 0L, filet: Long = 0L, potato: Long = 0L, pumpkin: Long = 0L, fiesta: Long = 0L) {
-        if (temporaryBuffsConfig.refinedCacaoTime != refined) temporaryBuffsConfig.refinedCacaoTime = refined
-        if (temporaryBuffsConfig.filetTime != filet) temporaryBuffsConfig.filetTime = filet
-        if (temporaryBuffsConfig.pristinePotatoTime != potato) temporaryBuffsConfig.pristinePotatoTime = potato
-        if (temporaryBuffsConfig.powderPumpkinTime != pumpkin) temporaryBuffsConfig.powderPumpkinTime = pumpkin
-        if (temporaryBuffsConfig.fiestaFlaskTime != fiesta) temporaryBuffsConfig.fiestaFlaskTime = fiesta
+    fun setDuration(buff: TemporaryBuff, duration: Long) {
+        when (buff) {
+            TemporaryBuff.REFINED_CACAO -> temporaryBuffsConfig.refinedCacaoTime = duration
+            TemporaryBuff.FILET_O_FORTUNE -> temporaryBuffsConfig.filetTime = duration
+            TemporaryBuff.CHILLED_PRISTINE_POTATO -> temporaryBuffsConfig.pristinePotatoTime = duration
+            TemporaryBuff.POWDER_PIE -> temporaryBuffsConfig.powderPumpkinTime = duration
+            TemporaryBuff.FIESTA_FLASK -> temporaryBuffsConfig.fiestaFlaskTime = duration
+        }
     }
 
     fun setProfessionalMS(level: Int) {

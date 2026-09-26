@@ -162,10 +162,9 @@ object InventoryListener {
             return InteractionResult.PASS
         }
 
-        lines.firstOrNull()?.let {
+        TemporaryBuffsParser.getConsumable(stack.hoverName.string)?.let {
             pendingConsumable = HandItemState(
-                hand = hand,
-                itemName = it,
+                buff = it,
                 count = stack.count,
                 slot = player.inventory.selected,
                 timestamp = System.currentTimeMillis()
@@ -189,7 +188,7 @@ object InventoryListener {
         pendingConsumable?.let { pending ->
             val now = System.currentTimeMillis()
 
-            if (now - pending.timestamp > 1000L) {
+            if (now - pending.timestamp > 2000L) {
                 pendingConsumable = null
                 return@let
             }
@@ -198,14 +197,13 @@ object InventoryListener {
             val currentStack = player.inventory.getItem(pending.slot)
 
             if (currentStack.isEmpty || currentStack.count < pending.count) {
-                TemporaryBuffsParser.resetConsumable(pending.itemName)
+                TemporaryBuffsParser.resetConsumable(pending.buff)
                 pendingConsumable = null
             }
         }
 
     private data class HandItemState(
-        val hand: InteractionHand,
-        val itemName: String,
+        val buff: TemporaryBuffsParser.TemporaryBuff,
         val count: Int,
         val slot: Int,
         val timestamp: Long

@@ -26,7 +26,6 @@ import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.*
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
@@ -41,7 +40,6 @@ object ChatListener {
         // Coleweight pattern
         ABILITY("""^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!""", RegexOption.IGNORE_CASE),
         CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? ?Ability""", RegexOption.IGNORE_CASE),
-        CONSUME("""^You consumed an? (.+?) and gained""", RegexOption.IGNORE_CASE),
         ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
         ATTRIBUTE("""^ATTRIBUTE\s+LEVEL\s+UP\s+Pickaxe\s+Cooldown.*?([\d]+|[IVX]+)\b$""", RegexOption.IGNORE_CASE),
         COMMISSION("""^(.+?)\s+Commission Complete!.*$""", RegexOption.IGNORE_CASE);
@@ -86,7 +84,6 @@ object ChatListener {
         if (cleanText.contains("used your")) abilityListener(cleanText)
         if (cleanText.contains("on cooldown")) onCooldownListener(cleanText)
         if (cleanText.contains("You selected")) abilitySwapListener(cleanText)
-        if (cleanText.contains("consumed")) consumableListener(cleanText)
         if (cleanText.contains("You have reset")) treeResetListener(cleanText)
         if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
         if (cleanText.startsWith("You equipped")) onLoadoutChange()
@@ -193,15 +190,6 @@ object ChatListener {
             ConfigHelper.setAxeAbilityName(abilityName)
         } else {
             ConfigHelper.setAbilityName(abilityName)
-        }
-    }
-
-    private fun consumableListener(text: String) {
-        val match = Patterns.CONSUME.find(text) ?: return
-        val consumableName = match.groupValues[1].trim()
-
-        if (consumableName == "Refined Dark Cacao Truffle") {
-            TemporaryBuffsParser.resetRefinedCacao()
         }
     }
 
