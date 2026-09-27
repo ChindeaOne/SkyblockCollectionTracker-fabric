@@ -1,5 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
+import net.minecraft.world.level.block.Blocks
+
 object ForagingMapping {
 
     val foragingAreas = setOf(
@@ -25,12 +27,10 @@ object ForagingMapping {
         "Timber"
     )
 
-    val foragingBlockPerType = mapOf(
-        "fig" to setOf("minecraft:stripped_spruce_wood"),
-        "mangrove" to setOf("minecraft:mangrove_wood"),
-        "helix" to setOf(
-            "minecraft:stripped_mangrove_wood",
-            "minecraft:stripped_birch_wood"
-        )
+    val foragingBlockTypePerBlock = mapOf(
+        Blocks.STRIPPED_SPRUCE_WOOD to "fig",
+        Blocks.MANGROVE_WOOD to "mangrove",
+        Blocks.STRIPPED_MANGROVE_WOOD to "helix",
+        Blocks.STRIPPED_BIRCH_WOOD to "helix"
     )
 }
