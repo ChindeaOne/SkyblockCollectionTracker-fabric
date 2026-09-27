@@ -189,8 +189,6 @@ object CommandRegistry {
             .then(ClientCommands.argument("type", StringArgumentType.word())
                 .suggests(TRACKING_SUGGESTIONS)
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val type = StringArgumentType.getString(it, "type").trim()
                     when (type) {
                         "collection" -> {
@@ -216,8 +214,6 @@ object CommandRegistry {
             .then(ClientCommands.argument("type", StringArgumentType.word())
                 .suggests(TRACKING_SUGGESTIONS)
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val type = StringArgumentType.getString(it, "type").trim()
                     when (type) {
                         "collection" -> {
@@ -244,8 +240,6 @@ object CommandRegistry {
             .then(ClientCommands.argument("type", StringArgumentType.word())
                 .suggests(TRACKING_SUGGESTIONS)
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val type = StringArgumentType.getString(it, "type").trim()
                     when (type) {
                         "collection" -> {
@@ -406,23 +400,17 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("stop")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     ColeweightTrackingHandler.stopTrackingManual()
                     1
                 }
             )
             .then(ClientCommands.literal("pause")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     ColeweightTrackingHandler.pauseTracking()
                     1
                 }
             ).then(ClientCommands.literal("resume")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     ColeweightTrackingHandler.resumeTracking()
                     1
                 }
@@ -577,8 +565,6 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("pause")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val timer = OverlayManager.getTimerOverlay()
                     timer?.pauseTimer()
                     1
@@ -586,8 +572,6 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("resume")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val timer = OverlayManager.getTimerOverlay()
                     timer?.pauseTimer()
                     1
@@ -595,8 +579,6 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("stop")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val timer = OverlayManager.getTimerOverlay()
                     timer?.setTimer(0)
                     1
@@ -616,8 +598,6 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("pause")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val stopwatch = OverlayManager.getStopwatchOverlay()
                     stopwatch?.pauseStopwatch()
                     1
@@ -625,8 +605,6 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("resume")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val stopwatch = OverlayManager.getStopwatchOverlay()
                     stopwatch?.pauseStopwatch()
                     1
@@ -634,8 +612,6 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("stop")
                 .executes {
-                    if (!canUseCommand()) return@executes 0
-
                     val stopwatch = OverlayManager.getStopwatchOverlay()
                     stopwatch?.stopStopwatch()
                     1
