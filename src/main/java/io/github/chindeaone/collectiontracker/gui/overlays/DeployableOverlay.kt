@@ -4,10 +4,7 @@ import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.deployablePosition
 import io.github.chindeaone.collectiontracker.config.enableDeployable
-import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser.buff
-import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser.buffColor
-import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser.isNear
-import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser.remainingTime
+import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 
 class DeployableOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
@@ -39,30 +36,19 @@ class DeployableOverlay : AbstractOverlay() {
 
         if (ModLoader.clientTicks % 5L != 0L) return
 
-        val currentBuff = buff
-        val expireTime = remainingTime
-        val currentNear = isNear
-        val currentBuffColor = buffColor
-
-        if (currentBuff.isEmpty() || expireTime.isEmpty() || !currentNear) {
+        val deployable = DeployableTracker.activeDeployable ?: run {
             cachedLines = emptyList()
             return
         }
 
-        var timeLeft: Int
-        try {
-            timeLeft = expireTime.replace("s", "").toInt()
-        } catch (_: NumberFormatException) {
-            cachedLines = emptyList()
-            return
-        }
+        val timeLeft = deployable.remainingSeconds
 
-        val newLines = if (timeLeft <= 5) {
-            listOf("$currentBuffColor$currentBuff §cSoon!")
-        } else {
-            listOf("$currentBuffColor$currentBuff §e${timeLeft}s")
-        }
-
-        cachedLines = newLines
+        cachedLines = listOf(
+            if (timeLeft <= 5) {
+                "${deployable.type.displayName} §cSoon!"
+            } else {
+                "${deployable.type.displayName} §e${timeLeft}s"
+            }
+        )
     }
 }

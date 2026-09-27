@@ -14,7 +14,7 @@ import io.github.chindeaone.collectiontracker.utils.TimeUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
-import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
+import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
 import io.github.chindeaone.collectiontracker.utils.tab.TabData
@@ -149,7 +149,7 @@ object ModLoader: ModInitializer {
             BlockWatcher.onClientTick(client)
             DwarvenHeatmap.onClientTick(client)
             ScoreboardUtils.onClientTick(client)
-            DeployableParser.onClientTick(client)
+            DeployableTracker.onClientTick(client)
             InventoryListener.onClientTick()
             ConfigStateUtils.onClientTick()
             ContainerParser.onClientTick(client)

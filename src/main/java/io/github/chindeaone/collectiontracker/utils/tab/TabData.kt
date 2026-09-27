@@ -14,7 +14,7 @@ import io.github.chindeaone.collectiontracker.config.enableMiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.enableSkyMall
 import io.github.chindeaone.collectiontracker.config.farmingweightRankingInChat
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
-import io.github.chindeaone.collectiontracker.utils.parser.DeployableParser
+import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 import net.minecraft.client.Minecraft
@@ -43,7 +43,7 @@ object TabData {
         if (world != currentWorld) {
             world = currentWorld
             IslandTracker.reset()
-            DeployableParser.reset()
+            DeployableTracker.reset()
             WaypointsUtils.reset()
             StatsWidget.clearStats()
             lastWorldSwitch = System.currentTimeMillis()
