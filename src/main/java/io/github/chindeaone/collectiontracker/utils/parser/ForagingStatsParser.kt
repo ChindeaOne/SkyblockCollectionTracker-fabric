@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.enableForagingStatsOverlay
 import io.github.chindeaone.collectiontracker.config.foragingStatsOverlayInForagingIslandsOnly
 import io.github.chindeaone.collectiontracker.config.showDetailedForagingFortune
@@ -23,6 +24,8 @@ object ForagingStatsParser {
     private val NON_DIGIT = Regex("[^0-9]+")
 
     fun onClientTick() {
+        if (ModLoader.clientTicks % 4L != 0L) return
+
         cachedLines = parse(StatsWidget.rawStats, StatsWidget.rawBeaconStats, StatsWidget.rawStarbornTempleStats)
     }
 

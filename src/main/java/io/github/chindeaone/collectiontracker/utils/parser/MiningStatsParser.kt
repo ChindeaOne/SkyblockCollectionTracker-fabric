@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.enableMiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.miningStatsOverlayInMiningIslandsOnly
 import io.github.chindeaone.collectiontracker.config.professionalMS
@@ -22,6 +23,8 @@ object MiningStatsParser {
     private val NON_DIGIT = Regex("[^0-9]+")
 
     fun onClientTick() {
+        if (ModLoader.clientTicks % 4L != 0L) return
+
         cachedLines = parse(StatsWidget.rawStats)
     }
 
@@ -108,25 +111,15 @@ object MiningStatsParser {
         }
 
         if (!ctx.shouldShowSpecificFortune()) return
+        if (ctx.specificFortuneName.isEmpty()) return
+        if (!line.contains(ctx.specificFortuneName)) return
 
-        val match = when (ctx.blockType) {
-            "dwarven_metals" -> line.contains("Dwarven Metal Fortune")
-            "pure_ores", "ores" -> line.contains("Ore Fortune")
-            "gemstones" -> line.contains("Gemstone Fortune")
-            "blocks" -> line.contains("Block Fortune")
-            else -> false
-        }
+        ctx.specificFortune = value
 
-        ctx.specificFortuneName = if (ctx.specificFortune > 0) ctx.getFortuneLabel() else "Mining Fortune"
-
-        if (match) {
-            ctx.specificFortune = value
-
-            // Update last displayed specific fortune
-            lastDisplayedSpecificFortune = ctx.specificFortuneName
-            lastDisplayedSpecificFortuneValue = ctx.specificFortune
-        }
+        lastDisplayedSpecificFortune = ctx.specificFortuneName
+        lastDisplayedSpecificFortuneValue = value
     }
+
     private fun addMiningSpeedPerks(line: String, ctx: MiningContext) {
         val value = extractMiningSpeed(line)
 
@@ -166,7 +159,14 @@ private class MiningContext(
 
     var globalFortune = 0
     var specificFortune = 0
-    var specificFortuneName = ""
+
+    val specificFortuneName = when (blockType) {
+        "dwarven_metals" -> "Dwarven Metal Fortune"
+        "pure_ores", "ores" -> "Ore Fortune"
+        "gemstones" -> "Gemstone Fortune"
+        "blocks" -> "Block Fortune"
+        else -> ""
+    }
 
     val speed = MiningStat("Mining Speed", "\uE015", "§6")
     val miningSpread = MiningStat("Mining Spread", "\uE016", "§e")
@@ -179,16 +179,6 @@ private class MiningContext(
 
     fun shouldShowSpecificFortune(): Boolean {
         return allowSpecificFortune
-    }
-
-    fun getFortuneLabel(): String {
-        return when (blockType) {
-            "dwarven_metals" -> "Dwarven Metal Fortune"
-            "pure_ores", "ores" -> "Ore Fortune"
-            "gemstones" -> "Gemstone Fortune"
-            "blocks" -> "Block Fortune"
-            else -> "Mining Fortune"
-        }
     }
 
     fun getFortuneColor(): String {
