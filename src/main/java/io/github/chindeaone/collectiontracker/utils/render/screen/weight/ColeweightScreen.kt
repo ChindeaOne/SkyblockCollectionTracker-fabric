@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.render.screen.weight
 
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.ScreenColors
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 
@@ -14,6 +15,12 @@ class ColeweightScreen(
 
     override val screenTitle: Component
         get() = Component.literal("Coleweight Profile").withColor(ColorUtils.COLEWEIGHT)
+
+    override val weightName: String
+        get() = "Coleweight"
+
+    override val widgetBgColor: Int
+        get() = ScreenColors.COLEWEIGHT_WIDGET_BG.color
 
     override fun isProfileInit(): Boolean = ColeweightManager.loadedPlayer == playerName
 
@@ -33,6 +40,10 @@ class ColeweightScreen(
         addWeightSection(
             "Mining Experience",
             storage.experience["total"] ?: 0f,
+            ScreenColors.COLEWEIGHT_WIDGET_BG.color,
+            storage.experience,
+            "Coleweight",
+            playerName,
             leftX,
             firstY
         )
@@ -40,6 +51,10 @@ class ColeweightScreen(
         addWeightSection(
             "Collection",
             storage.collection["total"] ?: 0f,
+            ScreenColors.COLEWEIGHT_WIDGET_BG.color,
+            storage.collection,
+            "Coleweight",
+            playerName,
             leftX,
             secondY
         )
@@ -49,6 +64,10 @@ class ColeweightScreen(
         addWeightSection(
             "Powder",
             storage.powder["total"] ?: 0f,
+            ScreenColors.COLEWEIGHT_WIDGET_BG.color,
+            storage.powder,
+            "Coleweight",
+            playerName,
             rightX,
             firstY
         )
@@ -56,6 +75,10 @@ class ColeweightScreen(
         addWeightSection(
             "Miscellaneous",
             storage.miscellaneous["total"] ?: 0f,
+            ScreenColors.COLEWEIGHT_WIDGET_BG.color,
+            storage.miscellaneous,
+            "Coleweight",
+            playerName,
             rightX,
             secondY
         )

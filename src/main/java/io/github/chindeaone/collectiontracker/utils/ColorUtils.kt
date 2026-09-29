@@ -73,6 +73,9 @@ enum class ScreenColors(val color: Int) {
     PANEL_BG(0xEE101010.toInt()),
     PANEL_BORDER(0xFF555555.toInt()),
     PANEL_HEADER(0xFF333333.toInt()),
+
+    COLEWEIGHT_WIDGET_BG(0xFF508FBA.toInt()),
+    FARMINGWEIGHT_WIDGET_BG(0xFF659446.toInt()),
 }
 
 object ColorUtils {
