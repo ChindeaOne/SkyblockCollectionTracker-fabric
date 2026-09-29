@@ -19,9 +19,13 @@ import net.minecraft.world.level.Level
 */
 object DeployableTracker {
 
-    private val TIME_REGEX = Regex("""(\d+)s""")
-
+    data class TrackedDeployable(val type: MiningDeployable, val entity: ArmorStand, val expiresAt: Long) {
+        val remainingSeconds: Int
+            get() = ((expiresAt - System.currentTimeMillis()) / 1000L).toInt().coerceAtLeast(0)
+    }
     var activeDeployable: TrackedDeployable? = null
+
+    private val TIME_REGEX = Regex("""(\d+)s""")
 
     private var isInMineshaft: Boolean = false
     private val trackedDeployables = mutableListOf<TrackedDeployable>()
