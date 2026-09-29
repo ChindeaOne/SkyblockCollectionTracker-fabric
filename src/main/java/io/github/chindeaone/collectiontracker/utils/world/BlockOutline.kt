@@ -102,9 +102,11 @@ object BlockOutline {
             val edgeNormal = Vector3f(v2f).sub(v1f).normalize()
 
             vc.addVertex(matrix, v1[0], v1[1], v1[2])
+                .setColor(red, green, 0, 191)
+                .setNormal(edgeNormal.x(), edgeNormal.y(), edgeNormal.z())
+                .setLineWidth(1f)
             vc.addVertex(matrix, v2[0], v2[1], v2[2])
-
-            vc.setColor(red, green, 0, 191)
+                .setColor(red, green, 0, 191)
                 .setNormal(edgeNormal.x(), edgeNormal.y(), edgeNormal.z())
                 .setLineWidth(1f)
         }
@@ -168,9 +170,12 @@ object BlockOutline {
         val normal = Vector3f(ex - sx, ey - sy, ez - sz).normalize()
 
         vc.addVertex(matrix, sx, sy, sz)
-        vc.addVertex(matrix, ex, ey, ez)
+            .setColor(0, 255, 0, 191)
+            .setNormal(normal.x(), normal.y(), normal.z())
+            .setLineWidth(1f)
 
-        vc.setColor(0, 255, 0, 191)
+        vc.addVertex(matrix, ex, ey, ez)
+            .setColor(0, 255, 0, 191)
             .setNormal(normal.x(), normal.y(), normal.z())
             .setLineWidth(1f)
     }
@@ -225,43 +230,41 @@ object BlockOutline {
     ) {
         val lineWidth = 1f
 
-        vc.setColor(red, green, blue, alpha).setLineWidth(lineWidth)
-
         // front (+Z)
-        vc.addVertex(posMatrix, minX, minY, maxZ).setNormal(0f, 0f, 1f)
-        vc.addVertex(posMatrix, maxX, minY, maxZ).setNormal(0f, 0f, 1f)
-        vc.addVertex(posMatrix, maxX, maxY, maxZ).setNormal(0f, 0f, 1f)
-        vc.addVertex(posMatrix, minX, maxY, maxZ).setNormal(0f, 0f, 1f)
+        vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
 
         // back (-Z)
-        vc.addVertex(posMatrix, maxX, minY, minZ).setNormal(0f, 0f, -1f)
-        vc.addVertex(posMatrix, minX, minY, minZ).setNormal(0f, 0f, -1f)
-        vc.addVertex(posMatrix, minX, maxY, minZ).setNormal(0f, 0f, -1f)
-        vc.addVertex(posMatrix, maxX, maxY, minZ).setNormal(0f, 0f, -1f)
+        vc.addVertex(posMatrix, maxX, minY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, -1f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, minY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, -1f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, -1f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, -1f).setLineWidth(lineWidth)
 
         // left (-X)
-        vc.addVertex(posMatrix, minX, minY, minZ).setNormal(-1f, 0f, 0f)
-        vc.addVertex(posMatrix, minX, minY, maxZ).setNormal(-1f, 0f, 0f)
-        vc.addVertex(posMatrix, minX, maxY, maxZ).setNormal(-1f, 0f, 0f)
-        vc.addVertex(posMatrix, minX, maxY, minZ).setNormal(-1f, 0f, 0f)
+        vc.addVertex(posMatrix, minX, minY, minZ).setColor(red, green, blue, alpha).setNormal(-1f, 0f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(-1f, 0f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(-1f, 0f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(-1f, 0f, 0f).setLineWidth(lineWidth)
 
         // right (+X)
-        vc.addVertex(posMatrix, maxX, minY, maxZ).setNormal(1f, 0f, 0f)
-        vc.addVertex(posMatrix, maxX, minY, minZ).setNormal(1f, 0f, 0f)
-        vc.addVertex(posMatrix, maxX, maxY, minZ).setNormal(1f, 0f, 0f)
-        vc.addVertex(posMatrix, maxX, maxY, maxZ).setNormal(1f, 0f, 0f)
+        vc.addVertex(posMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(1f, 0f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, minY, minZ).setColor(red, green, blue, alpha).setNormal(1f, 0f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(1f, 0f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(1f, 0f, 0f).setLineWidth(lineWidth)
 
         // top (+Y)
-        vc.addVertex(posMatrix, minX, maxY, maxZ).setNormal(0f, 1f, 0f)
-        vc.addVertex(posMatrix, maxX, maxY, maxZ).setNormal(0f, 1f, 0f)
-        vc.addVertex(posMatrix, maxX, maxY, minZ).setNormal(0f, 1f, 0f)
-        vc.addVertex(posMatrix, minX, maxY, minZ).setNormal(0f, 1f, 0f)
+        vc.addVertex(posMatrix, minX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 1f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 1f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 1f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 1f, 0f).setLineWidth(lineWidth)
 
         // bottom (-Y)
-        vc.addVertex(posMatrix, minX, minY, minZ).setNormal(0f, -1f, 0f)
-        vc.addVertex(posMatrix, maxX, minY, minZ).setNormal(0f, -1f, 0f)
-        vc.addVertex(posMatrix, maxX, minY, maxZ).setNormal(0f, -1f, 0f)
-        vc.addVertex(posMatrix, minX, minY, maxZ).setNormal(0f, -1f, 0f)
+        vc.addVertex(posMatrix, minX, minY, minZ).setColor(red, green, blue, alpha).setNormal(0f, -1f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, minY, minZ).setColor(red, green, blue, alpha).setNormal(0f, -1f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, -1f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, -1f, 0f).setLineWidth(lineWidth)
     }
 
     private fun drawLineToBox(
@@ -286,9 +289,14 @@ object BlockOutline {
 
         val normal = Vector3f(ex - sx, ey - sy, ez - sz).normalize()
 
-        vc.setColor(0, 255, 0, 191).setLineWidth(1f)
+        vc.addVertex(matrix, sx, sy, sz)
+            .setColor(0, 255, 0, 191)
+            .setNormal(normal.x(), normal.y(), normal.z())
+            .setLineWidth(1f)
 
-        vc.addVertex(matrix, sx, sy, sz).setNormal(normal.x(), normal.y(), normal.z())
-        vc.addVertex(matrix, ex, ey, ez).setNormal(normal.x(), normal.y(), normal.z())
+        vc.addVertex(matrix, ex, ey, ez)
+            .setColor(0, 255, 0, 191)
+            .setNormal(normal.x(), normal.y(), normal.z())
+            .setLineWidth(1f)
     }
 }
