@@ -12,6 +12,9 @@ import io.github.chindeaone.collectiontracker.config.enablePureOresRoutes
 import io.github.chindeaone.collectiontracker.config.heatmapOpacity
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
+import io.github.chindeaone.collectiontracker.utils.blue
+import io.github.chindeaone.collectiontracker.utils.green
+import io.github.chindeaone.collectiontracker.utils.red
 import io.github.chindeaone.collectiontracker.utils.render.CustomPipelines
 import io.github.chindeaone.collectiontracker.utils.render.WorldRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
@@ -26,7 +29,6 @@ import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import java.awt.Color
 
 object BlockOutline {
 
@@ -183,7 +185,7 @@ object BlockOutline {
     fun renderBlockHighlight(
         pos: BlockPos,
         camera: CameraRenderState,
-        color: Color,
+        color: Int,
         alpha: Int = (heatmapOpacity * 255f).toInt(),
     ) {
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.HIGHLIGHT)
@@ -196,14 +198,13 @@ object BlockOutline {
         val maxZ = minZ + 1f + 0.002f
 
         val posMatrix = Matrix4f().translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
-
-        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, color.red, color.green, color.blue, alpha)
+        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, color, alpha)
     }
 
     fun renderBox(
         box: AABB,
         camera: CameraRenderState,
-        color: Color,
+        color: Int,
         alpha: Int = 255
     ) {
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.HIGHLIGHT)
@@ -217,7 +218,7 @@ object BlockOutline {
         val maxY = box.maxY.toFloat()
         val maxZ = box.maxZ.toFloat()
 
-        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, color.red, color.green, color.blue, alpha)
+        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, color, alpha)
         if (drawLineToPrecisionMining) drawLineToBox(box, camera)
     }
 
@@ -226,9 +227,13 @@ object BlockOutline {
         posMatrix: Matrix4f,
         minX: Float, minY: Float, minZ: Float,
         maxX: Float, maxY: Float, maxZ: Float,
-        red: Int, green: Int, blue: Int, alpha: Int
+        color:Int,
+        alpha: Int
     ) {
         val lineWidth = 1f
+        val red = color.red()
+        val green = color.green()
+        val blue = color.blue()
 
         // front (+Z)
         vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)

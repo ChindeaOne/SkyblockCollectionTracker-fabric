@@ -1,13 +1,13 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.config.enablePrecisionMiningHighlight
+import io.github.chindeaone.collectiontracker.utils.Colors
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import java.awt.Color
 
 object PrecisionMining {
 
@@ -40,7 +40,7 @@ object PrecisionMining {
             pos.x + 0.08, pos.y + 0.08, pos.z + 0.08
         )
 
-        val color = if (isLooking) Color.GREEN else Color.RED
+        val color = if (isLooking) Colors.GREEN.color else Colors.RED.color
         BlockOutline.renderBox(box, camera, color)
     }
 

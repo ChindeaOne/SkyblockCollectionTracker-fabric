@@ -27,6 +27,10 @@ fun Color.toChromaColor(alpha: Int = this.alpha, chromaSpeedMillis: Int = 0): Ch
 fun String.toColor(): Component =
     ColorUtils.collToColor(this)
 
+fun Int.red(): Int = (this shr 16) and 0xFF
+fun Int.green(): Int = (this shr 8) and 0xFF
+fun Int.blue(): Int = this and 0xFF
+
 @Suppress("unused")
 enum class Colors(private val colorCode: Char, val color: Int) {
     BLACK('0', 0xFF000000.toInt()),
