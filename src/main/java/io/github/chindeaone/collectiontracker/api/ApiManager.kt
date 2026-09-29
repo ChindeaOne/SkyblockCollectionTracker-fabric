@@ -87,14 +87,14 @@ object ApiManager {
     }
 
     fun fetchGameProfile(username: String): CompletableFuture<GameProfile?> {
-        if (username == PlayerData.playerName) {
-            return CompletableFuture.completedFuture(
-                session.fetchProfile(PlayerData.profileId, true)?.profile
-            )
-        }
-
         return CompletableFuture.supplyAsync(
-            { MinecraftUtils.services.profileResolver.fetchByName(username).orElse(null) },
+            {
+                if (username == PlayerData.playerName) {
+                    session.fetchProfile(PlayerData.profileId, true)?.profile
+                } else {
+                    MinecraftUtils.services.profileResolver.fetchByName(username).orElse(null)
+                }
+            },
             Util.nonCriticalIoPool()
         )
     }

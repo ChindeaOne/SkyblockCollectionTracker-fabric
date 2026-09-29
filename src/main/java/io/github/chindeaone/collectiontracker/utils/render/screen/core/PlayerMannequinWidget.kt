@@ -13,28 +13,25 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState
 import net.minecraft.network.chat.Component
 import org.joml.Quaternionf
 import org.joml.Vector3f
+import kotlin.math.floor
 
-class PlayerMannequinWidget(profile: GameProfile, width: Int, height: Int) : AbstractWidget(0, 0, width, height, Component.empty()) {
+class PlayerMannequinWidget(profile: GameProfile, nameTag: Component, width: Int, height: Int) : AbstractWidget(0, 0, width, height, Component.empty()) {
 
-    private val mannequin = PlayerMannequin(profile)
+    private val mannequin = PlayerMannequin(profile, nameTag)
     private val renderer = MinecraftUtils.entityRenderDispatcher.getRenderer(mannequin) as AvatarRenderer
     private val renderState = AvatarRenderState()
 
-    override fun extractWidgetRenderState(
-        context: GuiGraphicsExtractor,
-        mouseX: Int,
-        mouseY: Int,
-        partialTick: Float
-    ) {
+    override fun extractWidgetRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTick: Float) {
         renderer.extractRenderState(mannequin, renderState, partialTick)
+
+        val scale = floor(width / 3f)
+        val scaledSize = scale / mannequin.scale
 
         context.entity(
             renderState,
-            40.0f,
-            Vector3f(0f, 3f, 1f),
-            Quaternionf()
-                .rotateY(Math.PI.toFloat())
-                .rotateZ(Math.PI.toFloat()),
+            scaledSize,
+            Vector3f(0f, 0.5f, 0f),
+            Quaternionf().rotateXYZ(0f, Math.PI.toFloat(), Math.PI.toFloat()),
             null,
             x,
             y,

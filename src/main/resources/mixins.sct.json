@@ -12,7 +12,8 @@
     "chroma.GlyphTypesMixin",
     "chroma.RenderSystemMixin",
     "AbstractContainerMenuMixin",
-    "EntityRendererMixin"
+    "EntityRendererMixin",
+    "AvatarRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
