@@ -52,21 +52,21 @@ object BlockOutline {
         // 2nd previous waypoint -> red (only if we have approached at least 2)
         if (currentIndex >= 2) {
             val (label, pos) = allWaypoints[currentIndex - 2]
-            renderBlockOutline(pos, camera, 1f, 0f)
+            renderBlockOutline(pos, camera, 255, 0)
             renderText(pos, label, camera, Colors.RED.color)
         }
 
         // previous waypoint -> yellow (only if we have approached at least 1)
         if (currentIndex >= 1 && currentIndex - 1 < allWaypoints.size) {
             val (label, pos) = allWaypoints[currentIndex - 1]
-            renderBlockOutline(pos, camera, 1f, 1f)
+            renderBlockOutline(pos, camera, 255, 255)
             renderText(pos, label, camera, Colors.YELLOW.color)
         }
 
         // current target waypoint -> green
         if (currentIndex < allWaypoints.size) {
             val (label, pos) = allWaypoints[currentIndex]
-            renderBlockOutline(pos, camera, 0f, 1f)
+            renderBlockOutline(pos, camera, 0, 255)
             renderText(pos, label, camera, Colors.GREEN.color)
             drawLinetoBlock(pos, camera)
         }
@@ -75,8 +75,8 @@ object BlockOutline {
     private fun renderBlockOutline(
         pos: BlockPos,
         camera: CameraRenderState,
-        r: Float,
-        g: Float,
+        red: Int,
+        green: Int,
     ) {
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.LINE_THROUGH_WALLS)
 
@@ -102,11 +102,9 @@ object BlockOutline {
             val edgeNormal = Vector3f(v2f).sub(v1f).normalize()
 
             vc.addVertex(matrix, v1[0], v1[1], v1[2])
-                .setColor(r, g, 0f, 0.75f)
-                .setNormal(edgeNormal.x(), edgeNormal.y(), edgeNormal.z())
-                .setLineWidth(1f)
             vc.addVertex(matrix, v2[0], v2[1], v2[2])
-                .setColor(r, g, 0f, 0.75f)
+
+            vc.setColor(red, green, 0, 191)
                 .setNormal(edgeNormal.x(), edgeNormal.y(), edgeNormal.z())
                 .setLineWidth(1f)
         }
@@ -170,12 +168,9 @@ object BlockOutline {
         val normal = Vector3f(ex - sx, ey - sy, ez - sz).normalize()
 
         vc.addVertex(matrix, sx, sy, sz)
-            .setColor(0f, 1f, 0f, 0.75f)
-            .setNormal(normal.x(), normal.y(), normal.z())
-            .setLineWidth(1f)
-
         vc.addVertex(matrix, ex, ey, ez)
-            .setColor(0f, 1f, 0f, 0.75f)
+
+        vc.setColor(0, 255, 0, 191)
             .setNormal(normal.x(), normal.y(), normal.z())
             .setLineWidth(1f)
     }
@@ -183,10 +178,8 @@ object BlockOutline {
     fun renderBlockHighlight(
         pos: BlockPos,
         camera: CameraRenderState,
-        red: Float,
-        green: Float,
-        blue: Float,
-        alpha: Float = heatmapOpacity,
+        color: Color,
+        alpha: Int = (heatmapOpacity * 255f).toInt(),
     ) {
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.HIGHLIGHT)
 
@@ -199,14 +192,14 @@ object BlockOutline {
 
         val posMatrix = Matrix4f().translate((-camera.pos.x).toFloat(),(-camera.pos.y).toFloat(),(-camera.pos.z).toFloat())
 
-        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha)
+        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, color.red, color.green, color.blue, alpha)
     }
 
     fun renderBox(
         box: AABB,
         camera: CameraRenderState,
         color: Color,
-        alpha: Float = 1f,
+        alpha: Int = 255
     ) {
         val vc : VertexConsumer = WorldRenderer.getBuffer(CustomPipelines.HIGHLIGHT)
 
@@ -219,11 +212,7 @@ object BlockOutline {
         val maxY = box.maxY.toFloat()
         val maxZ = box.maxZ.toFloat()
 
-        val r = color.red / 255f
-        val g = color.green / 255f
-        val b = color.blue / 255f
-
-        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, alpha)
+        drawBox(vc, posMatrix, minX, minY, minZ, maxX, maxY, maxZ, color.red, color.green, color.blue, alpha)
         if (drawLineToPrecisionMining) drawLineToBox(box, camera)
     }
 
@@ -232,45 +221,47 @@ object BlockOutline {
         posMatrix: Matrix4f,
         minX: Float, minY: Float, minZ: Float,
         maxX: Float, maxY: Float, maxZ: Float,
-        red: Float, green: Float, blue: Float, alpha: Float
+        red: Int, green: Int, blue: Int, alpha: Int
     ) {
         val lineWidth = 1f
 
+        vc.setColor(red, green, blue, alpha).setLineWidth(lineWidth)
+
         // front (+Z)
-        vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, minX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, 1f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, minY, maxZ).setNormal(0f, 0f, 1f)
+        vc.addVertex(posMatrix, maxX, minY, maxZ).setNormal(0f, 0f, 1f)
+        vc.addVertex(posMatrix, maxX, maxY, maxZ).setNormal(0f, 0f, 1f)
+        vc.addVertex(posMatrix, minX, maxY, maxZ).setNormal(0f, 0f, 1f)
 
         // back (-Z)
-        vc.addVertex(posMatrix, maxX, minY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, -1f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, minX, minY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, -1f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, minX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, -1f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 0f, -1f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, minY, minZ).setNormal(0f, 0f, -1f)
+        vc.addVertex(posMatrix, minX, minY, minZ).setNormal(0f, 0f, -1f)
+        vc.addVertex(posMatrix, minX, maxY, minZ).setNormal(0f, 0f, -1f)
+        vc.addVertex(posMatrix, maxX, maxY, minZ).setNormal(0f, 0f, -1f)
 
         // left (-X)
-        vc.addVertex(posMatrix, minX, minY, minZ).setColor(red, green, blue, alpha).setNormal(-1f, 0f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(-1f, 0f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, minX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(-1f, 0f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, minX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(-1f, 0f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, minY, minZ).setNormal(-1f, 0f, 0f)
+        vc.addVertex(posMatrix, minX, minY, maxZ).setNormal(-1f, 0f, 0f)
+        vc.addVertex(posMatrix, minX, maxY, maxZ).setNormal(-1f, 0f, 0f)
+        vc.addVertex(posMatrix, minX, maxY, minZ).setNormal(-1f, 0f, 0f)
 
         // right (+X)
-        vc.addVertex(posMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(1f, 0f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, minY, minZ).setColor(red, green, blue, alpha).setNormal(1f, 0f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(1f, 0f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(1f, 0f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, maxX, minY, maxZ).setNormal(1f, 0f, 0f)
+        vc.addVertex(posMatrix, maxX, minY, minZ).setNormal(1f, 0f, 0f)
+        vc.addVertex(posMatrix, maxX, maxY, minZ).setNormal(1f, 0f, 0f)
+        vc.addVertex(posMatrix, maxX, maxY, maxZ).setNormal(1f, 0f, 0f)
 
         // top (+Y)
-        vc.addVertex(posMatrix, minX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 1f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, maxY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, 1f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 1f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, minX, maxY, minZ).setColor(red, green, blue, alpha).setNormal(0f, 1f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, maxY, maxZ).setNormal(0f, 1f, 0f)
+        vc.addVertex(posMatrix, maxX, maxY, maxZ).setNormal(0f, 1f, 0f)
+        vc.addVertex(posMatrix, maxX, maxY, minZ).setNormal(0f, 1f, 0f)
+        vc.addVertex(posMatrix, minX, maxY, minZ).setNormal(0f, 1f, 0f)
 
         // bottom (-Y)
-        vc.addVertex(posMatrix, minX, minY, minZ).setColor(red, green, blue, alpha).setNormal(0f, -1f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, minY, minZ).setColor(red, green, blue, alpha).setNormal(0f, -1f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, -1f, 0f).setLineWidth(lineWidth)
-        vc.addVertex(posMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha).setNormal(0f, -1f, 0f).setLineWidth(lineWidth)
+        vc.addVertex(posMatrix, minX, minY, minZ).setNormal(0f, -1f, 0f)
+        vc.addVertex(posMatrix, maxX, minY, minZ).setNormal(0f, -1f, 0f)
+        vc.addVertex(posMatrix, maxX, minY, maxZ).setNormal(0f, -1f, 0f)
+        vc.addVertex(posMatrix, minX, minY, maxZ).setNormal(0f, -1f, 0f)
     }
 
     private fun drawLineToBox(
@@ -295,14 +286,9 @@ object BlockOutline {
 
         val normal = Vector3f(ex - sx, ey - sy, ez - sz).normalize()
 
-        vc.addVertex(matrix, sx, sy, sz)
-            .setColor(0f, 1f, 0f, 0.75f)
-            .setNormal(normal.x(), normal.y(), normal.z())
-            .setLineWidth(1f)
+        vc.setColor(0, 255, 0, 191).setLineWidth(1f)
 
-        vc.addVertex(matrix, ex, ey, ez)
-            .setColor(0f, 1f, 0f, 0.75f)
-            .setNormal(normal.x(), normal.y(), normal.z())
-            .setLineWidth(1f)
+        vc.addVertex(matrix, sx, sy, sz).setNormal(normal.x(), normal.y(), normal.z())
+        vc.addVertex(matrix, ex, ey, ez).setNormal(normal.x(), normal.y(), normal.z())
     }
 }

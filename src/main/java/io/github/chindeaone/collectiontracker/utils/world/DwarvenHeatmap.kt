@@ -9,22 +9,16 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import java.awt.Color
 
 object DwarvenHeatmap {
 
-    private data class HeatmapHighlight(val pos: BlockPos, val r: Float, val g: Float, val b: Float)
+    private data class HeatmapHighlight(val pos: BlockPos, val color: Color)
 
     private val trackedBlocks = setOf(
         Blocks./*? if 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/,
         Blocks.SMOOTH_RED_SANDSTONE,
-        Blocks.TERRACOTTA,
-        Blocks.INFESTED_COBBLESTONE,
         Blocks.CLAY
-    )
-
-    private val badBlocks = setOf(
-        Blocks.INFESTED_COBBLESTONE,
-        Blocks.TERRACOTTA
     )
 
     private var cachedHighlights: List<HeatmapHighlight> = emptyList()
@@ -44,19 +38,18 @@ object DwarvenHeatmap {
         val mutablePos = BlockPos.MutableBlockPos()
         val list = mutableListOf<HeatmapHighlight>()
 
-        for (x in playerPos.x - 7..playerPos.x + 7) {
-            for (y in playerPos.y - 1..playerPos.y + 7) {
-                for (z in playerPos.z - 7..playerPos.z + 7) {
+        for (x in playerPos.x - 5..playerPos.x + 5) {
+            for (y in playerPos.y - 1..playerPos.y + 6) {
+                for (z in playerPos.z - 5..playerPos.z + 5) {
                     mutablePos.set(x, y, z)
 
-                    val state = world.getBlockState(mutablePos)
-                    val block = state.block
+                    val block = world.getBlockState(mutablePos).block
 
-                    if (block !in trackedBlocks || block in badBlocks) continue
+                    if (block !in trackedBlocks) continue
                     if (!isBlockExposed(world, mutablePos)) continue
 
-                    val (r, g, b) = priorityColor(block)
-                    list.add(HeatmapHighlight(mutablePos.immutable(), r, g ,b))
+                    val blockColor = priorityColor(block)
+                    list.add(HeatmapHighlight(mutablePos.immutable(), blockColor))
                 }
             }
         }
@@ -67,21 +60,19 @@ object DwarvenHeatmap {
         val camera = context.levelState().cameraRenderState
 
         for (highlight in cachedHighlights) {
-            BlockOutline.renderBlockHighlight(highlight.pos, camera, highlight.r, highlight.g, highlight.b)
+            BlockOutline.renderBlockHighlight(highlight.pos, camera, highlight.color)
         }
     }
 
-    private fun priorityColor(block: Block): Triple<Float, Float, Float> {
+    private fun priorityColor(block: Block): Color {
         return when (block) {
-            Blocks.SMOOTH_RED_SANDSTONE, Blocks.CLAY -> Triple(0f / 255f, 100f / 255f, 0f / 255f)
-            Blocks./*? if 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/ -> Triple(144f / 255f, 238f / 255f, 144f / 255f)
-            else -> Triple(0f / 255f, 255f / 255f, 0f / 255f)
+            Blocks.SMOOTH_RED_SANDSTONE, Blocks.CLAY -> Color(0, 100, 0)
+            Blocks./*? if 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/ -> Color(144, 238, 144)
+            else -> Color(0, 255, 0)
         }
     }
 
     private fun isBlockExposed(world: ClientLevel, pos: BlockPos): Boolean {
-        if (world.getBlockState(pos).block == Blocks.BEDROCK) return false // ignore bedrock
-
         fun isNotSolid(pos: BlockPos): Boolean {
             val state = world.getBlockState(pos)
             return state.isAir || state.block == Blocks.SNOW || state.block == Blocks./*? if 26.2 {*/ /*CARPET.lightGray *//*?} else {*/ LIGHT_GRAY_CARPET /*?}*/
