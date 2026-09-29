@@ -29,22 +29,10 @@ class BaseButton(
                 context.translate(x + width / 2f, y + height / 2f)
                 context.scale(1.5f, 1f)
 
-                context.centeredText(
-                    MinecraftUtils.font,
-                    label,
-                    0,
-                    - MinecraftUtils.font.lineHeight / 2,
-                    Colors.WHITE.color
-                )
+                context.centeredText(MinecraftUtils.font, label, 0, - MinecraftUtils.font.lineHeight / 2, Colors.WHITE.color)
             }
         } else {
-            context.centeredText(
-                MinecraftUtils.font,
-                label,
-                x + width / 2,
-                y + (height - MinecraftUtils.font.lineHeight) / 2,
-                Colors.WHITE.color
-            )
+            context.centeredText(MinecraftUtils.font, label, x + width / 2, y + (height - MinecraftUtils.font.lineHeight) / 2, Colors.WHITE.color)
         }
     }
 

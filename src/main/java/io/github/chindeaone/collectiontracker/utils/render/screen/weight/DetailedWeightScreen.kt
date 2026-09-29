@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.render.screen.weight
 
 import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.render.scissor
 import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseButton
 import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseScrollableScreen
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -49,19 +50,17 @@ open class DetailedWeightScreen(
         val entries = weightEntries.filterKeys { it != "total" && it != "totalWeight"}
         val midpoint = (entries.size + 1) / 2
 
-        context.enableScissor(panelLeft, contentTop, panelRight, contentBottom)
+        context.scissor(panelLeft, contentTop, panelRight, contentBottom) {
+            entries.entries.forEachIndexed { index, (name, value) ->
+                val column = if (index < midpoint) 0 else 1
+                val row = if (index < midpoint) index else index - midpoint
 
-        entries.entries.forEachIndexed { index, (name, value) ->
-            val column = if (index < midpoint) 0 else 1
-            val row = if (index < midpoint) index else index - midpoint
+                val x = centeredInColumn(column)
+                val y = contentTop + row * (widgetHeight + verticalGap) - currentScrollOffset
 
-            val x = centeredInColumn(column)
-            val y = contentTop + row * (widgetHeight + verticalGap) - currentScrollOffset
-
-            renderWeightEntry(context, name, value, x, y)
+                renderWeightEntry(context, name, value, x, y)
+            }
         }
-
-        context.disableScissor()
     }
 
     private fun renderWeightEntry(context: GuiGraphicsExtractor, name: String, value: Float, x: Int, y: Int) {

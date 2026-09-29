@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.RepoUtils
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.render.ScaleUtils
+import io.github.chindeaone.collectiontracker.utils.render.scissor
 import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseScrollableScreen
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
@@ -45,23 +46,21 @@ class ChangelogScreen(
             rawNotes
         }
 
-        val screenWidth = context.guiWidth()
+        val screenWidth = ScaleUtils.scaledWidth
         val overlayWidth = screenWidth / 2
 
         val startX = (screenWidth - overlayWidth) / 2
 
-        context.enableScissor(startX, contentTop, startX + overlayWidth, contentBottom)
-
-        RenderUtils.renderChangelogLines(
-            context,
-            cleanNotes,
-            startX,
-            contentTop  - currentScrollOffset,
-            overlayWidth,
-            contentTop,
-            contentBottom - contentTop
-        )
-
-        context.disableScissor()
+        context.scissor(startX, contentTop, startX + overlayWidth, contentBottom) {
+            RenderUtils.renderChangelogLines(
+                context,
+                cleanNotes,
+                startX,
+                contentTop  - currentScrollOffset,
+                overlayWidth,
+                contentTop,
+                contentBottom - contentTop
+            )
+        }
     }
 }

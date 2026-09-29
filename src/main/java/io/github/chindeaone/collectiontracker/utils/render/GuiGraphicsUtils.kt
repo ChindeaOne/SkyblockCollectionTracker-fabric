@@ -12,11 +12,17 @@ fun GuiGraphicsExtractor.pushPopMatrix(block: () -> Unit) {
 }
 
 fun GuiGraphicsExtractor.translate(x: Number, y: Number) {
-    pose().translate(x.toFloat(), y.toFloat())
+    this.pose().translate(x.toFloat(), y.toFloat())
 }
 
 fun GuiGraphicsExtractor.scale(x: Number, y: Number) {
-    pose().scale(x.toFloat(), y.toFloat())
+    this.pose().scale(x.toFloat(), y.toFloat())
+}
+
+fun GuiGraphicsExtractor.scissor(x0: Int, y0: Int, x1: Int, y1: Int, block: () -> Unit) {
+    this.enableScissor(x0, y0, x1 - x0, y1 - y0)
+    block()
+    this.disableScissor()
 }
 
 fun GuiGraphicsExtractor.drawTooltipBox(x: Int, y: Int, width: Int, height: Int) {
