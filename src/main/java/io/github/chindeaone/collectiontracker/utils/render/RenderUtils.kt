@@ -375,7 +375,7 @@ object RenderUtils {
             context.text(font, prefix, 0, y, prefixColor, true)
 
             val prefixWidth = font.width(prefix)
-            context.text(font, numberPart,  prefixWidth, y, ColorUtils.CUSTOM_WHITE, true)
+            context.text(font, numberPart,  prefixWidth, y, ColorUtils.OVERLAY_VALUE_COLOR, true)
         } else {
             context.text(font, line, 0, y, prefixColor, true)
         }

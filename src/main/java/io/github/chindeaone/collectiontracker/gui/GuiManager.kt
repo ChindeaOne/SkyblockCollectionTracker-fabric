@@ -12,9 +12,9 @@ import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.render.screen.ChangelogScreen
 import io.github.chindeaone.collectiontracker.utils.render.screen.leaderboard.LeaderboardScreen
 import io.github.chindeaone.collectiontracker.utils.render.screen.milestone.MilestoneScreen
-import io.github.chindeaone.collectiontracker.utils.render.screen.weight.ColeweightScreen
-import io.github.chindeaone.collectiontracker.utils.render.screen.weight.DetailedWeightScreen
-import io.github.chindeaone.collectiontracker.utils.render.screen.weight.FarmingweightScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.weight.ColeweightOverviewScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.weight.FarmingweightOverviewScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.weight.WeightBreakdownScreen
 import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
@@ -43,15 +43,28 @@ object GuiManager {
     }
 
     fun openColeweightScreen(playerName: String) {
-        openScreen { oldScreen -> ColeweightScreen(oldScreen, playerName) }
+        openScreen { oldScreen -> ColeweightOverviewScreen(oldScreen, playerName) }
     }
 
     fun openFarmingweightScreen(playerName: String) {
-        openScreen { oldScreen -> FarmingweightScreen(oldScreen, playerName) }
+        openScreen { oldScreen -> FarmingweightOverviewScreen(oldScreen, playerName) }
     }
 
-    fun openDetailedWeightScreen(weightName: String, weightType: String, playerName: String, bgColor: Int, weightEntries: Map<String, Float>) {
-        openScreen { oldScreen -> DetailedWeightScreen(oldScreen, weightName, weightType, playerName, bgColor, weightEntries) }
+    fun openWeightBreakdownScreen(
+        weightName: String,
+        widgetBgColor: Int,
+        weightEntries: Map<String, Float>,
+        onBack: () -> Unit
+    ) {
+        openScreen { oldScreen ->
+            WeightBreakdownScreen(
+                oldScreen = oldScreen,
+                weightName = weightName,
+                widgetBgColor = widgetBgColor,
+                weightEntries = weightEntries,
+                onBack = onBack
+            )
+        }
     }
 
     fun openLeaderboardScreen() {

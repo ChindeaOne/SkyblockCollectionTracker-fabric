@@ -73,37 +73,40 @@ enum class ScreenColors(val color: Int) {
     PANEL_BG(0xEE101010.toInt()),
     PANEL_BORDER(0xFF555555.toInt()),
     PANEL_HEADER(0xFF333333.toInt()),
+    
+    COLEWEIGHT_WIDGET_BG(0xFF2E6F7E.toInt()),
+    FARMINGWEIGHT_WIDGET_BG(0xFF3B6E38.toInt()),
 
-    COLEWEIGHT_WIDGET_BG(0xFF508FBA.toInt()),
-    FARMINGWEIGHT_WIDGET_BG(0xFF659446.toInt()),
+    COLEWEIGHT_TEXT(0xFF508FBA.toInt()),
+    FARMINGWEIGHT_TEXT(0xFF659446.toInt()),
+
+    WIDGET_TITLE_TEXT(0xFFE8F1F5.toInt()),
+    WIDGET_VALUE_TEXT(0xFFFFD166.toInt()),
 }
 
 object ColorUtils {
-    const val CUSTOM_WHITE: Int = 0xFFCCD7E0.toInt()
+    const val OVERLAY_VALUE_COLOR: Int = 0xFFCCD7E0.toInt()
     const val DUMMY_BG: Int = 0x80404040.toInt()
     const val TOOLTIP_BG: Int = 0x90000000.toInt()
+    
     const val COLEWEIGHT: Int = 0xFF7FB4DB.toInt()
     const val FARMINGWEIGHT: Int = 0xFF58CF30.toInt()
 
     val GRADIENT_START_COLOR: Color = Color(255, 212, 71)
     val GRADIENT_END_COLOR: Color = Color(255, 159, 46)
 
-    val skillColors: MutableMap<String, Int> = HashMap()
-    val collectionColors: MutableMap<String, Int> = HashMap()
+    @Volatile
+    var skillColors: Map<String, Int> = emptyMap()
+    @Volatile
+    var collectionColors: Map<String, Int> = emptyMap()
 
     fun setupColors(json: JsonObject) {
         parseColorMap(json, "skills")?.let { values ->
-            synchronized(skillColors) {
-                skillColors.clear()
-                skillColors.putAll(values)
-            }
+            skillColors = values
         }
 
         parseColorMap(json, "collections")?.let { values ->
-            synchronized(collectionColors) {
-                collectionColors.clear()
-                collectionColors.putAll(values)
-            }
+            collectionColors = values
         }
     }
 
