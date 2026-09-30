@@ -21,7 +21,7 @@ abstract class BasePaginatedConfigScreen(oldScreen: AbstractContainerScreen<*>?)
     var currentPage = Page.COLLECTIONS
         protected set
 
-    override fun init() {
+    override fun initContent() {
         initPageButtons()
         initActionButtons()
     }

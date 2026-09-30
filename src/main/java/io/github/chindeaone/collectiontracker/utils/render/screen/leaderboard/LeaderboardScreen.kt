@@ -11,9 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
 
-class LeaderboardScreen(
-    oldScreen: AbstractContainerScreen<*>?
-): BaseLeaderboardScreen(oldScreen) {
+class LeaderboardScreen(oldScreen: AbstractContainerScreen<*>?): BaseLeaderboardScreen(oldScreen) {
     private data class LeaderboardWidgets(val name: BaseDropdown, val position: EditBox, val remove: Button)
     private val entryWidgets = mutableListOf<LeaderboardWidgets>()
 

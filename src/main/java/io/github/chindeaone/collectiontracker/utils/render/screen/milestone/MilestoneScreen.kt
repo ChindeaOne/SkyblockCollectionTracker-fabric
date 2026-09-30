@@ -13,9 +13,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
 
-class MilestoneScreen(
-    oldScreen: AbstractContainerScreen<*>?
-): BaseMilestoneScreen(oldScreen) {
+class MilestoneScreen(oldScreen: AbstractContainerScreen<*>?): BaseMilestoneScreen(oldScreen) {
 
     private data class MilestoneWidgets(val total: Button, val name: BaseDropdown, val value: EditBox, val remove: Button)
     private val entryWidgets = mutableListOf<MilestoneWidgets>()
