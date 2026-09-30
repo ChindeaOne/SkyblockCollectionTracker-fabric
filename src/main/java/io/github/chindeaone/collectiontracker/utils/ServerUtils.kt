@@ -13,24 +13,38 @@ import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrack
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import kotlin.concurrent.fixedRateTimer
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 object ServerUtils {
 
     var serverStatus = false
 
     private const val CHECK_INTERVAL = 600_000L
+    private const val REDUCED_CHECK_INTERVAL = CHECK_INTERVAL / 2
 
     private val logger: Logger = LogManager.getLogger(ServerUtils::class.java)
 
+    private val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor {
+        Thread(it, "sct-server-status").apply { isDaemon = true }
+    }
+
     fun startCheckingServer () {
-        fixedRateTimer(name = "sct-server-status", daemon = true, initialDelay = CHECK_INTERVAL, period = CHECK_INTERVAL) {
-            checkServerStatusPeriodically()
-        }
+        scheduleNextCheck(CHECK_INTERVAL)
+    }
+
+    private fun scheduleNextCheck(delay: Long) {
+        scheduler.schedule({ checkServerStatusPeriodically() }, delay, TimeUnit.MILLISECONDS)
     }
 
     private fun checkServerStatusPeriodically() {
-        if (!HypixelUtils.isInSkyblock) return
+        if (!HypixelUtils.isInSkyblock) {
+            val nextDelay = if (serverStatus) CHECK_INTERVAL else REDUCED_CHECK_INTERVAL
+            scheduleNextCheck(nextDelay)
+            return
+        }
+
         logger.info("[SCT]: Checking server status...")
 
         ApiManager.checkServer()
@@ -52,6 +66,15 @@ object ServerUtils {
                     SkillTrackingHandler.stopTracking()
                     ColeweightTrackingHandler.stopTracking()
                 }
+            }
+            .exceptionally { error ->
+                logger.error("[SCT]: Error occurred while checking server status.", error)
+                serverStatus = false
+                null
+            }
+            .whenComplete { _, _ ->
+                val nextDelay = if (serverStatus) CHECK_INTERVAL else REDUCED_CHECK_INTERVAL
+                scheduleNextCheck(nextDelay)
             }
     }
 
