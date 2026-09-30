@@ -2,11 +2,10 @@ package io.github.chindeaone.collectiontracker.utils.render.screen.core
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 
-abstract class BaseScrollableScreen(
-    oldScreen: AbstractContainerScreen<*>?
-): BaseInteractableScreen(oldScreen) {
+abstract class BaseScrollableScreen(oldScreen: AbstractContainerScreen<*>?): BaseScreen(oldScreen) {
 
-    private var scrollOffset = 0
+    protected var scrollOffset = 0
+        private set
 
     protected val contentTop: Int
         get() = panelTop + 60
@@ -17,22 +16,28 @@ abstract class BaseScrollableScreen(
     private val visibleHeight: Int
         get() = contentBottom - contentTop
 
-    protected val currentScrollOffset: Int
-        get() = scrollOffset
-
     protected abstract val contentHeight: Int
 
     private val maxScrollOffset: Int
         get() = (contentHeight  - visibleHeight).coerceAtLeast(0)
 
+    fun resetScroll() {
+        scrollOffset = 0
+    }
+
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
-        if (mouseX >= panelLeft && mouseX < panelRight && mouseY >= contentTop && mouseY < contentBottom) {
+        if (isMouseInArea(mouseX, mouseY)) {
+            val prev = scrollOffset
             scrollOffset = (scrollOffset - scrollY.toInt() * 10).coerceIn(0, maxScrollOffset)
 
-            rebuildWidgets()
-            return true
+            if (prev != scrollOffset) {
+                rebuildWidgets()
+                return true
+            }
         }
-
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)
     }
+
+    private fun isMouseInArea(mouseX: Double, mouseY: Double): Boolean =
+        mouseX in panelLeft.toDouble()..panelRight.toDouble() && mouseY in contentTop.toDouble()..contentBottom.toDouble()
 }

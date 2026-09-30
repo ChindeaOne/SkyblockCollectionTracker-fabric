@@ -9,28 +9,27 @@ import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseButton
-import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseListScreen
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseScrollableScreen
 import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.Component
 
-class CollectionScreen(
-    private val collectionList: List<String>,
-    private val onCancel: Runnable? = null
-) : BaseListScreen(null) {
+class CollectionScreen(private val collectionList: List<String>, private val onCancel: Runnable? = null) : BaseScrollableScreen(null) {
 
     private val map = mutableMapOf<String, EditBox>()
     private var confirmed = false
 
-    override val entryCount: Int
-        get() = collectionList.size
+    private val rowHeight = 28
+
+    override val contentHeight: Int
+        get() = collectionList.size * rowHeight
 
     override val screenTitle = Component.literal("Collections")
 
-    override val message = Component.literal("ⓘ Couldn't reach Hypixel's API, so you have to set your collection values manually.")
+    private val message = Component.literal("ⓘ Couldn't reach Hypixel's API, so you have to set your collection values manually.")
 
-    override fun initButtons() {
+    override fun initContent() {
         addRenderableWidget(
             BaseButton(width / 2 - 40, panelBottom - 30, 80, 20, { Component.literal("Confirm") }) {
                 val values = map.mapValues { NumbersUtils.parseValue(it.value.value) ?: 0L }
@@ -57,13 +56,39 @@ class CollectionScreen(
                 onClose()
             }
         )
+        rebuildEntryWidgets()
     }
 
-    override fun onClose() {
-        if (!confirmed) {
-            onCancel?.run()
+    private fun rebuildEntryWidgets() {
+        if (collectionList.isEmpty()) {
+            ChatUtils.sendMessage("§cNo collections to set custom values for.")
+            onClose()
+            return
         }
-        super.onClose()
+
+        map.clear()
+
+        collectionList.forEachIndexed { index, name ->
+            val y = contentTop + index * rowHeight - scrollOffset
+
+            if (y + 10 < contentTop || y > contentBottom - 10) {
+                return@forEachIndexed
+            }
+
+            val displayName = StringUtils.formatCollectionName(name)
+
+            val box = object: EditBox(MinecraftUtils.font, width / 2 - 25, y, 70, 20, Component.literal(displayName)) {
+                override fun insertText(input: String) {
+                    super.insertText(input.filter { it.isDigit() || it in ".,kmbKMB" })
+                }
+            }.apply {
+                this.value = ""
+                maxLength = 32
+            }
+
+            map[name] = box
+            addRenderableWidget(box)
+        }
     }
 
     override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
@@ -83,33 +108,10 @@ class CollectionScreen(
         context.centeredText(MinecraftUtils.font, message, width / 2, panelBottom + 2, Colors.GRAY.color)
     }
 
-    override fun rebuildEntryWidgets() {
-        if (collectionList.isEmpty()) {
-            ChatUtils.sendMessage("§cNo collections to set custom values for.")
-            onClose()
-            return
+    override fun onClose() {
+        if (!confirmed) {
+            onCancel?.run()
         }
-
-        map.clear()
-
-        collectionList.forEachIndexed { index, name ->
-            val y = contentTop + index * rowHeight - currentScrollOffset
-
-            if (y + 10 < contentTop || y > contentBottom - 10) {
-                return@forEachIndexed
-            }
-
-            val displayName = StringUtils.formatCollectionName(name)
-
-            val box = createInputBox(
-                "",
-                width / 2 - 25,
-                y,
-                displayName
-            )
-
-            map[name] = box
-            addRenderableWidget(box)
-        }
+        super.onClose()
     }
 }

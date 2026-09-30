@@ -7,15 +7,12 @@ import io.github.chindeaone.collectiontracker.config.milestones
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
-import io.github.chindeaone.collectiontracker.utils.render.screen.core.BaseListScreen
-import io.github.chindeaone.collectiontracker.utils.render.screen.core.Page
+import io.github.chindeaone.collectiontracker.utils.render.screen.core.BasePaginatedConfigScreen
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 
-abstract class BaseMilestoneScreen(
-    oldScreen: AbstractContainerScreen<*>?
-): BaseListScreen(oldScreen) {
+abstract class BaseMilestoneScreen(oldScreen: AbstractContainerScreen<*>?): BasePaginatedConfigScreen(oldScreen) {
 
     protected data class Entry(var name: String, var value: String, var isTotal: Boolean)
 
@@ -28,8 +25,12 @@ abstract class BaseMilestoneScreen(
             Page.SKILLS -> skillEntries
         }
 
-    override val entryCount: Int
-        get() = entries.size
+    protected val rowHeight = 28
+
+    override val contentHeight: Int
+        get() = entries.size * rowHeight
+
+    protected abstract val message: Component
 
     protected val totalColumnX: Int
         get() = panelLeft + (panelWidth * 0.15f).toInt()
@@ -42,6 +43,13 @@ abstract class BaseMilestoneScreen(
 
     protected val actionColumnX: Int
         get() = panelLeft + (panelWidth * 0.85f).toInt()
+
+    override fun initContent() {
+        super.initContent()
+        rebuildEntryWidgets()
+    }
+
+    protected abstract fun rebuildEntryWidgets()
 
     override fun loadData() {
         collectionEntries.clear()

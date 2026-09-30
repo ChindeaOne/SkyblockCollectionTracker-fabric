@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component
 
 class LoadingWidget(
     private val speed: Int = 50
-) : AbstractWidget(
+): AbstractWidget(
     0,
     0,
     MinecraftUtils.font.width("Loading Data..."),
@@ -24,13 +24,7 @@ class LoadingWidget(
         val dots = ((frames / speed) % 4).toInt()
         val text = "Loading Data" + ".".repeat(dots)
 
-        context.centeredText(
-            MinecraftUtils.font,
-            text,
-            x + width / 2,
-            y + (height - MinecraftUtils.font.lineHeight) / 2,
-            Colors.WHITE.color
-        )
+        context.centeredText(MinecraftUtils.font, text, x + width / 2, y + (height - MinecraftUtils.font.lineHeight) / 2, Colors.WHITE.color)
     }
 
     override fun updateWidgetNarration(output: NarrationElementOutput) {}

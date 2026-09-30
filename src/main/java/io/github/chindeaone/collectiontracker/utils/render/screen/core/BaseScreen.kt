@@ -10,9 +10,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 
-open class BaseScreen(
-    private val oldScreen: AbstractContainerScreen<*>?,
-): Screen(Component.empty()) {
+open class BaseScreen(private val oldScreen: AbstractContainerScreen<*>?): Screen(Component.empty()) {
 
     protected open val screenTitle: Component
         get() = Component.empty()

@@ -11,9 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 
-class ChangelogScreen(
-    oldScreen: AbstractContainerScreen<*>?
-) : BaseScrollableScreen(oldScreen) {
+class ChangelogScreen(oldScreen: AbstractContainerScreen<*>?) : BaseScrollableScreen(oldScreen) {
 
     override val contentHeight: Int
         get() = RenderUtils.getChangelogHeight(ScaleUtils.scaledWidth)
@@ -30,8 +28,6 @@ class ChangelogScreen(
 
     private val versionColor
         get() = if (isReleaseVersion) Colors.GREEN.color else Colors.GOLD.color
-
-    override fun initButtons() {}
 
     override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
         super.extractRenderState(context, mouseX, mouseY, a)
@@ -56,7 +52,7 @@ class ChangelogScreen(
                 context,
                 cleanNotes,
                 startX,
-                contentTop  - currentScrollOffset,
+                contentTop - scrollOffset,
                 overlayWidth,
                 contentTop,
                 contentBottom - contentTop
