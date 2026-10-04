@@ -6,8 +6,8 @@ import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.customCWColor
 import io.github.chindeaone.collectiontracker.config.customFWColor
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.Colors
 import net.minecraft.client.Minecraft
-import java.awt.Color
 
 object ChromaRenderer {
 
@@ -39,8 +39,8 @@ object ChromaRenderer {
         normalChromaSlice = chromaUniform.writeUniform(
             computeTimeOffset(0),
             0,
-            Color.BLACK,
-            Color.BLACK
+            Colors.BLACK.color,
+            Colors.BLACK.color
         )
 
         // Prefix chroma
