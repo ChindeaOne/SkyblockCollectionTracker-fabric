@@ -29,32 +29,24 @@ object InventoryListener {
     private var pendingConsumable: HandItemState? = null
 
     fun onClientTick() {
-        if (ModLoader.clientTicks % 4L != 0L) return
-
-        if (MinecraftUtils.screen != null) {
-            lastInventoryState.clear()
-            slotMatchHits.clear()
-            slotSkipMap.clear()
-            return
-        }
-
         checkIfConsumableConsumed()
+
+        if (ModLoader.clientTicks % 4L != 0L) return
 
         val isTracking = TrackingHandler.isTracking
         val isMultiTracking = MultiTrackingHandler.isMultiTracking
 
-        val isTrackingPaused = TrackingHandler.isPaused
-        val isMultiTrackingPaused = MultiTrackingHandler.isMultiPaused
-
-        if (!isTracking && !isMultiTracking) {
+        if (!isTracking && !isMultiTracking || MinecraftUtils.screen != null) {
             lastInventoryState.clear()
             slotMatchHits.clear()
             slotSkipMap.clear()
             return
         }
 
-        if (isTrackingPaused || isMultiTrackingPaused || !IslandTracker.isInRift) return
-        if (apiTracking) return
+        val isTrackingPaused = TrackingHandler.isPaused
+        val isMultiTrackingPaused = MultiTrackingHandler.isMultiPaused
+
+        if (isTrackingPaused || isMultiTrackingPaused || !IslandTracker.isInRift || apiTracking) return
 
         val player = MinecraftUtils.player ?: return
         val inventory = player.inventory
