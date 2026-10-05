@@ -173,8 +173,8 @@ object SacksTrackingManager {
             "ink sac" to "enchanted ink sac",
             "raw cod" to "enchanted raw cod",
             "tropical fish" to "enchanted tropical fish",
-            "magmafish" to "gold magmafish",
-            "lotus" to "gold lotus"
+            "magmafish" to "silver magmafish",
+            "lotus" to "silver lotus"
     )
 
     private val SUPER_ENCHANTED_DISPLAY_OVERRIDES = mapOf(
@@ -185,7 +185,7 @@ object SacksTrackingManager {
             "raw porkchop" to "enchanted cooked porkchop",
             "lily pad" to "condensed lily pad",
             "raw cod" to "enchanted cooked cod",
-            "magmafish" to "silver magmafish",
-            "lotus" to "silver lotus"
+            "magmafish" to "gold magmafish",
+            "lotus" to "gold lotus"
     )
 }
