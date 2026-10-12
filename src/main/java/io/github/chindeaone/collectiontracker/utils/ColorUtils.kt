@@ -30,22 +30,22 @@ fun Int.blue(): Int = this and 0xFF
 
 @Suppress("unused")
 enum class Colors(private val colorCode: Char, val color: Int) {
-    BLACK('0', 0x000000),
-    DARK_BLUE('1', 0x0000AA),
-    DARK_GREEN('2', 0x00AA00),
-    DARK_AQUA('3', 0x00AAAA),
-    DARK_RED('4', 0xAA0000),
-    DARK_PURPLE('5', 0xAA00AA),
-    GOLD('6', 0xFFAA00),
-    GRAY('7', 0xAAAAAA),
-    DARK_GRAY('8', 0x555555),
-    BLUE('9', 0x5555FF),
-    GREEN('a', 0x55FF55),
-    AQUA('b', 0x55FFFF),
-    RED('c', 0xFF5555),
-    LIGHT_PURPLE('d', 0xFF55FF),
-    YELLOW('e', 0xFFFF55),
-    WHITE('f', 0xFFFFFF);
+    BLACK('0', 0xFF000000.toInt()),
+    DARK_BLUE('1', 0xFF0000AA.toInt()),
+    DARK_GREEN('2', 0xFF00AA00.toInt()),
+    DARK_AQUA('3', 0xFF00AAAA.toInt()),
+    DARK_RED('4', 0xFFAA0000.toInt()),
+    DARK_PURPLE('5', 0xFFAA00AA.toInt()),
+    GOLD('6', 0xFFFFAA00.toInt()),
+    GRAY('7', 0xFFAAAAAA.toInt()),
+    DARK_GRAY('8', 0xFF555555.toInt()),
+    BLUE('9', 0xFF5555FF.toInt()),
+    GREEN('a', 0xFF55FF55.toInt()),
+    AQUA('b', 0xFF55FFFF.toInt()),
+    RED('c', 0xFFFF5555.toInt()),
+    LIGHT_PURPLE('d', 0xFFFF55FF.toInt()),
+    YELLOW('e', 0xFFFFFF55.toInt()),
+    WHITE('f', 0xFFFFFFFF.toInt());
 }
 
 @Suppress("unused")
@@ -61,36 +61,36 @@ enum class Formatting(private val code: Char, val format: ChatFormatting) {
 enum class ScreenColors(val color: Int) {
     SCREEN_BG(0xCC080808.toInt()),
 
-    BUTTON(0x444444),
-    BUTTON_HOVER(0x777777),
+    BUTTON(0xFF444444.toInt()),
+    BUTTON_HOVER(0xFF777777.toInt()),
 
-    DROPDOWN_HOVER(0x303030),
+    DROPDOWN_HOVER(0xFF303030.toInt()),
     DROPDOWN(0xEE181818.toInt()),
 
     PANEL_BG(0xEE101010.toInt()),
-    PANEL_BORDER(0x555555),
-    PANEL_HEADER(0x333333),
+    PANEL_BORDER(0xFF555555.toInt()),
+    PANEL_HEADER(0xFF333333.toInt()),
     
-    COLEWEIGHT_WIDGET_BG(0x2E6F7E),
-    FARMINGWEIGHT_WIDGET_BG(0x3B6E38),
+    COLEWEIGHT_WIDGET_BG(0xFF2E6F7E.toInt()),
+    FARMINGWEIGHT_WIDGET_BG(0xFF3B6E38.toInt()),
 
-    COLEWEIGHT_TEXT(0x508FBA),
-    FARMINGWEIGHT_TEXT(0x659446),
+    COLEWEIGHT_TEXT(0xFF508FBA.toInt()),
+    FARMINGWEIGHT_TEXT(0xFF659446.toInt()),
 
-    WIDGET_TITLE_TEXT(0xE8F1F5),
-    WIDGET_VALUE_TEXT(0xFFD166),
+    WIDGET_TITLE_TEXT(0xFFE8F1F5.toInt()),
+    WIDGET_VALUE_TEXT(0xFFFFD166.toInt()),
 }
 
 object ColorUtils {
-    const val OVERLAY_VALUE_COLOR: Int = 0xCCD7E0
+    const val OVERLAY_VALUE_COLOR: Int = 0xFFCCD7E0.toInt()
     const val DUMMY_BG: Int = 0x80404040.toInt()
     const val TOOLTIP_BG: Int = 0x90000000.toInt()
     
-    const val COLEWEIGHT: Int = 0x7FB4DB
-    const val FARMINGWEIGHT: Int = 0x58CF30
+    const val COLEWEIGHT: Int = 0xFF7FB4DB.toInt()
+    const val FARMINGWEIGHT: Int = 0xFF58CF30.toInt()
 
-    const val GRADIENT_START_COLOR: Int = 0xFFD447
-    const val GRADIENT_END_COLOR: Int = 0xFF9F2E
+    const val GRADIENT_START_COLOR: Int = 0xFFFFD447.toInt()
+    const val GRADIENT_END_COLOR: Int = 0xFFFF9F2E.toInt()
 
     @Volatile
     var skillColors: Map<String, Int> = emptyMap()
