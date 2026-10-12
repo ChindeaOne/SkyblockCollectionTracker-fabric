@@ -72,6 +72,7 @@ class CollectionOverlay : AbstractOverlay() {
         val main = mutableListOf<String>()
         CollectionParser.updateTrackingLines(main)
         if (main.isNotEmpty()) {
+            main.add("") // add separator line
             main.add("Uptime: $uptime")
             if (!showExtra && isChatOpened) CollectionParser.addToggleableSettingsLines(main)
         }

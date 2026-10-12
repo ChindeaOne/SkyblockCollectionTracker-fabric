@@ -17,10 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(EntityRenderer.class)
 public class EntityRendererMixin {
 
-    @ModifyReturnValue(
-            method = "getNameTag",
-            at = @At("RETURN")
-    )
+    @ModifyReturnValue(method = "getNameTag", at = @At("RETURN"))
     private Component sct$addRankToNameTag(Component original, @Local(argsOnly = true, name = "entity") Entity entity) {
         if (!HypixelUtils.isInSkyblock()) return original;
         if (!(entity instanceof Player player)) return original;
