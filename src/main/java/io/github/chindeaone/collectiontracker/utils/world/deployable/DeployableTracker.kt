@@ -7,28 +7,18 @@ import io.github.chindeaone.collectiontracker.config.showDeployableTitle
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
-import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.level.Level
 
 /**
 * This Kotlin object is based on SkyHanni's implementation.
 */
 object DeployableTracker {
 
-    data class TrackedDeployable(val type: MiningDeployable, val entity: ArmorStand, val expiresAt: Long) {
-        val remainingSeconds: Int
-            get() = ((expiresAt - System.currentTimeMillis()) / 1000L).toInt().coerceAtLeast(0)
-    }
-    var activeDeployable: TrackedDeployable? = null
+    var activeDeployable: MiningDeployable? = null
 
-    private val TIME_REGEX = Regex("""(\d+)s""")
-
-    private var isInMineshaft: Boolean = false
-    private val trackedDeployables = mutableListOf<TrackedDeployable>()
+    private val trackedDeployables = mutableListOf<MiningDeployable>()
 
     fun onClientTick(client: Minecraft) {
         if (!enableDeployable) return
@@ -37,103 +27,76 @@ object DeployableTracker {
         val level = client.level ?: return
         val player = client.player ?: return
 
-        isInMineshaft = IslandTracker.currentMiningIsland == "Mineshaft"
+        EntityUtils.getArmorStandsAroundPlayer(level, player.position(), 30.0).forEach { addDeployables(it) }
 
+        val current = getBestDeployable()
         val previous = activeDeployable
 
-        updateTrackedDeployables(level, player)
-
-        if (previous != null && previous.remainingSeconds <= 0) {
-            notifyExpiration(previous)
-        }
-
-        trackedDeployables.removeIf { it.remainingSeconds <= 0 }
-
-        val current = getBestDeployable(player)
-
-        if (current != null && previous != null && shouldNotifyOutOfRange(previous, current, player)) {
-            notifyOutOfRange(previous)
-        }
-
-        if (current == null) {
-            activeDeployable = null
-            return
+        if (previous != null && current == null) {
+            notifyPlayer(previous)
         }
 
         activeDeployable = current
+
+        trackedDeployables.removeIf { !it.isAlive() }
+        MiningDeployable.entries.forEach { if (!it.isAlive()) it.reset() }
     }
 
-    private fun updateTrackedDeployables(level: Level, player: Player) {
-        val nearbyEntities = EntityUtils.getArmorStandsAroundPlayer(level, player.position(), 30.0)
+    private fun addDeployables(entity: ArmorStand) {
+        val entityName = entity.name.string.removeColor()
 
-        for (entity in nearbyEntities) {
-            val type = getDeployableType(entity) ?: continue
+        for (deployable in MiningDeployable.entries) {
+            if (!deployable.isInPlayerRange(entity)) continue
 
-            if (trackedDeployables.any { it.entity.id == entity.id }) {
-                continue
+            val match = deployable.pattern.find(entityName) ?: continue
+            val deployableTime = match.groupValues[1].toLongOrNull() ?: continue
+            val time = System.currentTimeMillis() / 1000 + deployableTime - 1
+
+            if (deployable.expiryTime > time && deployable.isActive()) continue
+
+            deployable.entity = entity
+            deployable.expiryTime = time
+
+            if (!trackedDeployables.contains(deployable)) {
+                trackedDeployables.add(deployable)
             }
-
-            val seconds = getRemainingSeconds(entity)
-
-            trackedDeployables += TrackedDeployable(
-                entity = entity,
-                type = type,
-                expiresAt = System.currentTimeMillis() + seconds * 1000L
-            )
         }
     }
 
-    private fun getDeployableType(entity: ArmorStand): MiningDeployable? {
-        val name = entity.name.string.removeColor()
-
-        return MiningDeployable.entries.firstOrNull {
-            name.contains(it.deployableName, ignoreCase = true)
-        }
-    }
-
-    private fun getRemainingSeconds(entity: ArmorStand): Int {
-        val name = entity.name.string.removeColor()
-        return TIME_REGEX.find(name)?.groupValues?.get(1)?.toIntOrNull() ?: 0
-    }
-
-    private fun getBestDeployable(player: Player): TrackedDeployable? {
+    private fun getBestDeployable(): MiningDeployable? {
         return trackedDeployables
-            .filter { it.entity.isAlive }
-            .filter { it.remainingSeconds > 0 }
-            .filter { isPlayerInRange(it, player) }
+            .filter { it.isActive() }
             .maxWithOrNull(
-                compareBy<TrackedDeployable> { it.type.tier }
-                    .thenBy { it.remainingSeconds }
+                compareBy<MiningDeployable> { it.tier }
+                    .thenBy { it.expiryTime }
             )
     }
 
-    private fun isPlayerInRange(deployable: TrackedDeployable, player: Player): Boolean {
-        return (isInMineshaft && deployable.type.mineshaftGlobalRange) || deployable.entity.distanceToSqr(player) <= 30.0 * 30.0
+    private fun notifyPlayer(previous: MiningDeployable?) {
+        if (previous == null) return
+
+        if (!previous.isAlive()) {
+            notifyExpiration(previous)
+        } else if (!previous.isInPlayerRange()) {
+            notifyOutOfRange(previous)
+        }
     }
 
-    private fun notifyExpiration(deployable: TrackedDeployable) {
+    private fun notifyExpiration(deployable: MiningDeployable) {
         if (!showDeployableTitle) return
 
-        RenderUtils.showTitle(Component.literal("${deployable.type.displayName} §cExpired!"))
+        RenderUtils.showTitle(Component.literal("${deployable.displayName} §cExpired!"))
     }
 
-    private fun shouldNotifyOutOfRange(previous: TrackedDeployable, current: TrackedDeployable, player: Player): Boolean {
-        if (previous.remainingSeconds <= 0) return false
-        if (isPlayerInRange(previous, player)) return false
-        if (current.entity.id == previous.entity.id) return false
-        if (current.type.tier >= previous.type.tier) return false
-
-        return !(isInMineshaft && previous.type.mineshaftGlobalRange)
-    }
-
-    private fun notifyOutOfRange(deployable: TrackedDeployable) {
+    private fun notifyOutOfRange(deployable: MiningDeployable) {
         if (!deployableOutOfRangeWarning) return
 
-        RenderUtils.showTitle(Component.literal("${deployable.type.displayName} §cOut of range!"))
+        RenderUtils.showTitle(Component.literal("${deployable.displayName} §cOut of range!"))
     }
 
     fun reset() {
         trackedDeployables.clear()
         activeDeployable = null
+        MiningDeployable.entries.forEach { it.reset() }
     }
 }

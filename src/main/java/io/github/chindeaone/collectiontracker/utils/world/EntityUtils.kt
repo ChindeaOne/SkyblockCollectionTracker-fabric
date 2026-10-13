@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
@@ -14,6 +15,10 @@ object EntityUtils {
         )
 
         return level.getEntitiesOfClass(ArmorStand::class.java, searchBox)
-            .filter { it.distanceToSqr(pos) <= radius * radius }
+            .filter { it.distanceToSqr(pos) < radius * radius }
+    }
+
+    fun isEntityInPlayerRange(entity: ArmorStand): Boolean {
+        return entity.position().distanceToSqr(MinecraftUtils.player!!.position()) < 30.0 * 30.0
     }
 }

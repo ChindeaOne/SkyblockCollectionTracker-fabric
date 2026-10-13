@@ -4,6 +4,7 @@ import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.deployablePosition
 import io.github.chindeaone.collectiontracker.config.enableDeployable
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 
 class DeployableOverlay : AbstractOverlay() {
@@ -34,20 +35,20 @@ class DeployableOverlay : AbstractOverlay() {
             return
         }
 
-        if (ModLoader.clientTicks % 5L != 0L) return
+        if (ModLoader.clientTicks % 2L != 0L) return
 
         val deployable = DeployableTracker.activeDeployable ?: run {
             cachedLines = emptyList()
             return
         }
 
-        val timeLeft = deployable.remainingSeconds
+        val timeLeft = deployable.expiryTime - System.currentTimeMillis() / 1000
 
         cachedLines = listOf(
-            if (timeLeft <= 5) {
-                "${deployable.type.displayName} §cSoon!"
+            if (timeLeft < 5) {
+                "${deployable.displayName} §cSoon!"
             } else {
-                "${deployable.type.displayName} §e${timeLeft}s"
+                "${deployable.displayName} §e${StringUtils.formatCompactTime(timeLeft)}"
             }
         )
     }
