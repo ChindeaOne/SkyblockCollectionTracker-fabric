@@ -65,7 +65,7 @@ class ModConfig : Config() {
     override fun getTitle() : StructuredText {
         val modName = "SkyblockCollectionTracker"
         return StructuredText.empty()
-            .append(StructuredText.of(modName).withColour(ChromaText.PREFIX_COLOR_RGB))
+            .append(StructuredText.of(modName).withColour(ChromaText.PREFIX_TEXT.value))
             .append(StructuredText.of(" by §3Chindea_YTB§r, config by §5Moulberry §rand §5nea89"))
     }
 

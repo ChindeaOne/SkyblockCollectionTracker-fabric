@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.render
 
+import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 import net.minecraft.client.renderer.rendertype.RenderSetup
@@ -12,7 +13,6 @@ import net.minecraft.util.Util
 object ChromaText {
     val CHROMA_TEXT = TextColor(0xFFFFFF, "sct_chroma")
     val PREFIX_TEXT  = TextColor(0xFFFFFE, "sct_prefix")
-    const val PREFIX_COLOR_RGB = 0xFFFFFE
 
     @JvmStatic
     var prefixGlyph = false
@@ -51,17 +51,17 @@ object ChromaText {
 
     @JvmStatic
     fun isChromaGlyph(glyph: GlyphInstance): Boolean {
-        val color = glyph.style.color
-        return when (color?.name) {
+        return when (glyph.style.color?.name) {
             CHROMA_TEXT.name, PREFIX_TEXT.name -> true
-            else -> color?.value == PREFIX_COLOR_RGB
+            else -> false
         }
     }
 
     @JvmStatic
     fun isPrefixGradientGlyph(glyph: GlyphInstance): Boolean {
-        val color = glyph.style.color
-        return color?.name == PREFIX_TEXT.name || color?.value == PREFIX_COLOR_RGB
+        val color = glyph.style.color ?: return false
+
+        return color.name == PREFIX_TEXT.name || (ConfigHelper.isConfigScreenOpen() && color.value == PREFIX_TEXT.value)
     }
 
     fun style(color: ChromaColour): Style {

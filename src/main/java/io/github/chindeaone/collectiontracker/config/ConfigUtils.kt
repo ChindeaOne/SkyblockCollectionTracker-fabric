@@ -41,8 +41,10 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCol
 import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillConfig
 import io.github.chindeaone.collectiontracker.config.categories.party.PartyNotifierConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.TemporaryBuff
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 
 /**
  * Global accessors for configs
@@ -658,4 +660,6 @@ object ConfigHelper {
     fun saveLeaderboardPositions(map : Map<String, Int>) {
         leaderboardOverlay.leaderboardPositions = map
     }
+
+    fun isConfigScreenOpen(): Boolean = MinecraftUtils.screen is MoulConfigScreenComponent
 }
