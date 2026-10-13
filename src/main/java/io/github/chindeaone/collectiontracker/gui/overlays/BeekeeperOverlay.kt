@@ -15,7 +15,7 @@ class BeekeeperOverlay : AbstractRotatingPerksOverlay() {
 
     override val isEnabled: Boolean get() = enableBeekeeper
 
-    override val buffPrefix get() = "§6Beekeeper"
+    override val buffPrefix get() = "§2Beekeeper"
 
     override val currentBuff: String get() = currentBeekeeperBuff
 

@@ -15,7 +15,7 @@ class SkyMallOverlay : AbstractRotatingPerksOverlay() {
 
     override val isEnabled: Boolean get() = enableSkyMall
 
-    override val buffPrefix get() = "§bSky Mall"
+    override val buffPrefix get() = "§6Sky Mall"
 
     override val currentBuff: String get() = currentSkyMallBuff
 

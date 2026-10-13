@@ -97,6 +97,6 @@ class AxeAbilityOverlay : AbstractOverlay() {
             else -> "§aReady!"
         }
 
-        cachedLines = listOf("§e$displayName CD: $status") // Credit to Ninjune for Coleweight's formatting
+        cachedLines = listOf("§e$displayName: $status") // Credit to Ninjune for Coleweight's formatting
     }
 }
