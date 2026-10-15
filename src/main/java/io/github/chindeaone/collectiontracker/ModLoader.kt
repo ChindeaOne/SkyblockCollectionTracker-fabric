@@ -12,6 +12,7 @@ import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.TimeUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.inventory.ItemUseUtils
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
 import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
@@ -93,8 +94,9 @@ object ModLoader: ModInitializer {
         UseItemCallback.EVENT.register { player, _, hand ->
             if (!HypixelUtils.isInSkyblock) return@register InteractionResult.PASS
 
-            InventoryListener.checkHandItem(player, hand)
+            ItemUseUtils.checkHandItemInteraction(player, hand)
         }
+
         LevelRenderEvents.END_MAIN.register { context ->
             if (!HypixelUtils.isInSkyblock) return@register
             if (!RenderSystem.isOnRenderThread()) return@register
@@ -108,6 +110,7 @@ object ModLoader: ModInitializer {
                 WorldRenderer.executeDraws()
             }
         }
+
         val overlayId = Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "overlay")
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, overlayId) { context, _ ->
             // Avoid rendering in editor mode
@@ -119,6 +122,7 @@ object ModLoader: ModInitializer {
                 }
             }
         }
+
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             if (!HypixelUtils.isInSkyblock) return@register
 
@@ -156,6 +160,7 @@ object ModLoader: ModInitializer {
             MiningStatsParser.onClientTick()
             ForagingStatsParser.onClientTick()
             TimeUtils.onClientTick()
+            ItemUseUtils.onClientTick()
         }
     }
 }

@@ -8,16 +8,9 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
-import io.github.chindeaone.collectiontracker.utils.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
-import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.Item
 
 object InventoryListener {
 
@@ -26,11 +19,7 @@ object InventoryListener {
     private val lastInventoryState = mutableMapOf<Int, Int>()
     private val lastItemNames = mutableMapOf<Int, String>()
 
-    private var pendingConsumable: HandItemState? = null
-
     fun onClientTick() {
-        checkIfConsumableConsumed()
-
         if (ModLoader.clientTicks % 4L != 0L) return
 
         val isTracking = TrackingHandler.isTracking
@@ -136,36 +125,6 @@ object InventoryListener {
         }
     }
 
-    @Suppress("SameReturnValue")
-    fun checkHandItem(player: Player, hand: InteractionHand): InteractionResult {
-        val stack = player.getItemInHand(hand)
-        if (stack.isEmpty) return InteractionResult.PASS
-
-        // Extract tooltips once
-        val context = Item.TooltipContext.of(player.level().registryAccess())
-        val lines = stack.getTooltipLines(
-            context,
-            player,
-            AbilityItemParser.tooltipFlag()
-        ).map { it.string }.map { StringUtils.normalizeText(it) }
-
-        AbilityItemParser.parse(lines)?.let { snap ->
-            AbilityUtils.update(snap)
-            return InteractionResult.PASS
-        }
-
-        TemporaryBuffsParser.getConsumable(stack.hoverName.string)?.let {
-            pendingConsumable = HandItemState(
-                buff = it,
-                count = stack.count,
-                slot = player.inventory.selected,
-                timestamp = System.currentTimeMillis()
-            )
-        }
-
-        return InteractionResult.PASS
-    }
-
     private fun matches(itemName: String, collection: String): Boolean {
         return itemName.startsWith(collection)
     }
@@ -175,29 +134,4 @@ object InventoryListener {
             "half-eaten carrot" -> 8 // suppose max threshold
             else -> 1
         }
-
-    private fun checkIfConsumableConsumed() =
-        pendingConsumable?.let { pending ->
-            val now = System.currentTimeMillis()
-
-            if (now - pending.timestamp > 2000L) {
-                pendingConsumable = null
-                return@let
-            }
-
-            val player = MinecraftUtils.player ?: return@let
-            val currentStack = player.inventory.getItem(pending.slot)
-
-            if (currentStack.isEmpty || currentStack.count < pending.count) {
-                TemporaryBuffsParser.resetConsumable(pending.buff)
-                pendingConsumable = null
-            }
-        }
-
-    private data class HandItemState(
-        val buff: TemporaryBuffsParser.TemporaryBuff,
-        val count: Int,
-        val slot: Int,
-        val timestamp: Long
-    )
 }
