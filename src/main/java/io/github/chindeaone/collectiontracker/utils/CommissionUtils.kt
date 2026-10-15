@@ -26,7 +26,7 @@ import io.github.chindeaone.collectiontracker.config.enableCommissionsTracking
 import io.github.chindeaone.collectiontracker.config.keybindConfig
 import io.github.chindeaone.collectiontracker.mixins.AbstractContainerScreenAccessor
 import io.github.chindeaone.collectiontracker.tracker.commissions.CommissionsTracker
-import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
+import io.github.chindeaone.collectiontracker.utils.inventory.ItemUtils
 import io.github.chindeaone.collectiontracker.utils.parser.CommissionParser
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
@@ -39,7 +39,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import java.util.Collections
 import java.util.WeakHashMap
@@ -72,14 +71,8 @@ object CommissionUtils {
         if (stack.isEmpty) return
 
         val player = MinecraftUtils.player ?: return
-        val level = MinecraftUtils.level ?: return
 
-        val tooltipContext = Item.TooltipContext.of(level.registryAccess())
-        val tooltipLines = stack.getTooltipLines(
-            tooltipContext,
-            player,
-            AbilityItemParser.tooltipFlag()
-        ).map { it.string }
+        val tooltipLines = ItemUtils.getTooltipLines(stack, player)
 
         val name = findCommissionName(tooltipLines) ?: return
         val progress = findProgress(tooltipLines)
@@ -301,13 +294,8 @@ object CommissionUtils {
         if (stack.isEmpty) return false
 
         val player = MinecraftUtils.player ?: return false
-        val level = MinecraftUtils.level ?: return false
 
-        val tooltipLines = stack.getTooltipLines(
-            Item.TooltipContext.of(level.registryAccess()),
-            player,
-            AbilityItemParser.tooltipFlag()
-        ).map { it.string }
+        val tooltipLines = ItemUtils.getTooltipLines(stack, player)
 
         return tooltipLines.any {
             it.contains("COMPLETED", ignoreCase = true)

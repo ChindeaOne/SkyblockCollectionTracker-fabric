@@ -14,14 +14,15 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentBee
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentLotteryBuff
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentSkyMallBuff
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.isPickaxeAbility
+import io.github.chindeaone.collectiontracker.utils.inventory.ItemUtils
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.core.component.DataComponents
 import net.minecraft.resources.Identifier
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import java.util.HashMap
 
@@ -68,6 +69,7 @@ object ContainerParser {
     }
 
     fun onClientTick(client: Minecraft) {
+        val player = client.player ?: return
         val screen = currentHotxScreen ?: return
 
         if (client./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ !== screen) {
@@ -77,18 +79,20 @@ object ContainerParser {
         }
 
         when (currentHotxType) {
-            HotxScreenType.HOTM -> handleHotm(screen, client)
-            HotxScreenType.HOTF -> handleHotf(screen, client)
+            HotxScreenType.HOTM -> handleHotm(screen, player)
+            HotxScreenType.HOTF -> handleHotf(screen, player)
             null -> return
         }
     }
 
-    private fun handleHotm(screen: AbstractContainerScreen<*>, client: Minecraft) {
+    private fun handleHotm(screen: AbstractContainerScreen<*>, player: Player) {
         findCoreStack(screen).let { stack ->
             val cotmLevel = cotmLevel
             if (cotmLevel == 10) return@let
 
-            val level = getTooltips(stack, client).getOrNull(1)?.split(" ")?.getOrNull(1)?.toIntOrNull() ?: return@let
+            val tooltipLines = ItemUtils.getTooltipLines(stack, player)
+
+            val level = tooltipLines.getOrNull(1)?.split(" ")?.getOrNull(1)?.toIntOrNull() ?: return@let
             if (level != cotmLevel) {
                 ConfigHelper.setCotmLevel(level)
             }
@@ -111,14 +115,16 @@ object ContainerParser {
                 return@let
             }
 
-            val result = parseEffect(stack, client) ?: return@let
+            val result = parseEffect(stack, player) ?: return@let
 
             currentSkyMallBuff = result
             isPickaxeAbility = result.contains("cooldown", ignoreCase = true)
         }
 
         findPerksStack(screen, "Professional")?.let { stack ->
-            val level = getTooltips(stack, client)
+            val tooltipLines = ItemUtils.getTooltipLines(stack, player)
+
+            val level = tooltipLines
                 .getOrNull(1)?.split(" ")
                 ?.getOrNull(1)?.split("/")
                 ?.getOrNull(0)?.toIntOrNull()
@@ -130,7 +136,9 @@ object ContainerParser {
         }
 
         findPerksStack(screen, "Strong Arm")?.let { stack ->
-            val level = getTooltips(stack, client)
+            val tooltipLines = ItemUtils.getTooltipLines(stack, player)
+
+            val level = tooltipLines
                 .getOrNull(1)?.split(" ")
                 ?.getOrNull(1)?.split("/")
                 ?.getOrNull(0)?.toIntOrNull()
@@ -145,12 +153,14 @@ object ContainerParser {
         currentHotxType = null
     }
 
-    private fun handleHotf(screen: AbstractContainerScreen<*>, client: Minecraft) {
+    private fun handleHotf(screen: AbstractContainerScreen<*>, player: Player) {
         findCoreStack(screen).let { stack ->
             val cotfLevel = cotfLevel
             if (cotfLevel == 5) return@let
 
-            val level = getTooltips(stack, client).getOrNull(1)?.split(" ")?.getOrNull(1)?.toIntOrNull() ?: return@let
+            val tooltipLines = ItemUtils.getTooltipLines(stack, player)
+
+            val level = tooltipLines.getOrNull(1)?.split(" ")?.getOrNull(1)?.toIntOrNull() ?: return@let
             if (level != cotfLevel) {
                 ConfigHelper.setCotfLevel(level)
             }
@@ -171,7 +181,7 @@ object ContainerParser {
                 return@let
             }
 
-            parseEffect(stack, client)?.let { effect ->
+            parseEffect(stack, player)?.let { effect ->
                 currentLotteryBuff = effect
             }
         }
@@ -194,7 +204,7 @@ object ContainerParser {
             }
 
             if (beekeeperStack.hoverName.string.removeColor() == "Beekeeper") {
-                parseEffect(beekeeperStack, client)?.let { effect ->
+                parseEffect(beekeeperStack, player)?.let { effect ->
                     currentBeekeeperBuff = effect
                 }
             }
@@ -226,10 +236,10 @@ object ContainerParser {
         return null
     }
 
-    private fun parseEffect(stack: ItemStack, client: Minecraft): String? {
-        val tooltip = getTooltips(stack, client)
+    private fun parseEffect(stack: ItemStack, player: Player): String? {
+        val tooltipLines = ItemUtils.getTooltipLines(stack, player)
 
-        return tooltip
+        return tooltipLines
             .dropWhile { it != "Your Current Effect" }
             .drop(1)
             .takeWhile { it.isNotBlank()}
@@ -237,16 +247,6 @@ object ContainerParser {
             .trim()
             .takeIf { it.isNotEmpty() }
             ?.let(StringUtils::formatHotXPerkBuffs)
-    }
-
-    private fun getTooltips(stack: ItemStack, client: Minecraft): List<String> {
-        val level = client.level ?: return emptyList()
-
-        return stack.getTooltipLines(
-            Item.TooltipContext.of(level.registryAccess()),
-            client.player,
-            AbilityItemParser.tooltipFlag()
-        ).map { it.string }
     }
 
     private fun onCommissionScreen(container: AbstractContainerScreen<*>) {

@@ -160,7 +160,6 @@ object ModLoader: ModInitializer {
             MiningStatsParser.onClientTick()
             ForagingStatsParser.onClientTick()
             TimeUtils.onClientTick()
-            ItemUseUtils.onClientTick()
         }
     }
 }
