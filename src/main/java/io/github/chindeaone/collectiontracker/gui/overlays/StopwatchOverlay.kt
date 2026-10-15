@@ -4,7 +4,7 @@ import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.coleweightStopwatchPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.TimeUtils
+import io.github.chindeaone.collectiontracker.utils.chat.TimeNotifierUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 
 class StopwatchOverlay : AbstractOverlay() {
@@ -46,7 +46,7 @@ class StopwatchOverlay : AbstractOverlay() {
         stopwatchPaused = false
 
         sendMessage("§aStopwatch started!", true)
-        TimeUtils.resetStopwatchNotifier()
+        TimeNotifierUtils.resetStopwatchNotifier()
     }
 
     fun stopStopwatch() {

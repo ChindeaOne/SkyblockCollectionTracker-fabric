@@ -25,7 +25,7 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
-import io.github.chindeaone.collectiontracker.utils.TimeUtils
+import io.github.chindeaone.collectiontracker.utils.chat.TimeNotifierUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -718,7 +718,7 @@ object CommandRegistry {
                     return@executes 0
                 }
 
-                TimeUtils.sendTimerToParty(timerOverlay.getRemainingTimeInSeconds(), timerOverlay.isPaused)
+                TimeNotifierUtils.sendTimerToParty(timerOverlay.getRemainingTimeInSeconds(), timerOverlay.isPaused)
                 1
             }
         )
@@ -734,7 +734,7 @@ object CommandRegistry {
                     return@executes 0
                 }
 
-                TimeUtils.sendStopwatchToParty(stopwatchOverlay.getElapsedTimeInSeconds(), stopwatchOverlay.stopwatchPaused)
+                TimeNotifierUtils.sendStopwatchToParty(stopwatchOverlay.getElapsedTimeInSeconds(), stopwatchOverlay.stopwatchPaused)
                 1
             }
         )

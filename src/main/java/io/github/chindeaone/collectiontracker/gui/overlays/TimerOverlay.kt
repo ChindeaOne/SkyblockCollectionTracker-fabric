@@ -5,7 +5,7 @@ import io.github.chindeaone.collectiontracker.config.coleweightTimerPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.showTimerTitle
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.TimeUtils
+import io.github.chindeaone.collectiontracker.utils.chat.TimeNotifierUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
 import net.minecraft.network.chat.Component
@@ -50,7 +50,7 @@ class TimerOverlay : AbstractOverlay() {
         hasEnded = false
 
         sendMessage("§aTimer set for ${StringUtils.formatCompactTime(duration)}!", true)
-        TimeUtils.resetTimerNotifier()
+        TimeNotifierUtils.resetTimerNotifier()
     }
 
     fun pauseTimer() {
