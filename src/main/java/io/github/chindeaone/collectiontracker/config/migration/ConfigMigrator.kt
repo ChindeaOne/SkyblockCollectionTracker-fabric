@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 
 object ConfigMigrator {
 
-    const val CURRENT_VERSION = 2
+    const val CURRENT_VERSION = 3
 
     fun migrate(config: JsonObject): Boolean {
         val oldVersion = config
@@ -20,6 +20,7 @@ object ConfigMigrator {
             when (++currentVersion) {
                 1 -> migrateToVersion1(config)
                 2 -> migrateToVersion2(config)
+                3 -> migrateToVersion3(config)
             }
         }
 
@@ -114,5 +115,36 @@ object ConfigMigrator {
 
             element.isJsonArray -> element.asJsonArray.forEach(::migratePositions)
         }
+    }
+
+    /**
+     * Changed `Temporary Buff` config to `Mining Consumables` config.
+     * Renamed all config fields as well.
+     * Removed `refinedCacaoTime`.
+     */
+    private fun migrateToVersion3(config: JsonObject) {
+        val mining = config.getAsJsonObject("mining") ?: return
+
+        val tempBuffConfig = mining.remove("temporaryBuffsConfig")
+            ?.takeIf { it.isJsonObject }
+            ?.asJsonObject
+            ?: return
+
+        // rename fields
+        tempBuffConfig.remove("enableTempBuffTracker")?.let {
+            tempBuffConfig.add("enableConsumableTracker", it)
+        }
+
+        tempBuffConfig.remove("showTempBuffExpiredTitle")?.let {
+            tempBuffConfig.add("showConsumableExpiredTitle", it)
+        }
+
+        tempBuffConfig.remove("tempBuffPosition")?.let {
+            tempBuffConfig.add("consumablePosition", it)
+        }
+
+        tempBuffConfig.remove("refinedCacaoTime")
+
+        mining.add("consumableConfig", tempBuffConfig)
     }
 }

@@ -28,7 +28,7 @@ import io.github.chindeaone.collectiontracker.config.categories.mining.routes.Mi
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.PickaxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.SkyMallConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.TemporaryBuffsConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.ConsumableConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.DwarvenMetalsRoutes
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.PureOresRoutes
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig
@@ -42,7 +42,7 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.SkillCon
 import io.github.chindeaone.collectiontracker.config.categories.party.PartyNotifierConfig
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.TemporaryBuff
+import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser.Consumables
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 
@@ -63,7 +63,7 @@ val beekeeperPosition: Position get() = modConfig.foraging.hotfConfig.beekeeperC
 val pickaxeAbilityPosition: Position get() = modConfig.mining.hotmConfig.pickaxeAbilityConfig.pickaxeAbilityPosition
 val axeAbilityPosition: Position get() = modConfig.foraging.hotfConfig.axeAbilityConfig.axeAbilityPosition
 val deployablePosition: Position get() = modConfig.mining.lanternDeployableConfig.deployablePosition
-val tempBuffPosition: Position get() = modConfig.mining.temporaryBuffsConfig.tempBuffPosition
+val tempBuffPosition: Position get() = modConfig.mining.consumableConfig.consumablePosition
 val titlePosition: Position get() = modConfig.misc.titlePosition
 val multiOverlayPosition: Position get() = modConfig.tracking.multiCollectionConfig.multiOverlayPosition
 val coleweightTimerPosition: Position get() = modConfig.mining.coleweightConfig.coleweightTimerPosition
@@ -99,7 +99,7 @@ val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
 val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
 val lanternDeployableConfig: LanternDeployableConfig get() = miningConfig.lanternDeployableConfig
-val temporaryBuffsConfig: TemporaryBuffsConfig get() = miningConfig.temporaryBuffsConfig
+val consumableConfig: ConsumableConfig get() = miningConfig.consumableConfig
 val cotmLevel: Int get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = hotmConfig.pickaxeAbilityConfig.indicator
@@ -122,8 +122,8 @@ val dwarvenMetalRoutes: DwarvenMetalsRoutes.DwarvenMetalRoutes get() = dwarvenMe
 val pureOresRoutesConfig: PureOresRoutes get() = miningRoutesConfig.pureOresRoutes
 val enablePureOresRoutes: Boolean get() = pureOresRoutesConfig.enablePureOresRoutes
 val pureOresRoutes: PureOresRoutes.PureOreRoutes get() = pureOresRoutesConfig.selectedPureOresRoute
-val enableTempBuffTracker: Boolean get() = temporaryBuffsConfig.enableTempBuffTracker
-val showTempBuffExpiredTitle: Boolean get() = temporaryBuffsConfig.showTempBuffExpiredTitle
+val enableTempBuffTracker: Boolean get() = consumableConfig.enableConsumableTracker
+val showTempBuffExpiredTitle: Boolean get() = consumableConfig.showConsumableExpiredTitle
 
 // Coleweight Config Accessors
 val coleweightConfig: ColeweightConfig get() = miningConfig.coleweightConfig
@@ -260,13 +260,12 @@ object ConfigAccess {
     @JvmStatic
     fun isFarmingweightRankInNameTag(): Boolean = farmingweightRankInNameTag
 
-    fun getDuration(buff: TemporaryBuff): Long {
+    fun getConsumableDuration(buff: Consumables): Long {
         return when (buff) {
-            TemporaryBuff.REFINED_CACAO -> temporaryBuffsConfig.refinedCacaoTime
-            TemporaryBuff.FILET_O_FORTUNE -> temporaryBuffsConfig.filetTime
-            TemporaryBuff.CHILLED_PRISTINE_POTATO -> temporaryBuffsConfig.pristinePotatoTime
-            TemporaryBuff.POWDER_PIE -> temporaryBuffsConfig.powderPumpkinTime
-            TemporaryBuff.FIESTA_FLASK -> temporaryBuffsConfig.fiestaFlaskTime
+            Consumables.FILET_O_FORTUNE -> consumableConfig.filetTime
+            Consumables.CHILLED_PRISTINE_POTATO -> consumableConfig.pristinePotatoTime
+            Consumables.POWDER_PIE -> consumableConfig.powderPumpkinTime
+            Consumables.FIESTA_FLASK -> consumableConfig.fiestaFlaskTime
         }
     }
 }
@@ -401,12 +400,12 @@ object ConfigHelper {
     }
 
     fun toggleTempBuffTracker(): Boolean {
-        temporaryBuffsConfig.enableTempBuffTracker = !enableTempBuffTracker
+        consumableConfig.enableConsumableTracker = !enableTempBuffTracker
         return enableTempBuffTracker
     }
 
     fun toggleTempBuffExpiredTitle(): Boolean {
-        temporaryBuffsConfig.showTempBuffExpiredTitle = !showTempBuffExpiredTitle
+        consumableConfig.showConsumableExpiredTitle = !showTempBuffExpiredTitle
         return showTempBuffExpiredTitle
     }
 
@@ -559,13 +558,12 @@ object ConfigHelper {
         axeAbilityConfig.abilityNameAxe = name
     }
 
-    fun setDuration(buff: TemporaryBuff, duration: Long) {
+    fun setConsumableDuration(buff: Consumables, duration: Long) {
         when (buff) {
-            TemporaryBuff.REFINED_CACAO -> temporaryBuffsConfig.refinedCacaoTime = duration
-            TemporaryBuff.FILET_O_FORTUNE -> temporaryBuffsConfig.filetTime = duration
-            TemporaryBuff.CHILLED_PRISTINE_POTATO -> temporaryBuffsConfig.pristinePotatoTime = duration
-            TemporaryBuff.POWDER_PIE -> temporaryBuffsConfig.powderPumpkinTime = duration
-            TemporaryBuff.FIESTA_FLASK -> temporaryBuffsConfig.fiestaFlaskTime = duration
+            Consumables.FILET_O_FORTUNE -> consumableConfig.filetTime = duration
+            Consumables.CHILLED_PRISTINE_POTATO -> consumableConfig.pristinePotatoTime = duration
+            Consumables.POWDER_PIE -> consumableConfig.powderPumpkinTime = duration
+            Consumables.FIESTA_FLASK -> consumableConfig.fiestaFlaskTime = duration
         }
     }
 

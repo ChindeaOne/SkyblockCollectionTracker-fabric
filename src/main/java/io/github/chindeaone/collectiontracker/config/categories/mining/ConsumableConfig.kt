@@ -6,23 +6,20 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class TemporaryBuffsConfig {
+class ConsumableConfig {
     @Expose
-    @ConfigOption(name = "Enable Tracker", desc = "Toggles an overlay that tracks mining temporary buffs.")
+    @ConfigOption(name = "Enable Overlay", desc = "Toggles an overlay that tracks mining consumables.")
     @ConfigEditorBoolean
-    var enableTempBuffTracker: Boolean = false
+    var enableConsumableTracker: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Show Expired Title", desc = "Shows a title when a temporary buff expires.")
+    @ConfigOption(name = "Show Expired Title", desc = "Shows a title when a mining consumable expires.")
     @ConfigEditorBoolean
-    var showTempBuffExpiredTitle: Boolean = false
+    var showConsumableExpiredTitle: Boolean = false
 
     @Expose
-    @ConfigLink(owner = TemporaryBuffsConfig::class, field = "enableTempBuffTracker")
-    var tempBuffPosition: Position = Position(400, 100)
-
-    @Expose
-    var refinedCacaoTime: Long = 0L
+    @ConfigLink(owner = ConsumableConfig::class, field = "enableConsumableTracker")
+    var consumablePosition: Position = Position(400, 100)
 
     @Expose
     var filetTime: Long = 0L

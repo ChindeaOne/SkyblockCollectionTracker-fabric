@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployableConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.TemporaryBuffsConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.ConsumableConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CommissionsConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MiningStatsConfig
@@ -43,7 +43,7 @@ class Mining {
     var lanternDeployableConfig: LanternDeployableConfig = LanternDeployableConfig()
 
     @Expose
-    @ConfigOption(name = "Temporary Buffs Tracker", desc = "")
+    @ConfigOption(name = "Mining Consumable", desc = "")
     @Accordion
-    var temporaryBuffsConfig: TemporaryBuffsConfig = TemporaryBuffsConfig()
+    var consumableConfig: ConsumableConfig = ConsumableConfig()
 }

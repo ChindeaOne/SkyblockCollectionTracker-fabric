@@ -47,7 +47,7 @@ object OverlayManager {
             PickaxeAbilityOverlay(),
             AxeAbilityOverlay(),
             DeployableOverlay(),
-            TemporaryBuffsOverlay(),
+            ConsumablesOverlay(),
             TitleOverlay(),
             TimerOverlay(),
             StopwatchOverlay(),

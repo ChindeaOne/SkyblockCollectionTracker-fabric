@@ -6,17 +6,17 @@ import io.github.chindeaone.collectiontracker.config.enableTempBuffTracker
 import io.github.chindeaone.collectiontracker.config.showTempBuffExpiredTitle
 import io.github.chindeaone.collectiontracker.config.tempBuffPosition
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser.TemporaryBuff
+import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser
+import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser.Consumables
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
 import net.minecraft.network.chat.Component
 import java.util.EnumMap
 
-class TemporaryBuffsOverlay : AbstractOverlay() {
+class ConsumablesOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
-    private val activeStates = EnumMap<TemporaryBuff, Boolean>(TemporaryBuff::class.java)
+    private val activeStates = EnumMap<Consumables, Boolean>(Consumables::class.java)
 
-    override val overlayLabel: String = "Temporary Buffs"
+    override val overlayLabel: String = "Consumables"
 
     override val position: Position get() = tempBuffPosition
 
@@ -45,16 +45,16 @@ class TemporaryBuffsOverlay : AbstractOverlay() {
 
         val newLines = mutableListOf<String>()
 
-        TemporaryBuff.entries.forEach { buff ->
+        Consumables.entries.forEach { buff ->
             processBuff(newLines, buff)
         }
 
         cachedLines = newLines
     }
 
-    private fun processBuff(lines: MutableList<String>, buff: TemporaryBuff) {
+    private fun processBuff(lines: MutableList<String>, buff: Consumables) {
         val now = System.currentTimeMillis()
-        val expireTime = TemporaryBuffsParser.getEndTime(buff)
+        val expireTime = ConsumableParser.getEndTime(buff)
 
         val isActive = expireTime > now
         val wasActive = activeStates.getOrDefault(buff, false)

@@ -19,7 +19,7 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.migration.ConfigMigrator
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
-import io.github.chindeaone.collectiontracker.utils.parser.TemporaryBuffsParser
+import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -197,12 +197,12 @@ class ConfigManager {
             logger.info("[SCT]: Loaded last Beekeeper buff from config: {}", lastBeekeeperBuff)
         }
 
-        TemporaryBuffsParser.loadDurations()
+        ConsumableParser.loadConsumableDurations()
     }
 
     @Synchronized
     fun save(auto: Boolean = false) {
-        TemporaryBuffsParser.saveDurations()
+        ConsumableParser.saveConsumableDurations()
 
         val config = config ?: run {
             logger.error("[SCT]: Cannot save null config.")
