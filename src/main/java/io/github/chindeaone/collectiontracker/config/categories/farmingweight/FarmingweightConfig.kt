@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class FarmingweightConfig {
     @Expose
     @ConfigOption(
-        name = "Farming Weight Ranks in chat",
+        name = "Chat Farming Weight Ranks",
         desc = "Enable Farming Weight ranks in chat.\n§eNote: If you use Skyhanni's chat formatting, make sure you have at least §bPlayer Name §evisible!"
     )
     @ConfigEditorBoolean
@@ -16,8 +16,8 @@ class FarmingweightConfig {
 
     @Expose
     @ConfigOption(
-        name = "Farming Weight Ranks in name tag",
-        desc = "Displays Farming Weight ranks in the name tag of players."
+        name = "Nametag Farming Weight Ranks",
+        desc = "Display Farming Weight ranks in the player names."
     )
     @ConfigEditorBoolean
     var farmingweightRankInNameTag: Boolean = false
@@ -25,7 +25,7 @@ class FarmingweightConfig {
     @Expose
     @ConfigOption(
         name = "Farming Islands Only",
-        desc = "Show Farming Weight ranks in chat only when on Farming Islands."
+        desc = "Show Farming Weight ranks in chat only on Farming Islands."
     )
     @ConfigEditorBoolean
     var onlyOnFarmingIslands: Boolean = false

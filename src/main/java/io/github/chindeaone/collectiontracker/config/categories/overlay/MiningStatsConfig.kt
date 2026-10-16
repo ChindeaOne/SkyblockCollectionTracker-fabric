@@ -10,18 +10,24 @@ class MiningStatsConfig {
     @Expose
     @ConfigOption(
         name = "Mining Stats Overlay",
-        desc = "Toggles an overlay for mining stats.\n§eNote: Your mining stats (e.g. Mining Speed, Mining Fortune, etc.) must be §bvisible§e in the Stats tab widget!"
+        desc = "Enable the mining stats overlay.\n§eNote: Your mining stats (e.g. Mining Speed, Mining Fortune, etc.) must be §bvisible§e in the Stats tab widget!"
     )
     @ConfigEditorBoolean
     var enableMiningStatsOverlay: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Mining Islands Only", desc = "Allows the overlay to be rendered only in Mining Islands.")
+    @ConfigOption(
+        name = "Mining Islands Only",
+        desc = "Show the overlay only on Mining Islands."
+    )
     @ConfigEditorBoolean
     var miningStatsOverlayInMiningIslandsOnly: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Show detailed fortune", desc = "Shows the fortune breakdown in the overlay.")
+    @ConfigOption(
+        name = "Detailed Fortune",
+        desc = "Show the fortune breakdown in the overlay."
+    )
     @ConfigEditorBoolean
     var showDetailedFortune: Boolean = false
 

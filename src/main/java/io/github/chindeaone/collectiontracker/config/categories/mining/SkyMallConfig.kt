@@ -9,8 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class SkyMallConfig {
     @Expose
     @ConfigOption(
-        name = "Better Sky Mall",
-        desc = "Displays current Sky Mall perks and compacts Sky Mall chat messages."
+        name = "Sky Mall Display",
+        desc = "Display current Sky Mall perk and time left and compacts Sky Mall chat messages."
     )
     @ConfigEditorBoolean
     var enableSkyMall: Boolean = false
@@ -21,7 +21,7 @@ class SkyMallConfig {
     @Expose
     @ConfigOption(
         name = "Mining Islands Only",
-        desc = "Allows the Sky Mall overlay to be rendered only in Mining Islands."
+        desc = "Show the Sky Mall display only on Mining Islands."
     )
     @ConfigEditorBoolean
     var skyMallInMiningIslandsOnly: Boolean = true
@@ -29,7 +29,7 @@ class SkyMallConfig {
     @Expose
     @ConfigOption(
         name = "Disable Sky Mall chat messages",
-        desc = "Hides Sky Mall chat messages while displaying perks in the overlay and allowing other mods to process the messages."
+        desc = "Hide Sky Mall chat messages while allowing other mods to process the them."
     )
     @ConfigEditorBoolean
     var disableSkyMallChatMessages: Boolean = false

@@ -10,7 +10,7 @@ class PartyNotifierConfig {
     @Expose
     @ConfigOption(
         name = "Timer Notifier",
-        desc = "Sends a party message every x minutes, with the remaining time of the timer."
+        desc = "Send a party message every x minutes with the remaining time of the timer."
     )
     @ConfigEditorBoolean
     var timerNotifier: Boolean = false
@@ -26,7 +26,7 @@ class PartyNotifierConfig {
     @Expose
     @ConfigOption(
         name = "Stopwatch Notifier",
-        desc = "Sends a party message every x minutes, with the elapsed time of the stopwatch."
+        desc = "Send a party message every x minutes with the elapsed time of the stopwatch."
     )
     @ConfigEditorBoolean
     var stopwatchNotifier: Boolean = false

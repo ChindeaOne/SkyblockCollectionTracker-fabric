@@ -10,8 +10,8 @@ class CollectionMilestonesConfig {
 
     @Expose
     @ConfigOption(
-        name = "Collection Milestones Overlay",
-        desc = "Enables the milestones overlay during collection tracking."
+        name = "Milestones Display",
+        desc = "Display the milestones during collection tracking."
     )
     @ConfigEditorBoolean
     var collectionMilestones: Boolean = false
@@ -19,7 +19,7 @@ class CollectionMilestonesConfig {
     @Expose
     @ConfigOption(
         name = "Title Notification",
-        desc = "Send a title when you reach a collection milestone."
+        desc = "Show a title when you reach a collection milestone."
     )
     @ConfigEditorBoolean
     var collectionMilestonesTitleNotification: Boolean = false

@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils
 
-import io.github.chindeaone.collectiontracker.config.explicitValues
+import io.github.chindeaone.collectiontracker.config.formattedValues
 import java.util.Locale
 
 object NumbersUtils {
@@ -16,7 +16,7 @@ object NumbersUtils {
     }
 
     fun formatNumber(number: Long): String {
-        if (explicitValues) {
+        if (formattedValues) {
             return String.format(Locale.ROOT, "%,d", number)
         }
 
@@ -24,7 +24,7 @@ object NumbersUtils {
     }
 
     fun formatFloat(number: Float): String {
-        if (explicitValues) {
+        if (formattedValues) {
             return String.format(Locale.ROOT, "%,.2f", number)
         }
 

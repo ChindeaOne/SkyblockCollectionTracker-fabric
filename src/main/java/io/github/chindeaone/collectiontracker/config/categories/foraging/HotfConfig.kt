@@ -2,15 +2,20 @@ package io.github.chindeaone.collectiontracker.config.categories.foraging
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HotfConfig {
-    @Expose
     @ConfigOption(
-        name = "Center Of The Forest Level",
-        desc = "Input your Center Of The Forest level.\n§eRequired for more precise axe ability cooldown."
+        name = "§aInfo",
+        desc = "§eThese settings don't need to be manually updated, unless they aren't being detected correctly."
     )
+    @ConfigEditorInfoText
+    val info: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Center Of The Forest Level", desc = "")
     @ConfigEditorSlider(minValue = 0f, maxValue = 5f, minStep = 1f)
     var cotfLevel: Int = 0
 

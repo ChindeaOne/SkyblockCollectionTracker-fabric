@@ -28,7 +28,10 @@ class MultiCollectionConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Tracking Stats", desc = "Select what is displayed in the overlay for each collection.")
+    @ConfigOption(
+        name = "Tracking Stats",
+        desc = "Select what is displayed in the overlay for each collection."
+    )
     @ConfigEditorDropdown
     var trackingOptions: TrackingOptions = TrackingOptions.COLLECTION_RATE // Default to collection amount
 
@@ -41,12 +44,18 @@ class MultiCollectionConfig {
     var multiTrackingSummary: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Detailed Gemstone Summary", desc = "Shows a more detailed summary for gemstones.")
+    @ConfigOption(
+        name = "Detailed Gemstone Summary",
+        desc = "Shows a more detailed summary for gemstones."
+    )
     @ConfigEditorBoolean
     var multiDetailedSummary: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Summary Stats", desc = "Choose what stats show in the summary.")
+    @ConfigOption(
+        name = "Summary Stats",
+        desc = "Choose what stats show in the summary."
+    )
     @ConfigEditorDropdown
     var summaryStats: SummaryStats = SummaryStats.BOTH // Default to showing both collection and money
 

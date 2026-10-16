@@ -8,24 +8,30 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class LeaderboardConfig {
     @ConfigOption(
         name = "§eLeaderboard Info",
-        desc = "Shows your collection or skill rank (if eligible), next player and their collection/skill xp and eta until you pass them and progress to the next rank"
+        desc = "Show your collection or skill rank §7(if eligible), next player and their collection/skill xp, eta until you pass them and progress to the next rank"
     )
     @ConfigEditorInfoText
     var info: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Collection Leaderboard", desc = "Enables leaderboard for collection tracking")
+    @ConfigOption(
+        name = "Collection Leaderboard",
+        desc = "Enable collection tracking leaderboard."
+    )
     @ConfigEditorBoolean
     var collectionLeaderboard: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Skill Leaderboard", desc = "Enables leaderboard for skill tracking")
+    @ConfigOption(
+        name = "Skill Leaderboard",
+        desc = "Enable skill tracking leaderboard."
+    )
     @ConfigEditorBoolean
     var skillLeaderboard: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "Enable Previous Position",
+        name = "Previous Position",
         desc = "Show details about the previous position on the leaderboard."
     )
     @ConfigEditorBoolean
@@ -42,7 +48,7 @@ class LeaderboardConfig {
     @Expose
     @ConfigOption(
         name = "Custom Leaderboard Positions",
-        desc = "Will show your progress towards the custom position instead of the next player on the leaderboard"
+        desc = "Show your progress towards the custom position instead of the next player on the leaderboard.\n§eNote: If no custom position is set, it will show the next player on the leaderboard."
     )
     @ConfigEditorBoolean
     var leaderboardPosition: Boolean = false

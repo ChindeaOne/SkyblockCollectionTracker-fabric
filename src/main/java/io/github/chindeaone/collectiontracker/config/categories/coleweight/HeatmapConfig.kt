@@ -9,7 +9,7 @@ class HeatmapConfig {
     @Expose
     @ConfigOption(
         name = "Enable Heatmap",
-        desc = "Toggles the Heatmap for Glacite Tunnels and Mineshaft.\n§eColor mapping: §2dark green §f> §alight green."
+        desc = "Color mapping: §2dark green §f> §alight green.\n§eNote: The heatmap only works in §bGlacite Tunnels §fand §bMineshaft."
     )
     @ConfigEditorBoolean
     var enableHeatmap: Boolean = false
@@ -17,7 +17,7 @@ class HeatmapConfig {
     @Expose
     @ConfigOption(
         name = "Heatmap Opacity",
-        desc = "Adjust the opacity of the heatmap overlay.\n§eNote: 0.0 - fully transparent, 1.0 - fully opaque."
+        desc = "Adjust the opacity of the heatmap.\n§eNote: 0.0 - fully transparent, 1.0 - fully opaque."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.1f)
     var heatmapOpacity: Float = 1f

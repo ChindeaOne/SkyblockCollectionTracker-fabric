@@ -21,15 +21,15 @@ class PureOresRoutes {
     }
 
     @Expose
-    @ConfigOption(name = "Enable Pure Ores Routes", desc = "Enables routes for Pure Ores.")
+    @ConfigOption(
+        name = "Pure Ores Routes",
+        desc = "Enable routes for Pure Ores in §2Dwarven Mines§f."
+    )
     @ConfigEditorBoolean
     var enablePureOresRoutes: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Pure Ores Route",
-        desc = "Select the route you want to use for Pure Ores.\n§eRoutes provided by Mining Cult."
-    )
+    @ConfigOption(name = "Select Route", desc = "")
     @ConfigEditorDropdown
     var selectedPureOresRoute: PureOreRoutes = PureOreRoutes.DIAMOND
 }

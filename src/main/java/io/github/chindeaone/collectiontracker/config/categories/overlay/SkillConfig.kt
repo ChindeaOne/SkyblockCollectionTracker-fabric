@@ -9,8 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class SkillConfig {
     @Expose
     @ConfigOption(
-        name = "Enable Taming Tracking",
-        desc = "Toggles additional tracking for Taming."
+        name = "Taming Tracking",
+        desc = "Toggle an additional tracking for the Taming skill."
     )
     @ConfigEditorBoolean
     var enableTamingTracking: Boolean = false

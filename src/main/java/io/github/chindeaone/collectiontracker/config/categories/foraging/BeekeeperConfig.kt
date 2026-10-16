@@ -9,8 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class BeekeeperConfig {
     @Expose
     @ConfigOption(
-        name = "Better Beekeeper",
-        desc = "Displays current Beekeeper perks and compacts Beekeeper chat messages."
+        name = "Beekeeper Display",
+        desc = "Display current Beekeeper perks and time left and compacts Beekeeper chat messages."
     )
     @ConfigEditorBoolean
     var enableBeekeeper: Boolean = false
@@ -21,7 +21,7 @@ class BeekeeperConfig {
     @Expose
     @ConfigOption(
         name = "Foraging Islands Only",
-        desc = "Allows the Beekeeper overlay to be rendered only in Foraging Islands."
+        desc = "Show the Beekeeper display only on Foraging Islands."
     )
     @ConfigEditorBoolean
     var beekeeperInForagingIslandsOnly: Boolean = true
@@ -29,7 +29,7 @@ class BeekeeperConfig {
     @Expose
     @ConfigOption(
         name = "Disable Beekeeper chat messages",
-        desc = "Hides Beekeeper chat messages while displaying perks in the overlay and allowing other mods to process the messages."
+        desc = "Hide Beekeeper chat messages while allowing other mods to process the them."
     )
     @ConfigEditorBoolean
     var disableBeekeeperChatMessages: Boolean = false

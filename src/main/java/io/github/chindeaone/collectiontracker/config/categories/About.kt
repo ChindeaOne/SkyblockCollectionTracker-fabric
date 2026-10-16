@@ -32,7 +32,7 @@ class About {
         desc = "§eThis mod is meant to track all collections in Hypixel Skyblock and provide some nice qol features.\n\n\nUse §b/sct commands §eto see all available commands."
     )
     @ConfigEditorInfoText
-    var info: Boolean = true
+    val info: Boolean = true
 
     @Expose
     @ConfigOption(

@@ -19,22 +19,22 @@ class MineshaftRoutes {
 
     @Expose
     @ConfigOption(
-        name = "Enable Mineshaft Routes",
-        desc = "Displays ordered waypoints for the Mineshaft type you enter.\n§eRoutes provided by Mining Cult."
+        name = "Mineshaft Routes",
+        desc = "Display ordered waypoints for the Mineshaft type you enter.\n§eNote: §5Crystal §fand §dJasper §fMineshaft supported only."
     )
     @ConfigEditorBoolean
     var enableMineshaftRoutes: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Enable Mineshaft Spawn Routes", desc = "Enables routes for spawning Mineshafts.")
+    @ConfigOption(
+        name = "Mineshaft Spawn Routes",
+        desc = "Enable routes for spawning Mineshafts."
+    )
     @ConfigEditorBoolean
     var enableMineshaftSpawnRoutes: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Mineshaft Spawn Route",
-        desc = "Select the route you want to use to spawn Mineshafts.\n§eRoutes provided by Mining Cult."
-    )
+    @ConfigOption(name = "Select Route", desc = "")
     @ConfigEditorDropdown
     var selectedMineshaftSpawnRoute: MineshaftSpawnRoutes = MineshaftSpawnRoutes.GEMSTONES
 }

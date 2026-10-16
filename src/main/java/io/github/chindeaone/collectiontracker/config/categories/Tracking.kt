@@ -54,7 +54,7 @@ class Tracking {
     @Expose
     @ConfigOption(
         name = "Custom Collection Color",
-        desc = "Renders the collection overlay text using a custom color instead of the default one."
+        desc = "Render the collection overlay text using a custom color instead of the default one."
     )
     @SerializedName("overlayTextColor")
     @ConfigEditorBoolean
@@ -62,10 +62,9 @@ class Tracking {
 
     @Expose
     @ConfigOption(
-        name = "Explicit values",
-        desc = "Show full values instead of formatted values for all overlays and summaries."
+        name = "Format values",
+        desc = "Show formatted values (e.g. 1M) instead of full values for all overlays and summaries."
     )
-    @SerializedName("explicitValues")
     @ConfigEditorBoolean
-    var explicitValues: Boolean = false
+    var formattedValues: Boolean = true
 }

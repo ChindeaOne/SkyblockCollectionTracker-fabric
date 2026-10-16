@@ -17,15 +17,15 @@ class DwarvenMetalsRoutes {
     }
 
     @Expose
-    @ConfigOption(name = "Enable Dwarven Metal Routes", desc = "Enables routes for Dwarven Metals.")
+    @ConfigOption(
+        name = "Dwarven Metal Routes",
+        desc = "Enable routes for Dwarven Metals."
+    )
     @ConfigEditorBoolean
     var enableDwarvenMetalRoutes: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Dwarven Metal Route",
-        desc = "Select the route you want to use for Dwarven Metals.\n§eRoutes provided by Mining Cult."
-    )
+    @ConfigOption(name = "Select Route", desc = "")
     @ConfigEditorDropdown
     var selectedDwarvenMetalRoute: DwarvenMetalRoutes = DwarvenMetalRoutes.PURE_UMBER
 }

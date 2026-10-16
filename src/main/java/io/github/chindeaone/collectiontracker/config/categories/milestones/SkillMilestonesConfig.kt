@@ -10,8 +10,8 @@ class SkillMilestonesConfig {
 
     @Expose
     @ConfigOption(
-        name = "Skill Milestones Overlay",
-        desc = "Enables the milestones overlay during skill tracking."
+        name = "Milestones Display",
+        desc = "Display the milestones during skill tracking."
     )
     @ConfigEditorBoolean
     var skillMilestones: Boolean = false
@@ -19,7 +19,7 @@ class SkillMilestonesConfig {
     @Expose
     @ConfigOption(
         name = "Title Notification",
-        desc = "Send a title when you reach a skill milestone."
+        desc = "Show a title when you reach a skill milestone."
     )
     @ConfigEditorBoolean
     var skillMilestonesTitleNotification: Boolean = false

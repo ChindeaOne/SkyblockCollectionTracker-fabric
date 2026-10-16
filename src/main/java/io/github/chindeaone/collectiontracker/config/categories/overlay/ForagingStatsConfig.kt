@@ -10,18 +10,24 @@ class ForagingStatsConfig {
     @Expose
     @ConfigOption(
         name = "Foraging Stats Overlay",
-        desc = "Toggles an overlay for foraging stats.\n§eNote: Your foraging stats (e.g. Foraging Fortune, Sweep etc.) must be §bvisible§e in the Stats tab widget!"
+        desc = "Enable the foraging stats overlay.\n§eNote: Your foraging stats (e.g. Foraging Fortune, Sweep etc.) must be §bvisible§e in the Stats tab widget!"
     )
     @ConfigEditorBoolean
     var enableForagingStatsOverlay: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Foraging Islands Only", desc = "Allows the overlay to be rendered only in Foraging Islands.")
+    @ConfigOption(
+        name = "Foraging Islands Only",
+        desc = "Show the overlay only on Foraging Islands."
+    )
     @ConfigEditorBoolean
     var foragingStatsOverlayInForagingIslandsOnly: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Show detailed fortune", desc = "Shows the fortune breakdown in the overlay.")
+    @ConfigOption(
+        name = "Detailed Fortune",
+        desc = "Show the fortune breakdown in the overlay."
+    )
     @ConfigEditorBoolean
     var showDetailedFortune: Boolean = false
 

@@ -10,22 +10,34 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class CommissionsConfig {
     @Expose
-    @ConfigOption(name = "Enable Commissions Overlay", desc = "Toggles an overlay for mining commissions.")
+    @ConfigOption(
+        name = "Commissions Overlay",
+        desc = "Enable the commissions overlay."
+    )
     @ConfigEditorBoolean
     var enableCommissionsOverlay: Boolean = false
 
     @Expose
-    @ConfigOption(name = "New Commission Title", desc = "Display a title when a new commission is received.")
+    @ConfigOption(
+        name = "New Commission Title",
+        desc = "Display a title when a new commission is received."
+    )
     @ConfigEditorBoolean
     var newCommissionTitle: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Completion Notification Title", desc = "Display a title when a commission is completed.")
+    @ConfigOption(
+        name = "Completion Notification Title",
+        desc = "Display a title when a commission is completed."
+    )
     @ConfigEditorBoolean
     var completionTitle: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Enable Commissions Tracking", desc = "Toggles tracking for mining commissions.")
+    @ConfigOption(
+        name = "Commissions Tracking",
+        desc = "Enable commission tracking."
+    )
     @ConfigEditorBoolean
     var enableCommissionsTracking: Boolean = false
 

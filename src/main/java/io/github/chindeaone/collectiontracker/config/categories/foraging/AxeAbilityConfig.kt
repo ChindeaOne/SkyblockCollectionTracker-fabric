@@ -10,37 +10,49 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class AxeAbilityConfig {
     @Expose
-    @ConfigOption(name = "Ability Display", desc = "Displays current axe ability and remaining duration while active.")
+    @ConfigOption(
+        name = "Ability Display",
+        desc = "Display current axe ability name and cooldown/duration time."
+    )
     @ConfigEditorBoolean
     var displayAxeAbility: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Ability Indicator", desc = "Select a custom ability indicator.")
+    @ConfigOption(
+        name = "Ability Indicator",
+        desc = "Select a custom ability indicator."
+    )
     @ConfigEditorDropdown
     var indicator: Misc.AbilityDisplayIndicator = Misc.AbilityDisplayIndicator.NONE // Default to none
 
     @Expose
     @ConfigOption(
         name = "Foraging Islands Only",
-        desc = "Allows the axe ability display to be rendered only in Foraging Islands."
+        desc = "Show the axe ability display only on Foraging Islands."
     )
     @ConfigEditorBoolean
     var axeAbilityInForagingIslandsOnly: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Show Title", desc = "Shows a title when axe ability is ready.")
+    @ConfigOption(
+        name = "Ready Title Notification",
+        desc = "Show a title when the ability is ready."
+    )
     @ConfigEditorBoolean
     var showAxeReadyAbilityTitle: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show Expired Title", desc = "Shows a title when axe ability expires.")
+    @ConfigOption(
+        name = "Expired Title Notification",
+        desc = "Show a title when the ability expires."
+    )
     @ConfigEditorBoolean
     var showAxeExpiredAbilityTitle: Boolean = true
 
     @Expose
-    var abilityNameAxe: String = ""
-
-    @Expose
     @ConfigLink(owner = AxeAbilityConfig::class, field = "displayAxeAbility")
     var axeAbilityPosition: Position = Position(500, 200)
+
+    @Expose
+    var abilityNameAxe: String = ""
 }

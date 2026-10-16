@@ -12,8 +12,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class MilestonesConfig {
 
     @ConfigOption(
-        name = "Milestones Info",
-        desc = "Shows your progress towards your collection and skill milestones."
+        name = "§eMilestones Info",
+        desc = "Show your progress towards your collection and skill milestones."
     )
     @ConfigEditorInfoText
     var info: Boolean = true

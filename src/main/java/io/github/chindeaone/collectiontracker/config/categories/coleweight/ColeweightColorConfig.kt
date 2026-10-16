@@ -10,15 +10,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class ColeweightColorConfig {
     @Expose
     @ConfigOption(
-        name = "Enable Custom Rank Color",
-        desc = "Allows you to customize your Coleweight rank color in chat."
+        name = "Enable Custom Color",
+        desc = "Use a custom color for your Coleweight rank."
     )
     @ConfigEditorBoolean
     var enableCustomColor: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "Custom Rank Color",
+        name = "Set Custom Color",
         desc = "§eNote: If both Coleweight and Farming Weight use animated chroma, Coleweight takes animation speed priority."
     )
     @ConfigEditorColour

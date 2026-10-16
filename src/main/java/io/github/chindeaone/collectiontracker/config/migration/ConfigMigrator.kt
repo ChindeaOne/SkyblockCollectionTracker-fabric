@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 
 object ConfigMigrator {
 
-    const val CURRENT_VERSION = 3
+    const val CURRENT_VERSION = 4
 
     fun migrate(config: JsonObject): Boolean {
         val oldVersion = config
@@ -21,6 +21,7 @@ object ConfigMigrator {
                 1 -> migrateToVersion1(config)
                 2 -> migrateToVersion2(config)
                 3 -> migrateToVersion3(config)
+                4 -> migrateToVersion4(config)
             }
         }
 
@@ -146,5 +147,16 @@ object ConfigMigrator {
         tempBuffConfig.remove("refinedCacaoTime")
 
         mining.add("consumableConfig", tempBuffConfig)
+    }
+
+    /**
+     * Changed `explicitValues` to `formattedValues` and inverted the value.
+     */
+    private fun migrateToVersion4(config: JsonObject) {
+        val tracking = config.getAsJsonObject("tracking") ?: return
+
+        tracking.remove("explicitValues")?.let {
+            tracking.addProperty("formattedValues", !it.asBoolean)
+        }
     }
 }

@@ -37,7 +37,10 @@ class CollectionConfig {
     )
 
     @Expose
-    @ConfigOption(name = "Extra Stats", desc = "Show extra stats in the overlay.")
+    @ConfigOption(
+        name = "Extra Stats",
+        desc = "Show extra stats in the overlay."
+    )
     @ConfigEditorBoolean
     var showExtraStats: Boolean = false
 

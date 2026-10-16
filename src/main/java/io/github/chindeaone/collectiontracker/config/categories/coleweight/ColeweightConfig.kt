@@ -11,19 +11,25 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class ColeweightConfig {
     @Expose
     @ConfigOption(
-        name = "Coleweight Ranks in chat",
+        name = "Chat Coleweight Ranks",
         desc = "Enable Coleweight ranks in chat.\n§eNote: If you use Skyhanni's chat formatting, make sure you have at least §bPlayer Name §evisible!"
     )
     @ConfigEditorBoolean
     var coleweightRankingInChat: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Coleweight Ranks in name tag", desc = "Displays Coleweight ranks in the name tag of players.")
+    @ConfigOption(
+        name = "Nametag Coleweight Ranks",
+        desc = "Display Coleweight ranks in the player names."
+    )
     @ConfigEditorBoolean
     var coleweightRankInNameTag: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Mining Islands Only", desc = "Show Coleweight ranks in chat only when on the Mining Islands.")
+    @ConfigOption(
+        name = "Mining Islands Only",
+        desc = "Show Coleweight ranks in chat only on Mining Islands."
+    )
     @ConfigEditorBoolean
     var onlyOnMiningIslands: Boolean = false
 

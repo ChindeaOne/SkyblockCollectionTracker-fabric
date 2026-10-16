@@ -21,12 +21,18 @@ class Misc {
     }
 
     @Expose
-    @ConfigOption(name = "Timer precision", desc = "Change how many decimals cooldown and duration will show.")
+    @ConfigOption(
+        name = "Timer precision",
+        desc = "Change how many decimals cooldown and duration will show."
+    )
     @ConfigEditorSlider(minValue = 0f, maxValue = 2f, minStep = 1f)
     var abilityPrecision: Int = 0
 
     @Expose
-    @ConfigOption(name = "Title Duration", desc = "How long (in seconds) will titles remain on screen.")
+    @ConfigOption(
+        name = "Title Duration",
+        desc = "How long (in seconds) will titles remain on screen."
+    )
     @ConfigEditorSlider(minValue = 1f, maxValue = 8f, minStep = 1f)
     var titleDisplayTimer: Int = 3
 
@@ -38,26 +44,35 @@ class Misc {
     @ConfigEditorDropdown
     var titleScale: TitleScale = TitleScale.MEDIUM // Default to MEDIUM
 
-    @ConfigOption(name = "Title Position GUI", desc = "Edit the position of titles.")
+    @ConfigOption(
+        name = "Title Position GUI",
+        desc = "Edit the position of titles."
+    )
     @ConfigEditorButton(buttonText = "Edit")
     @Suppress("unused")
     var editTitlePosition: Runnable = Runnable { GuiManager.openGuiTitlePositionEditor() }
 
     @Expose
-    @ConfigOption(name = "Ability Cooldown Only", desc = "Only display ability cooldowns.")
+    @ConfigOption(
+        name = "Ability Cooldown Only",
+        desc = "Display only ability cooldowns."
+    )
     @ConfigEditorBoolean
-    var abilityCooldownOnly: Boolean = false
+    var abilityCooldownOnly: Boolean = true
 
     @Expose
     @ConfigOption(
         name = "Server Lag Protection",
-        desc = "Prevents ability timers from counting down during server lag.\n§eNote: Might desync timers if you swap lobbies a lot!"
+        desc = "Prevent ability timers from counting down during server lag.\n§eNote: Might desync timers if you swap lobbies a lot!"
     )
     @ConfigEditorBoolean
     var serverLagProtection: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Timer Title", desc = "Shows a title when the timer ends.")
+    @ConfigOption(
+        name = "Timer Title",
+        desc = "Show a title when the timer ends."
+    )
     @ConfigEditorBoolean
     var showTimerTitle: Boolean = false
 

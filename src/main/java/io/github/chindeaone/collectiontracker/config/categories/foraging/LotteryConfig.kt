@@ -8,7 +8,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class LotteryConfig {
     @Expose
-    @ConfigOption(name = "Better Lottery", desc = "Displays current Lottery perks and compacts Lottery chat messages.")
+    @ConfigOption(
+        name = "Lottery Display",
+        desc = "Display current Lottery perk and time left and compacts Lottery chat messages."
+    )
     @ConfigEditorBoolean
     var enableLottery: Boolean = false
 
@@ -18,7 +21,7 @@ class LotteryConfig {
     @Expose
     @ConfigOption(
         name = "Foraging Islands Only",
-        desc = "Allows the Lottery overlay to be rendered only in Foraging Islands."
+        desc = "Show the Lottery display only on Foraging Islands."
     )
     @ConfigEditorBoolean
     var lotteryInForagingIslandsOnly: Boolean = true
@@ -26,7 +29,7 @@ class LotteryConfig {
     @Expose
     @ConfigOption(
         name = "Disable Lottery chat messages",
-        desc = "Hides Lottery chat messages while displaying perks in the overlay and allowing other mods to process the messages."
+        desc = "Hide Lottery chat messages while allowing other mods to process the them."
     )
     @ConfigEditorBoolean
     var disableLotteryChatMessages: Boolean = false
