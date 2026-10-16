@@ -16,7 +16,7 @@ object NumbersUtils {
     }
 
     fun formatNumber(number: Long): String {
-        if (formattedValues) {
+        if (!formattedValues) {
             return String.format(Locale.ROOT, "%,d", number)
         }
 
@@ -24,7 +24,7 @@ object NumbersUtils {
     }
 
     fun formatFloat(number: Float): String {
-        if (formattedValues) {
+        if (!formattedValues) {
             return String.format(Locale.ROOT, "%,.2f", number)
         }
 
