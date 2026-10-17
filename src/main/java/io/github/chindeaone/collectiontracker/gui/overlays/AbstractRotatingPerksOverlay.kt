@@ -1,8 +1,9 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatClock
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils.nextBuffTime
-import io.github.chindeaone.collectiontracker.utils.StringUtils.formatTime
 import kotlin.ranges.contains
 
 /**
@@ -41,15 +42,21 @@ abstract class AbstractRotatingPerksOverlay: AbstractOverlay() {
     }
 
     private fun updateTimer(): String {
-        val timeLeft = (nextBuffTime - System.currentTimeMillis()) / 1000
-        if (timeLeft in 0..5) {
-            return "§aTime left: §cSoon"
-        }
-        if (timeLeft < 0 && !ScoreboardUtils.checkTime) {
-            ScoreboardUtils.checkTime = true
+        val target = nextBuffTime ?: return "§aTime left: §cSoon"
+
+        val timeLeft = target - EpochMark.now()
+
+        if (timeLeft.isNegative()) {
+            if (!ScoreboardUtils.checkTime) {
+                ScoreboardUtils.checkTime = true
+            }
             return "§aTime left: §cSoon"
         }
 
-        return "§aTime left: §e${formatTime(timeLeft)}"
+        if (timeLeft.inWholeSeconds in 0..5) {
+            return "§aTime left: §cSoon"
+        }
+
+        return "§aTime left: ${timeLeft.formatClock()}"
     }
 }

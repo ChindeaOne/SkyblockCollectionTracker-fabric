@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.tracker.coleweight
 
 import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import org.apache.logging.log4j.LogManager
@@ -11,18 +12,20 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.collections.set
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object ColeweightDataFetcher {
     private val logger = LogManager.getLogger(ColeweightDataFetcher::class.java)
 
-    private val cache: MutableMap<String, String> = ConcurrentHashMap<String, String>()
-    private val cacheTimestamps: MutableMap<String, Long> = ConcurrentHashMap<String, Long>()
-    private const val CACHE_LIFESPAN_MS: Long = 180000L // default 3 minutes
+    private val cache: MutableMap<String, String> = ConcurrentHashMap()
+    private val cacheTimestamps: MutableMap<String, EpochMark> = ConcurrentHashMap()
+    private val CACHE_LIFESPAN: Duration = 4.minutes
     var scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
     fun scheduleFetch() {
-        scheduler.scheduleAtFixedRate({ fetchData() }, 1, 200, TimeUnit.SECONDS)
-        logger.info("[SCT]: Coleweight fetching scheduled every 200 seconds.")
+        scheduler.scheduleAtFixedRate({ fetchData() }, 1, 300, TimeUnit.SECONDS)
+        logger.info("[SCT]: Coleweight fetching scheduled every 5 minutes.")
     }
 
     private fun fetchData() {
@@ -62,13 +65,10 @@ object ColeweightDataFetcher {
     fun getData(): CompletableFuture<String> {
         val uuid = PlayerData.playerUUID
         val name = PlayerData.playerName
-        val now = System.currentTimeMillis()
 
         val lastFetched = cacheTimestamps[uuid]
-
-        if (lastFetched != null && (now - lastFetched) < CACHE_LIFESPAN_MS) {
-            val elapsed: Long = now - lastFetched
-            logger.info("[SCT]: Returning cached data for player with UUID: $uuid (cache age: $elapsed ms)")
+        if (lastFetched != null && lastFetched.timePassedSince() < CACHE_LIFESPAN) {
+            logger.info("[SCT]: Returning cached data for player with UUID: $uuid (cache age: ${lastFetched.timePassedSince().inWholeSeconds} seconds)")
             return CompletableFuture.completedFuture(cache[uuid] ?: "")
         }
 
@@ -79,7 +79,7 @@ object ColeweightDataFetcher {
                     ""
                 } else {
                     cache[uuid] = data
-                    cacheTimestamps[uuid] = now
+                    cacheTimestamps[uuid] = EpochMark.now()
                     data
                 }
             }

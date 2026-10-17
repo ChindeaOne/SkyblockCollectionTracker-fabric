@@ -3,16 +3,17 @@ package io.github.chindeaone.collectiontracker.utils
 import io.github.chindeaone.collectiontracker.config.attributeLevel
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping.miningIslands
+import kotlin.time.Duration.Companion.seconds
 
 object AbilityUtils {
 
     sealed interface AbilitySnapshot {
-        val timestamp: Long
+        val timestamp: EpochMark
         val hasAbility: Boolean
     }
 
     data class PickaxeAbilitySnapshot(
-        override val timestamp: Long,
+        override val timestamp: EpochMark,
         val isDrill: Boolean,
         override val hasAbility: Boolean,
         val fuelTank: FuelTank?,
@@ -20,7 +21,7 @@ object AbilityUtils {
     ) : AbilitySnapshot
 
     data class AxeAbilitySnapshot(
-        override val timestamp: Long,
+        override val timestamp: EpochMark,
         override val hasAbility: Boolean
     ) : AbilitySnapshot
 
@@ -36,7 +37,7 @@ object AbilityUtils {
 
     @Volatile
     var lastAxeSnap: AxeAbilitySnapshot? = null
-    private const val MAX_AGE_MS = 3000L // 3 seconds
+    private val MAX_AGE = 3.seconds
 
     var isMayhemCooldown: Boolean = false
 
@@ -47,11 +48,11 @@ object AbilityUtils {
         }
     }
 
-    fun recentOrNull(now: Long = System.currentTimeMillis()): PickaxeAbilitySnapshot? =
-        lastPickaxeSnap?.takeIf { now - it.timestamp <= MAX_AGE_MS }
+    fun recentOrNull(): PickaxeAbilitySnapshot? =
+        lastPickaxeSnap?.takeIf { it.timestamp.timePassedSince() <= MAX_AGE }
 
-    fun recentOrNullAxe(now: Long = System.currentTimeMillis()): AxeAbilitySnapshot? =
-        lastAxeSnap?.takeIf { now - it.timestamp <= MAX_AGE_MS }
+    fun recentOrNullAxe(): AxeAbilitySnapshot? =
+        lastAxeSnap?.takeIf { it.timestamp.timePassedSince() <= MAX_AGE }
 
     fun getBaseCooldown(ability: String, abilityLevel: Int, hasBlueCheese: Boolean): Int {
         val effectiveLevel = if (hasBlueCheese) abilityLevel + 1 else abilityLevel

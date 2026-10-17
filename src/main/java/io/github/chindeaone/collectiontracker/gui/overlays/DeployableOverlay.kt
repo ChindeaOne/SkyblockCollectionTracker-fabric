@@ -4,7 +4,7 @@ import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.deployablePosition
 import io.github.chindeaone.collectiontracker.config.enableDeployable
-import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatCompact
 import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 
 class DeployableOverlay : AbstractOverlay() {
@@ -42,13 +42,14 @@ class DeployableOverlay : AbstractOverlay() {
             return
         }
 
-        val timeLeft = deployable.expiryTime - System.currentTimeMillis() / 1000
+        val expiryTime = deployable.expiryTime ?: return
+        val timeLeft = expiryTime.timeUntil()
 
         cachedLines = listOf(
-            if (timeLeft < 5) {
+            if (timeLeft.inWholeSeconds < 5) {
                 "${deployable.displayName} §cSoon!"
             } else {
-                "${deployable.displayName} §e${StringUtils.formatCompactTime(timeLeft)}"
+                "${deployable.displayName} §e${timeLeft.formatCompact()}"
             }
         )
     }

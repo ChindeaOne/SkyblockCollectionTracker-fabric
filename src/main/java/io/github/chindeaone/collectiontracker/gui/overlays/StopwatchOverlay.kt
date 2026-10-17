@@ -3,15 +3,17 @@ package io.github.chindeaone.collectiontracker.gui.overlays
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.coleweightStopwatchPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatCompact
 import io.github.chindeaone.collectiontracker.utils.chat.TimeNotifierUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import kotlin.time.Duration
 
 class StopwatchOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
 
-    private var stopwatchStartTime = 0L
-    private var stopwatchElapsed = 0L
+    private var stopwatchStartTime: EpochMark? = null
+    private var stopwatchElapsed: Duration = Duration.ZERO
     var stopwatchRunning = false
     var stopwatchPaused = false
 
@@ -40,8 +42,8 @@ class StopwatchOverlay : AbstractOverlay() {
             return
         }
 
-        stopwatchStartTime = System.currentTimeMillis()
-        stopwatchElapsed = 0L
+        stopwatchStartTime = EpochMark.now()
+        stopwatchElapsed = Duration.ZERO
         stopwatchRunning = true
         stopwatchPaused = false
 
@@ -55,11 +57,13 @@ class StopwatchOverlay : AbstractOverlay() {
             return
         }
 
-        val elapsed = (if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + (System.currentTimeMillis() - stopwatchStartTime)) / 1000L
-        sendMessage("§cStopwatch stopped at §e" + StringUtils.formatCompactTime(elapsed) + "§c!", true)
+        val startTime = stopwatchStartTime ?: return
+        val elapsed = if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + startTime.timePassedSince()
 
-        stopwatchStartTime = 0L
-        stopwatchElapsed = 0L
+        sendMessage("§cStopwatch stopped at §e" + elapsed.formatCompact() + "§c!", true)
+
+        stopwatchStartTime = null
+        stopwatchElapsed = Duration.ZERO
         stopwatchRunning = false
         stopwatchPaused = false
         cachedLines = emptyList()
@@ -71,12 +75,14 @@ class StopwatchOverlay : AbstractOverlay() {
             return
         }
 
+        val startTime = stopwatchStartTime ?: return
+
         if (!stopwatchPaused) {
-            stopwatchElapsed += System.currentTimeMillis() - stopwatchStartTime
+            stopwatchElapsed += startTime.timePassedSince()
             stopwatchPaused = true
             sendMessage("§eStopwatch paused!", true)
         } else {
-            stopwatchStartTime = System.currentTimeMillis()
+            stopwatchStartTime = EpochMark.now()
             stopwatchPaused = false
             sendMessage("§aStopwatch resumed!", true)
         }
@@ -88,13 +94,15 @@ class StopwatchOverlay : AbstractOverlay() {
             return
         }
 
-        if (ModLoader.clientTicks % 5L != 0L) return
+        if (ModLoader.clientTicks % 2L != 0L) return
 
-        val elapsedSeconds = (if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + (System.currentTimeMillis() - stopwatchStartTime)) / 1000L
+        val startTime = stopwatchStartTime ?: return
+
+        val elapsedSeconds = if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + startTime.timePassedSince()
 
         val pauseText = if (stopwatchPaused) "§7 (Paused)" else ""
-        cachedLines = listOf("§bStopwatch: §e" + StringUtils.formatCompactTime(elapsedSeconds) + pauseText)
+        cachedLines = listOf("§bStopwatch: §e" + elapsedSeconds.formatCompact() + pauseText)
     }
 
-    fun getElapsedTimeInSeconds(): Long = (if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + (System.currentTimeMillis() - stopwatchStartTime)) / 1000L
+    fun getElapsedTimeInSeconds(): Duration = if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + (stopwatchStartTime?.timePassedSince() ?: Duration.ZERO)
 }

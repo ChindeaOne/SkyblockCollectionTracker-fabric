@@ -9,14 +9,17 @@ import io.github.chindeaone.collectiontracker.gui.overlays.saveSkillMilestonePro
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.clearCache
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduleSkillFetch
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillFetcher.scheduler
+import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatClock
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
-import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 object SkillTrackingHandler {
@@ -27,30 +30,28 @@ object SkillTrackingHandler {
     var isPaused: Boolean = false
     var leaderboardTrackingInitialized: Boolean = false
 
-    var startTime: Long = 0
-    private var lastTime: Long = 0
-    private var lastTrackedTime: Long = 0
-    private val COOLDOWN_MILLIS = 10.seconds.inWholeMilliseconds
+    var startTime: EpochMark? = null
+    private var pauseDuration: Duration = Duration.ZERO
+    private var lastTrackedTime: EpochMark? = null
 
     private const val RESETS = 10
     private var restartCount = 0
-    private var firstRestartTime: Long = 0
+    private var firstRestartTime: EpochMark? = null
 
     var isSkillMaxed: Boolean = false
 
     fun startTracking() {
-        val now = System.currentTimeMillis()
 
-        if (now - lastTrackedTime < COOLDOWN_MILLIS) {
-            sendMessage("§cPlease wait a few seconds before tracking another skill!", true)
+        if (lastTrackedTime != null && lastTrackedTime!!.timePassedSince() < 10.seconds) {
+            sendMessage("§cPlease wait a few seconds before tracking another skill!")
             return
         } else {
-            sendMessage("§aTracking $skillName skill.", true)
+            sendMessage("§aTracking $skillName skill.")
         }
 
         if (scheduler == null || scheduler!!.isShutdown) scheduler = Executors.newSingleThreadScheduledExecutor()
 
-        initTracking(now)
+        initTracking()
         setSkillOverlayRendering(true)
 
         isSkillMaxed = SkillUtils.isSkillMaxed(skillName) == true
@@ -74,40 +75,44 @@ object SkillTrackingHandler {
         SkillTrackingRates.calculateSkillRates(value)
     }
 
-    private fun initTracking(now: Long) {
-        lastTrackedTime = now
+    private fun initTracking() {
+        lastTrackedTime = EpochMark.now()
 
         isTracking = true
         isPaused = false
         leaderboardTrackingInitialized = skillLeaderboard
 
-        startTime = now
-        lastTime = 0
+        startTime = EpochMark.now()
+        pauseDuration = Duration.ZERO
     }
 
     fun pauseTracking() {
         if (checkTracking()) return
         if (isPaused) {
-            sendMessage("§cSkill tracking is already paused.", true)
+            sendMessage("§cSkill tracking is already paused.")
             logger.warn("[SCT]: Skills tracking is already paused.")
             return
         }
+
         isPaused = true
-        lastTime = (System.currentTimeMillis() - startTime) / 1000
-        sendMessage("§7Paused tracking $skillName skill.", true)
+        startTime?.let { pauseDuration += it.timePassedSince() }
+
+        sendMessage("§7Paused tracking $skillName skill.")
         logger.info("[SCT]: Pausing tracking $skillName")
     }
 
     fun resumeTracking() {
         if (checkTracking()) return
         if (!isPaused) {
-            sendMessage("§cSkill tracking is not paused.", true)
+            sendMessage("§cSkill tracking is not paused.")
             logger.warn("[SCT]: Skills tracking is not paused.")
             return
         }
+
         isPaused = false
-        startTime = System.currentTimeMillis()
-        sendMessage("§7Resumed tracking $skillName skill.", true)
+        startTime = EpochMark.now()
+
+        sendMessage("§7Resumed tracking $skillName skill.")
         logger.info("[SCT]: Resuming tracking $skillName")
     }
 
@@ -117,7 +122,7 @@ object SkillTrackingHandler {
         if (!server) {
             logger.info("[SCT]: Tracking stopped because player disconnected from the server.")
         } else {
-            sendMessage("§cAPI server is down. Stopping the skill tracker.", true)
+            sendMessage("§cAPI server is down. Stopping the skill tracker.")
             logger.info("[SCT]: Skill tracking stopped because the API server is down.")
         }
 
@@ -128,7 +133,7 @@ object SkillTrackingHandler {
         if (checkTracking()) return
 
         resetTrackingData(false)
-        sendMessage("§cStopped tracking $skillName skill!", true)
+        sendMessage("§cStopped tracking $skillName skill!")
         logger.info("[SCT]: Stopped tracking $skillName")
     }
 
@@ -151,13 +156,13 @@ object SkillTrackingHandler {
         isPaused = false
         leaderboardTrackingInitialized = false
 
-        startTime = 0
-        lastTime = 0
+        startTime = null
+        pauseDuration = Duration.ZERO
 
-        val now = System.currentTimeMillis()
+        val now = EpochMark.now()
         lastTrackedTime = if (!restart) {
             now
-        } else now - COOLDOWN_MILLIS
+        } else now - 10.seconds
 
         isSkillMaxed = false
         setSkillOverlayRendering(false)
@@ -170,28 +175,25 @@ object SkillTrackingHandler {
 
     private fun checkTracking(): Boolean {
         if (!isTracking) {
-            sendMessage("§cNo skill is being tracked currently!", true)
+            sendMessage("§cNo skill is being tracked currently!")
             logger.warn("[SCT]: No skill is being tracked currently.")
             return true
         }
+
         return false
     }
 
     fun restartTracking() {
         if (checkTracking()) return
 
-        if (restartCount == 0) {
-            firstRestartTime = System.currentTimeMillis()
-        } else {
-            val elapsedTime = System.currentTimeMillis() - firstRestartTime
-            if (elapsedTime >= TimeUnit.HOURS.toMillis(1)) {
-                restartCount = 0
-                firstRestartTime = System.currentTimeMillis()
-            }
+        val firstRestart = firstRestartTime
+        if (restartCount == 0 || firstRestart == null || firstRestart.timePassedSince() >= 1.hours) {
+            firstRestartTime = EpochMark.now()
+            restartCount = 0
         }
 
         if (restartCount >= RESETS) {
-            sendMessage("§cHourly restart limit reached. Please wait before restarting again.", true)
+            sendMessage("§cHourly restart limit reached. Please wait before restarting again.")
             logger.warn("[SCT]: Hourly restart limit reached for skill tracking.")
             return
         }
@@ -201,13 +203,17 @@ object SkillTrackingHandler {
         startTracking()
     }
 
-    val uptimeInSeconds: Long
-        get() = if (isPaused) {
-            lastTime
+    private val totalUptime: Duration
+        get() = if (isPaused || startTime == null) {
+            pauseDuration
         } else {
-            lastTime + (System.currentTimeMillis() - startTime) / 1000
+            pauseDuration + startTime!!.timePassedSince()
         }
 
-    val uptime: String get() = StringUtils.formatTime(uptimeInSeconds)
+    val uptimeInSeconds: Long
+        get() = totalUptime.inWholeSeconds
+
+    val uptime: String
+        get() = totalUptime.formatClock()
 
 }

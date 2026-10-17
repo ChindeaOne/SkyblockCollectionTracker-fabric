@@ -1,13 +1,15 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.ModLoader
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.fromNow
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.utils.SkyblockTimeUtils.toRealSeconds
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.world.scores.DisplaySlot
-import kotlin.math.ceil
-import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object ScoreboardUtils {
 
@@ -22,10 +24,11 @@ object ScoreboardUtils {
     var heatValue: Int = 0
     var coldValue: Int = 0
 
-    var nextBuffTime: Long = 0
+    var nextBuffTime: EpochMark? = null
+    var updated: Boolean = false
+    var timeLeft: Duration = Duration.ZERO
+
     var checkTime: Boolean = true
-    var timeLeft: Int = 0
-    private var lastMinutesSinceMidnight = -1
 
     fun onClientTick(client: Minecraft) {
         if (ModLoader.clientTicks % 4L != 0L) return
@@ -54,7 +57,7 @@ object ScoreboardUtils {
 
         checkSkyblockTime(rawLines)
         checkLocation(rawLines)
-        checkIfMineshaft(rawLines)
+        checkMineshaftType(rawLines)
         getHeatValue(rawLines)
         getColdValue(rawLines)
     }
@@ -80,41 +83,46 @@ object ScoreboardUtils {
         timeRegex.find(timeLine)?.let { result ->
             val hour = result.groupValues[1].toInt()
             val minute = result.groupValues[2].toInt()
-            val amPm = result.groupValues[3]
+            val period = result.groupValues[3]
 
-            val sb10Minutes = 1200.0 / 144.0
-
-            val hour24 = when {
-                amPm.equals("am", ignoreCase = true) && hour == 12 -> 0
-                amPm.equals("am", ignoreCase = true) -> hour
-                amPm.equals("pm", ignoreCase = true) && hour == 12 -> 12
-                else -> hour + 12
-            }
-
-            val minutesSinceMidnight = hour24 * 60 + minute
+            val untilMidnight = timeUntilMidnight(hour, minute, period)
 
             // Initial sync when joining
             if (checkTime) {
-                val totalMinutesInDay = 24 * 60
-                var minutesUntilMidnight = (totalMinutesInDay - minutesSinceMidnight) % totalMinutesInDay
-                if (minutesSinceMidnight == 0) minutesUntilMidnight = 0
-
-                val tenMinuteChunks = if (minutesUntilMidnight == 0) 0.0 else ceil(minutesUntilMidnight / 10.0)
-
-                val secondsLeft = tenMinuteChunks * sb10Minutes
-
-                timeLeft = secondsLeft.roundToInt()
+                timeLeft = untilMidnight
+                nextBuffTime = untilMidnight.fromNow()
                 checkTime = false
-                nextBuffTime = System.currentTimeMillis() + (timeLeft * 1000L)
             }
 
             // Detect transition to a new SkyBlock day
-            if (minutesSinceMidnight == 0 && lastMinutesSinceMidnight != 0) {
-                nextBuffTime = System.currentTimeMillis() + 20 * 60 * 1000L
-            }
+            val isMidnight = hour == 12 && minute == 0 && period == "am"
 
-            lastMinutesSinceMidnight = minutesSinceMidnight
+            if (isMidnight) {
+                if (!updated) {
+                    nextBuffTime = 20.minutes.fromNow()
+                    updated = true
+                } else {
+                    updated = false
+                }
+            }
         }
+    }
+
+    private fun timeUntilMidnight(hour: Int, minute: Int, period: String): Duration {
+        val minutesSinceMidnight = skyblockMinutesSinceMidnight(hour, minute, period)
+        val minutesUntilMidnight = (24 * 60 - minutesSinceMidnight) % (24 * 60)
+        return minutesUntilMidnight.toRealSeconds()
+    }
+
+    private fun skyblockMinutesSinceMidnight(hour: Int, minute: Int, period: String): Int {
+        val normalizedHour = when (period) {
+            "am" if hour == 12 -> 0
+            "am" -> hour
+            "pm" if hour == 12 -> 12
+            else -> hour + 12
+        }
+
+        return SkyblockTimeUtils.skyblockTimeInMinutes(normalizedHour, minute)
     }
 
     fun checkScoreboard(client: Minecraft): Boolean? {
@@ -126,7 +134,7 @@ object ScoreboardUtils {
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
-    private fun checkIfMineshaft(rawLines: List<String>) {
+    private fun checkMineshaftType(rawLines: List<String>) {
         if (!IslandTracker.currentMiningIsland.equals("Mineshaft")) {
             if (mineshaftType.isNotEmpty()) {
                 mineshaftType = ""
@@ -135,7 +143,7 @@ object ScoreboardUtils {
         }
 
         val foundType = rawLines.firstNotNullOfOrNull { line ->
-            WaypointsUtils.MineshaftTypes.entries.find {type ->
+            WaypointsUtils.MineshaftTypes.entries.find { type ->
                 line.contains(type.name)
             }?.name
         } ?: ""

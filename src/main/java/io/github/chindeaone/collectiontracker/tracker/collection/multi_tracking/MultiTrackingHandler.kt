@@ -13,18 +13,20 @@ import io.github.chindeaone.collectiontracker.config.multiDetailedSummary
 import io.github.chindeaone.collectiontracker.config.multiTrackingSummary
 import io.github.chindeaone.collectiontracker.config.summaryStats
 import io.github.chindeaone.collectiontracker.config.useBazaar
-import io.github.chindeaone.collectiontracker.gui.OverlayManager
+import io.github.chindeaone.collectiontracker.gui.OverlayManager.setMultiTrackingOverlayRendering
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.gui.overlays.saveMilestonesProgress
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearCollectionCache
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.lastCollectionUpdate
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.lastMultiCollectionUpdate
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatClock
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatInWords
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
-import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
@@ -34,31 +36,31 @@ import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 object MultiTrackingHandler  {
 
     private val logger: Logger = LogManager.getLogger(MultiTrackingHandler::class.java)
-    val COOLDOWN_MILLIS = 10.seconds.inWholeMilliseconds
 
     @Volatile
     var isMultiTracking = false
     var isMultiPaused = false
     var leaderboardTrackingInitialized = false
 
-    var multiStartTime: Long = 0
-    var multiLastTime: Long = 0
-    var multiLastTrackTime: Long = 0
+    var multiStartTime: EpochMark? = null
+    private var multiPauseDuration: Duration = Duration.ZERO
+    var multiLastTrackTime: EpochMark? = null
 
     private const val RESETS: Int = 10
     private var multiRestartCount: Int = 0
-    private var multiFirstRestartTime: Long = 0
+    private var multiFirstRestartTime: EpochMark? = null
 
     fun startMultiTracking() {
         logger.info("[SCT]: Starting multi tracking for player ${PlayerData.playerName}")
 
-        OverlayManager.setMultiTrackingOverlayRendering(true)
+        setMultiTrackingOverlayRendering(true)
 
         // Always do initial fetch
         MultiDataFetcher.fetchMultiCollectionData()
@@ -69,10 +71,10 @@ object MultiTrackingHandler  {
         }
     }
 
-    fun initMultiTracking(now: Long) {
-        multiStartTime = now
-        multiLastTrackTime = now
-        multiLastTime = 0
+    fun initMultiTracking() {
+        multiStartTime = EpochMark.now()
+        multiLastTrackTime = EpochMark.now()
+        multiPauseDuration = Duration.ZERO
 
         isMultiTracking = true
         isMultiPaused = false
@@ -80,52 +82,50 @@ object MultiTrackingHandler  {
     }
 
     fun stopMultiTrackingManual() {
-        if (isMultiTracking) {
-            sendMessage("§cStopped multi-tracking!", true)
-
-            resetMultiTrackingData(false)
-
-            logger.info("[SCT]: Multi-tracking stopped.")
-        } else {
-            sendMessage("§cNo multi-tracking active!", true)
+        if (!isMultiTracking) {
+            sendMessage("§cNo multi-tracking active!")
             logger.warn("[SCT]: Attempted to stop multi-tracking manually, but no multi-tracking is active.")
+            return
         }
+
+        sendMessage("§cStopped multi-tracking!")
+        logger.info("[SCT]: Multi-tracking stopped.")
+
+        resetMultiTrackingData(false)
     }
 
     fun stopMultiTracking() {
-        if (isMultiTracking) {
-            if (!server) {
-                logger.info("[SCT]: Multi-tracking stopped because player disconnected from the server.")
-            } else {
-                sendMessage("§cAPI server is down. Stopping multi-tracker.", true)
-                logger.info("[SCT]: Multi-tracking stopped because the API server is down.")
-            }
-
-            resetMultiTrackingData(false)
-        } else {
+        if (!isMultiTracking) {
             logger.warn("[SCT]: Attempted to stop multi-tracking, but no multi-tracking is active.")
+            return
         }
+
+        if (!server) {
+            logger.info("[SCT]: Multi-tracking stopped because player disconnected from the server.")
+            return
+        }
+
+        sendMessage("§cAPI server is down. Stopping multi-tracker.")
+        logger.info("[SCT]: Multi-tracking stopped because the API server is down.")
+
+        resetMultiTrackingData(false)
     }
 
     fun restartMultiTracking() {
         if (!isMultiTracking) {
-            sendMessage("§cNo multi-tracking active to restart!", true)
+            sendMessage("§cNo multi-tracking active to restart!")
             logger.warn("[SCT]: Attempted to restart multi-tracking, but no multi-tracking is active.")
             return
         }
 
-        if (multiRestartCount == 0) {
-            multiFirstRestartTime = System.currentTimeMillis()
-        } else {
-            val elapsedTime = System.currentTimeMillis() - multiFirstRestartTime
-            if (elapsedTime >= 1.hours.inWholeMilliseconds) {
-                multiRestartCount = 0
-                multiFirstRestartTime = System.currentTimeMillis()
-            }
+        val firstMultiRestart = multiFirstRestartTime
+        if (multiRestartCount == 0 || firstMultiRestart == null || firstMultiRestart.timePassedSince() >= 1.hours) {
+            multiFirstRestartTime = EpochMark.now()
+            multiRestartCount = 0
         }
 
         if (multiRestartCount >= RESETS) {
-            sendMessage("§cHourly restart limit reached! Cannot restart multi-tracking.", true)
+            sendMessage("§cHourly restart limit reached! Cannot restart multi-tracking.")
             logger.warn("[SCT]: Hourly restart limit reached. Cannot restart multi-tracking.")
             return
         }
@@ -147,13 +147,13 @@ object MultiTrackingHandler  {
 
         saveMilestonesProgress(false)
 
-        val now = System.currentTimeMillis()
+        val now = EpochMark.now()
         if (!restart) {
             multiLastTrackTime = now
             clearFetchedData()
-        } else multiLastTrackTime = now - COOLDOWN_MILLIS
+        } else multiLastTrackTime = now - 10.seconds
 
-        OverlayManager.setMultiTrackingOverlayRendering(false)
+        setMultiTrackingOverlayRendering(false)
         MultiCollectionOverlay.trackingDirty = false
     }
 
@@ -165,8 +165,8 @@ object MultiTrackingHandler  {
     private fun resetVariables() {
         isMultiTracking = false
         isMultiPaused = false
-        multiStartTime = 0
-        multiLastTime = 0
+        multiStartTime = null
+        multiPauseDuration = Duration.ZERO
         leaderboardTrackingInitialized = false
 
         if (trackingTask != null) {
@@ -175,7 +175,7 @@ object MultiTrackingHandler  {
         }
 
         clearMaps()
-        lastCollectionUpdate = 0
+        lastMultiCollectionUpdate = null
     }
 
     fun clearMaps() {
@@ -193,94 +193,87 @@ object MultiTrackingHandler  {
 
     fun pauseMultiTracking() {
         if (!isMultiTracking) {
-            sendMessage("§cNo multi-tracking active!", true)
+            sendMessage("§cNo multi-tracking active!")
             logger.warn("[SCT]: Attempted to pause multi-tracking, but no multi-tracking is active.")
         }
 
         if (isMultiPaused) {
-            sendMessage("§cMulti-tracking is already paused!", true)
+            sendMessage("§cMulti-tracking is already paused!")
             logger.warn("[SCT]: Attempted to pause multi-tracking, but multi-tracking is already paused.")
             return
         }
+
         isMultiPaused = true
-        multiLastTime += (System.currentTimeMillis() - multiStartTime) / 1000
-        sendMessage("§7Multi-tracking paused.", true)
+        multiStartTime?.let { multiPauseDuration += it.timePassedSince() }
+        sendMessage("§7Multi-tracking paused.")
         logger.info("[SCT]: Multi-tracking paused.")
 
     }
 
     fun resumeMultiTracking() {
         if (!isMultiTracking) {
-            sendMessage("§cNo multi-tracking active!", true)
+            sendMessage("§cNo multi-tracking active!")
             logger.warn("[SCT]: Attempted to resume multi-tracking, but no multi-tracking is active.")
             return
         }
 
         if (!isMultiPaused) {
-            sendMessage("§cMulti-tracking is already active!", true)
+            sendMessage("§cMulti-tracking is already active!")
             logger.warn("[SCT]: Attempted to resume multi-tracking, but multi-tracking is already active.")
             return
         }
 
         isMultiPaused = false
-        multiStartTime = System.currentTimeMillis()
-        sendMessage("§7Resuming multi-tracking.", true)
+        multiStartTime = EpochMark.now()
+        sendMessage("§7Resuming multi-tracking.")
         logger.info("[SCT]: Resuming multi-tracking.")
     }
 
     fun resumeMultiRiftTracking() {
-        if (!isMultiTracking) {
-            return
-        }
+        if (!isMultiTracking || !isMultiPaused) return
 
         if (!hasAnyRiftCollection()) {
             logger.warn("[SCT]: Attempted to resume Rift multi tracking, but none of the tracked collections are Rift collections.")
             return
         }
 
-        if (!isMultiPaused) return
-
-        multiStartTime = System.currentTimeMillis()
+        multiStartTime = EpochMark.now()
         isMultiPaused = false
 
-        sendMessage("§7Resuming multi tracking after rejoining The Rift.", true)
+        sendMessage("§7Resuming multi tracking after rejoining The Rift.")
         logger.info("[SCT]: Resuming multi tracking after rejoining The Rift.")
     }
 
     fun pauseMultiRiftTracking() {
-        if (!isMultiTracking) {
-            return
-        }
+        if (!isMultiTracking || isMultiPaused) return
 
         if (!hasAnyRiftCollection()) {
             logger.warn("[SCT]: Attempted to pause Rift multi tracking, but none of the tracked collections are Rift collections.")
             return
         }
 
-        if (isMultiPaused) return
-
-        multiLastTime += (System.currentTimeMillis() - multiStartTime) / 1000
+        multiStartTime?.let { multiPauseDuration += it.timePassedSince() }
         isMultiPaused = true
 
-        sendMessage("§7Pausing multi tracking before leaving The Rift.", true)
+        sendMessage("§7Pausing multi tracking before leaving The Rift.")
         logger.info("[SCT]: Pausing multi tracking before leaving The Rift.")
     }
 
-    val multiUptimeInSeconds: Long
-        get() = if (isMultiPaused) {
-            multiLastTime
+    private val totalMultiUptime: Duration
+        get() = if (isMultiPaused || multiStartTime == null) {
+            multiPauseDuration
         } else {
-            multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
+            multiPauseDuration + multiStartTime!!.timePassedSince()
         }
 
+    val multiUptimeInSeconds: Long
+        get() = totalMultiUptime.inWholeSeconds
 
     private val multiUptimeInWords: String
-        get() {
-            val uptime: Long = multiLastTime + (System.currentTimeMillis() - multiStartTime) / 1000
-            return StringUtils.formatTimeIntoText(uptime)
-        }
+        get() = totalMultiUptime.formatInWords()
 
-    val multiUptime: String get() = StringUtils.formatTime(multiUptimeInSeconds)
+    val multiUptime: String
+        get() = totalMultiUptime.formatClock()
 
     fun sendMultiRates() {
         MultiTrackingRates.updateRates()
@@ -343,23 +336,23 @@ object MultiTrackingHandler  {
             val line = Component.literal("   ").append(formattedName).append("§r: ")
 
             when (summaryStatsName) {
-                "COLLECTION" -> line.append("§f${formatNumber(collectionMade)} §7(${formatNumber(collectionRate)}/h)")
+                "COLLECTION" -> line.append("§f${NumbersUtils.formatNumber(collectionMade)} §7(${NumbersUtils.formatNumber(collectionRate)}/h)")
 
                 "MONEY" -> {
                     if (useMotes) {
-                        line.append("§d${formatNumber(currentMoney)} Motes §7(${formatNumber(currentRate)} Motes/h)")
+                        line.append("§d${NumbersUtils.formatNumber(currentMoney)} Motes §7(${NumbersUtils.formatNumber(currentRate)} Motes/h)")
                     } else {
-                        line.append("§a$${formatNumber(currentMoney)} §7($${formatNumber(currentRate)}/h)")
+                        line.append("§a$${NumbersUtils.formatNumber(currentMoney)} §7($${NumbersUtils.formatNumber(currentRate)}/h)")
                     }
                 }
 
                 "BOTH" -> {
-                    line.append("§f${formatNumber(collectionMade)} §7(${formatNumber(collectionRate)}/h)   ")
+                    line.append("§f${NumbersUtils.formatNumber(collectionMade)} §7(${NumbersUtils.formatNumber(collectionRate)}/h)   ")
 
                     if (useMotes) {
-                        line.append("§d${formatNumber(currentMoney)} Motes §7(${formatNumber(currentRate)} Motes/h)")
+                        line.append("§d${NumbersUtils.formatNumber(currentMoney)} Motes §7(${NumbersUtils.formatNumber(currentRate)} Motes/h)")
                     } else {
-                        line.append("§a$${formatNumber(currentMoney)} §7($${formatNumber(currentRate)}/h)")
+                        line.append("§a$${NumbersUtils.formatNumber(currentMoney)} §7($${NumbersUtils.formatNumber(currentRate)}/h)")
                     }
                 }
 
@@ -400,11 +393,11 @@ object MultiTrackingHandler  {
                 val line = Component.literal("    - ").append(formattedName).append(": ")
 
                 when (summaryStatsName) {
-                    "COLLECTION" -> line.append("§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)")
+                    "COLLECTION" -> line.append("§f${NumbersUtils.formatNumber(amount)} §7(${NumbersUtils.formatNumber(rate)}/h)")
 
-                    "MONEY" -> line.append("§a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
+                    "MONEY" -> line.append("§a$${NumbersUtils.formatNumber(gemMoney)} §7($${NumbersUtils.formatNumber(gemRate)}/h)")
 
-                    "BOTH" -> line.append("§f${formatNumber(amount)} §7(${formatNumber(rate)}/h)   §a$${formatNumber(gemMoney)} §7($${formatNumber(gemRate)}/h)")
+                    "BOTH" -> line.append("§f${NumbersUtils.formatNumber(amount)} §7(${NumbersUtils.formatNumber(rate)}/h)   §a$${NumbersUtils.formatNumber(gemMoney)} §7($${NumbersUtils.formatNumber(gemRate)}/h)")
                 }
 
                 gemstoneLines.add(line)
@@ -419,9 +412,9 @@ object MultiTrackingHandler  {
                 val totalLine = Component.literal("   ")
 
                 if (useMotes) {
-                    totalLine.append("§eTotal Motes: §f${formatNumber(totalMoneyMade)}   §eRate: §f${formatNumber(totalMoneyRate)} Motes/h   §ePricing: §f$pricingLabel")
+                    totalLine.append("§eTotal Motes: §f${NumbersUtils.formatNumber(totalMoneyMade)}   §eRate: §f${NumbersUtils.formatNumber(totalMoneyRate)} Motes/h   §ePricing: §f$pricingLabel")
                 } else {
-                    totalLine.append("§eTotal Profit: §f$${formatNumber(totalMoneyMade)}   §eRate: §f$${formatNumber(totalMoneyRate)}/h   §ePricing: §f$pricingLabel")
+                    totalLine.append("§eTotal Profit: §f$${NumbersUtils.formatNumber(totalMoneyMade)}   §eRate: §f$${NumbersUtils.formatNumber(totalMoneyRate)}/h   §ePricing: §f$pricingLabel")
                 }
 
                 lines.add(totalLine)
@@ -439,17 +432,17 @@ object MultiTrackingHandler  {
                     val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
                     val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
 
-                    summaryLine.append("§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)")
+                    summaryLine.append("§f${NumbersUtils.formatNumber(totalColl)} §7(${NumbersUtils.formatNumber(totalRate)}/h)")
                 }
 
-                "MONEY" -> summaryLine.append("§a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)")
+                "MONEY" -> summaryLine.append("§a$${NumbersUtils.formatNumber(totalGemstoneMoneyMade)} §7($${NumbersUtils.formatNumber(totalGemstoneMoneyRate)}/h)")
 
                 "BOTH" -> {
                     val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
                     val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
 
                     summaryLine.append(
-                        "§f${formatNumber(totalColl)} §7(${formatNumber(totalRate)}/h)   §a$${formatNumber(totalGemstoneMoneyMade)} §7($${formatNumber(totalGemstoneMoneyRate)}/h)"
+                        "§f${NumbersUtils.formatNumber(totalColl)} §7(${NumbersUtils.formatNumber(totalRate)}/h)   §a$${NumbersUtils.formatNumber(totalGemstoneMoneyMade)} §7($${NumbersUtils.formatNumber(totalGemstoneMoneyRate)}/h)"
                     )
                 }
             }

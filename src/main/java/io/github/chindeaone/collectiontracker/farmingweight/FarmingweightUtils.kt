@@ -4,16 +4,18 @@ import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.toFWRankComponent
 import net.minecraft.network.chat.Component
+import kotlin.time.Duration.Companion.minutes
 
 object FarmingweightUtils {
 
-    private val playerCooldowns = mutableMapOf<String, Long>()
+    private val playerCooldowns = mutableMapOf<String, EpochMark>()
     private var lastPlayer: String? = null
-    private const val COOLDOWN_DURATION = 5 * 60 * 1000L
+    private val COOLDOWN_DURATION = 5.minutes
 
     fun getFarmingweightRank(playerName: String) {
         ChatUtils.sendMessage("§aFetching Farming Weight for $playerName ...", true)
@@ -28,7 +30,7 @@ object FarmingweightUtils {
 
                 FarmingweightManager.updateFarmingweightRank(body)
 
-                playerCooldowns[playerName] = System.currentTimeMillis()
+                playerCooldowns[playerName] = EpochMark.now()
                 lastPlayer = playerName
                 displayFarmingweight(playerName, FarmingweightManager.storage)
             }
@@ -40,7 +42,7 @@ object FarmingweightUtils {
 
             FarmingweightManager.updateFarmingweightData(body, playerName)
 
-            playerCooldowns[playerName] = System.currentTimeMillis()
+            playerCooldowns[playerName] = EpochMark.now()
             lastPlayer = playerName
         }
     }
@@ -52,8 +54,8 @@ object FarmingweightUtils {
     }
 
     private fun isPlayerCached(name: String): Boolean {
-        val lastFetch = playerCooldowns[name] ?: 0L
-        return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
+        val lastFetch = playerCooldowns[name] ?: return false
+        return lastPlayer == name && lastFetch.timePassedSince() < COOLDOWN_DURATION
     }
 
     fun getFarmingweightLeaderboard(position: Int) {

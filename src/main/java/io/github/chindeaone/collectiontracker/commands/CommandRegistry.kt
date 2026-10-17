@@ -30,6 +30,8 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object CommandRegistry {
 
@@ -550,9 +552,9 @@ object CommandRegistry {
                         if (!canUseCommand()) return@executes 0
 
                         val time = StringArgumentType.getString(it, "time")
-                        val seconds = NumbersUtils.parseToSeconds(time)
+                        val seconds = NumbersUtils.parseToSeconds(time).seconds
 
-                        if (seconds < 0) {
+                        if (seconds.isNegative()) {
                             ChatUtils.sendMessage("§cInvalid time format. Use formats like '1h30m', '45s', or '90'.", true)
                             return@executes 1
                         }
@@ -580,7 +582,7 @@ object CommandRegistry {
             .then(ClientCommands.literal("stop")
                 .executes {
                     val timer = OverlayManager.getTimerOverlay()
-                    timer?.setTimer(0)
+                    timer?.setTimer(Duration.ZERO)
                     1
                 }
             )

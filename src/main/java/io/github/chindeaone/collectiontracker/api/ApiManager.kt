@@ -3,6 +3,7 @@ package io.github.chindeaone.collectiontracker.api
 import com.mojang.authlib.GameProfile
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
@@ -31,7 +32,7 @@ object ApiManager {
 
     var serverId: String? = null
 
-    private var lastTokenRequest = 0L
+    private var lastTokenRequest: EpochMark? = null
 
     // Same logic as SkyblockPv
     fun authenticateMojang(notify: Boolean = false): CompletableFuture<String?> {
@@ -76,12 +77,12 @@ object ApiManager {
             return
         }
 
-        val now = System.currentTimeMillis()
-        if (now - lastTokenRequest < 1.minutes.inWholeMilliseconds) {
+        val lastRequest = lastTokenRequest
+        if (lastRequest != null && lastRequest.timePassedSince() < 1.minutes) {
             sendMessage("§cPlease wait before requesting a new token.")
             return
         }
-        lastTokenRequest = now
+        lastTokenRequest = EpochMark.now()
 
         CompletableFuture.runAsync { authenticateMojang(true) }
     }

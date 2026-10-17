@@ -1,16 +1,19 @@
 package io.github.chindeaone.collectiontracker.tracker.coleweight
 
-import io.github.chindeaone.collectiontracker.gui.OverlayManager
+import io.github.chindeaone.collectiontracker.gui.OverlayManager.setColeweightOverlayRendering
 import io.github.chindeaone.collectiontracker.gui.overlays.ColeweightOverlay
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightDataFetcher.scheduler
-import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.afk
+import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatClock
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
-import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
 
 object ColeweightTrackingHandler {
 
@@ -21,18 +24,17 @@ object ColeweightTrackingHandler {
 
     private const val RESETS: Int = 10
     private var restartCount: Int = 0
-    private var firstRestartTime: Long = 0
+    private var firstRestartTime: EpochMark? = null
 
-    private var startTime: Long = 0
-    private var lastTime: Long = 0
-    private var lastTrackedTime: Long = 0
-    private val COOLDOWN_MILLIS = TimeUnit.SECONDS.toMillis(10)
+    private var startTime: EpochMark? = null
+    private var pauseDuration: Duration = Duration.ZERO
+    private var lastTrackedTime: EpochMark? = null
+
+    private val COOLDOWN = 10.seconds
 
     fun startTracking() {
-        val now = System.currentTimeMillis()
-
-        if (now - lastTrackedTime < COOLDOWN_MILLIS) {
-            sendMessage("§cPlease wait a few seconds before tracking Coleweight again!", true)
+        if (lastTrackedTime != null && lastTrackedTime!!.timePassedSince() < COOLDOWN) {
+            sendMessage("§cPlease wait a few seconds before tracking Coleweight again!")
             return
         }
 
@@ -40,73 +42,66 @@ object ColeweightTrackingHandler {
             scheduler = Executors.newSingleThreadScheduledExecutor()
         }
 
-        initTracking(now)
-        sendMessage("§aStarted tracking Coleweight.", true)
+        initTracking()
+        sendMessage("§aStarted tracking Coleweight.")
 
-        OverlayManager.setColeweightOverlayRendering(true)
+        setColeweightOverlayRendering(true)
         ColeweightDataFetcher.scheduleFetch()
     }
 
-    private fun initTracking(now: Long) {
-        startTime = now
-        lastTrackedTime = now
-        lastTime = 0
+    private fun initTracking() {
+        startTime = EpochMark.now()
+        lastTrackedTime = EpochMark.now()
+        pauseDuration = Duration.ZERO
         isTracking = true
         isPaused = false
     }
 
     fun stopTrackingManual() {
-        if (!scheduler.isShutdown) {
-            sendMessage("§cStopping Coleweight tracking!", true)
-
-            resetTrackingData()
-
-            logger.info("[SCT]: Coleweight tracking stopped.")
-        } else {
-            sendMessage("§cNo Coleweight tracking active!", true)
+        if (scheduler.isShutdown) {
+            sendMessage("§cNo Coleweight tracking active!")
             logger.warn("[SCT]: Attempted to stop Coleweight tracking manually, but no active tracking session was found.")
+            return
         }
+
+        sendMessage("§cStopping Coleweight tracking!")
+        logger.info("[SCT]: Coleweight tracking stopped.")
+
+        resetTrackingData()
     }
 
     fun stopTracking() {
-        if (!isTracking) return
-        if (!scheduler.isShutdown) {
-            if (!server) {
-                logger.info("[SCT]: Coleweight tracking stopped because player disconnected from the server.")
-            } else if (afk) {
-                sendMessage("§cYou have been marked as AFK. Stopping Coleweight tracker.", true)
-                logger.info("[SCT]: Coleweight tracking stopped because the player was marked as AFK or the API server is down.")
-            } else {
-                sendMessage("§cAPI server is down. Stopping Coleweight tracker.", true)
-                logger.info("[SCT]: Coleweight tracking stopped because the API server is down.")
-            }
-            afk = false
-
-            resetTrackingData(false)
-        } else {
+        if (!isTracking) {
+            sendMessage("§cNo Coleweight tracking active!")
             logger.warn("[SCT]: Attempted to stop Coleweight tracking, but no active tracking session was found.")
+            return
         }
+
+        if (!server) {
+            logger.info("[SCT]: Coleweight tracking stopped because player disconnected from the server.")
+        } else {
+            sendMessage("§cAPI server is down. Stopping Coleweight tracker.")
+            logger.info("[SCT]: Coleweight tracking stopped because the API server is down.")
+        }
+
+        resetTrackingData(false)
     }
 
     fun restartTracking() {
         if (!isTracking) {
-            sendMessage("§cNo active Coleweight tracking session to restart!", true)
+            sendMessage("§cNo active Coleweight tracking session to restart!")
             logger.warn("[SCT]: Attempted to restart Coleweight tracking, but no active tracking session was found.")
             return
         }
 
-        if (restartCount == 0) {
-            firstRestartTime = System.currentTimeMillis()
-        } else {
-            val elapsedTime = System.currentTimeMillis() - firstRestartTime
-            if (elapsedTime >= TimeUnit.HOURS.toMillis(1)) {
-                restartCount = 0
-                firstRestartTime = System.currentTimeMillis()
-            }
+        val firstRestart = firstRestartTime
+        if (restartCount == 0 || firstRestart == null || firstRestart.timePassedSince() >= 1.hours) {
+            firstRestartTime = EpochMark.now()
+            restartCount = 0
         }
 
         if (restartCount >= RESETS) {
-            sendMessage("§cHourly restart limit reached! Cannot restart Coleweight tracking.", true)
+            sendMessage("§cHourly restart limit reached! Cannot restart Coleweight tracking.")
             logger.warn("[SCT]: Hourly restart limit reached. Cannot restart Coleweight tracking.")
             return
         }
@@ -131,70 +126,74 @@ object ColeweightTrackingHandler {
 
         ColeweightDataFetcher.clearCache()
 
-        val now = System.currentTimeMillis()
+        val now = EpochMark.now()
         lastTrackedTime = if (!restart) {
             now
-        } else now - COOLDOWN_MILLIS
+        } else now - 10.seconds
 
-        OverlayManager.setColeweightOverlayRendering(false)
+        setColeweightOverlayRendering(false)
         ColeweightOverlay.trackingDirty = false
     }
 
     private fun resetVariables() {
-        startTime = 0
-        lastTrackedTime = 0
+        startTime = null
+        pauseDuration = Duration.ZERO
+        lastTrackedTime = null
         isTracking = false
         isPaused = false
         ColeweightTrackingRates.reset()
     }
 
     fun pauseTracking() {
-        if (!scheduler.isShutdown) {
-            if (isPaused) {
-                sendMessage("§cColeweight tracking is already paused!", true)
-                logger.warn("[SCT]: Attempted to pause Coleweight tracking, but tracking is already paused.")
-                return
-            }
-            isPaused = true
-            lastTime += (System.currentTimeMillis() - startTime) / 1000
-            sendMessage("§7Coleweight tracking paused.", true)
-            logger.info("[SCT]: Coleweight tracking paused.")
-        } else {
-            sendMessage("§cNo Coleweight tracking active!", true)
-            logger.warn("[SCT]: Attempted to pause Coleweight tracking, but no active tracking session was found.")
-        }
-    }
-
-    fun resumeTracking() {
-        if (scheduler.isShutdown && !isTracking) {
-            sendMessage("§cNo Coleweight tracking active!", true)
-            logger.warn("[SCT]: Attempted to resume Coleweight tracking, but no active tracking session was found.")
-            return
-        }
-
         if (!isTracking) {
-            sendMessage("§cTracking has not been started yet!", true)
-            logger.warn("[SCT]: Attempted to resume Coleweight tracking, but tracking has not been started yet.")
+            sendMessage("§cNo Coleweight tracking active!")
+            logger.warn("[SCT]: Attempted to pause Coleweight tracking, but no active tracking session was found.")
             return
         }
 
         if (isPaused) {
-            sendMessage("§7Resuming Coleweight tracking.", true)
-            logger.info("[SCT]: Resuming Coleweight tracking.")
-            startTime = System.currentTimeMillis()
-            isPaused = false
-        } else {
-            sendMessage("§cColeweight tracking is already active!", true)
-            logger.warn("[SCT]: Attempted to resume Coleweight tracking, but tracking is already active and not paused.")
+            sendMessage("§cColeweight tracking is already paused!")
+            logger.warn("[SCT]: Attempted to pause Coleweight tracking, but tracking is already paused.")
+            return
         }
+
+        isPaused = true
+        startTime?.let { pauseDuration += it.timePassedSince() }
+
+        sendMessage("§7Coleweight tracking paused.")
+        logger.info("[SCT]: Coleweight tracking paused.")
     }
 
-    val uptimeInSeconds: Long
-        get() = if (isPaused) {
-            lastTime
-        } else {
-            lastTime + (System.currentTimeMillis() - startTime) / 1000
+    fun resumeTracking() {
+        if (!isTracking) {
+            sendMessage("§cNo Coleweight tracking active!")
+            logger.warn("[SCT]: Attempted to resume Coleweight tracking, but no active tracking session was found.")
+            return
         }
 
-    val uptime: String get() = StringUtils.formatTime(uptimeInSeconds)
+        if (!isPaused) {
+            sendMessage("§cColeweight tracking is not paused!")
+            logger.warn("[SCT]: Attempted to resume Coleweight tracking, but tracking is not paused.")
+            return
+        }
+
+        startTime = EpochMark.now()
+        isPaused = false
+
+        sendMessage("§7Resuming Coleweight tracking.")
+        logger.info("[SCT]: Resuming Coleweight tracking.")
+    }
+
+    private val totalUptime: Duration
+        get() = if (isPaused || startTime == null) {
+            pauseDuration
+        } else {
+            pauseDuration + startTime!!.timePassedSince()
+        }
+
+    val uptimeInSeconds: Long
+        get() = totalUptime.inWholeSeconds
+
+    val uptime: String
+        get() = totalUptime.formatClock()
 }

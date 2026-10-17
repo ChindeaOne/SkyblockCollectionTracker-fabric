@@ -8,20 +8,23 @@ import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.utils.render.screen.CollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler.isMultiTracking
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object MultiDataFetcher {
 
     private val logger: Logger = LogManager.getLogger(MultiDataFetcher::class.java)
 
-    private val collectionCache: MutableMap<CacheKey, Map<String, Long>> = ConcurrentHashMap<CacheKey, Map<String, Long>>()
-    private val cacheTimestamps: MutableMap<CacheKey, Long> = ConcurrentHashMap<CacheKey, Long>()
-    private const val CACHE_LIFESPAN_MS: Long = 240_000L // default 4 minutes
+    private val collectionCache: MutableMap<CacheKey, Map<String, Long>> = ConcurrentHashMap()
+    private val cacheTimestamps: MutableMap<CacheKey, EpochMark> = ConcurrentHashMap()
+    private val CACHE_LIFESPAN: Duration = 4.minutes
 
     fun fetchMultiCollectionData(isInitialFetch: Boolean = true) {
         if (!ServerUtils.serverStatus) {
@@ -64,7 +67,7 @@ object MultiDataFetcher {
 
                 val cacheKey = CacheKey(collectionList)
                 collectionCache[cacheKey] = map
-                cacheTimestamps[cacheKey] = System.currentTimeMillis()
+                cacheTimestamps[cacheKey] = EpochMark.now()
 
                 if (isInitialFetch) {
                     MultiTrackingRates.setCollections(map)
@@ -91,9 +94,8 @@ object MultiDataFetcher {
         val cacheKey = CacheKey(collectionList)
         val lastFetched = cacheTimestamps[cacheKey]
 
-        if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < CACHE_LIFESPAN_MS) {
-            val elapsed: Long = System.currentTimeMillis() - lastFetched
-            logger.info("[SCT]: Returning cached data for collections: $collectionList (last fetched $elapsed ms ago)")
+        if (lastFetched != null && lastFetched.timePassedSince() < CACHE_LIFESPAN) {
+            logger.info("[SCT]: Returning cached data for collections: $collectionList (last fetched ${lastFetched.timePassedSince().inWholeSeconds} seconds ago)")
             return collectionCache[cacheKey]
         }
         return null
@@ -104,8 +106,7 @@ object MultiDataFetcher {
         val lastFetched = cacheTimestamps[cacheKey]
 
         if (lastFetched != null) {
-            val elapsed = System.currentTimeMillis() - lastFetched
-            logger.info("[SCT]: Cache expired for collections $collectionList (last fetched $elapsed ms ago). Fetching new data.")
+            logger.info("[SCT]: Cache expired for collections $collectionList (last fetched ${lastFetched.timePassedSince().inWholeSeconds} seconds ago). Fetching new data.")
         } else {
             logger.info("[SCT]: No cache present for collections $collectionList. Fetching data.")
         }

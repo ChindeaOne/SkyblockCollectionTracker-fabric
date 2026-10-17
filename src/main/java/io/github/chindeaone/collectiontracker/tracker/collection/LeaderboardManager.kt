@@ -252,4 +252,9 @@ object LeaderboardManager {
     fun isEmpty(): Boolean = currentLeaderboard.isEmpty()
 }
 
-data class LeaderboardEntry(var username: String, var rank: Int, var amount: Long, var wiped: Boolean)
+data class LeaderboardEntry(
+    var username: String,
+    var rank: Int,
+    var amount: Long,
+    var wiped: Boolean
+)

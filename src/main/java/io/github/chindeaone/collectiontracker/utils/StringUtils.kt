@@ -77,7 +77,7 @@ object StringUtils {
         return parts.ifEmpty { listOf("0s") }.joinToString(" ")
     }
 
-    fun formatTimeIntoText(seconds: Long): String {
+    fun formatTimeInWords(seconds: Long): String {
         if (seconds <= 0) return "0 seconds"
 
         val days = seconds / 86400
@@ -109,9 +109,9 @@ object StringUtils {
         }
     }
 
-    fun formatFloatOrPlaceholder(value: Float): String = if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
+    fun formatFloat(value: Float): String = if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
 
-    fun formatNumberOrPlaceholder(value: Long): String = if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
+    fun formatNumber(value: Long): String = if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
 
     fun formatHotXPerkBuffs(message: String): String {
         val numberRegex = Regex("[+-]?\\d+")

@@ -7,6 +7,7 @@ import io.github.chindeaone.collectiontracker.config.includeWipedProfiles
 import io.github.chindeaone.collectiontracker.config.skillLeaderboard
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardEntry
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils.serverStatus
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
@@ -19,15 +20,17 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 object SkillFetcher {
     private val logger: Logger = LogManager.getLogger(SkillFetcher::class.java)
 
-    private val cacheTimestamps: MutableMap<String, Long> = ConcurrentHashMap<String, Long>()
-    private val leaderboardCacheTimestamps: MutableMap<String, Long> = ConcurrentHashMap<String, Long>()
-    private val skillLeaderboardFetchInProgress: MutableMap<String, AtomicBoolean> = ConcurrentHashMap<String, AtomicBoolean>()
-    private const val CACHE_LIFESPAN_MS = 180000L // default 3 minutes
-    private const val LEADERBOARD_CACHE_LIFESPAN_MS = 3600000L // 1 hour
+    private val cacheTimestamps: MutableMap<String, EpochMark> = ConcurrentHashMap()
+    private val leaderboardCacheTimestamps: MutableMap<String, EpochMark> = ConcurrentHashMap()
+    private val skillLeaderboardFetchInProgress: MutableMap<String, AtomicBoolean> = ConcurrentHashMap()
+    private val CACHE_LIFESPAN = 4.minutes
+    private val LEADERBOARD_CACHE_LIFESPAN = 1.hours
 
     var scheduler: ScheduledExecutorService? = null
 
@@ -49,8 +52,7 @@ object SkillFetcher {
                 return
             }
 
-            if (!SkillTrackingHandler.isTracking) return
-            if (SkillTrackingHandler.isPaused) return
+            if (!SkillTrackingHandler.isTracking || SkillTrackingHandler.isPaused) return
 
             getData(skillName) // fetch data for the tracked skill
 
@@ -73,7 +75,7 @@ object SkillFetcher {
 
         return try {
             val lastFetched = leaderboardCacheTimestamps[skillName.lowercase()]
-            if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
+            if (lastFetched != null && lastFetched.timePassedSince() < LEADERBOARD_CACHE_LIFESPAN) {
                 inProgress.set(false)
                 return CompletableFuture.completedFuture(null)
             } else {
@@ -82,7 +84,7 @@ object SkillFetcher {
                 fetchCollectionLeaderboard(skillName.lowercase()).thenAccept { jsonData: String? ->
                     if (jsonData == null) {
                         logger.error("[SCT]: Failed to fetch leaderboard data for skill $skillName from the Elite API")
-                        ChatUtils.sendMessage("§c[SCT] Failed to fetch leaderboard data for $skillName.", true)
+                        ChatUtils.sendMessage("§c[SCT] Failed to fetch leaderboard data for $skillName.")
                         return@thenAccept
                     }
                     val jsonObject = JsonParser.parseString(jsonData).getAsJsonObject()
@@ -105,7 +107,7 @@ object SkillFetcher {
                     }
 
                     LeaderboardManager.setSkillLeaderboard(skillName, entries)
-                    leaderboardCacheTimestamps[skillName.lowercase()] = System.currentTimeMillis()
+                    leaderboardCacheTimestamps[skillName.lowercase()] = EpochMark.now()
                     logger.info("[SCT]: Leaderboard data successfully fetched and updated for $skillName")
                 }.exceptionally { ex: Throwable ->
                     logger.error("[SCT]: Exception occurred while fetching leaderboard data for $skillName: ${ex.message}",ex)
@@ -123,22 +125,19 @@ object SkillFetcher {
 
     private fun getData(skill: String) {
         val lastFetched = cacheTimestamps[skill]
-        val now = System.currentTimeMillis()
 
-        if (lastFetched != null && (now - lastFetched) < CACHE_LIFESPAN_MS) {
-            val elapsed = System.currentTimeMillis() - lastFetched
-            logger.info("[SCT]: Using cached data for $skill (last fetched $elapsed ms ago).")
+        if (lastFetched != null && lastFetched.timePassedSince() < CACHE_LIFESPAN) {
+            logger.info("[SCT]: Using cached data for $skill (last fetched ${lastFetched.timePassedSince().inWholeSeconds} seconds ago).")
         }
 
         if (lastFetched != null) {
-            val elapsed = now - lastFetched
-            logger.info("[SCT]: Cache expired for $skill (last fetched $elapsed ms ago). Fetching new data.")
+            logger.info("[SCT]: Cache expired for $skill (last fetched ${lastFetched.timePassedSince().inWholeSeconds} seconds ago). Fetching new data.")
         } else {
             logger.info("[SCT]: No cache present for $skill. Fetching data.")
         }
 
         fetchSkillsData()
-        cacheTimestamps[skill] = now
+        cacheTimestamps[skill] = EpochMark.now()
     }
 
     fun clearCache() {

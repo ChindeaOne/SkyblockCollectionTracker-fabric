@@ -1,32 +1,36 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.config.serverLagProtection
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 object ServerTickUtils {
 
-    private var lastServerGameTime = -1L
-    private var lastPacketSystemTime = -1L
-    var totalLagAdjustment = 0L
+    private var serverGameTime: Long = -1L
+    private var packetSystemTime: EpochMark? = null
+    var totalLagAdjustment: Duration = Duration.ZERO
 
     @JvmStatic
     fun onServerTick(gameTime: Long) {
-        val now = System.currentTimeMillis()
+        val previousGameTime = serverGameTime
+        val previousSystemTime = packetSystemTime
 
-        if (lastServerGameTime != -1L && serverLagProtection) {
-            val expectedTicks = gameTime - lastServerGameTime
-            val actualTime = now - lastPacketSystemTime
-            val expectedTime = expectedTicks * 50
-            totalLagAdjustment += (actualTime - expectedTime)
+        if (previousGameTime != -1L && previousSystemTime != null && serverLagProtection) {
+            val expectedTicks = gameTime - previousGameTime
+            val actualTime = previousSystemTime.timePassedSince()
+            val expectedTime = (expectedTicks * 50).milliseconds
+
+            totalLagAdjustment += actualTime - expectedTime
         }
 
-        lastServerGameTime = gameTime
-        lastPacketSystemTime = now
+        serverGameTime = gameTime
+        packetSystemTime = EpochMark.now()
     }
 
     @JvmStatic
     fun reset() {
-        lastServerGameTime = -1L
-        lastPacketSystemTime = -1L
-        totalLagAdjustment = 0L
+        serverGameTime = -1L
+        packetSystemTime = null
+        totalLagAdjustment = Duration.ZERO
     }
 }

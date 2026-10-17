@@ -1,5 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.world.deployable
 
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -13,7 +14,7 @@ enum class MiningDeployable(
     val tier: Int,
     val mineshaftGlobalRange: Boolean = false,
     var entity: ArmorStand? = null,
-    var expiryTime: Long = 0L
+    var expiryTime: EpochMark? = null
 ) {
     DWARVEN_LANTERN("Dwarven Lantern", "§fDwarven Lantern", 1),
     MITHRIL_LANTERN("Mithril Lantern", "§aMithril Lantern", 2),
@@ -40,10 +41,10 @@ enum class MiningDeployable(
 
     fun isActive(): Boolean = isAlive() && isInPlayerRange()
 
-    fun isAlive(): Boolean = expiryTime - System.currentTimeMillis() / 1000 >= 0
+    fun isAlive(): Boolean = expiryTime?.isPassed == false
 
     fun reset() {
         entity = null
-        expiryTime = 0L
+        expiryTime = null
     }
 }

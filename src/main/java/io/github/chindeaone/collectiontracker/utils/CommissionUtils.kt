@@ -43,6 +43,7 @@ import net.minecraft.world.item.ItemStack
 import java.util.Collections
 import java.util.WeakHashMap
 import org.lwjgl.glfw.GLFW
+import kotlin.time.Duration.Companion.milliseconds
 
 object CommissionUtils {
 
@@ -53,7 +54,7 @@ object CommissionUtils {
         keybindConfig.commission4
     )
 
-    private const val CLICK_DEBOUNCE_MS = 100L
+    private val CLICK_DEBOUNCE = 100.milliseconds
 
     private val SLOT_LAYOUTS = mapOf(
         2 to intArrayOf(11, 15),
@@ -115,9 +116,12 @@ object CommissionUtils {
     fun onClientTick(client: Minecraft) {
         val screen = ContainerParser.currentCommissionScreen ?: return
 
-        val now = System.currentTimeMillis()
-        if (now - ContainerParser.openedAt < CLICK_DEBOUNCE_MS) return
-        if (now - ContainerParser.lastClick < CLICK_DEBOUNCE_MS) return
+        ContainerParser.openedAt?.let {
+            if (it.timePassedSince() < CLICK_DEBOUNCE) return
+        }
+        ContainerParser.lastClick?.let {
+            if (it.timePassedSince() < CLICK_DEBOUNCE) return
+        }
 
         val pressedIndex = resolveCommissionIndex(client) ?: return
 
@@ -154,7 +158,7 @@ object CommissionUtils {
             CommissionsTracker.onCommissionClaimed()
         }
 
-        ContainerParser.lastClick = now
+        ContainerParser.lastClick = EpochMark.now()
     }
 
     private fun getContainerSlot(commissionIndex: Int): Int? {

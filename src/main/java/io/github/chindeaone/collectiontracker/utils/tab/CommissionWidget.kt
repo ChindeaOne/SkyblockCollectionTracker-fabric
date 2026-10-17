@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
+import kotlin.time.Duration.Companion.milliseconds
 
 object CommissionWidget {
     var commissions: MutableList<ActiveCommission> = mutableListOf()
@@ -36,7 +37,7 @@ object CommissionWidget {
             .append(Component.literal("New Commission: ").withColor(Colors.YELLOW.color))
             .append(Component.literal(updated.type.name).withColor(color))
 
-        RenderUtils.showTitle(component, 1500)
+        RenderUtils.showTitle(component, 1500.milliseconds)
     }
 
     fun completeCollectorCommission(commissionName: String) {
@@ -54,7 +55,7 @@ object CommissionWidget {
             .append(Component.literal(active.type.name).withColor(color))
             .append(Component.literal(" Completed!").withColor(Colors.GREEN.color))
 
-        RenderUtils.showTitle(component, 1500)
+        RenderUtils.showTitle(component, 1500.milliseconds)
     }
 
     fun onTabUpdate() {

@@ -1,25 +1,33 @@
 package io.github.chindeaone.collectiontracker.utils
 
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.fromNow
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+
 class AbilityState {
 
-    var endTimestamp = 0L
-    var initialLag = 0L
+    var endTimestamp: EpochMark? = null
+    var initialLag: Duration = Duration.ZERO
 
-    fun start(durationMs: Long) {
-        endTimestamp = System.currentTimeMillis() + durationMs
+    fun start(duration: Duration) {
+        endTimestamp = duration.fromNow()
         initialLag = ServerTickUtils.totalLagAdjustment
     }
 
     fun reset() {
-        endTimestamp = 0L
-        initialLag = 0L
+        endTimestamp = null
+        initialLag = Duration.ZERO
     }
 
-    val remainingSeconds: Double
+    val remainingDuration: Duration
         get() {
-            if (endTimestamp == 0L) return 0.0
+            val timestamp = endTimestamp ?: return Duration.ZERO
             val lagDelta = ServerTickUtils.totalLagAdjustment - initialLag
-            val remaining = (endTimestamp + lagDelta) - System.currentTimeMillis()
-            return (remaining / 1000.0).coerceAtLeast(0.0)
+            val remaining = (timestamp + lagDelta).timeUntil()
+
+            return remaining.coerceAtLeast(Duration.ZERO)
         }
+
+    val remainingSeconds: Double
+        get() = remainingDuration.toDouble(DurationUnit.SECONDS)
 }

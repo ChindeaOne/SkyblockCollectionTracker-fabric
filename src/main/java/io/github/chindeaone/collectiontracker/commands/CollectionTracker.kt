@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
+import kotlin.time.Duration.Companion.seconds
 
 object CollectionTracker {
 
@@ -23,7 +24,6 @@ object CollectionTracker {
     var isApiTracking = false
     var scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     var trackingTask: ScheduledFuture<*>? = null
-
     private val logger: Logger = LogManager.getLogger(CollectionTracker::class.java)
 
     fun startTracking(coll: String) {
@@ -62,7 +62,8 @@ object CollectionTracker {
             } else CollectionsManager.collectionSource = "sacks"
 
             // Check cooldown before fetching bazaar prices
-            if (System.currentTimeMillis() - TrackingHandler.lastTrackTime < TrackingHandler.COOLDOWN_MILLIS) {
+            val lastTrack = TrackingHandler.lastTrackTime
+            if (lastTrack != null && lastTrack.timePassedSince() < 10.seconds) {
                 ChatUtils.sendMessage("§cPlease wait before tracking another collection!", true)
                 return
             } else {
@@ -127,7 +128,8 @@ object CollectionTracker {
                 return
             }
 
-            if (System.currentTimeMillis() - MultiTrackingHandler.multiLastTrackTime < MultiTrackingHandler.COOLDOWN_MILLIS) {
+            val lastMultiTrack = MultiTrackingHandler.multiLastTrackTime
+            if (lastMultiTrack != null && lastMultiTrack.timePassedSince() < 10.seconds) {
                 ChatUtils.sendMessage("§cPlease wait before another multi-tracking!", true)
                 return
             } else {

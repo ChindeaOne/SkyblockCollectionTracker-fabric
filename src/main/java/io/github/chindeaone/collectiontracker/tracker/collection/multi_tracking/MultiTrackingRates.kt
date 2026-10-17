@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
 import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import java.util.concurrent.ConcurrentHashMap
 
@@ -21,7 +22,7 @@ object MultiTrackingRates {
     val collectionMade = ConcurrentHashMap<String, Long>()
     val sessionStartCollections = ConcurrentHashMap<String, Long>()
     val lastApiCollections = ConcurrentHashMap<String, Long>()
-    @Volatile var lastCollectionUpdate: Long = -1L
+    @Volatile var lastMultiCollectionUpdate: EpochMark? = null
 
     // Track seen gemstones to only render them if they've been received from chat
     val seenGemstones: MutableSet<String> = ConcurrentHashMap.newKeySet()
@@ -48,12 +49,11 @@ object MultiTrackingRates {
     @Volatile var isPreviousWiped = false
 
     fun setCollections(values: Map<String, Long>) {
-        val now = System.currentTimeMillis()
-        MultiTrackingHandler.initMultiTracking(now)
+        MultiTrackingHandler.initMultiTracking()
 
         for ((coll, value) in values) {
             lastApiCollections[coll] = value
-            lastCollectionUpdate = now
+            lastMultiCollectionUpdate = EpochMark.now()
             if (sessionStartCollections.getOrDefault(coll, -1L) == -1L) {
                 sessionStartCollections[coll] = value
 
@@ -110,7 +110,7 @@ object MultiTrackingRates {
     private fun updateValues(coll: String, currentCollection: Long, sinceLast: Long) {
         val uptime = MultiTrackingHandler.multiUptimeInSeconds
 
-        if (sinceLast > 0) lastCollectionUpdate = System.currentTimeMillis()
+        if (sinceLast > 0) lastMultiCollectionUpdate = EpochMark.now()
 
         val sessionStart = sessionStartCollections.getOrDefault(coll, currentCollection)
         val collectedSinceStart = currentCollection - sessionStart

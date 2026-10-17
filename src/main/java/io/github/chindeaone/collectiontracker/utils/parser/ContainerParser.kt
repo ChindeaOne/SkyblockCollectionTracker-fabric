@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.config.enableLottery
 import io.github.chindeaone.collectiontracker.config.enableSkyMall
 import io.github.chindeaone.collectiontracker.config.professionalMS
 import io.github.chindeaone.collectiontracker.config.strongArmMS
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentBeekeeperBuff
@@ -32,9 +33,8 @@ object ContainerParser {
     var attachedCommissionMenu: AbstractContainerMenu? = null
     var isCommissionMenuOpen = false
 
-    var openedAt = 0L
-
-    var lastClick = -1L
+    var openedAt: EpochMark? = null
+    var lastClick: EpochMark? = null
     val wasDown = HashMap<Int, Boolean>()
 
     private enum class HotxScreenType {
@@ -267,7 +267,7 @@ object ContainerParser {
         attachedCommissionMenu = menu
         wasDown.clear()
 
-        openedAt = System.currentTimeMillis()
+        openedAt = EpochMark.now()
         lastClick = openedAt
     }
 

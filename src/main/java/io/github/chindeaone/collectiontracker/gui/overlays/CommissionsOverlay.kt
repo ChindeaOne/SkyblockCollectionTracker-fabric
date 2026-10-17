@@ -50,7 +50,7 @@ class CommissionsOverlay : AbstractOverlay() {
         val isTracking = enableCommissionsTracking
         val completed = getCompletedCount()
         val perHour = getCommissionsPerHour()
-        val currentUptime = getUptime()
+        val currentUptime = getUptime() ?: "00:00"
 
         val newLines = mutableListOf<String>()
         var detectedArea: CommissionParser.Area? = null

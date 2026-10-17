@@ -4,12 +4,15 @@ import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.enableDeployable
 import io.github.chindeaone.collectiontracker.config.deployableOutOfRangeWarning
 import io.github.chindeaone.collectiontracker.config.showDeployableTitle
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.fromNow
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
+import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 /**
 * This Kotlin object is based on SkyHanni's implementation.
@@ -50,12 +53,18 @@ object DeployableTracker {
 
             val match = deployable.pattern.find(entityName) ?: continue
             val deployableTime = match.groupValues[1].toLongOrNull() ?: continue
-            val time = System.currentTimeMillis() / 1000 + deployableTime - 1
+            val timeLeft = deployableTime.seconds.fromNow()
 
-            if (deployable.expiryTime > time && deployable.isActive()) continue
+            val expiryTime = deployable.expiryTime
+            if (expiryTime != null) {
+                val diff = abs((expiryTime - timeLeft).inWholeSeconds)
+                if (diff <= 1) continue
+
+                if (expiryTime > timeLeft && deployable.isActive()) continue
+            }
 
             deployable.entity = entity
-            deployable.expiryTime = time
+            deployable.expiryTime = timeLeft
 
             if (!trackedDeployables.contains(deployable)) {
                 trackedDeployables.add(deployable)

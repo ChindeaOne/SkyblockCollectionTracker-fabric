@@ -10,8 +10,8 @@ import io.github.chindeaone.collectiontracker.config.skillLeaderboard
 import io.github.chindeaone.collectiontracker.config.skillPosition
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
-import io.github.chindeaone.collectiontracker.utils.StringUtils.formatNumberOrPlaceholder
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils
+import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.drawOverlayFrame
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderSkillStringsWithTaming
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -69,10 +69,10 @@ class SkillOverlay : AbstractOverlay() {
         val skillLines = mutableListOf<String>()
         val rankSuffix = formatRankSuffix(currentSkillRank, leaderboard)
 
-        skillLines.add("$currentSkill Level: ${formatNumber(SkillTrackingRates.skillLevel.toLong())}$rankSuffix")
-        skillLines.add("Total $currentSkill XP: ${formatNumberOrPlaceholder(SkillTrackingRates.totalSkillXp)}")
-        skillLines.add("XP (Session): ${formatNumberOrPlaceholder(SkillTrackingRates.skillXpGained)}")
-        skillLines.add("XP/h: ${formatNumberOrPlaceholder(SkillTrackingRates.skillPerHour)}")
+        skillLines.add("$currentSkill Level: ${NumbersUtils.formatNumber(SkillTrackingRates.skillLevel.toLong())}$rankSuffix")
+        skillLines.add("Total $currentSkill XP: ${StringUtils.formatNumber(SkillTrackingRates.totalSkillXp)}")
+        skillLines.add("XP (Session): ${StringUtils.formatNumber(SkillTrackingRates.skillXpGained)}")
+        skillLines.add("XP/h: ${StringUtils.formatNumber(SkillTrackingRates.skillPerHour)}")
 
         addLeaderboardLines(
             skillLines,
@@ -88,16 +88,18 @@ class SkillOverlay : AbstractOverlay() {
             SkillTrackingRates.isPreviousSkillWiped,
             leaderboard
         )
+        skillLines.add("")
         skillLines.add("Uptime: ${SkillTrackingHandler.uptime}")
 
         val tamingLines = mutableListOf<String>()
         if (withTaming) {
+            tamingLines.add("")
             val tamingRankSuffix = formatRankSuffix(currentTamingRank, leaderboard)
 
-            tamingLines.add("Taming Level: ${formatNumber(SkillTrackingRates.tamingLevel.toLong())}$tamingRankSuffix")
-            tamingLines.add("Total Taming XP: ${formatNumberOrPlaceholder(currentTamingTotalXp)}")
-            tamingLines.add("XP (Session): ${formatNumberOrPlaceholder(SkillTrackingRates.tamingXpGained)}")
-            tamingLines.add("XP/h: ${formatNumberOrPlaceholder(SkillTrackingRates.tamingPerHour)}")
+            tamingLines.add("Taming Level: ${NumbersUtils.formatNumber(SkillTrackingRates.tamingLevel.toLong())}$tamingRankSuffix")
+            tamingLines.add("Total Taming XP: ${StringUtils.formatNumber(currentTamingTotalXp)}")
+            tamingLines.add("XP (Session): ${StringUtils.formatNumber(SkillTrackingRates.tamingXpGained)}")
+            tamingLines.add("XP/h: ${StringUtils.formatNumber(SkillTrackingRates.tamingPerHour)}")
 
             addLeaderboardLines(
                 tamingLines,
@@ -121,7 +123,6 @@ class SkillOverlay : AbstractOverlay() {
         cachedLines = buildList {
             addAll(skillLines)
             if (withTaming && tamingLines.isNotEmpty()) {
-                add("")
                 addAll(tamingLines)
             }
         }
@@ -158,11 +159,11 @@ class SkillOverlay : AbstractOverlay() {
 
             if (nextUser != null) {
                 val wipedSuffix = if (isNextWiped) "-wiped" else ""
-                list.add("$posLabel ($nextUser$wipedSuffix): ${formatNumber(nextAmount)}")
+                list.add("$posLabel ($nextUser$wipedSuffix): ${NumbersUtils.formatNumber(nextAmount)}")
                 if (tillNext == -1L) {
                     list.add("$tillLabel: Calculating...")
                 } else {
-                    list.add("$tillLabel: ${formatNumber(tillNext)}")
+                    list.add("$tillLabel: ${NumbersUtils.formatNumber(tillNext)}")
                 }
                 if (!eta.isNullOrEmpty()) {
                     list.add("$etaLabel: $eta")
@@ -180,7 +181,7 @@ class SkillOverlay : AbstractOverlay() {
             list.add("")
             if (previousUser != null) {
                 val wipedSuffix = if (isPreviousWiped) "-wiped" else ""
-                list.add("Passed ($previousUser$wipedSuffix): ${formatNumber(previousAmount)}")
+                list.add("Passed ($previousUser$wipedSuffix): ${NumbersUtils.formatNumber(previousAmount)}")
             } else {
                 list.add("Passed: Calculating...")
             }
@@ -188,7 +189,7 @@ class SkillOverlay : AbstractOverlay() {
             if (abovePrevious == -1L) {
                 list.add("Difference: Calculating...")
             } else {
-                list.add("Difference: ${formatNumber(abovePrevious)}")
+                list.add("Difference: ${NumbersUtils.formatNumber(abovePrevious)}")
             }
         }
     }

@@ -1,11 +1,14 @@
 package io.github.chindeaone.collectiontracker.utils.render.screen.core
 
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 abstract class BasePaginatedConfigScreen(oldScreen: AbstractContainerScreen<*>?): BaseScrollableScreen(oldScreen) {
 
@@ -15,8 +18,8 @@ abstract class BasePaginatedConfigScreen(oldScreen: AbstractContainerScreen<*>?)
     }
 
     private var statusMessage: Pair<Component, StatusType>? = null
-    private var statusTimestamp = 0L
-    private val statusDuration = 2000L
+    private var statusTimestamp: EpochMark? = null
+    private val statusDuration: Duration = 2.seconds
 
     var currentPage = Page.COLLECTIONS
         protected set
@@ -75,12 +78,12 @@ abstract class BasePaginatedConfigScreen(oldScreen: AbstractContainerScreen<*>?)
 
     fun showSuccess(message: String) {
         statusMessage = Component.literal(message) to StatusType.SUCCESS
-        statusTimestamp = System.currentTimeMillis()
+        statusTimestamp = EpochMark.now()
     }
 
     fun showError(message: String) {
         statusMessage = Component.literal(message) to StatusType.ERROR
-        statusTimestamp = System.currentTimeMillis()
+        statusTimestamp = EpochMark.now()
     }
 
     override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
@@ -90,7 +93,9 @@ abstract class BasePaginatedConfigScreen(oldScreen: AbstractContainerScreen<*>?)
 
     private fun drawStatusMessage(context: GuiGraphicsExtractor) {
         val (message, type) = statusMessage ?: return
-        if (System.currentTimeMillis() - statusTimestamp > statusDuration) {
+
+        val timestamp = statusTimestamp ?: return
+        if (timestamp.timePassedSince() > statusDuration) {
             statusMessage = null
             return
         }

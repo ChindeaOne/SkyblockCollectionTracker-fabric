@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
 import io.github.chindeaone.collectiontracker.config.includeWipedProfiles
 import io.github.chindeaone.collectiontracker.utils.render.screen.CollectionScreen
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler.isTracking
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils
@@ -18,16 +19,21 @@ import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 object DataFetcher {
 
-    private val collectionCache: MutableMap<String, Long> = mutableMapOf()
-    private val cacheTimestamps: MutableMap<String, Long> = mutableMapOf()
-    private val leaderboardCacheTimestamps: MutableMap<String, Long> = mutableMapOf()
-    private const val CACHE_LIFESPAN_MS = 240_000L // 4 minutes
-    private const val LEADERBOARD_CACHE_LIFESPAN_MS = 3_600_000L // 1 hour
+    private val collectionCache: MutableMap<String, Long> = ConcurrentHashMap()
+    private val cacheTimestamps: MutableMap<String, EpochMark> = ConcurrentHashMap()
+    private val leaderboardCacheTimestamps: MutableMap<String, EpochMark> = ConcurrentHashMap()
+    private val CACHE_LIFESPAN: Duration = 4.minutes
+    private val LEADERBOARD_CACHE_LIFESPAN: Duration = 1.hours
+
     @OptIn(ExperimentalAtomicApi::class)
     private val leaderboardFetchInProgress: AtomicBoolean = AtomicBoolean(false)
 
@@ -65,7 +71,7 @@ object DataFetcher {
                 collectionData = JsonParser.parseString(jsonData).asJsonObject[collection].asLong
 
                 collectionCache[collection] = collectionData
-                cacheTimestamps[collection] = System.currentTimeMillis()
+                cacheTimestamps[collection] = EpochMark.now()
 
                 if (isInitialFetch) {
                     TrackingRates.setCollection(collectionData)
@@ -89,11 +95,9 @@ object DataFetcher {
 
     private fun getCachedData(collection: String): Long? {
         val lastFetched = cacheTimestamps[collection]
-        val now = System.currentTimeMillis()
 
-        if (lastFetched != null && (now - lastFetched) < CACHE_LIFESPAN_MS) {
-            val elapsed = now - lastFetched
-            logger.info("[SCT]: Returning cached data for collection: $collection (last fetched $elapsed ms ago)")
+        if (lastFetched != null && lastFetched.timePassedSince() < CACHE_LIFESPAN) {
+            logger.info("[SCT]: Returning cached data for collection: $collection (last fetched ${lastFetched.timePassedSince().inWholeSeconds} seconds ago)")
             return collectionCache[collection]
         }
         return null
@@ -103,8 +107,7 @@ object DataFetcher {
         val lastFetched = cacheTimestamps[collection]
 
         if (lastFetched != null) {
-            val elapsed = System.currentTimeMillis() - lastFetched
-            logger.info("[SCT]: Cache expired for collection $collection (last fetched $elapsed ms ago). Fetching new data.")
+            logger.info("[SCT]: Cache expired for collection $collection (last fetched ${lastFetched.timePassedSince().inWholeSeconds} seconds ago). Fetching new data.")
         } else {
             logger.info("[SCT]: No cache present for collection $collection. Fetching data.")
         }
@@ -135,7 +138,7 @@ object DataFetcher {
 
         return try {
             val lastFetched = leaderboardCacheTimestamps[targetCollection]
-            if (lastFetched != null && (System.currentTimeMillis() - lastFetched) < LEADERBOARD_CACHE_LIFESPAN_MS) {
+            if (lastFetched != null && lastFetched.timePassedSince() < LEADERBOARD_CACHE_LIFESPAN) {
                 leaderboardFetchInProgress.store(false)
                 return CompletableFuture.completedFuture(null)
             } else {
@@ -144,7 +147,7 @@ object DataFetcher {
                 EliteApiFetcher.fetchCollectionLeaderboard(targetCollection).thenAccept { jsonData ->
                     if (jsonData == null) {
                         logger.error("[SCT]: Failed to fetch leaderboard data from the Elite API")
-                        ChatUtils.sendMessage("§cFailed to fetch leaderboard data.", true)
+                        ChatUtils.sendMessage("§cFailed to fetch leaderboard data.")
                         return@thenAccept
                     }
 
@@ -166,7 +169,7 @@ object DataFetcher {
                         )
                     }
                     LeaderboardManager.set(entries)
-                    leaderboardCacheTimestamps[targetCollection] = System.currentTimeMillis()
+                    leaderboardCacheTimestamps[targetCollection] = EpochMark.now()
                     logger.info("[SCT]: Leaderboard data successfully fetched and updated for collection: $targetCollection")
                 }.exceptionally { throwable ->
                     logger.error("[SCT]: Error fetching leaderboard data: ${throwable.message}", throwable)

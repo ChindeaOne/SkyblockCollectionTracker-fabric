@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.utils.AbilityUtils
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 
 object AbilityItemParser {
 
@@ -30,7 +31,7 @@ object AbilityItemParser {
 
         if (isAxe) {
             return AbilityUtils.AxeAbilitySnapshot(
-                timestamp = System.currentTimeMillis(),
+                timestamp = EpochMark.now(),
                 hasAbility = true
             )
         }
@@ -57,7 +58,7 @@ object AbilityItemParser {
             }
 
             return AbilityUtils.PickaxeAbilitySnapshot(
-                timestamp = System.currentTimeMillis(),
+                timestamp = EpochMark.now(),
                 isDrill = isDrill,
                 hasAbility = true,
                 fuelTank = fuelTank,

@@ -9,6 +9,8 @@ import io.github.chindeaone.collectiontracker.config.titleDisplayTimer
 import io.github.chindeaone.collectiontracker.config.titlePosition
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.fromNow
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils.font
 import io.github.chindeaone.collectiontracker.utils.RepoUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
@@ -18,10 +20,13 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 object RenderUtils {
 
-    private data class QueuedTitle(val title: Component, val duration: Long)
+    private data class QueuedTitle(val title: Component, val expiresAt: EpochMark)
     private val titleQueue = ArrayDeque<QueuedTitle>()
 
     fun drawOverlayFrame(context: GuiGraphicsExtractor, pos: Position, drawContext: Runnable) {
@@ -127,7 +132,7 @@ object RenderUtils {
         val outlineColor: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
 
         if (withColor) {
-            drawLayeredOutline(context, lines + "" + tamingLines, outlineColor)
+            drawLayeredOutline(context, lines + tamingLines, outlineColor)
         }
 
         val color: Int = (ColorUtils.skillColors[SkillTracker.skillName]) ?: Colors.GREEN.color
@@ -140,7 +145,6 @@ object RenderUtils {
 
         val tamingColor: Int = (ColorUtils.skillColors["Taming"]) ?: Colors.GREEN.color
 
-        y += font.lineHeight
         for (line in tamingLines) {
             drawHelper(line, context, y, tamingColor)
             y += font.lineHeight
@@ -276,15 +280,15 @@ object RenderUtils {
         "axe" -> AbilityTimes(
             ChatListener.finalAxeCooldown,
             ChatListener.finalAxeDuration,
-            ChatListener.maxAxeCooldown,
-            ChatListener.maxAxeDuration
+            ChatListener.maxAxeCooldown.toDouble(DurationUnit.SECONDS),
+            ChatListener.maxAxeDuration.toDouble(DurationUnit.SECONDS)
         )
 
         "pickaxe" -> AbilityTimes(
             ChatListener.finalCooldown,
             ChatListener.finalDuration,
-            ChatListener.maxCooldown,
-            ChatListener.maxDuration
+            ChatListener.maxCooldown.toDouble(DurationUnit.SECONDS),
+            ChatListener.maxDuration.toDouble(DurationUnit.SECONDS)
         )
 
         else -> AbilityTimes(0.0, 0.0, 0.0, 0.0)
@@ -381,19 +385,24 @@ object RenderUtils {
         }
     }
 
-    fun showTitle(title: Component, duration: Long = titleDisplayTimer) {
-        if (titleQueue.isEmpty()) {
-            titleQueue.add(QueuedTitle(title, System.currentTimeMillis() + duration))
+    fun showTitle(title: Component, duration: Duration = titleDisplayTimer.seconds) {
+        val expiresAt = if (titleQueue.isEmpty()) {
+            duration.fromNow()
         } else {
-            titleQueue.add(QueuedTitle(title, titleQueue.last().duration + duration))
+            titleQueue.last().expiresAt + duration
         }
+
+        titleQueue.add(QueuedTitle(title, expiresAt))
     }
 
     fun drawActiveTitle(context: GuiGraphicsExtractor) {
         val title = titleQueue.firstOrNull() ?: return
-        if (System.currentTimeMillis() < title.duration) {
-            renderTitle(context, title.title)
-        } else titleQueue.removeFirst()
+        if (title.expiresAt.isPassed) {
+            titleQueue.removeFirst()
+            return
+        }
+
+        renderTitle(context, title.title)
     }
 
     private fun renderTitle(context: GuiGraphicsExtractor, title: Component) {

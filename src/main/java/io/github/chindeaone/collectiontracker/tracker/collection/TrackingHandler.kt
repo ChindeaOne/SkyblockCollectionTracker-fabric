@@ -38,10 +38,13 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.e
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lastApiCollection
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.sacksCollectionGained
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.sessionStartCollection
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lastCollectionTime
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lastCollectionUpdate
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionTillNextRank
+import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatClock
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatInWords
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
@@ -52,27 +55,28 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.Volatile
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 object TrackingHandler {
     private val logger: Logger = LogManager.getLogger(TrackingHandler::class.java)
-    val COOLDOWN_MILLIS = 10.seconds.inWholeMilliseconds
 
     @Volatile
     var isTracking: Boolean = false
     var isPaused: Boolean = false
     var leaderboardTrackingInitialized: Boolean = false
 
-    var startTime: Long = 0
-    private var lastTime: Long = 0
-    var lastTrackTime: Long = 0
+    var startTime: EpochMark? = null
+    private var pauseDuration: Duration = Duration.ZERO
+    var lastTrackTime: EpochMark? = null
 
     private const val RESETS = 10
     private var restartCount = 0
-    private var firstRestartTime: Long = 0
+    private var firstRestartTime: EpochMark? = null
 
     fun startTracking() {
-        logger.info("[SCT]: Tracking started for collection: $collection")
+        logger.info("[SCT]: Started tracking collection $collection")
 
         setTrackingOverlayRendering(true)
 
@@ -87,66 +91,64 @@ object TrackingHandler {
         }
     }
 
-    fun initTracking(now: Long) {
-        lastTrackTime = now
+    fun initTracking() {
+        lastTrackTime = EpochMark.now()
 
         isTracking = true
         isPaused = false
         leaderboardTrackingInitialized = collectionLeaderboard
 
-        startTime = now
-        lastTime = 0
+        startTime = EpochMark.now()
+        pauseDuration = Duration.ZERO
 
         if (collectionType == null) logger.error("[SCT]: Collection type is null for collection $collection")
     }
 
     fun stopTrackingManual() {
-        if (isTracking) {
-            sendMessage("§cStopped tracking!", true)
-
-            resetTrackingData(false)
-
-            logger.info("[SCT]: Tracking stopped.")
-        } else {
-            sendMessage("§cNo tracking active!", true)
+        if (!isTracking) {
+            sendMessage("§cNo tracking active!")
             logger.warn("[SCT]: Attempted to stop tracking manually, but no tracking is active.")
+            return
         }
+
+        sendMessage("§cStopped tracking!")
+        logger.info("[SCT]: Tracking stopped.")
+
+        resetTrackingData(false)
     }
 
     fun stopTracking() {
-        if (isTracking) {
-            if (!server) {
-                logger.info("[SCT]: Tracking stopped because player disconnected from the server.")
-            } else {
-                sendMessage("§cAPI server is down. Stopping the tracker.", true)
-                logger.info("[SCT]: Tracking stopped because the API server is down.")
-            }
-
-            resetTrackingData(false)
-        } else {
+        if (!isTracking) {
             logger.warn("[SCT]: Attempted to stop tracking, but no tracking is active.")
+            return
         }
+
+        if (!server) {
+            logger.info("[SCT]: Tracking stopped because player disconnected from the server.")
+            return
+        }
+
+        sendMessage("§cAPI server is down. Stopping the tracker.")
+        logger.info("[SCT]: Tracking stopped because the API server is down.")
+
+        resetTrackingData(false)
     }
 
     fun restartTracking() {
         if (!isTracking) {
-            sendMessage("§cNo tracking active to restart!", true)
+            sendMessage("§cNo tracking active to restart!")
             logger.warn("[SCT]: Attempted to restart tracking, but no tracking is active.")
             return
         }
 
-        if (restartCount == 0) {
-            firstRestartTime = System.currentTimeMillis()
-        } else {
-            val elapsedTime = System.currentTimeMillis() - firstRestartTime
-            if (elapsedTime >= TimeUnit.HOURS.toMillis(1)) {
-                restartCount = 0
-                firstRestartTime = System.currentTimeMillis()
-            }
+        val firstRestart = firstRestartTime
+        if (restartCount == 0 || firstRestart == null || firstRestart.timePassedSince() >= 1.hours) {
+            firstRestartTime = EpochMark.now()
+            restartCount = 0
         }
 
         if (restartCount >= RESETS) {
-            sendMessage("§cHourly restart limit reached! Cannot restart tracking.", true)
+            sendMessage("§cHourly restart limit reached! Cannot restart tracking.")
             logger.warn("[SCT]: Hourly restart limit reached. Cannot restart tracking.")
             return
         }
@@ -170,11 +172,11 @@ object TrackingHandler {
         saveMilestonesProgress(true)
 
         // Reset uptime
-        val now = System.currentTimeMillis()
+        val now = EpochMark.now()
         if (!restart) {
             lastTrackTime = now
             clearFetchedData()
-        } else lastTrackTime = now - COOLDOWN_MILLIS
+        } else lastTrackTime = now - 10.seconds
 
         setTrackingOverlayRendering(false)
         CollectionOverlay.trackingDirty = false
@@ -189,8 +191,8 @@ object TrackingHandler {
         isTracking = false
         isPaused = false
         leaderboardTrackingInitialized = false
-        startTime = 0
-        lastTime = 0
+        startTime = null
+        pauseDuration = Duration.ZERO
 
         if (trackingTask != null) {
             trackingTask!!.cancel(false)
@@ -201,7 +203,7 @@ object TrackingHandler {
         lastApiCollection = -1L
         sacksCollectionGained = 0L
         sessionStartCollection = -1L
-        lastCollectionTime = -1L
+        lastCollectionUpdate = null
 
         // Clear profit map
         moneyPerHourBazaar.clear()
@@ -228,77 +230,90 @@ object TrackingHandler {
     }
 
     fun pauseTracking() {
-        if (isTracking) {
-            if (isPaused) {
-                sendMessage("§cTracking is already paused!", true)
-                logger.warn("[SCT]: Attempted to pause tracking, but tracking is already paused.")
-                return
-            }
-            isPaused = true
-            lastTime += (System.currentTimeMillis() - startTime) / 1000
-            sendMessage("§7Tracking paused.", true)
-            logger.info("[SCT]: Tracking paused.")
-        } else {
-            sendMessage("§cNo tracking active!", true)
-            logger.warn("[SCT]: Attempted to pause tracking, but no tracking is active.")
-        }
-    }
-
-    fun resumeTracking() {
         if (!isTracking) {
-            sendMessage("§cNo tracking active!", true)
-            logger.warn("[SCT]: Attempted to resume tracking, but no tracking is active.")
+            sendMessage("§cNo tracking active!")
+            logger.warn("[SCT]: Attempted to pause tracking, but no tracking is active.")
             return
         }
 
         if (isPaused) {
-            sendMessage("§7Resuming tracking.", true)
-            logger.info("[SCT]: Resuming tracking.")
-            startTime = System.currentTimeMillis()
-            isPaused = false
-        } else {
-            sendMessage("§cTracking is already active!", true)
-            logger.warn("[SCT]: Attempted to resume tracking, but tracking is already active.")
+            sendMessage("§cTracking is already paused!")
+            logger.warn("[SCT]: Attempted to pause tracking, but tracking is already paused.")
+            return
         }
+
+        isPaused = true
+        startTime?.let { pauseDuration += it.timePassedSince() }
+
+        sendMessage("§7Tracking paused.")
+        logger.info("[SCT]: Tracking paused.")
+    }
+
+    fun resumeTracking() {
+        if (!isTracking) {
+            sendMessage("§cNo tracking active!")
+            logger.warn("[SCT]: Attempted to resume tracking, but no tracking is active.")
+            return
+        }
+
+        if (!isPaused) {
+            sendMessage("§cTracking is already active!")
+            logger.warn("[SCT]: Attempted to resume tracking, but tracking is already active.")
+            return
+        }
+
+        startTime = EpochMark.now()
+        isPaused = false
+
+        sendMessage("§7Resuming tracking.")
+        logger.info("[SCT]: Resuming tracking.")
     }
 
     fun resumeRiftTracking() {
-        if (!isTracking) {
-            return
-        }
+        if (!isTracking || !isPaused) return
 
         if (!isRiftCollection(collection)) {
             logger.warn("[SCT]: Attempted to resume Rift tracking, but current collection is not a Rift collection.")
             return
         }
 
-        if (!isPaused) return
-
-        startTime = System.currentTimeMillis()
+        startTime = EpochMark.now()
         isPaused = false
 
-        sendMessage("§7Resuming tracking after rejoining The Rift.", true)
+        sendMessage("§7Resuming tracking after rejoining The Rift.")
         logger.info("[SCT]: Resuming tracking after rejoining The Rift.")
     }
 
     fun pauseRiftTracking() {
-        if (!isTracking) {
-            return
-        }
+        if (!isTracking || isPaused) return
 
         if (!isRiftCollection(collection)) {
             logger.warn("[SCT]: Attempted to pause Rift tracking, but current collection is not a Rift collection.")
             return
         }
 
-        if (isPaused) return
-
-        lastTime += (System.currentTimeMillis() - startTime) / 1000
+        startTime?.let { pauseDuration += it.timePassedSince() }
         isPaused = true
 
-        sendMessage("§7Pausing tracking before leaving The Rift.", true)
+        sendMessage("§7Pausing tracking before leaving The Rift.")
         logger.info("[SCT]: Pausing tracking before leaving The Rift.")
     }
+
+    private val totalUptime: Duration
+        get() = if (isPaused || startTime == null) {
+            pauseDuration
+        } else {
+            pauseDuration + startTime!!.timePassedSince()
+        }
+
+    val uptimeInSeconds: Long
+        get() = totalUptime.inWholeSeconds
+
+    private val uptimeInWords: String
+        get() = totalUptime.formatInWords()
+
+    val uptime: String
+        get() = totalUptime.formatClock()
 
     private fun sendRates() {
         TrackingRates.updateRates()
@@ -307,7 +322,7 @@ object TrackingHandler {
 
         val lines: MutableList<Component> = mutableListOf()
         lines.add(Component.literal("   §aCollection tracked: §f").append(collectionDisplay.toColor()))
-        lines.add(Component.literal("   §b${collectionDisplay} Made: §f${formatNumber(collectionMade)}   §bRate: §f${formatNumber(collectionPerHour)}/h"))
+        lines.add(Component.literal("   §b${collectionDisplay} Made: §f${NumbersUtils.formatNumber(collectionMade)}   §bRate: §f${NumbersUtils.formatNumber(collectionPerHour)}/h"))
 
         val useBazaar = useBazaar
         val typeKey = CollectionParser.bazaarTypeKey()
@@ -316,22 +331,22 @@ object TrackingHandler {
         if (!useBazaar) {
             val npcMoney: Long = moneyMade["NPC"] ?: 0L
             if (isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                lines.add(Component.literal("   §6Motes: §f$${formatNumber(npcMoney)}   §6Rate: §f${formatNumber(moneyPerHourNPC)}/h"))
+                lines.add(Component.literal("   §6Motes: §f$${NumbersUtils.formatNumber(npcMoney)}   §6Rate: §f${NumbersUtils.formatNumber(moneyPerHourNPC)}/h"))
             } else if (NpcPrices.getNpcPrice(collection) != 0) {
-                lines.add(Component.literal("   §6Money (NPC): §f$${formatNumber(npcMoney)}   §6Rate: §f$${formatNumber(moneyPerHourNPC)}/h"))
+                lines.add(Component.literal("   §6Money (NPC): §f$${NumbersUtils.formatNumber(npcMoney)}   §6Rate: §f$${NumbersUtils.formatNumber(moneyPerHourNPC)}/h"))
             }
         } else {
             when (collectionType) {
                 "normal" -> {
                     val bazMoney = moneyMade.getOrDefault("$collectionType$suffix", 0L)
                     val bazRate = moneyPerHourBazaar.getOrDefault("$collectionType$suffix", 0L)
-                    lines.add(Component.literal("   §6Money (Bazaar): §f$${formatNumber(bazMoney)}   §6Rate: §f$${formatNumber(bazRate)}/h"))
+                    lines.add(Component.literal("   §6Money (Bazaar): §f$${NumbersUtils.formatNumber(bazMoney)}   §6Rate: §f$${NumbersUtils.formatNumber(bazRate)}/h"))
                 }
 
                 "enchanted" -> {
                     val money = moneyMade.getOrDefault("$typeKey$suffix", 0L)
                     val rate = moneyPerHourBazaar.getOrDefault("$typeKey$suffix", 0L)
-                    lines.add(Component.literal("   §6Money (Bazaar): §f$${formatNumber(money)}  §6Rate: §f$${formatNumber(rate)}/h"))
+                    lines.add(Component.literal("   §6Money (Bazaar): §f$${NumbersUtils.formatNumber(money)}  §6Rate: §f$${NumbersUtils.formatNumber(rate)}/h"))
                 }
 
                 "gemstone" -> {
@@ -339,7 +354,7 @@ object TrackingHandler {
 
                     val gMoney = moneyMade.getOrDefault("$gemstoneVariant$suffix", 0L)
                     val gRate = moneyPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
-                    lines.add(Component.literal("   §6Money (Bazaar): §f$${formatNumber(gMoney)}  §6Rate: §f$${formatNumber(gRate)}/h"))
+                    lines.add(Component.literal("   §6Money (Bazaar): §f$${NumbersUtils.formatNumber(gMoney)}  §6Rate: §f$${NumbersUtils.formatNumber(gRate)}/h"))
                 }
             }
         }
@@ -358,25 +373,25 @@ object TrackingHandler {
 
         // Collection extremes
         if (highestCollectionPerHour > 0) {
-            lines.add(Component.literal("   §6Best collection rate: §f${formatNumber(highestCollectionPerHour)} coll/h"))
+            lines.add(Component.literal("   §6Best collection rate: §f${NumbersUtils.formatNumber(highestCollectionPerHour)} coll/h"))
         }
         if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Long.MAX_VALUE) {
-            lines.add(Component.literal("   §6Worst collection rate: §f${formatNumber(lowestCollectionPerHour)} coll/h"))
+            lines.add(Component.literal("   §6Worst collection rate: §f${NumbersUtils.formatNumber(lowestCollectionPerHour)} coll/h"))
         }
 
         if (!useBazaar) {
             // NPC money extremes
             if (highestRatePerHourNPC > 0) {
                 if (isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(Component.literal("   §6Best motes rate: §f${formatNumber(highestRatePerHourNPC)}/h"))
+                    lines.add(Component.literal("   §6Best motes rate: §f${NumbersUtils.formatNumber(highestRatePerHourNPC)}/h"))
                 } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
-                    Component.literal("   §6Best NPC money rate: §f$${formatNumber(highestRatePerHourNPC)}/h")
+                    Component.literal("   §6Best NPC money rate: §f$${NumbersUtils.formatNumber(highestRatePerHourNPC)}/h")
                 )
             }
             if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
                 if (isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(Component.literal("   §6Worst motes rate: §f${formatNumber(lowestRatePerHourNPC)}/h"))
-                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal("   §6Worst NPC money rate: §f$${formatNumber(lowestRatePerHourNPC)}/h"))
+                    lines.add(Component.literal("   §6Worst motes rate: §f${NumbersUtils.formatNumber(lowestRatePerHourNPC)}/h"))
+                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal("   §6Worst NPC money rate: §f$${NumbersUtils.formatNumber(lowestRatePerHourNPC)}/h"))
             }
         } else {
             // Bazaar extremes per variant
@@ -386,16 +401,16 @@ object TrackingHandler {
                         val low = lowestRatesPerHourBazaar.getOrDefault("normal$suffix", 0L)
                         val high = highestRatesPerHourBazaar.getOrDefault("normal$suffix", 0L)
 
-                        lines.add(Component.literal("   §6Best money rate: §f$${ formatNumber(high)}/h"))
-                        lines.add(Component.literal("   §6Worst money rate: §f$${formatNumber(low)}/h"))
+                        lines.add(Component.literal("   §6Best money rate: §f$${NumbersUtils.formatNumber(high)}/h"))
+                        lines.add(Component.literal("   §6Worst money rate: §f$${NumbersUtils.formatNumber(low)}/h"))
                     }
 
                     "enchanted" -> {
                         val low = lowestRatesPerHourBazaar.getOrDefault("$typeKey$suffix", 0L)
                         val high = highestRatesPerHourBazaar.getOrDefault("$typeKey$suffix", 0L)
 
-                        lines.add(Component.literal("   §6Best money rate: §f$${formatNumber(high)}/h"))
-                        lines.add(Component.literal("   §6Worst money rate: §f$${formatNumber(low)}/h"))
+                        lines.add(Component.literal("   §6Best money rate: §f$${NumbersUtils.formatNumber(high)}/h"))
+                        lines.add(Component.literal("   §6Worst money rate: §f$${NumbersUtils.formatNumber(low)}/h"))
                     }
 
                     "gemstone" -> {
@@ -404,27 +419,12 @@ object TrackingHandler {
                         val low = lowestRatesPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
                         val high = highestRatesPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
 
-                        lines.add(Component.literal("   §6Best money rate: §f$${formatNumber(high)}/h"))
-                        lines.add(Component.literal("   §6Worst money rate: §f$${formatNumber(low)}/h"))
+                        lines.add(Component.literal("   §6Best money rate: §f$${NumbersUtils.formatNumber(high)}/h"))
+                        lines.add(Component.literal("   §6Worst money rate: §f$${NumbersUtils.formatNumber(low)}/h"))
                     }
                 }
             }
         }
         ChatUtils.sendSummary("§e§lTracking Summary", lines)
     }
-
-    val uptimeInSeconds: Long
-        get() = if (isPaused) {
-            lastTime
-        } else {
-            lastTime + (System.currentTimeMillis() - startTime) / 1000
-        }
-
-    private val uptimeInWords: String
-        get() {
-            val uptime = lastTime + (System.currentTimeMillis() - startTime) / 1000
-            return StringUtils.formatTimeIntoText(uptime)
-        }
-
-    val uptime: String get() = StringUtils.formatTime(uptimeInSeconds)
 }

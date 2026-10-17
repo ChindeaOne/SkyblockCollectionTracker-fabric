@@ -28,10 +28,10 @@ import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardMana
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatNumber
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatCompact
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatBazaarItemName
-import io.github.chindeaone.collectiontracker.utils.StringUtils.formatNumberOrPlaceholder
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
 
 object CollectionParser {
@@ -66,13 +66,13 @@ object CollectionParser {
 
         if (leaderboardPosition) {
             if (TrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
-            if (TrackingRates.isNextWiped) return "Custom Position (${TrackingRates.nextRankUsername}-wiped): ${formatNumber(TrackingRates.nextRankAmount)}"
-            return "Custom Position (${TrackingRates.nextRankUsername}): ${formatNumber(TrackingRates.nextRankAmount)}"
+            if (TrackingRates.isNextWiped) return "Custom Position (${TrackingRates.nextRankUsername}-wiped): ${NumbersUtils.formatNumber(TrackingRates.nextRankAmount)}"
+            return "Custom Position (${TrackingRates.nextRankUsername}): ${NumbersUtils.formatNumber(TrackingRates.nextRankAmount)}"
         }
 
         if (TrackingRates.nextRankUsername == null) return "Next Position: Calculating..."
-        if (TrackingRates.isNextWiped) return "Next Position (${TrackingRates.nextRankUsername}-wiped): ${formatNumber(TrackingRates.nextRankAmount)}"
-        return "Next Position (${TrackingRates.nextRankUsername}): ${formatNumber(TrackingRates.nextRankAmount)}"
+        if (TrackingRates.isNextWiped) return "Next Position (${TrackingRates.nextRankUsername}-wiped): ${NumbersUtils.formatNumber(TrackingRates.nextRankAmount)}"
+        return "Next Position (${TrackingRates.nextRankUsername}): ${NumbersUtils.formatNumber(TrackingRates.nextRankAmount)}"
     }
 
     private fun handleCollectionTillNextRank(): String? {
@@ -80,11 +80,11 @@ object CollectionParser {
 
         if (leaderboardPosition) {
             if (TrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
-            return "Till Custom Position: ${formatNumber(TrackingRates.collectionTillNextRank)}"
+            return "Till Custom Position: ${NumbersUtils.formatNumber(TrackingRates.collectionTillNextRank)}"
         }
 
         if (TrackingRates.collectionTillNextRank == -1L) return "Till Next Position: Calculating..."
-        return "Till Next Position: ${formatNumber(TrackingRates.collectionTillNextRank)}"
+        return "Till Next Position: ${NumbersUtils.formatNumber(TrackingRates.collectionTillNextRank)}"
     }
 
     private fun handleEta(): String? {
@@ -103,15 +103,15 @@ object CollectionParser {
         if (isEmpty() || !previousPosition) return null
 
         if (TrackingRates.previousRankUsername == null) return "Passed: Calculating..."
-        if (TrackingRates.isPreviousWiped) return "Passed (${TrackingRates.previousRankUsername}-wiped): ${formatNumber(TrackingRates.previousRankAmount)}"
-        return "Passed (${TrackingRates.previousRankUsername}): ${formatNumber(TrackingRates.previousRankAmount)}"
+        if (TrackingRates.isPreviousWiped) return "Passed (${TrackingRates.previousRankUsername}-wiped): ${NumbersUtils.formatNumber(TrackingRates.previousRankAmount)}"
+        return "Passed (${TrackingRates.previousRankUsername}): ${NumbersUtils.formatNumber(TrackingRates.previousRankAmount)}"
     }
 
     private fun handleCollectionAbovePreviousRank(): String? {
         if (isEmpty() || !previousPosition) return null
 
         if (TrackingRates.collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
-        return "Difference: ${formatNumber(TrackingRates.collectionAbovePreviousRankAmount)}"
+        return "Difference: ${NumbersUtils.formatNumber(TrackingRates.collectionAbovePreviousRankAmount)}"
     }
 
     private fun handleMultiNextPosition(): String? {
@@ -119,13 +119,13 @@ object CollectionParser {
 
         if (leaderboardPosition) {
             if (MultiTrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
-            if (MultiTrackingRates.isNextWiped) return "Custom Position (${MultiTrackingRates.nextRankUsername}-wiped): ${formatNumber(MultiTrackingRates.nextRankAmount)}"
-            return "Custom Position (${MultiTrackingRates.nextRankUsername}): ${formatNumber(MultiTrackingRates.nextRankAmount)}"
+            if (MultiTrackingRates.isNextWiped) return "Custom Position (${MultiTrackingRates.nextRankUsername}-wiped): ${NumbersUtils.formatNumber(MultiTrackingRates.nextRankAmount)}"
+            return "Custom Position (${MultiTrackingRates.nextRankUsername}): ${NumbersUtils.formatNumber(MultiTrackingRates.nextRankAmount)}"
         }
 
         if (MultiTrackingRates.nextRankUsername == null) return "Next Position: Calculating..."
-        if (MultiTrackingRates.isNextWiped) return "Next Position (${MultiTrackingRates.nextRankUsername}-wiped): ${formatNumber(MultiTrackingRates.nextRankAmount)}"
-        return "Next Position (${MultiTrackingRates.nextRankUsername}): ${formatNumber(MultiTrackingRates.nextRankAmount)}"
+        if (MultiTrackingRates.isNextWiped) return "Next Position (${MultiTrackingRates.nextRankUsername}-wiped): ${NumbersUtils.formatNumber(MultiTrackingRates.nextRankAmount)}"
+        return "Next Position (${MultiTrackingRates.nextRankUsername}): ${NumbersUtils.formatNumber(MultiTrackingRates.nextRankAmount)}"
     }
 
     private fun handleMultiCollectionTillNextRank(): String? {
@@ -133,11 +133,11 @@ object CollectionParser {
 
         if (leaderboardPosition) {
             if (MultiTrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
-            return "Till Custom Position: ${formatNumber(MultiTrackingRates.collectionTillNextRank)}"
+            return "Till Custom Position: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionTillNextRank)}"
         }
 
         if (MultiTrackingRates.collectionTillNextRank == -1L) return "Till Next Position: Calculating..."
-        return "Till Next Position: ${formatNumber(MultiTrackingRates.collectionTillNextRank)}"
+        return "Till Next Position: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionTillNextRank)}"
     }
 
     private fun handleMultiEta(): String? {
@@ -156,15 +156,15 @@ object CollectionParser {
         if (isEmpty() || !previousPosition) return null
 
         if (MultiTrackingRates.previousRankUsername == null) return "Passed: Calculating..."
-        if (MultiTrackingRates.isPreviousWiped) return "Passed (${MultiTrackingRates.previousRankUsername}-wiped): ${formatNumber(MultiTrackingRates.previousRankAmount)}"
-        return "Passed (${MultiTrackingRates.previousRankUsername}): ${formatNumber(MultiTrackingRates.previousRankAmount)}"
+        if (MultiTrackingRates.isPreviousWiped) return "Passed (${MultiTrackingRates.previousRankUsername}-wiped): ${NumbersUtils.formatNumber(MultiTrackingRates.previousRankAmount)}"
+        return "Passed (${MultiTrackingRates.previousRankUsername}): ${NumbersUtils.formatNumber(MultiTrackingRates.previousRankAmount)}"
     }
 
     private fun handleMultiCollectionAbovePreviousRank(): String? {
         if (isEmpty() || !previousPosition) return null
 
         if (MultiTrackingRates.collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
-        return "Difference: ${formatNumber(MultiTrackingRates.collectionAbovePreviousRankAmount)}"
+        return "Difference: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionAbovePreviousRankAmount)}"
     }
 
     private fun addIfNotNull(list: MutableList<String>, line: String?) {
@@ -179,20 +179,20 @@ object CollectionParser {
             else " [#${TrackingRates.playerCurrentRank}]"
         }
         return if (TrackingRates.collectionAmount >= 0)
-            "${formatCollectionName(collection)} : ${formatNumber(TrackingRates.collectionAmount)}$rankSuffix"
+            "${formatCollectionName(collection)} : ${NumbersUtils.formatNumber(TrackingRates.collectionAmount)}$rankSuffix"
         else
             "${formatCollectionName(collection)} : Calculating..."
     }
 
     private fun handleCollectionSession(): String =
         if (TrackingRates.collectionMade > 0)
-            "${formatCollectionName(collection)} (session): ${formatNumber(TrackingRates.collectionMade)}"
+            "${formatCollectionName(collection)} (session): ${NumbersUtils.formatNumber(TrackingRates.collectionMade)}"
         else
             "${formatCollectionName(collection)} (session): Calculating..."
 
     private fun handleCollectionPerHour(): String =
         if (TrackingRates.collectionPerHour > 0)
-            "Coll/h: ${formatNumber(TrackingRates.collectionPerHour)}"
+            "Coll/h: ${NumbersUtils.formatNumber(TrackingRates.collectionPerHour)}"
         else
             "Coll/h: Calculating..."
 
@@ -209,9 +209,9 @@ object CollectionParser {
             val localMoneyPerHourNPC: Long = TrackingRates.moneyPerHourNPC
             if (CollectionsManager.isRiftCollection(collection)) {
                 // Use motes instead of money for rift collections
-                return "Motes/h: ${formatNumberOrPlaceholder(localMoneyPerHourNPC)}"
+                return "Motes/h: ${StringUtils.formatNumber(localMoneyPerHourNPC)}"
             }
-            return "$/h (NPC): ${formatNumberOrPlaceholder(localMoneyPerHourNPC)}"
+            return "$/h (NPC): ${StringUtils.formatNumber(localMoneyPerHourNPC)}"
         }
 
         if (!useBazaar) return null
@@ -221,25 +221,25 @@ object CollectionParser {
         when (collectionType) {
             "normal" -> {
                 localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("$collectionType$suffix", 0L)
-                return "$/h (Bazaar): ${formatNumberOrPlaceholder(localMoneyPerHour)}"
+                return "$/h (Bazaar): ${StringUtils.formatNumber(localMoneyPerHour)}"
             }
 
             "enchanted" -> {
                 if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
                     localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("Enchanted version$suffix", 0L)
-                    return "$/h (Bazaar): ${formatNumberOrPlaceholder(localMoneyPerHour)}"
+                    return "$/h (Bazaar): ${StringUtils.formatNumber(localMoneyPerHour)}"
                 } else {
                     localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("Super Enchanted version$suffix", -1L)
                     if (localMoneyPerHour == -1L) {
                         setBazaarType(Bazaar.BazaarType.ENCHANTED_VERSION)
                         return null
-                    } else return "$/h (Bazaar): ${formatNumberOrPlaceholder(localMoneyPerHour)}"
+                    } else return "$/h (Bazaar): ${StringUtils.formatNumber(localMoneyPerHour)}"
                 }
             }
 
             "gemstone" -> {
                 localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
-                return "$/h (Bazaar): ${formatNumberOrPlaceholder(localMoneyPerHour)}"
+                return "$/h (Bazaar): ${StringUtils.formatNumber(localMoneyPerHour)}"
             }
 
             else -> return null
@@ -259,9 +259,9 @@ object CollectionParser {
             val localMoneyMadeNPC = TrackingRates.moneyMade.getOrDefault("NPC", 0L)
             if (CollectionsManager.isRiftCollection(collection)) {
                 // Use motes instead of money for rift collections
-                return "Motes made: ${formatNumberOrPlaceholder(localMoneyMadeNPC)}"
+                return "Motes made: ${StringUtils.formatNumber(localMoneyMadeNPC)}"
             }
-            return "$ made (NPC): ${formatNumberOrPlaceholder(localMoneyMadeNPC)}"
+            return "$ made (NPC): ${StringUtils.formatNumber(localMoneyMadeNPC)}"
         }
 
         if (!useBazaar) return null
@@ -271,25 +271,25 @@ object CollectionParser {
         when (collectionType) {
             "normal" -> {
                 localMoneyMade = TrackingRates.moneyMade.getOrDefault("$collectionType$suffix", 0L)
-                return "$ made (Bazaar): ${formatNumberOrPlaceholder(localMoneyMade)}"
+                return "$ made (Bazaar): ${StringUtils.formatNumber(localMoneyMade)}"
             }
 
             "enchanted" -> {
                 if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
                     localMoneyMade = TrackingRates.moneyMade.getOrDefault("Enchanted version$suffix", 0L)
-                    return "$ made (Bazaar): ${formatNumberOrPlaceholder(localMoneyMade)}"
+                    return "$ made (Bazaar): ${StringUtils.formatNumber(localMoneyMade)}"
                 } else {
                     localMoneyMade = TrackingRates.moneyMade.getOrDefault("Super Enchanted version$suffix", -1L)
                     if (localMoneyMade == -1L) {
                         setBazaarType(Bazaar.BazaarType.ENCHANTED_VERSION)
                         return null
-                    } else return "$ made (Bazaar): ${formatNumberOrPlaceholder(localMoneyMade)}"
+                    } else return "$ made (Bazaar): ${StringUtils.formatNumber(localMoneyMade)}"
                 }
             }
 
             "gemstone" -> {
                 localMoneyMade = TrackingRates.moneyMade.getOrDefault("$gemstoneVariant$suffix", 0L)
-                return "$ made (Bazaar): ${formatNumberOrPlaceholder(localMoneyMade)}"
+                return "$ made (Bazaar): ${StringUtils.formatNumber(localMoneyMade)}"
             }
 
             else -> return null
@@ -298,12 +298,14 @@ object CollectionParser {
 
     private fun handleCollectionSinceLast(): String =
         if (TrackingRates.collectionSinceLast > 0)
-            "${formatCollectionName(collection)} since last: ${formatNumber(TrackingRates.collectionSinceLast)}"
+            "${formatCollectionName(collection)} since last: ${NumbersUtils.formatNumber(TrackingRates.collectionSinceLast)}"
         else
             "${formatCollectionName(collection)} since last: Calculating..."
 
     private fun handleCollectionSinceLastTimer(): String {
-        val totalSeconds: Long = (System.currentTimeMillis() - TrackingRates.lastCollectionTime) / 1000
+        val lastUpdate = TrackingRates.lastCollectionUpdate ?: return "Last updated: Calculating..."
+        val totalSeconds = lastUpdate.timePassedSince().inWholeSeconds
+
         return "Last updated: ${StringUtils.formatCompactTime(totalSeconds)} ago"
     }
 
@@ -351,7 +353,7 @@ object CollectionParser {
                     if (price == 0f) {
                         return "Item price: Unknown price"
                     }
-                    return "Item price: ${formatNumber(price.toLong())}"
+                    return "Item price: ${NumbersUtils.formatNumber(price.toLong())}"
                 } else {
                     if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
                         setBazaarType(Bazaar.BazaarType.ENCHANTED_VERSION)
@@ -362,7 +364,7 @@ object CollectionParser {
                         if (price == 0f) {
                             return "Item price: Unknown price"
                         }
-                        return "Item price: ${formatNumber(price.toLong())}"
+                        return "Item price: ${NumbersUtils.formatNumber(price.toLong())}"
                     }
                 }
             }
@@ -373,7 +375,7 @@ object CollectionParser {
 
                 if (price == 0f) return "Variant price: Unknown price"
 
-                return "Variant price: ${formatNumber(price.toLong())}"
+                return "Variant price: ${NumbersUtils.formatNumber(price.toLong())}"
             }
 
             else -> return null
@@ -440,15 +442,15 @@ object CollectionParser {
                         .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
                         .sumOf { it.value }
                     list.add("")
-                    if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes/h: ${formatNumber(total)}")
-                    else list.add("§eOverall $/h (NPC): ${formatNumber(total)}")
+                    if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes/h: ${NumbersUtils.formatNumber(total)}")
+                    else list.add("§eOverall $/h (NPC): ${NumbersUtils.formatNumber(total)}")
                 } else {
                     val total = MultiTrackingRates.moneyPerHourBazaar.entries
                         .filter { (key, value) -> value > 0 && key.endsWith(suffix) }
                         .filter { (key) -> key.contains("_normal") || key.contains("_$typeKey") || key.contains("_$variant") }
                         .sumOf { it.value }
                     list.add("")
-                    list.add("§eOverall $/h (Bazaar): ${formatNumber(total)}")
+                    list.add("§eOverall $/h (Bazaar): ${NumbersUtils.formatNumber(total)}")
                 }
             }
 
@@ -458,15 +460,15 @@ object CollectionParser {
                         .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
                         .sumOf { it.value }
                     list.add("")
-                    if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes made: ${formatNumber(total)}")
-                    else list.add("§eOverall $ made (NPC): ${formatNumber(total)}")
+                    if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes made: ${NumbersUtils.formatNumber(total)}")
+                    else list.add("§eOverall $ made (NPC): ${NumbersUtils.formatNumber(total)}")
                 } else {
                     val total = MultiTrackingRates.moneyMadeBazaar.entries
                         .filter { (key, value) -> value > 0 && (key.endsWith(suffix)) }
                         .filter { (key) -> key.contains("_normal") || key.contains("_$typeKey") || key.contains("_$variant") }
                         .sumOf { it.value }
                     list.add("")
-                    list.add("§eOverall $ made (Bazaar): ${formatNumber(total)}")
+                    list.add("§eOverall $ made (Bazaar): ${NumbersUtils.formatNumber(total)}")
                 }
             }
             else -> {}
@@ -483,20 +485,20 @@ object CollectionParser {
             else " [#${MultiTrackingRates.playerCurrentRank}]"
         }
         return if (MultiTrackingRates.collectionAmounts.getOrDefault(coll, -1L) >= 0)
-            "${formatCollectionName(coll)}: ${formatNumber(MultiTrackingRates.collectionAmounts.getOrDefault(coll, 0L))}$rankSuffix"
+            "${formatCollectionName(coll)}: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionAmounts.getOrDefault(coll, 0L))}$rankSuffix"
         else
             "${formatCollectionName(coll)}: Calculating..."
     }
 
     private fun handleCollectionSessionMulti(coll: String): String =
         if (MultiTrackingRates.collectionMade.getOrDefault(coll, -1L) > 0)
-            "${formatCollectionName(coll)} (session): ${formatNumber(MultiTrackingRates.collectionMade.getOrDefault(coll, 0L))}"
+            "${formatCollectionName(coll)} (session): ${NumbersUtils.formatNumber(MultiTrackingRates.collectionMade.getOrDefault(coll, 0L))}"
         else
             "${formatCollectionName(coll)} (session): Calculating..."
 
     private fun handleCollectionPerHourMulti(coll: String): String =
         if (MultiTrackingRates.collectionPerHour.getOrDefault(coll, -1L) > 0)
-            "${formatCollectionName(coll)} Coll/h: ${formatNumber(MultiTrackingRates.collectionPerHour.getOrDefault(coll, 0L))}"
+            "${formatCollectionName(coll)} Coll/h: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionPerHour.getOrDefault(coll, 0L))}"
         else
             "${formatCollectionName(coll)} Coll/h: Calculating..."
 
@@ -515,7 +517,7 @@ object CollectionParser {
                     MultiTrackingRates.moneyPerHourNPC.getOrDefault("${gem}_${variant}".uppercase(), 0L)
                 }
             }
-            return "Gemstone $/h (${if (useBazaar) "Bazaar" else "NPC"}): ${formatNumberOrPlaceholder(totalRate)}"
+            return "Gemstone $/h (${if (useBazaar) "Bazaar" else "NPC"}): ${StringUtils.formatNumber(totalRate)}"
         }
 
         if (!useBazaar) {
@@ -527,9 +529,9 @@ object CollectionParser {
 
             val npcRate = MultiTrackingRates.moneyPerHourNPC.getOrDefault(key, -1L)
             if (CollectionsManager.isRiftCollection(coll)) {
-                return "${formatCollectionName(coll)} Motes/h: ${formatNumberOrPlaceholder(npcRate)}"
+                return "${formatCollectionName(coll)} Motes/h: ${StringUtils.formatNumber(npcRate)}"
             }
-            return "${formatCollectionName(coll)} $/h (NPC): ${formatNumberOrPlaceholder(npcRate)}"
+            return "${formatCollectionName(coll)} $/h (NPC): ${StringUtils.formatNumber(npcRate)}"
         } else {
             var actualColl: String = coll
             var gemstoneVariant: String? = null
@@ -541,7 +543,7 @@ object CollectionParser {
 
             if (gemstoneVariant != null) {
                 val rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault(gemstoneVariant + suffix, 0L)
-                return "${formatCollectionName(coll)} $/h (Bazaar): ${formatNumberOrPlaceholder(rate)}"
+                return "${formatCollectionName(coll)} $/h (Bazaar): ${StringUtils.formatNumber(rate)}"
             }
 
             val type = CollectionsManager.multiCollectionTypes[actualColl]
@@ -553,7 +555,7 @@ object CollectionParser {
                     "enchanted" -> rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault("${actualColl}_${bazaarTypeKey()}$suffix", 0L)
                 }
 
-                return "${formatCollectionName(coll)} $/h (Bazaar): ${formatNumberOrPlaceholder(rate)}"
+                return "${formatCollectionName(coll)} $/h (Bazaar): ${StringUtils.formatNumber(rate)}"
             } else {
                 return "${formatCollectionName(coll)} $/h (Bazaar): Calculating..."
             }
@@ -575,7 +577,7 @@ object CollectionParser {
                     MultiTrackingRates.moneyMadeNPC.getOrDefault(("${gem}_$variant").uppercase(), 0L)
                 }
             }
-            return "Gemstone $ made (${if (useBazaar) "Bazaar" else "NPC"}): ${formatNumberOrPlaceholder(totalMoney)}"
+            return "Gemstone $ made (${if (useBazaar) "Bazaar" else "NPC"}): ${StringUtils.formatNumber(totalMoney)}"
         }
 
         if (!useBazaar) {
@@ -587,9 +589,9 @@ object CollectionParser {
 
             val npcMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(key, -1L)
             if (CollectionsManager.isRiftCollection(coll)) {
-                return "${formatCollectionName(coll)} Motes made: ${formatNumberOrPlaceholder(npcMoney)}"
+                return "${formatCollectionName(coll)} Motes made: ${StringUtils.formatNumber(npcMoney)}"
             }
-            return "${formatCollectionName(coll)} $ made (NPC): ${formatNumberOrPlaceholder(npcMoney)}"
+            return "${formatCollectionName(coll)} $ made (NPC): ${StringUtils.formatNumber(npcMoney)}"
         } else {
             var actualColl: String = coll
             var gemstoneVariant: String? = null
@@ -601,7 +603,7 @@ object CollectionParser {
 
             if (gemstoneVariant != null) {
                 val money = MultiTrackingRates.moneyMadeBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
-                return "${formatCollectionName(coll)} $ made (Bazaar): ${formatNumberOrPlaceholder(money)}"
+                return "${formatCollectionName(coll)} $ made (Bazaar): ${StringUtils.formatNumber(money)}"
             }
 
             val type = CollectionsManager.multiCollectionTypes[actualColl]
@@ -613,7 +615,7 @@ object CollectionParser {
                     "enchanted" -> money = MultiTrackingRates.moneyMadeBazaar.getOrDefault("${actualColl}_${bazaarTypeKey()}$suffix", 0L)
                 }
 
-                return "${formatCollectionName(coll)} $ made (Bazaar): ${formatNumberOrPlaceholder(money)}"
+                return "${formatCollectionName(coll)} $ made (Bazaar): ${StringUtils.formatNumber(money)}"
             } else {
                 return "${formatCollectionName(coll)} $ made (Bazaar): Calculating..."
             }
@@ -636,8 +638,10 @@ object CollectionParser {
     }
 
     private fun handleMultiCollectionSinceLastTimer(): String {
-        val totalSeconds: Long = (System.currentTimeMillis() - MultiTrackingRates.lastCollectionUpdate) / 1000
-        return "Last updated: ${StringUtils.formatCompactTime(totalSeconds)} ago"
+        val lastUpdate = MultiTrackingRates.lastMultiCollectionUpdate ?: return "Last updated: Calculating..."
+        val totalSeconds = lastUpdate.timePassedSince()
+
+        return "Last updated${totalSeconds.formatCompact()} ago"
     }
 
     fun addToggleableSettingsLines(list: MutableList<String>) {

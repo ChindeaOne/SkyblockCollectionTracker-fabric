@@ -1,36 +1,40 @@
 package io.github.chindeaone.collectiontracker.tracker.commissions
 
-import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatClock
+import kotlin.time.Duration.Companion.seconds
 
 object CommissionsTracker {
-    private var completedCount = 0
-    private var startTime = 0L
+    private var completedCount: Int = 0
+    private var startTime: EpochMark? = null
 
-    private var cachedPerHour = 0.0
-    private var cachedUptime = "00:00:00"
-    private var lastUpdate = 0L
+    private var cachedPerHour: Double = 0.0
+    private var cachedUptime: String? = null
+    private var lastUpdate: EpochMark? = null
 
     fun onCommissionClaimed() {
         if (completedCount == 0) {
-            startTime = System.currentTimeMillis()
+            startTime = EpochMark.now()
         }
         completedCount++
         update(true)
     }
 
     private fun update(force: Boolean = false) {
-        val now = System.currentTimeMillis()
-        if (!force && now - lastUpdate < 1000L) return
+        val now = EpochMark.now()
+        if (!force && lastUpdate != null && lastUpdate!!.timePassedSince() < 1.seconds) return
 
         lastUpdate = now
 
-        val durationMs = now - startTime
-        if (durationMs > 0) {
-            val hours = durationMs.toDouble() / (1000.0 * 60.0 * 60.0)
-            cachedPerHour = completedCount / hours
-        }
+        val start = startTime ?: return
+        val duration = now - start
 
-        cachedUptime = StringUtils.formatTime(durationMs / 1000L)
+        if (duration >= 1.seconds) {
+            val hours = duration.inWholeSeconds / 3600.0
+            cachedPerHour = completedCount / hours
+        } else cachedPerHour = 0.0
+
+        cachedUptime = duration.formatClock()
     }
 
     fun getCompletedCount(): Int = completedCount
@@ -40,14 +44,17 @@ object CommissionsTracker {
         return cachedPerHour
     }
 
-    fun getUptime(): String {
+    fun getUptime(): String? {
         update()
         return cachedUptime
     }
 
     fun reset() {
         completedCount = 0
-        startTime = 0L
+        startTime = null
+        cachedPerHour = 0.0
+        cachedUptime = null
+        lastUpdate = null
     }
 }
 

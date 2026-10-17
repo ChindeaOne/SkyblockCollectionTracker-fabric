@@ -9,12 +9,14 @@ import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrack
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.coleweightGained
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.coleweightPerHour
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.coleweightSinceLast
-import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.lastColeweightTime
+import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.lastColeweightUpdate
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatCompact
 import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatFloat
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.concurrent.Volatile
+import kotlin.time.Duration.Companion.seconds
 
 class ColeweightOverlay : AbstractOverlay() {
     private var cachedLines: List<String> = emptyList()
@@ -53,20 +55,17 @@ class ColeweightOverlay : AbstractOverlay() {
             return
         }
 
-        if (ModLoader.clientTicks % 5L != 0L) return
+        if (ModLoader.clientTicks % 4L != 0L) return
 
-        val lastUpdateTime = lastColeweightTime
-        val timeAgo = if (lastUpdateTime > 0) {
-            val totalSeconds = (System.currentTimeMillis() - lastUpdateTime) / 1000
-            StringUtils.formatCompactTime(totalSeconds)
-        } else {
-            ""
-        }
+        val lastUpdate = lastColeweightUpdate ?: return
+        val timeAgo = if (lastUpdate.timePassedSince() >= 1.seconds) {
+            lastUpdate.timePassedSince().formatCompact()
+        } else ""
 
         val newLines = mutableListOf(
-            "Coleweight: ${StringUtils.formatFloatOrPlaceholder(coleweightAmount)}",
-            "CW (Session): ${StringUtils.formatFloatOrPlaceholder(coleweightGained)}",
-            "CW/h: ${StringUtils.formatFloatOrPlaceholder(coleweightPerHour)}",
+            "Coleweight: ${StringUtils.formatFloat(coleweightAmount)}",
+            "CW (Session): ${StringUtils.formatFloat(coleweightGained)}",
+            "CW/h: ${StringUtils.formatFloat(coleweightPerHour)}",
             "Since Last: ${formatFloat(coleweightSinceLast)}"
         )
 

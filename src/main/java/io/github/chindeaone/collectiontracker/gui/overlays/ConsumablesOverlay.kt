@@ -5,7 +5,7 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.enableTempBuffTracker
 import io.github.chindeaone.collectiontracker.config.showTempBuffExpiredTitle
 import io.github.chindeaone.collectiontracker.config.tempBuffPosition
-import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatCompact
 import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser
 import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser.Consumables
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
@@ -53,21 +53,21 @@ class ConsumablesOverlay : AbstractOverlay() {
     }
 
     private fun processBuff(lines: MutableList<String>, buff: Consumables) {
-        val now = System.currentTimeMillis()
-        val expireTime = ConsumableParser.getEndTime(buff)
+        val expireTime = ConsumableParser.getEndTime(buff) ?: return
+        val isExpired = expireTime.isPassed
+        val isActive = !isExpired
 
-        val isActive = expireTime > now
         val wasActive = activeStates.getOrDefault(buff, false)
 
-        if (wasActive && !isActive && showTempBuffExpiredTitle) {
+        if (wasActive && isExpired && showTempBuffExpiredTitle) {
             showTitle(Component.literal("${buff.overlayName} §cExpired!"))
         }
 
         activeStates[buff] = isActive
 
         if (isActive) {
-            val diff = expireTime - now
-            val formattedTime = StringUtils.formatCompactTime(diff / 1000)
+            val remaining = expireTime.timeUntil()
+            val formattedTime = remaining.formatCompact()
 
             lines.add("${buff.overlayName} §e$formattedTime")
         }

@@ -1,52 +1,35 @@
 package io.github.chindeaone.collectiontracker.tracker.coleweight
 
 import io.github.chindeaone.collectiontracker.gui.overlays.ColeweightOverlay
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 
 object ColeweightTrackingRates {
-    var coleweightAmount = 0f
-    var coleweightGained = 0f
-    var coleweightPerHour = 0f
-    var coleweightSinceLast = 0f
-    var lastColeweightTime = -1L
+    var coleweightAmount: Float = 0f
+    var coleweightGained: Float = 0f
+    var coleweightPerHour: Float = 0f
+    var coleweightSinceLast: Float = 0f
+    var lastColeweightUpdate: EpochMark? = null
 
-    var afk = false
-
-    private var startColeweight = -1f
-    private var unchangedStreak = 0
-    private const val THRESHOLD = 2
+    private var startColeweight: Float = -1f
 
     fun calculateRates(currentValue: Float) {
         if (startColeweight == -1f) {
             startColeweight = currentValue
             coleweightAmount = currentValue
-            lastColeweightTime = System.currentTimeMillis()
+            lastColeweightUpdate = EpochMark.now()
         }
 
         coleweightSinceLast = currentValue - coleweightAmount
-        lastColeweightTime = System.currentTimeMillis()
-
-        if (currentValue == coleweightAmount && currentValue != 0f) {
-            unchangedStreak++
-            if (unchangedStreak >= THRESHOLD) {
-                afk = true
-                ColeweightTrackingHandler.stopTracking()
-                unchangedStreak = 0
-                return
-            }
-        } else {
-            unchangedStreak = 0
-            afk = false
-        }
+        lastColeweightUpdate = EpochMark.now()
 
         coleweightAmount = currentValue
 
         coleweightGained = currentValue - startColeweight
         val uptime = ColeweightTrackingHandler.uptimeInSeconds
+
         coleweightPerHour = if (uptime > 0) {
             (coleweightGained / (uptime / 3600.0)).toFloat()
-        } else {
-            0f
-        }
+        } else 0f
 
         if (!ColeweightOverlay.trackingDirty) ColeweightOverlay.trackingDirty = true
     }
@@ -56,9 +39,7 @@ object ColeweightTrackingRates {
         coleweightGained = 0f
         coleweightPerHour = 0f
         coleweightSinceLast = 0f
-        lastColeweightTime = -1L
+        lastColeweightUpdate = null
         startColeweight = -1f
-        unchangedStreak = 0
-        afk = false
     }
 }

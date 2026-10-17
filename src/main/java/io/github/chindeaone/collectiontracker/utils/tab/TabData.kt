@@ -13,6 +13,7 @@ import io.github.chindeaone.collectiontracker.config.enableMineshaftSpawnRoutes
 import io.github.chindeaone.collectiontracker.config.enableMiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.enableSkyMall
 import io.github.chindeaone.collectiontracker.config.farmingweightRankingInChat
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
@@ -25,7 +26,7 @@ object TabData {
 
     private var tabCache: List<String> = emptyList()
     private var world: ClientLevel? = null
-    var lastWorldSwitch: Long = 0L
+    var lastWorldSwitch: EpochMark? = null
 
     private val TAB_COMPARATOR = compareBy<PlayerInfo>(
         { it.team?.name ?: "" }, { it.profile.name }
@@ -46,7 +47,7 @@ object TabData {
             DeployableTracker.reset()
             WaypointsUtils.reset()
             StatsWidget.clearStats()
-            lastWorldSwitch = System.currentTimeMillis()
+            lastWorldSwitch = EpochMark.now()
         }
 
         if (!enableMiningStatsOverlay &&

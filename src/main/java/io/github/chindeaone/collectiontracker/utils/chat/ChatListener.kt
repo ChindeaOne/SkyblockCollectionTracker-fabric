@@ -31,6 +31,9 @@ import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 object ChatListener {
 
@@ -71,10 +74,10 @@ object ChatListener {
     val finalAxeCooldown: Double get() = axeCooldown.remainingSeconds
     val finalAxeDuration: Double get() = axeDuration.remainingSeconds
 
-    var maxCooldown = 0.0
-    var maxDuration = 0.0
-    var maxAxeCooldown = 0.0
-    var maxAxeDuration = 0.0
+    var maxCooldown: Duration = Duration.ZERO
+    var maxDuration: Duration = Duration.ZERO
+    var maxAxeCooldown: Duration = Duration.ZERO
+    var maxAxeDuration: Duration = Duration.ZERO
 
     fun onChatMessage(message: Component) {
         val text = message.string
@@ -171,12 +174,12 @@ object ChatListener {
     }
 
     private fun syncTimer(timer: AbilityState, time: Long) {
-        val currentRemainingMs = (timer.remainingSeconds * 1000).toLong()
-        val currentSeconds = currentRemainingMs / 1000
+        val currentRemaining = timer.remainingDuration
+        val currentSeconds = currentRemaining.inWholeSeconds
 
         if (currentSeconds != time) {
-            val millisOffset = currentRemainingMs % 1000
-            val newCooldown = (time * 1000) + millisOffset
+            val millisOffset = (currentRemaining.inWholeMilliseconds % 1000).milliseconds
+            val newCooldown = time.seconds + millisOffset
             timer.start(newCooldown)
         }
     }
@@ -204,15 +207,15 @@ object ChatListener {
             snap = snap,
             skyMallActive = isPickaxeAbility,
             abilityName = ability
-        )
+        ).seconds
 
-        val durationMs = (AbilityUtils.getBaseDuration(ability, abilityLevel, hasBlueCheese) * 1000).toLong()
+        val durationSec = AbilityUtils.getBaseDuration(ability, abilityLevel, hasBlueCheese).seconds
 
         maxCooldown = finalCooldownSec
-        maxDuration = durationMs / 1000.0
+        maxDuration = durationSec
 
-        pickaxeDuration.start(durationMs)
-        pickaxeCooldown.start((finalCooldownSec * 1000).toLong())
+        pickaxeDuration.start(durationSec)
+        pickaxeCooldown.start(finalCooldownSec)
 
         ConfigHelper.setAbilityName(ability)
     }
@@ -221,24 +224,19 @@ object ChatListener {
         val cotf = cotfLevel
         val abilityLevel = if (cotf >= 2) 2 else 1
 
-        val finalCooldownSec = AbilityUtils.getBaseAxeCooldown(ability, abilityLevel).toDouble()
-        val durationMs = (AbilityUtils.getBaseAxeDuration(ability, abilityLevel) * 1000).toLong()
+        val finalCooldownSec = AbilityUtils.getBaseAxeCooldown(ability, abilityLevel).seconds
+        val durationSec = AbilityUtils.getBaseAxeDuration(ability, abilityLevel).seconds
 
         maxAxeCooldown = finalCooldownSec
-        maxAxeDuration = durationMs / 1000.0
+        maxAxeDuration = durationSec
 
-        axeDuration.start(durationMs)
-        axeCooldown.start((finalCooldownSec * 1000).toLong())
+        axeDuration.start(durationSec)
+        axeCooldown.start(finalCooldownSec)
 
         ConfigHelper.setAxeAbilityName(ability)
     }
 
     fun dailyPerksUpdate(message: Component): Boolean {
-        val remaining = ScoreboardUtils.nextBuffTime - System.currentTimeMillis()
-        if ((remaining > 60_000L && remaining < 19 * 60_000L) && ScoreboardUtils.checkTime) {
-            return true
-        }
-
         val text = message.string.removeColor()
 
         when {

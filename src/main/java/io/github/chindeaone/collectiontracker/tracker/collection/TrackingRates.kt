@@ -11,6 +11,7 @@ import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getNextRankEntry
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPlayerRank
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getPreviousRankEntry
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import org.apache.logging.log4j.LogManager
@@ -29,7 +30,7 @@ object TrackingRates {
     @Volatile var collectionMade: Long = 0
     @Volatile var collectionSinceLast: Long = 0
     @Volatile var sessionStartCollection: Long = -1L
-    @Volatile var lastCollectionTime: Long = -1L
+    @Volatile var lastCollectionUpdate: EpochMark? = null
 
     // Sacks tracking data
     @Volatile var lastApiCollection: Long = -1L
@@ -68,14 +69,13 @@ object TrackingRates {
     @Volatile var isPreviousWiped: Boolean = false
 
     fun setCollection(value: Long) {
-        val now = System.currentTimeMillis()
         lastApiCollection = value
         if (sessionStartCollection == -1L) {
             sessionStartCollection = value
-            TrackingHandler.initTracking(now)
+            TrackingHandler.initTracking()
         }
         collectionAmount = value
-        lastCollectionTime = now
+        lastCollectionUpdate = EpochMark.now()
 
         updateValues(collectionAmount, 0)
     }
@@ -145,7 +145,7 @@ object TrackingRates {
             logger.info("[SCT]: Current collection for $collection (using sacks) is $currentCollection")
             logger.info("[SCT]: Change in collection detected (using sacks). Old collection: ${currentCollection - collectionSinceLastVal}. New collection: $currentCollection")
 
-            lastCollectionTime = System.currentTimeMillis()
+            lastCollectionUpdate = EpochMark.now()
             logger.info("[SCT]: Collection since last check is $collectionSinceLast.")
         }
 
@@ -184,7 +184,9 @@ object TrackingRates {
 
         // Trigger tracking overlay update
         if (!CollectionOverlay.trackingDirty) {
-            if (!isTrackingDataReady) sendMessage("§cWarning! Some maps have not been fully initialized. You have the option to restart the tracker or wait for the next collection update.", true)
+            if (!isTrackingDataReady) {
+                sendMessage("§cWarning! Some maps have not been fully initialized. You have the option to restart the tracker or wait for the next collection update.")
+            }
             CollectionOverlay.trackingDirty = true
         }
 

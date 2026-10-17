@@ -4,16 +4,18 @@ import io.github.chindeaone.collectiontracker.api.coleweight.ColeweightFetcher
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.gui.GuiManager
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
+import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.toCWRankComponent
 import net.minecraft.network.chat.Component
+import kotlin.time.Duration.Companion.minutes
 
 object ColeweightUtils {
 
-    private val playerCooldowns = mutableMapOf<String, Long>()
+    private val playerCooldowns = mutableMapOf<String, EpochMark>()
     private var lastPlayer: String? = null
-    private const val COOLDOWN_DURATION = 5 * 60 * 1000L // 5 minutes cd
+    private val COOLDOWN_DURATION = 5.minutes
 
     fun getColeweight(playerName: String = PlayerData.playerName, sendInChat: Boolean = true) {
         if (sendInChat) {
@@ -31,7 +33,7 @@ object ColeweightUtils {
 
                 ColeweightManager.updateColeweight(body, playerName)
 
-                playerCooldowns[playerName] = System.currentTimeMillis()
+                playerCooldowns[playerName] = EpochMark.now()
                 lastPlayer = playerName
 
                 if (sendInChat) {
@@ -47,8 +49,8 @@ object ColeweightUtils {
     }
 
     private fun isPlayerCached(name: String): Boolean {
-        val lastFetch = playerCooldowns[name] ?: 0L
-        return lastPlayer == name && (System.currentTimeMillis() - lastFetch < COOLDOWN_DURATION)
+        val lastFetch = playerCooldowns[name] ?: return false
+        return lastPlayer == name && lastFetch.timePassedSince() < COOLDOWN_DURATION
     }
 
     fun getColeweightLeaderboard(position: Int) {
