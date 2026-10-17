@@ -20,7 +20,7 @@ class MineshaftRoutes {
     @Expose
     @ConfigOption(
         name = "Mineshaft Routes",
-        desc = "Display ordered waypoints for the Mineshaft type you enter.\n§eNote: §5Crystal §fand §dJasper §fMineshaft supported only."
+        desc = "Display ordered waypoints for the Mineshaft type you enter.\n§eNote: §5Crystal§e, §dJasper §eand §7Tungsten §eMineshafts support only."
     )
     @ConfigEditorBoolean
     var enableMineshaftRoutes: Boolean = false
