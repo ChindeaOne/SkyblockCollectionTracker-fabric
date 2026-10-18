@@ -25,8 +25,8 @@ object ConfigMigrator {
             }
         }
 
-        config.getAsJsonObject("internal") ?: JsonObject().also { config.add("internal", it) }
-            .addProperty("configVersion", CURRENT_VERSION)
+        val internal = config.getAsJsonObject("internal") ?: JsonObject().also { config.add("internal", it) }
+        internal.addProperty("configVersion", CURRENT_VERSION)
 
         return oldVersion < CURRENT_VERSION
     }
