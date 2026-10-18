@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.config.abilityCooldownOnly
-import io.github.chindeaone.collectiontracker.config.abilityNameAxe
+import io.github.chindeaone.collectiontracker.config.axeAbilityName
 import io.github.chindeaone.collectiontracker.config.axeAbilityDisplayIndicator
 import io.github.chindeaone.collectiontracker.config.axeAbilityInForagingIslandsOnly
 import io.github.chindeaone.collectiontracker.config.axeAbilityPosition
@@ -11,8 +11,7 @@ import io.github.chindeaone.collectiontracker.config.displayAxeAbility
 import io.github.chindeaone.collectiontracker.config.showAxeExpiredAbilityTitle
 import io.github.chindeaone.collectiontracker.config.showAxeReadyAbilityTitle
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalCooldown
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalDuration
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderCooldownBar
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderCooldownCircle
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
@@ -62,18 +61,19 @@ class AxeAbilityOverlay : AbstractOverlay() {
             return
         }
 
-        val abilityName = abilityNameAxe
-        val cooldown = finalCooldown
-        val active = finalDuration
+        val ability = AbilityUtils.currentAxeAbility
+        val abilityName = ability?.abilityName ?: axeAbilityName
+        val cooldown = AbilityUtils.finalAxeCooldown
+        val duration = AbilityUtils.finalAxeDuration
 
         val displayName = abilityName.ifEmpty { "Unknown Ability" }
 
-        if (active > 0) {
+        if (duration > 0) {
             expiredTitleShown = false
             readyTitleShown = false
         }
 
-        if (active == 0.0) {
+        if (duration == 0.0) {
             if (showAxeExpiredAbilityTitle && !expiredTitleShown && cooldown > 0) {
                 val titleExpired = "§6[§3§kd§6] §b§l$displayName §cExpired! §6[§3§kd§6]" // Credit to Ninjune for Coleweight's formatting
                 showTitle(Component.literal(titleExpired))
@@ -92,7 +92,7 @@ class AxeAbilityOverlay : AbstractOverlay() {
         }
 
         val status = when {
-            !abilityCooldownOnly && active > 0 -> "§a" + StringUtils.formatTimeInSeconds(active)
+            !abilityCooldownOnly && duration > 0 -> "§a" + StringUtils.formatTimeInSeconds(duration)
             cooldown > 0 -> "§c" + StringUtils.formatTimeInSeconds(cooldown)
             else -> "§aReady!"
         }

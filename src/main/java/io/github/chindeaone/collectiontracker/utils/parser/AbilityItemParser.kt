@@ -1,45 +1,31 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
-import io.github.chindeaone.collectiontracker.utils.AbilityUtils
-import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 
 object AbilityItemParser {
 
     private val AXE_REGEX = Regex("\\baxe\\b")
     private val DRILL_REGEX = Regex("\\bdrill\\b")
-    private val PICKAXE_REGEX = Regex("\\bpickaxe\\b")
-    private val GAUNTLET_REGEX = Regex("\\bgauntlet\\b")
 
     fun parse(lines: List<String>): AbilityUtils.AbilitySnapshot? {
         var isAxe = false
         var hasBreakingPower = false
         var isDrill = false
-        var isPickaxe = false
-        var isGauntlet = false
 
         for (line in lines) {
-            if (!isAxe && AXE_REGEX.containsMatchIn(line)) isAxe = true
-            if (!hasBreakingPower && line.startsWith("breaking power")) hasBreakingPower = true
-            if (!isDrill && DRILL_REGEX.containsMatchIn(line)) isDrill = true
-            if (!isPickaxe && PICKAXE_REGEX.containsMatchIn(line)) isPickaxe = true
-            if (!isGauntlet && GAUNTLET_REGEX.containsMatchIn(line)) isGauntlet = true
+            if (AXE_REGEX.containsMatchIn(line)) isAxe = true
+            if (line.startsWith("breaking power")) hasBreakingPower = true
+            if (DRILL_REGEX.containsMatchIn(line)) isDrill = true
         }
 
         if (!isAxe && !hasBreakingPower) return null
 
-        val isMiningTool = isDrill || isPickaxe || isGauntlet
+        val abilityType = if (isAxe) AbilityUtils.AbilityType.AXE else AbilityUtils.AbilityType.PICKAXE
 
-        if (isAxe) {
-            return AbilityUtils.AxeAbilitySnapshot(
-                timestamp = EpochMark.now(),
-                hasAbility = true
-            )
-        }
+        var fuelTank: AbilityUtils.FuelTank? = null
+        var hasBlueCheese = false
 
-        if (isMiningTool) {
-            var fuelTank: AbilityUtils.FuelTank? = null
-            var hasBlueCheese = false
-
+        if (isDrill) {
             for (line in lines) {
                 if (fuelTank == null) {
                     when {
@@ -50,21 +36,18 @@ object AbilityItemParser {
                     }
                 }
 
-                if (!hasBlueCheese && line.contains("blue cheese goblin omelette part")) {
+                if (line.contains("blue cheese goblin omelette part")) {
                     hasBlueCheese = true
                 }
 
                 if (fuelTank != null && hasBlueCheese) break
             }
-
-            return AbilityUtils.PickaxeAbilitySnapshot(
-                timestamp = EpochMark.now(),
-                isDrill = isDrill,
-                hasAbility = true,
-                fuelTank = fuelTank,
-                hasBlueCheesePart = isDrill && hasBlueCheese
-            )
         }
-        return null
+
+        return AbilityUtils.AbilitySnapshot(
+            abilityType = abilityType,
+            fuelTank = if (abilityType == AbilityUtils.AbilityType.PICKAXE) fuelTank else null,
+            hasBlueCheesePart = hasBlueCheese
+        )
     }
 }

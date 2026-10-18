@@ -10,11 +10,12 @@ import io.github.chindeaone.collectiontracker.utils.ConfigStateUtils
 import io.github.chindeaone.collectiontracker.utils.Hypixel
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.chat.TimeNotifierUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.inventory.ItemUseUtils
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
-import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
+import io.github.chindeaone.collectiontracker.utils.parser.container.ContainerParser
 import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
@@ -160,6 +161,7 @@ object ModLoader: ModInitializer {
             MiningStatsParser.onClientTick()
             ForagingStatsParser.onClientTick()
             TimeNotifierUtils.onClientTick()
+            AbilityUtils.onClientTick(client)
         }
     }
 }

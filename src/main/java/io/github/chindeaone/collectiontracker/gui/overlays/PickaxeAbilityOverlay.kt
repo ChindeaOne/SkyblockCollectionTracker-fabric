@@ -1,7 +1,8 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
+import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.abilityCooldownOnly
-import io.github.chindeaone.collectiontracker.config.abilityName
+import io.github.chindeaone.collectiontracker.config.pickaxeAbilityName
 import io.github.chindeaone.collectiontracker.config.categories.Misc
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.displayPickaxeAbility
@@ -11,8 +12,7 @@ import io.github.chindeaone.collectiontracker.config.pickaxeAbilityPosition
 import io.github.chindeaone.collectiontracker.config.showPickaxeExpiredAbilityTitle
 import io.github.chindeaone.collectiontracker.config.showPickaxeReadyAbilityTitle
 import io.github.chindeaone.collectiontracker.utils.StringUtils
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalCooldown
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.finalDuration
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderCooldownBar
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderCooldownCircle
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.showTitle
@@ -62,18 +62,21 @@ class PickaxeAbilityOverlay : AbstractOverlay() {
             return
         }
 
-        val abilityName = abilityName
-        val cooldown = finalCooldown
-        val active = finalDuration
+        if (ModLoader.clientTicks % 2L != 0L) return
+
+        val ability = AbilityUtils.currentPickaxeAbility
+        val abilityName = ability?.abilityName ?: pickaxeAbilityName
+        val cooldown = AbilityUtils.finalPickaxeCooldown
+        val duration = AbilityUtils.finalPickaxeDuration
 
         val displayName = abilityName.ifEmpty { "Unknown Ability" }
 
-        if (active > 0) {
+        if (duration > 0) {
             expiredTitleShown = false
             readyTitleShown = false
         }
 
-        if (active == 0.0) {
+        if (duration == 0.0) {
             if (showPickaxeExpiredAbilityTitle && !expiredTitleShown && cooldown > 0 && (displayName != "Pickobulus")) {
                 val titleExpired = "§6[§3§kd§6] §b§l$displayName §cExpired! §6[§3§kd§6]" // Credit to Ninjune for Coleweight's formatting
                 showTitle(Component.literal(titleExpired))
@@ -91,7 +94,7 @@ class PickaxeAbilityOverlay : AbstractOverlay() {
         }
 
         val status = when {
-            !abilityCooldownOnly && active > 0 -> "§a" + StringUtils.formatTimeInSeconds(active)
+            !abilityCooldownOnly && duration > 0 -> "§a" + StringUtils.formatTimeInSeconds(duration)
             cooldown > 0 -> "§c" + StringUtils.formatTimeInSeconds(cooldown)
             else -> "§aReady!"
         }

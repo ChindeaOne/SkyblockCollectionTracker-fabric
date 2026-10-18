@@ -1,6 +1,6 @@
 package io.github.chindeaone.collectiontracker.utils.inventory
 
-import io.github.chindeaone.collectiontracker.utils.AbilityUtils
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser
 import net.minecraft.world.InteractionHand
@@ -18,7 +18,7 @@ object ItemUseUtils {
         val tooltipLines = ItemUtils.getTooltipLines(stack, player, normalize = true)
         
         AbilityItemParser.parse(tooltipLines)?.let { snap ->
-            AbilityUtils.update(snap)
+            AbilityUtils.onItemUse(snap)
             return InteractionResult.PASS
         }
 

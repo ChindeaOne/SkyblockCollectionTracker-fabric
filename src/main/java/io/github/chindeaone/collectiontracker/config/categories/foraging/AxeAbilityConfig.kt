@@ -54,5 +54,5 @@ class AxeAbilityConfig {
     var axeAbilityPosition: Position = Position(500, 200)
 
     @Expose
-    var abilityNameAxe: String = ""
+    var abilityName: String = ""
 }

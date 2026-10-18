@@ -13,7 +13,7 @@ import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.fromNow
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils.font
 import io.github.chindeaone.collectiontracker.utils.RepoUtils
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import kotlin.math.abs
@@ -278,17 +278,17 @@ object RenderUtils {
 
     private fun getAbilityTimes(ability: String) = when (ability) {
         "axe" -> AbilityTimes(
-            ChatListener.finalAxeCooldown,
-            ChatListener.finalAxeDuration,
-            ChatListener.maxAxeCooldown.toDouble(DurationUnit.SECONDS),
-            ChatListener.maxAxeDuration.toDouble(DurationUnit.SECONDS)
+            AbilityUtils.finalAxeCooldown,
+            AbilityUtils.finalAxeDuration,
+            AbilityUtils.maxAxeCooldown.toDouble(DurationUnit.SECONDS),
+            AbilityUtils.maxAxeDuration.toDouble(DurationUnit.SECONDS)
         )
 
         "pickaxe" -> AbilityTimes(
-            ChatListener.finalCooldown,
-            ChatListener.finalDuration,
-            ChatListener.maxCooldown.toDouble(DurationUnit.SECONDS),
-            ChatListener.maxDuration.toDouble(DurationUnit.SECONDS)
+            AbilityUtils.finalPickaxeCooldown,
+            AbilityUtils.finalPickaxeDuration,
+            AbilityUtils.maxPickaxeCooldown.toDouble(DurationUnit.SECONDS),
+            AbilityUtils.maxPickaxeDuration.toDouble(DurationUnit.SECONDS)
         )
 
         else -> AbilityTimes(0.0, 0.0, 0.0, 0.0)

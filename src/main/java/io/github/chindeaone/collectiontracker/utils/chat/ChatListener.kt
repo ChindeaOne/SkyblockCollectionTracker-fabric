@@ -3,11 +3,11 @@ package io.github.chindeaone.collectiontracker.utils.chat
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
+import io.github.chindeaone.collectiontracker.config.pickaxeAbilityName
 import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.config.attributeLevel
+import io.github.chindeaone.collectiontracker.config.axeAbilityName
 import io.github.chindeaone.collectiontracker.config.coleweightRankingInChat
-import io.github.chindeaone.collectiontracker.config.cotfLevel
-import io.github.chindeaone.collectiontracker.config.cotmLevel
 import io.github.chindeaone.collectiontracker.config.disableBeekeeperChatMessages
 import io.github.chindeaone.collectiontracker.config.disableLotteryChatMessages
 import io.github.chindeaone.collectiontracker.config.disableSkyMallChatMessages
@@ -26,14 +26,14 @@ import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.*
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.utils.ability.Ability
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils.isPickaxeAbility
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 object ChatListener {
 
@@ -41,9 +41,9 @@ object ChatListener {
         // Skyhanni's skill pattern
         SKILL("""\+(?<gains>[\d,.]+)\s+(?<skillName>.+?)\s*\((?<current>[\d,]+)\s*/\s*(?<needed>[\d,]+)\)""", RegexOption.IGNORE_CASE),
         // Coleweight pattern
-        ABILITY("""^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!""", RegexOption.IGNORE_CASE),
         CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? ?Ability""", RegexOption.IGNORE_CASE),
         ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
+        EXPIRED_ABILITY("""^Your (.+?) has expired!""", RegexOption.IGNORE_CASE),
         ATTRIBUTE("""^ATTRIBUTE\s+LEVEL\s+UP\s+Pickaxe\s+Cooldown.*?([\d]+|[IVX]+)\b$""", RegexOption.IGNORE_CASE),
         COMMISSION("""^(.+?)\s+Commission Complete!.*$""", RegexOption.IGNORE_CASE);
         val regex: Regex = Regex(pattern, options.toSet())
@@ -54,42 +54,26 @@ object ChatListener {
     var lastSkillValue = 0L
 
     var currentSkyMallBuff = "§cUnknown"
-    var isPickaxeAbility = false
     var currentLotteryBuff = "§cUnknown"
     var currentBeekeeperBuff = "§cUnknown"
-
-    var abilityName: String? = null
 
     private var expectingSkyMallBuff = false
     private var expectingLotteryBuff = false
     private var expectingBeekeeper = false
-
-    private val pickaxeDuration = AbilityState()
-    private val pickaxeCooldown = AbilityState()
-    private val axeDuration = AbilityState()
-    private val axeCooldown = AbilityState()
-
-    val finalCooldown: Double get() = pickaxeCooldown.remainingSeconds
-    val finalDuration: Double get() = pickaxeDuration.remainingSeconds
-    val finalAxeCooldown: Double get() = axeCooldown.remainingSeconds
-    val finalAxeDuration: Double get() = axeDuration.remainingSeconds
-
-    var maxCooldown: Duration = Duration.ZERO
-    var maxDuration: Duration = Duration.ZERO
-    var maxAxeCooldown: Duration = Duration.ZERO
-    var maxAxeDuration: Duration = Duration.ZERO
 
     fun onChatMessage(message: Component) {
         val text = message.string
         val cleanText = text.removeColor()
 
         if (cleanText.contains("ATTRIBUTE")) setCooldownAttribute(cleanText)
-        if (cleanText.contains("used your")) abilityListener(cleanText)
         if (cleanText.contains("on cooldown")) onCooldownListener(cleanText)
+        // fallback methods
+        if (cleanText.contains("is now available")) onReadyAbilityListener(cleanText)
+        if (cleanText.contains("has expired!")) onExpiredAbilityListener(cleanText)
         if (cleanText.contains("You selected")) abilitySwapListener(cleanText)
+
         if (cleanText.contains("You have reset")) treeResetListener(cleanText)
         if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
-        if (cleanText.startsWith("You equipped")) onLoadoutChange()
         sacksListener(message)
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
@@ -140,23 +124,37 @@ object ChatListener {
         else -> toIntOrNull() ?: 0
     }
 
-    private fun abilityListener(text: String) {
-        val match = Patterns.ABILITY.find(text) ?: return
+    @Deprecated("Change to container detection")
+    private fun abilitySwapListener(text: String) {
+        val match = Patterns.CHANGE_ABILITY.find(text) ?: return
         val abilityName = match.groupValues[1].trim()
-        this.abilityName = abilityName
         val toolType = match.groupValues[2].lowercase()
 
-        if (toolType == "axe") {
-            val axeSnap = AbilityUtils.recentOrNullAxe()
-            if (axeSnap != null && axeSnap.hasAbility) {
-                startAxeAbilityTimeline(abilityName)
+        when (toolType) {
+            "axe" -> {
+                AbilityUtils.currentAxeAbility = Ability.fromName(abilityName)
+                ConfigHelper.setAxeAbilityName(abilityName)
             }
-        } else {
-            val pickSnap = AbilityUtils.recentOrNull()
-            if (pickSnap != null && pickSnap.hasAbility) {
-                startAbilityTimeline(abilityName, pickSnap)
+            "pickaxe" -> {
+                AbilityUtils.currentPickaxeAbility = Ability.fromName(abilityName)
+                ConfigHelper.setPickaxeAbilityName(abilityName)
             }
         }
+    }
+
+    private fun onExpiredAbilityListener(text: String) {
+        val match = Patterns.EXPIRED_ABILITY.find(text) ?: return
+        val abilityName = match.groupValues[1].trim()
+        val ability = Ability.fromName(abilityName) ?: return
+
+        AbilityUtils.updateAbilityFromName(ability, abilityName)
+    }
+
+    private fun onReadyAbilityListener(text: String) {
+        val abilityName = text.substringBefore("is now available").trim()
+        val ability = Ability.fromName(abilityName) ?: return
+
+        AbilityUtils.updateAbilityFromName(ability, abilityName)
     }
 
     private fun onCooldownListener(text: String) {
@@ -166,74 +164,13 @@ object ChatListener {
         val type = match.groupValues[1].trim()
         val time = match.groupValues[2].toLongOrNull() ?: return
 
-        if (type == "Pickaxe" && abilityName != "Pickobulus") {
-            syncTimer(pickaxeCooldown, time)
-        } else if (type == "Axe") {
-            syncTimer(axeCooldown, time)
-        }
-    }
-
-    private fun syncTimer(timer: AbilityState, time: Long) {
-        val currentRemaining = timer.remainingDuration
-        val currentSeconds = currentRemaining.inWholeSeconds
-
-        if (currentSeconds != time) {
-            val millisOffset = (currentRemaining.inWholeMilliseconds % 1000).milliseconds
-            val newCooldown = time.seconds + millisOffset
-            timer.start(newCooldown)
-        }
-    }
-
-    private fun abilitySwapListener(text: String) {
-        val match = Patterns.CHANGE_ABILITY.find(text) ?: return
-        val abilityName = match.groupValues[1].trim()
-        val toolType = match.groupValues[2].lowercase()
-
-        if (toolType == "axe") {
-            ConfigHelper.setAxeAbilityName(abilityName)
+        val activeName = if (type.equals("axe", ignoreCase = true)) {
+            AbilityUtils.currentAxeAbility?.abilityName ?: axeAbilityName
         } else {
-            ConfigHelper.setAbilityName(abilityName)
+            AbilityUtils.currentPickaxeAbility?.abilityName ?: pickaxeAbilityName
         }
-    }
 
-    private fun startAbilityTimeline(ability: String, snap: AbilityUtils.PickaxeAbilitySnapshot?) {
-        val cotm = cotmLevel
-        val abilityLevel = if (cotm >= 2) 2 else 1
-        val hasBlueCheese = snap?.hasBlueCheesePart == true
-
-        val baseCooldown = AbilityUtils.getBaseCooldown(ability, abilityLevel, hasBlueCheese)
-        val finalCooldownSec = AbilityUtils.calculateReduction(
-            baseCooldown = baseCooldown,
-            snap = snap,
-            skyMallActive = isPickaxeAbility,
-            abilityName = ability
-        ).seconds
-
-        val durationSec = AbilityUtils.getBaseDuration(ability, abilityLevel, hasBlueCheese).seconds
-
-        maxCooldown = finalCooldownSec
-        maxDuration = durationSec
-
-        pickaxeDuration.start(durationSec)
-        pickaxeCooldown.start(finalCooldownSec)
-
-        ConfigHelper.setAbilityName(ability)
-    }
-
-    private fun startAxeAbilityTimeline(ability: String) {
-        val cotf = cotfLevel
-        val abilityLevel = if (cotf >= 2) 2 else 1
-
-        val finalCooldownSec = AbilityUtils.getBaseAxeCooldown(ability, abilityLevel).seconds
-        val durationSec = AbilityUtils.getBaseAxeDuration(ability, abilityLevel).seconds
-
-        maxAxeCooldown = finalCooldownSec
-        maxAxeDuration = durationSec
-
-        axeDuration.start(durationSec)
-        axeCooldown.start(finalCooldownSec)
-
-        ConfigHelper.setAxeAbilityName(ability)
+        AbilityUtils.syncCooldown(type, activeName, time)
     }
 
     fun dailyPerksUpdate(message: Component): Boolean {
@@ -330,16 +267,6 @@ object ChatListener {
         val commissionName = match.groupValues[1].trim()
 
         CommissionWidget.completeCollectorCommission(commissionName)
-    }
-
-    private fun onLoadoutChange() {
-        currentSkyMallBuff = "§cUnknown"
-        currentLotteryBuff = "§cUnknown"
-        currentBeekeeperBuff = "§cUnknown"
-        ConfigHelper.setLastSkyMallBuff(currentSkyMallBuff)
-        ConfigHelper.setLastLotteryBuff(currentLotteryBuff)
-        ConfigHelper.setLastBeekeeperBuff(currentBeekeeperBuff)
-        isPickaxeAbility = false
     }
 
     fun coleweightHandle(message: Component): Component {
@@ -477,10 +404,5 @@ object ChatListener {
             SkillTrackingHandler.onSkillGain(current, skillName)
             lastSkillValue = current
         }
-    }
-
-    fun resetPickaxeAbilities() {
-        pickaxeDuration.reset()
-        pickaxeCooldown.reset()
     }
 }

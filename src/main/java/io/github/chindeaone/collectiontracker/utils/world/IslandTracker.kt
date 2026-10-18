@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 
 import io.github.chindeaone.collectiontracker.utils.tab.TabWidget
 
@@ -77,7 +77,7 @@ object IslandTracker {
     private fun onMineshaftEnter() {
         if (currentMiningIsland == "Mineshaft") {
             if (!wasReset) {
-                ChatListener.resetPickaxeAbilities()
+                AbilityUtils.resetPickaxeAbilities()
                 wasReset = true
             }
         } else {

@@ -17,8 +17,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonParser
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.migration.ConfigMigrator
+import io.github.chindeaone.collectiontracker.utils.ConfigUtils
 import io.github.chindeaone.collectiontracker.utils.HypixelUtils
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
@@ -179,25 +179,9 @@ class ConfigManager {
     }
 
     fun loadFromConfig() {
-        val lastSkyMallBuff = lastSkyMallBuff
-        val lastLotteryBuff = lastLotteryBuff
-        val lastBeekeeperBuff = lastBeekeeperBuff
-
-        if (lastSkyMallBuff.isNotBlank()) {
-            ChatListener.currentSkyMallBuff = lastSkyMallBuff
-            if (lastSkyMallBuff.contains("Pickaxe")) ChatListener.isPickaxeAbility = true
-            logger.info("[SCT]: Loaded last SkyMall buff from config: {}", lastSkyMallBuff)
-        }
-        if (lastLotteryBuff.isNotBlank()) {
-            ChatListener.currentLotteryBuff = lastLotteryBuff
-            logger.info("[SCT]: Loaded last Lottery buff from config: {}", lastLotteryBuff)
-        }
-        if (lastBeekeeperBuff.isNotBlank()) {
-            ChatListener.currentBeekeeperBuff = lastBeekeeperBuff
-            logger.info("[SCT]: Loaded last Beekeeper buff from config: {}", lastBeekeeperBuff)
-        }
-
-        ConsumableParser.loadConsumableDurations()
+        ConfigUtils.loadRotatingHotxPerks()
+        ConfigUtils.loadConsumableDurations()
+        ConfigUtils.loadAbilities()
     }
 
     @Synchronized

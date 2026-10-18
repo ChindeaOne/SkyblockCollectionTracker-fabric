@@ -103,7 +103,7 @@ val consumableConfig: ConsumableConfig get() = miningConfig.consumableConfig
 val cotmLevel: Int get() = hotmConfig.cotmLevel
 val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
 val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = hotmConfig.pickaxeAbilityConfig.indicator
-val abilityName: String get() = pickaxeAbilityConfig.abilityName
+val pickaxeAbilityName: String get() = pickaxeAbilityConfig.abilityName
 val attributeLevel: Int get() = pickaxeAbilityConfig.attributeLevel
 val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
 val lastSkyMallBuff: String get() = skyMallConfig.lastSkyMallBuff
@@ -160,7 +160,7 @@ val showDetailedForagingFortune: Boolean get() = foragingStatsConfig.showDetaile
 val hotfConfig: HotfConfig get() = foragingConfig.hotfConfig
 val axeAbilityConfig: AxeAbilityConfig get() = hotfConfig.axeAbilityConfig
 val cotfLevel: Int get() = hotfConfig.cotfLevel
-val abilityNameAxe: String get() = axeAbilityConfig.abilityNameAxe
+val axeAbilityName: String get() = axeAbilityConfig.abilityName
 val displayAxeAbility: Boolean get() = axeAbilityConfig.displayAxeAbility
 val axeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = axeAbilityConfig.indicator
 val lotteryConfig: LotteryConfig get() = hotfConfig.lotteryConfig
@@ -236,7 +236,7 @@ val skillMilestonesSoundNotification: Boolean get() = skillMilestonesConfig.skil
 // Misc Config Accessors
 val miscConfig: Misc get() = modConfig.misc
 val precision: Int get() = miscConfig.abilityPrecision
-val titleDisplayTimer: Long get() = miscConfig.titleDisplayTimer * 1000L
+val titleDisplayTimer: Int get() = miscConfig.titleDisplayTimer
 val titleScale: Misc.TitleScale get() = miscConfig.titleScale
 val abilityCooldownOnly: Boolean get() = miscConfig.abilityCooldownOnly
 val serverLagProtection: Boolean get() = miscConfig.serverLagProtection
@@ -307,8 +307,10 @@ object ConfigHelper {
         leaderboardOverlay.skillLeaderboard = false
     }
 
-    fun setAbilityName(name: String) {
-        pickaxeAbilityConfig.abilityName = name
+    fun setPickaxeAbilityName(name: String) {
+        if (pickaxeAbilityConfig.abilityName != name) {
+            pickaxeAbilityConfig.abilityName = name
+        }
     }
 
     fun setAttributeLevel(level: Int) {
@@ -555,7 +557,9 @@ object ConfigHelper {
     }
 
     fun setAxeAbilityName(name: String) {
-        axeAbilityConfig.abilityNameAxe = name
+        if (axeAbilityConfig.abilityName != name) {
+            axeAbilityConfig.abilityName = name
+        }
     }
 
     fun setConsumableDuration(buff: Consumables, duration: Long) {
