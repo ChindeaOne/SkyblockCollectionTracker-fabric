@@ -57,6 +57,6 @@ abstract class AbstractRotatingPerksOverlay: AbstractOverlay() {
             return "§aTime left: §cSoon"
         }
 
-        return "§aTime left: ${timeLeft.formatClock()}"
+        return "§aTime left: §e${timeLeft.formatClock()}"
     }
 }
