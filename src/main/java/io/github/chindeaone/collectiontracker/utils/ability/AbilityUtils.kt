@@ -7,6 +7,7 @@ import io.github.chindeaone.collectiontracker.config.attributeLevel
 import io.github.chindeaone.collectiontracker.config.axeAbilityName
 import io.github.chindeaone.collectiontracker.config.cotfLevel
 import io.github.chindeaone.collectiontracker.config.cotmLevel
+import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
 import io.github.chindeaone.collectiontracker.utils.inventory.ItemUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
@@ -54,9 +55,6 @@ object AbilityUtils {
     val maxAxeCooldown: Duration get() = axeState.maxCooldown
     val maxAxeDuration: Duration get() = axeState.maxDuration
 
-    var isMayhemCooldown: Boolean = false // TODO: Move this under Hotm and rename later
-    var isPickaxeAbility: Boolean = false // TODO: Move this under Sky Mall, and rename
-
     private var lastTooltips: List<String> = emptyList()
 
     fun getPickaxeEffectiveLevel(cotmLevel: Int, hasBlegg: Boolean): Int {
@@ -70,9 +68,7 @@ object AbilityUtils {
 
     fun calculatePickaxeAbilityReduction(
         baseCooldown: Duration,
-        snap: AbilitySnapshot?,
-        skyMallActive: Boolean,
-        ability: Ability
+        snap: AbilitySnapshot?
     ): Duration {
         var multiplier = 1.0
 
@@ -86,12 +82,12 @@ object AbilityUtils {
         }
 
         // Sky Mall
-        if (skyMallActive && MiningMapping.miningIslands.contains(IslandTracker.currentMiningIsland)) {
-            multiplier *= if (ability == Ability.PICKOBULUS) 0.765 else 0.8 // apparently it's more for pickobulus
+        if (HotmData.isSkyMallCooldown && MiningMapping.miningIslands.contains(IslandTracker.currentMiningIsland)) {
+            multiplier *= 0.8 // apparently it's more for pickobulus
         }
 
         // Mayhem cooldown reduction
-        if (IslandTracker.currentMiningIsland == "Mineshaft" && isMayhemCooldown) {
+        if (IslandTracker.currentMiningIsland == "Mineshaft" && HotmData.isMayhemCooldown) {
             multiplier *= 0.75
         }
 
@@ -119,7 +115,7 @@ object AbilityUtils {
 
         val parsedSnap = AbilityItemParser.parse(tooltips)
 
-        if (parsedSnap is AbilitySnapshot && pickaxeState.isReady) {
+        if (parsedSnap is AbilitySnapshot && pickaxeState.isActive) {
             val hasBlegg = parsedSnap.hasBlueCheesePart
             val effectiveLevel = getPickaxeEffectiveLevel(cotmLevel, hasBlegg)
 
@@ -153,8 +149,6 @@ object AbilityUtils {
         val finalCooldown = calculatePickaxeAbilityReduction(
             baseCooldown = baseCooldown,
             snap = snap,
-            skyMallActive = isPickaxeAbility,
-            ability = ability
         )
         val duration = ability.getDuration(effectiveLevel)
 
