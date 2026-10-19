@@ -101,9 +101,9 @@ object ScoreboardUtils {
                 if (!updated) {
                     nextBuffTime = 20.minutes.fromNow()
                     updated = true
-                } else {
-                    updated = false
                 }
+            } else {
+                updated = false
             }
         }
     }
