@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class LeaderboardConfig {
     @ConfigOption(
         name = "§eLeaderboard Info",
-        desc = "Show your collection or skill rank §7(if eligible), next player and their collection/skill xp, eta until you pass them and progress to the next rank"
+        desc = "Show your collection or skill rank §7(if eligible)§f, next player and their collection/skill xp, eta until you pass them and progress to the next rank"
     )
     @ConfigEditorInfoText
     var info: Boolean = true
