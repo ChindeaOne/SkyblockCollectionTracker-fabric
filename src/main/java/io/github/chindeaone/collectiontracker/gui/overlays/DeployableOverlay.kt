@@ -43,13 +43,12 @@ class DeployableOverlay : AbstractOverlay() {
         }
 
         val expiryTime = deployable.expiryTime ?: return
-        val timeLeft = expiryTime.timeUntil()
 
         cachedLines = listOf(
-            if (timeLeft.inWholeSeconds < 5) {
+            if (expiryTime.isSoon) {
                 "${deployable.displayName} §cSoon!"
             } else {
-                "${deployable.displayName} §e${timeLeft.formatCompact()}"
+                "${deployable.displayName} §e${expiryTime.timeUntil().formatCompact()}"
             }
         )
     }

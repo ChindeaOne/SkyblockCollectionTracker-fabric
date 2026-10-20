@@ -5,6 +5,7 @@ package io.github.chindeaone.collectiontracker.utils
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @JvmInline
 value class EpochMark(val millis: Long): Comparable<EpochMark> {
@@ -20,6 +21,7 @@ value class EpochMark(val millis: Long): Comparable<EpochMark> {
 
     val isPassed: Boolean get() = millis <= nowMillis()
     val isInFuture: Boolean get() = millis > nowMillis()
+    val isSoon: Boolean get() = timeUntil() <= 5.seconds
 
     val keepPositive: Duration get() = timeUntil().coerceAtLeast(Duration.ZERO)
 
