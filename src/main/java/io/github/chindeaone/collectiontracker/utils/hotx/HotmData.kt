@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.Pick
 import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.ProfessionalState
 import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.SkyMallState
 import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.StrongArmState
+import io.github.chindeaone.collectiontracker.config.compactMayhem
 import io.github.chindeaone.collectiontracker.config.cotmLevel
 import io.github.chindeaone.collectiontracker.config.currentHotmLoadout
 import io.github.chindeaone.collectiontracker.config.currentHotmLoadoutName
@@ -18,7 +19,6 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 
-// TODO: Make mayhem as a config option
 object HotmData {
     val selectedLoadout: HotmLoadout get() = currentHotmLoadout
     val loadoutName: String get() = currentHotmLoadoutName
@@ -187,6 +187,16 @@ object HotmData {
         if (!text.startsWith("MAYHEM!")) return true
 
         isMayhemCooldown = text.contains("Your Pickaxe Ability cooldown was reduced from your Mineshaft Mayhem perk!")
+
+        if (!compactMayhem) return true
+
+        val buffMessage = text.removePrefix("MAYHEM!").trim()
+        val formattedBuff = MineshaftMayhemBuff.formatMayhemBuff(buffMessage)
+
+        if (formattedBuff != null) {
+            ChatUtils.sendMessage("§bMineshaft Mayhem§r: $formattedBuff")
+            return false
+        }
 
         return true
     }

@@ -139,7 +139,7 @@ val currentHotmLoadout: HotmLoadout
         HotmLoadout()
     }
 val cotmLevel: Int get() = hotmConfig.cotmLevel
-
+val compactMayhem: Boolean get() = hotmConfig.compactMayhem
 val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
 val displayPickaxeAbility: Boolean get() = pickaxeAbilityConfig.displayPickaxeAbility
 val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = pickaxeAbilityConfig.indicator

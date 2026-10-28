@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.config.categories.mining.hotm
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HotmConfig {
@@ -20,6 +21,14 @@ class HotmConfig {
 
     @Expose
     var cotmLevel: Int = 0
+
+    @Expose
+    @ConfigOption(
+        name = "Compact Mayhem buff",
+        desc = "Compact chat messages from Mineshaft Mayhem perk when entering a Mineshaft."
+    )
+    @ConfigEditorBoolean
+    var compactMayhem: Boolean = false
 
     @Expose
     @ConfigOption(name = "Pickaxe Ability Config", desc = "")

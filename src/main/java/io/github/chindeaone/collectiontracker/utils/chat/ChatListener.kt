@@ -20,7 +20,6 @@ import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.hotx.HotfData
 import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
-import io.github.chindeaone.collectiontracker.utils.hotx.HotmData.isMayhemCooldown
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
@@ -63,7 +62,6 @@ object ChatListener {
         sacksListener(message)
 
         if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
-        // TODO: Add mayhem perk detection; regex: MAYHEM! You received a  Mining Speed buff from your Mineshaft Mayhem perk!
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
             TrackingHandler.pauseRiftTracking()
