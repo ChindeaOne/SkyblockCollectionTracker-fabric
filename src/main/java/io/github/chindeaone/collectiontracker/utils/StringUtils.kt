@@ -113,6 +113,20 @@ object StringUtils {
 
     fun formatNumber(value: Long): String = if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
 
+    fun String.toLevel(): Int = when (uppercase()) {
+        "I" -> 1
+        "II" -> 2
+        "III" -> 3
+        "IV" -> 4
+        "V" -> 5
+        "VI" -> 6
+        "VII" -> 7
+        "VIII" -> 8
+        "IX" -> 9
+        "X" -> 10
+        else -> toIntOrNull() ?: 0
+    }
+
     // Method taken from Skyhanni
     fun CharSequence.removeColor(keepFormatting: Boolean = false): String {
         // Glossary:

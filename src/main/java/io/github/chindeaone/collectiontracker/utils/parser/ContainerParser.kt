@@ -35,7 +35,7 @@ object ContainerParser {
     private var currentScreenType: ScreenType? = null
     private var currentScreen: AbstractContainerScreen<*>? = null
 
-    fun onScreenChanged(screen: Screen?) {
+    fun onScreenChanged(screen: Screen) {
         currentCommissionScreen = null
         detachListener()
 

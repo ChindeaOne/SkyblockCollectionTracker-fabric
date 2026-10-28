@@ -67,11 +67,14 @@ object ModLoader: ModInitializer {
         }
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
-        ClientReceiveMessageEvents.GAME.register { message, _ ->
+
+        ClientReceiveMessageEvents.GAME.register { message, actionBar ->
             if (!HypixelUtils.isInSkyblock) return@register
+            if (actionBar) return@register
 
             ChatListener.onChatMessage(message)
         }
+
         ClientReceiveMessageEvents.ALLOW_GAME.register { component, actionBar ->
             if (!HypixelUtils.isInSkyblock) return@register true
             if (actionBar) return@register true
@@ -87,6 +90,7 @@ object ModLoader: ModInitializer {
                 ChatListener.coleweightHandle(message)
             )
         }
+
         ClientReceiveMessageEvents.GAME_CANCELED.register { message, actionBar ->
             if (!HypixelUtils.isInSkyblock) return@register
             if (actionBar) return@register

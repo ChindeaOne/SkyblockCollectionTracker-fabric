@@ -17,6 +17,7 @@ import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.utils.StringUtils.toLevel
 import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.hotx.HotfData
 import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
@@ -47,21 +48,20 @@ object ChatListener {
 
     fun onChatMessage(message: Component) {
         val text = message.string
-        val cleanText = text.removeColor()
 
-        if (cleanText.contains("ATTRIBUTE")) setCooldownAttribute(cleanText)
+        if (text.contains("ATTRIBUTE LEVEL UP")) setCooldownAttribute(text)
 
         // fallback methods
-        if (cleanText.contains("is now available")) onReadyAbility(cleanText)
-        if (cleanText.contains("on cooldown")) onCooldownAbility(cleanText)
-        if (cleanText.contains("has expired!")) onExpiredAbility(cleanText)
-        if (cleanText.contains("You used your")) onUsedAbility(cleanText)
-        if (cleanText.contains("You selected")) onChangedAbility(cleanText)
+        if (text.contains("is now available")) onReadyAbility(text)
+        if (text.contains("on cooldown")) onCooldownAbility(text)
+        if (text.contains("has expired!")) onExpiredAbility(text)
+        if (text.contains("You used your")) onUsedAbility(text)
+        if (text.contains("You selected")) onChangedAbility(text)
 
-        treeResetListener(cleanText)
+        treeResetListener(text)
         sacksListener(message)
 
-        if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
+        if (text.contains("Commission Complete")) commissionListener(text)
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
             TrackingHandler.pauseRiftTracking()
@@ -91,24 +91,12 @@ object ChatListener {
     private fun setCooldownAttribute(text: String) {
         if (attributeLevel == 10) return
 
-        val value = Patterns.ATTRIBUTE.find(text.trimStart())?.groupValues?.get(1)
+        val cleanText = text.removeColor().trimStart()
+
+        val value = Patterns.ATTRIBUTE.find(cleanText)?.groupValues?.get(1)
         if (value != null) {
             ConfigHelper.setAttributeLevel(value.toLevel())
         }
-    }
-
-    private fun String.toLevel(): Int = when (uppercase()) {
-        "I" -> 1
-        "II" -> 2
-        "III" -> 3
-        "IV" -> 4
-        "V" -> 5
-        "VI" -> 6
-        "VII" -> 7
-        "VIII" -> 8
-        "IX" -> 9
-        "X" -> 10
-        else -> toIntOrNull() ?: 0
     }
 
     private fun onReadyAbility(text: String) {
