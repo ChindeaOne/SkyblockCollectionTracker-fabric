@@ -147,13 +147,13 @@ object AbilityUtils {
         when (fallbackType) {
             FallbackType.COOLDOWN -> {
                 val abilityType = type ?: return
-                val activeName = if (abilityType == "Axe") {
-                    HotfData.currentAxeAbility.abilityName
+                val ability = if (abilityType == "Axe") {
+                    HotfData.currentAxeAbility
                 } else {
-                    HotmData.currentPickaxeAbility.abilityName
+                    HotmData.currentPickaxeAbility
                 }
 
-                syncCooldown(type, activeName, time!!)
+                syncCooldown(type, ability, time!!)
             }
 
             else -> {
@@ -167,7 +167,7 @@ object AbilityUtils {
 
                     when (fallbackType) {
                         FallbackType.READY -> {
-                            if (!pickaxeState.isReady) {
+                            if (!pickaxeState.isReady && !pickaxeState.wasRecentlyUsed) {
                                 pickaxeState.reset()
                             }
                         }
@@ -179,10 +179,10 @@ object AbilityUtils {
                         }
 
                         FallbackType.USED -> {
-                            val snap = pendingPickaxeSnap ?: return
+                            if (!pickaxeState.isReady) {
+                                val snap = pendingPickaxeSnap ?: return
 
-                            if (pickaxeState.isReady) {
-                                triggerPickaxeAbility(snap)
+                                triggerPickaxeAbility(snap, forced = true)
                                 pendingPickaxeSnap = null
                             }
                         }
@@ -196,20 +196,20 @@ object AbilityUtils {
 
                     when (fallbackType) {
                         FallbackType.READY -> {
-                            if (!axeState.isReady) {
+                            if (!axeState.isReady && !axeState.wasRecentlyUsed) {
                                 axeState.reset()
                             }
                         }
 
                         FallbackType.EXPIRED -> {
-                            if (!axeState.isActive) {
+                            if (axeState.isActive) {
                                 axeState.syncCooldownOnExpired()
                             }
                         }
 
                         FallbackType.USED -> {
-                            if (!axeState.isReady && !axeState.isActive) {
-                                triggerAxeAbility()
+                            if (!axeState.isReady) {
+                                triggerAxeAbility(forced = true)
                             }
                         }
 
@@ -221,8 +221,8 @@ object AbilityUtils {
         }
     }
 
-    fun triggerPickaxeAbility(snap: AbilitySnapshot) {
-        if (!pickaxeState.isReady) return
+    fun triggerPickaxeAbility(snap: AbilitySnapshot, forced: Boolean = false) {
+        if (!forced && !pickaxeState.isReady) return
 
         val ability = HotmData.currentPickaxeAbility
         if (ability == Ability.UNKNOWN || !ability.pickaxeAbility) return
@@ -235,8 +235,8 @@ object AbilityUtils {
         pickaxeState.start(duration, finalCooldown)
     }
 
-    fun triggerAxeAbility() {
-        if (!axeState.isReady) return
+    fun triggerAxeAbility(forced: Boolean = false) {
+        if (!forced && !axeState.isReady) return
 
         val ability = HotfData.currentAxeAbility
         if (ability == Ability.UNKNOWN || !ability.axeAbility) return
@@ -248,9 +248,9 @@ object AbilityUtils {
         axeState.start(duration, cooldown)
     }
 
-    fun syncCooldown(type: String, abilityName: String?, timeSeconds: Int) {
+    fun syncCooldown(type: String, ability: Ability, timeSeconds: Int) {
         when (type) {
-            "Pickaxe" -> if (abilityName != "Pickobulus") pickaxeState.syncCooldown(timeSeconds)
+            "Pickaxe" -> if (ability != Ability.PICKOBULUS) pickaxeState.syncCooldown(timeSeconds)
             "Axe" -> axeState.syncCooldown(timeSeconds)
         }
     }

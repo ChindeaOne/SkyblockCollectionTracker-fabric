@@ -54,6 +54,9 @@ class AbilityState {
     val isActive: Boolean
         get() = remainingDuration > Duration.ZERO
 
+    val wasRecentlyUsed: Boolean
+        get() = cooldownStartTimestamp?.timePassedSince()?.let { it < 2.seconds } == true
+
     fun start(duration: Duration, cooldown: Duration) {
         maxDuration = duration
         maxCooldown = cooldown
