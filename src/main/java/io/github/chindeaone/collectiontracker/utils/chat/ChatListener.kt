@@ -3,17 +3,9 @@ package io.github.chindeaone.collectiontracker.utils.chat
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
-import io.github.chindeaone.collectiontracker.config.pickaxeAbilityName
 import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.config.attributeLevel
-import io.github.chindeaone.collectiontracker.config.axeAbilityName
 import io.github.chindeaone.collectiontracker.config.coleweightRankingInChat
-import io.github.chindeaone.collectiontracker.config.disableBeekeeperChatMessages
-import io.github.chindeaone.collectiontracker.config.disableLotteryChatMessages
-import io.github.chindeaone.collectiontracker.config.disableSkyMallChatMessages
-import io.github.chindeaone.collectiontracker.config.enableBeekeeper
-import io.github.chindeaone.collectiontracker.config.enableLottery
-import io.github.chindeaone.collectiontracker.config.enableSkyMall
 import io.github.chindeaone.collectiontracker.config.farmingweightRankingInChat
 import io.github.chindeaone.collectiontracker.config.onlyOnFarmingIslands
 import io.github.chindeaone.collectiontracker.config.onlyOnMiningIslands
@@ -24,11 +16,11 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.sacks.SacksTrackingManager
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
-import io.github.chindeaone.collectiontracker.utils.*
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
-import io.github.chindeaone.collectiontracker.utils.ability.Ability
 import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
-import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils.isPickaxeAbility
+import io.github.chindeaone.collectiontracker.utils.hotx.HotfData
+import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
+import io.github.chindeaone.collectiontracker.utils.hotx.HotmData.isMayhemCooldown
 import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import net.minecraft.network.chat.Component
@@ -37,11 +29,12 @@ import net.minecraft.network.chat.MutableComponent
 
 object ChatListener {
 
-    enum class Patterns(pattern: String, vararg options: RegexOption) {
+    private enum class Patterns(pattern: String, vararg options: RegexOption) {
         // Skyhanni's skill pattern
         SKILL("""\+(?<gains>[\d,.]+)\s+(?<skillName>.+?)\s*\((?<current>[\d,]+)\s*/\s*(?<needed>[\d,]+)\)""", RegexOption.IGNORE_CASE),
         // Coleweight pattern
-        CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? ?Ability""", RegexOption.IGNORE_CASE),
+        ABILITY_USE("""^You used your (.+?)(?: (Pickaxe|Axe) Ability)?!""", RegexOption.IGNORE_CASE),
+        CHANGE_ABILITY("""^You selected (.+?) as your (Pickaxe|Axe)? Ability""", RegexOption.IGNORE_CASE),
         ON_COOLDOWN("""^Your (.+?) ability is on cooldown for (\d+)s.""", RegexOption.IGNORE_CASE),
         EXPIRED_ABILITY("""^Your (.+?) has expired!""", RegexOption.IGNORE_CASE),
         ATTRIBUTE("""^ATTRIBUTE\s+LEVEL\s+UP\s+Pickaxe\s+Cooldown.*?([\d]+|[IVX]+)\b$""", RegexOption.IGNORE_CASE),
@@ -53,28 +46,24 @@ object ChatListener {
 
     var lastSkillValue = 0L
 
-    var currentSkyMallBuff = "§cUnknown"
-    var currentLotteryBuff = "§cUnknown"
-    var currentBeekeeperBuff = "§cUnknown"
-
-    private var expectingSkyMallBuff = false
-    private var expectingLotteryBuff = false
-    private var expectingBeekeeper = false
-
     fun onChatMessage(message: Component) {
         val text = message.string
         val cleanText = text.removeColor()
 
         if (cleanText.contains("ATTRIBUTE")) setCooldownAttribute(cleanText)
-        if (cleanText.contains("on cooldown")) onCooldownListener(cleanText)
-        // fallback methods
-        if (cleanText.contains("is now available")) onReadyAbilityListener(cleanText)
-        if (cleanText.contains("has expired!")) onExpiredAbilityListener(cleanText)
-        if (cleanText.contains("You selected")) abilitySwapListener(cleanText)
 
-        if (cleanText.contains("You have reset")) treeResetListener(cleanText)
-        if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
+        // fallback methods
+        if (cleanText.contains("is now available")) onReadyAbility(cleanText)
+        if (cleanText.contains("on cooldown")) onCooldownAbility(cleanText)
+        if (cleanText.contains("has expired!")) onExpiredAbility(cleanText)
+        if (cleanText.contains("You used your")) onUsedAbility(cleanText)
+        if (cleanText.contains("You selected")) onChangedAbility(cleanText)
+
+        treeResetListener(cleanText)
         sacksListener(message)
+
+        if (cleanText.contains("Commission Complete")) commissionListener(cleanText)
+        // TODO: Add mayhem perk detection; regex: MAYHEM! You received a  Mining Speed buff from your Mineshaft Mayhem perk!
 
         if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
             TrackingHandler.pauseRiftTracking()
@@ -124,140 +113,47 @@ object ChatListener {
         else -> toIntOrNull() ?: 0
     }
 
-    @Deprecated("Change to container detection")
-    private fun abilitySwapListener(text: String) {
-        val match = Patterns.CHANGE_ABILITY.find(text) ?: return
-        val abilityName = match.groupValues[1].trim()
-        val toolType = match.groupValues[2].lowercase()
-
-        when (toolType) {
-            "axe" -> {
-                AbilityUtils.currentAxeAbility = Ability.fromName(abilityName)
-                ConfigHelper.setAxeAbilityName(abilityName)
-            }
-            "pickaxe" -> {
-                AbilityUtils.currentPickaxeAbility = Ability.fromName(abilityName)
-                ConfigHelper.setPickaxeAbilityName(abilityName)
-            }
-        }
+    private fun onReadyAbility(text: String) {
+        val abilityName = text.substringBefore("is now available").trim()
+        AbilityUtils.onChatFallback(abilityName, fallbackType = AbilityUtils.FallbackType.READY)
     }
 
-    private fun onExpiredAbilityListener(text: String) {
+    private fun onExpiredAbility(text: String) {
         val match = Patterns.EXPIRED_ABILITY.find(text) ?: return
         val abilityName = match.groupValues[1].trim()
-        val ability = Ability.fromName(abilityName) ?: return
-
-        AbilityUtils.updateAbilityFromName(ability, abilityName)
+        AbilityUtils.onChatFallback(abilityName, fallbackType = AbilityUtils.FallbackType.EXPIRED)
     }
 
-    private fun onReadyAbilityListener(text: String) {
-        val abilityName = text.substringBefore("is now available").trim()
-        val ability = Ability.fromName(abilityName) ?: return
-
-        AbilityUtils.updateAbilityFromName(ability, abilityName)
+    private fun onUsedAbility(text: String) {
+        val match = Patterns.ABILITY_USE.find(text) ?: return
+        val abilityName = match.groupValues[1].trim()
+        AbilityUtils.onChatFallback(abilityName, fallbackType = AbilityUtils.FallbackType.USED)
     }
 
-    private fun onCooldownListener(text: String) {
+    private fun onCooldownAbility(text: String) {
         if (!serverLagProtection) return
 
         val match = Patterns.ON_COOLDOWN.find(text) ?: return
         val type = match.groupValues[1].trim()
-        val time = match.groupValues[2].toLongOrNull() ?: return
+        val time = match.groupValues[2].toIntOrNull() ?: return
 
-        val activeName = if (type.equals("axe", ignoreCase = true)) {
-            AbilityUtils.currentAxeAbility?.abilityName ?: axeAbilityName
-        } else {
-            AbilityUtils.currentPickaxeAbility?.abilityName ?: pickaxeAbilityName
-        }
-
-        AbilityUtils.syncCooldown(type, activeName, time)
+        AbilityUtils.onChatFallback(type = type, time = time, fallbackType = AbilityUtils.FallbackType.COOLDOWN)
     }
 
-    fun dailyPerksUpdate(message: Component): Boolean {
-        val text = message.string.removeColor()
-
-        when {
-            text.startsWith("MAYHEM!") -> {
-                AbilityUtils.isMayhemCooldown = text.contains("Your Pickaxe Ability cooldown was reduced from your Mineshaft Mayhem perk!")
-            }
-            text.contains("Your Sky Mall buff changed!") -> {
-                expectingSkyMallBuff = true
-                return !enableSkyMall
-            }
-            text.contains("Your Lottery buff changed!") -> {
-                expectingLotteryBuff = true
-                return !enableLottery
-            }
-            text.contains("Your Beekeeper buff changed") -> {
-                expectingBeekeeper = true
-                return !enableBeekeeper
-            }
-            text.startsWith("New buff: ") -> {
-                val buffText = text.substringAfter("New buff: ").trim()
-
-                val compact = StringUtils.formatHotXPerkBuffs(buffText)
-                if (expectingSkyMallBuff) {
-                    isPickaxeAbility = "Pickaxe Ability" in text
-                    currentSkyMallBuff = compact
-                    ConfigHelper.setLastSkyMallBuff(compact)
-                    expectingSkyMallBuff = false
-                    if (disableSkyMallChatMessages) return false // Don't render Sky Mall buff in chat, but update the buffs in overlay
-
-                    // Compact messages if overlay is enabled
-                    if (enableSkyMall) {
-                        ChatUtils.sendMessage("§eNew §bSky Mall §ebuff§r: $compact", prefix = true)
-                        return false
-                    }
-                    return true
-                }
-                if (expectingLotteryBuff) {
-                    currentLotteryBuff = compact
-                    ConfigHelper.setLastLotteryBuff(compact)
-                    expectingLotteryBuff = false
-                    if (disableLotteryChatMessages) return false // Don't render Lottery buff in chat, but update the buffs in overlay
-
-                    // Compact messages if overlay is enabled
-                    if (enableLottery) {
-                        ChatUtils.sendMessage("§eNew §2Lottery §ebuff§r: $compact", prefix = true)
-                        return false
-                    }
-                    return true
-                }
-                if (expectingBeekeeper) {
-                    currentBeekeeperBuff = compact
-                    ConfigHelper.setLastBeekeeperBuff(compact)
-                    expectingBeekeeper = false
-                    if (disableBeekeeperChatMessages) return false
-
-                    if (enableBeekeeper) {
-                        ChatUtils.sendMessage("§eNew §6Beekeeper §ebuff§r: $compact", prefix = true)
-                        return false
-                    }
-                    return true
-                }
-            }
-            // Don't render these messages at all
-            text.startsWith("You can disable this messaging by toggling") -> return false
-        }
-        return true
+    private fun onChangedAbility(text: String) {
+        val match = Patterns.CHANGE_ABILITY.find(text) ?: return
+        val abilityName = match.groupValues[1].trim()
+        AbilityUtils.onChatFallback(abilityName, fallbackType = AbilityUtils.FallbackType.CHANGED)
     }
 
     private fun treeResetListener(text: String) {
         when {
-            text.startsWith("You have reset your Heart of the Mountain", ignoreCase = true) -> {
-                ConfigHelper.setStrongArmMS(0)
-                ConfigHelper.setProfessionalMS(0)
-                ConfigHelper.setLastSkyMallBuff("")
-
-                currentSkyMallBuff = "§cUnknown"
-                isPickaxeAbility = false
+            text.startsWith("You have reset your Heart of the Mountain") -> {
+                HotmData.resetHotm()
             }
-            text.startsWith("You have reset your Heart of the Forest", ignoreCase = true) -> {
-                ConfigHelper.setLastLotteryBuff("")
-                ConfigHelper.setLastBeekeeperBuff("")
 
-                currentLotteryBuff = "§cUnknown"
-                currentBeekeeperBuff = "§cUnknown"
+            text.startsWith("You have reset your Heart of the Forest") -> {
+                HotfData.resetHotf()
             }
         }
     }

@@ -1,12 +1,9 @@
 package io.github.chindeaone.collectiontracker.utils.ability
 
-import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.config.ConfigHelper
-import io.github.chindeaone.collectiontracker.config.pickaxeAbilityName
 import io.github.chindeaone.collectiontracker.config.attributeLevel
-import io.github.chindeaone.collectiontracker.config.axeAbilityName
 import io.github.chindeaone.collectiontracker.config.cotfLevel
 import io.github.chindeaone.collectiontracker.config.cotmLevel
+import io.github.chindeaone.collectiontracker.utils.hotx.HotfData
 import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
 import io.github.chindeaone.collectiontracker.utils.inventory.ItemUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
@@ -33,15 +30,20 @@ object AbilityUtils {
         val isAxe: Boolean get() = abilityType == AbilityType.AXE
     }
 
+    enum class FallbackType {
+        READY,
+        EXPIRED,
+        COOLDOWN,
+        USED,
+        CHANGED
+    }
+
     enum class FuelTank(val cooldownReduction: Double) {
         MITHRIL(0.02),
         TITANIUM(0.04),
         GEMSTONE(0.06),
         PERFECTLY_CUT(0.10)
     }
-
-    var currentPickaxeAbility: Ability? = null
-    var currentAxeAbility: Ability? = null
 
     val pickaxeState = AbilityState()
     val axeState = AbilityState()
@@ -57,6 +59,8 @@ object AbilityUtils {
 
     private var lastTooltips: List<String> = emptyList()
 
+    private var pendingPickaxeSnap: AbilitySnapshot? = null
+
     fun getPickaxeEffectiveLevel(cotmLevel: Int, hasBlegg: Boolean): Int {
         val baseLevel = cotmLevel.coerceIn(1, 2)
         return if (hasBlegg) baseLevel + 1 else baseLevel
@@ -68,12 +72,12 @@ object AbilityUtils {
 
     fun calculatePickaxeAbilityReduction(
         baseCooldown: Duration,
-        snap: AbilitySnapshot?
+        snap: AbilitySnapshot
     ): Duration {
         var multiplier = 1.0
 
         // Fuel Tank
-        if (snap?.fuelTank != null) {
+        if (snap.fuelTank != null) {
             multiplier *= (1.0 - (snap.fuelTank.cooldownReduction))
         }
 
@@ -83,7 +87,7 @@ object AbilityUtils {
 
         // Sky Mall
         if (HotmData.isSkyMallCooldown && MiningMapping.miningIslands.contains(IslandTracker.currentMiningIsland)) {
-            multiplier *= 0.8 // apparently it's more for pickobulus
+            multiplier *= if (HotmData.currentPickaxeAbility == Ability.PICKOBULUS) 0.76 else 0.8 // apparently it's more for pickobulus
         }
 
         // Mayhem cooldown reduction
@@ -91,17 +95,18 @@ object AbilityUtils {
             multiplier *= 0.75
         }
 
-        val finalDuration = (baseCooldown.inWholeSeconds * multiplier).coerceAtLeast(0.0)
+        val finalDuration = (baseCooldown.inWholeSeconds.toDouble() * multiplier).coerceAtLeast(0.0)
         return finalDuration.seconds
     }
 
     fun onClientTick(client: Minecraft) {
-        if (ModLoader.clientTicks % 2L != 0L) return
+        // only for MSB
+        if (!pickaxeState.isActive || HotmData.currentPickaxeAbility != Ability.MINING_SPEED_BOOST) return
 
         val player = client.player ?: return
         val stack = player.mainHandItem
 
-        val tooltips = if (stack.isEmpty) emptyList() else ItemUtils.getTooltipLines(stack, player, normalize = true)
+        val tooltips = if (stack.isEmpty) emptyList() else ItemUtils.getTooltipLines(stack, true)
 
         if (tooltips != lastTooltips) {
             lastTooltips = tooltips
@@ -110,13 +115,10 @@ object AbilityUtils {
     }
 
     private fun handleItemChange(tooltips: List<String>) {
-        // only for MSB
-        if (!pickaxeState.isActive || currentPickaxeAbility != Ability.MINING_SPEED_BOOST) return
-
         val parsedSnap = AbilityItemParser.parse(tooltips)
 
-        if (parsedSnap is AbilitySnapshot && pickaxeState.isActive) {
-            val hasBlegg = parsedSnap.hasBlueCheesePart
+        if (pickaxeState.isActive) {
+            val hasBlegg = parsedSnap?.hasBlueCheesePart ?: false
             val effectiveLevel = getPickaxeEffectiveLevel(cotmLevel, hasBlegg)
 
             val newDuration = Ability.MINING_SPEED_BOOST.getDuration(effectiveLevel)
@@ -129,61 +131,124 @@ object AbilityUtils {
         if (snap == null) return
 
         if (snap.isPickaxe && pickaxeState.isReady) {
+            pendingPickaxeSnap = snap
             triggerPickaxeAbility(snap)
         } else if (snap.isAxe && axeState.isReady) {
             triggerAxeAbility()
         }
     }
 
-    fun triggerPickaxeAbility(snap: AbilitySnapshot? = null) {
+    fun onChatFallback(
+        name: String? = null,
+        type: String? = null,
+        time: Int? = null,
+        fallbackType: FallbackType
+    ) {
+        when (fallbackType) {
+            FallbackType.COOLDOWN -> {
+                val abilityType = type ?: return
+                val activeName = if (abilityType == "Axe") {
+                    HotfData.currentAxeAbility.abilityName
+                } else {
+                    HotmData.currentPickaxeAbility.abilityName
+                }
+
+                syncCooldown(type, activeName, time!!)
+            }
+
+            else -> {
+                val abilityName = name ?: return
+                val ability = Ability.fromName(abilityName) ?: return
+
+                if (ability.pickaxeAbility) {
+                    if (HotmData.currentPickaxeAbility != ability) {
+                        HotmData.currentPickaxeAbility = ability
+                    }
+
+                    when (fallbackType) {
+                        FallbackType.READY -> {
+                            if (!pickaxeState.isReady) {
+                                pickaxeState.reset()
+                            }
+                        }
+
+                        FallbackType.EXPIRED -> {
+                            if (pickaxeState.isActive) {
+                                pickaxeState.syncCooldownOnExpired()
+                            }
+                        }
+
+                        FallbackType.USED -> {
+                            val snap = pendingPickaxeSnap ?: return
+
+                            if (pickaxeState.isReady) {
+                                triggerPickaxeAbility(snap)
+                                pendingPickaxeSnap = null
+                            }
+                        }
+
+                        FallbackType.CHANGED -> {}
+                    }
+                } else if (ability.axeAbility) {
+                    if (HotfData.currentAxeAbility != ability) {
+                        HotfData.currentAxeAbility = ability
+                    }
+
+                    when (fallbackType) {
+                        FallbackType.READY -> {
+                            if (!axeState.isReady) {
+                                axeState.reset()
+                            }
+                        }
+
+                        FallbackType.EXPIRED -> {
+                            if (!axeState.isActive) {
+                                axeState.syncCooldownOnExpired()
+                            }
+                        }
+
+                        FallbackType.USED -> {
+                            if (!axeState.isReady && !axeState.isActive) {
+                                triggerAxeAbility()
+                            }
+                        }
+
+                        FallbackType.CHANGED -> {}
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun triggerPickaxeAbility(snap: AbilitySnapshot) {
         if (!pickaxeState.isReady) return
 
-        val selectedName = currentPickaxeAbility?.abilityName ?: pickaxeAbilityName
-        val ability = Ability.fromName(selectedName) ?: return
+        val ability = HotmData.currentPickaxeAbility
+        if (ability == Ability.UNKNOWN || !ability.pickaxeAbility) return
 
-        currentPickaxeAbility = ability
-
-        val effectiveLevel = getPickaxeEffectiveLevel(cotmLevel, snap?.hasBlueCheesePart == true)
-
+        val effectiveLevel = getPickaxeEffectiveLevel(cotmLevel, snap.hasBlueCheesePart)
         val baseCooldown = ability.getCooldown(effectiveLevel)
-        val finalCooldown = calculatePickaxeAbilityReduction(
-            baseCooldown = baseCooldown,
-            snap = snap,
-        )
+        val finalCooldown = calculatePickaxeAbilityReduction(baseCooldown, snap)
         val duration = ability.getDuration(effectiveLevel)
 
         pickaxeState.start(duration, finalCooldown)
-        ConfigHelper.setPickaxeAbilityName(ability.abilityName)
     }
 
     fun triggerAxeAbility() {
         if (!axeState.isReady) return
 
-        val selectedName = currentAxeAbility?.abilityName ?: axeAbilityName
-        val ability = Ability.fromName(selectedName) ?: return
-
-        currentAxeAbility = ability
+        val ability = HotfData.currentAxeAbility
+        if (ability == Ability.UNKNOWN || !ability.axeAbility) return
 
         val effectiveLevel = getAxeEffectiveLevel(cotfLevel)
-
         val cooldown = ability.getCooldown(effectiveLevel)
         val duration = ability.getDuration(effectiveLevel)
 
         axeState.start(duration, cooldown)
-        ConfigHelper.setAxeAbilityName(ability.abilityName)
     }
 
-    fun updateAbilityFromName(ability: Ability, name: String) {
-        if (ability.isPickaxeAbility() && currentPickaxeAbility != ability) {
-            currentPickaxeAbility = ability
-            ConfigHelper.setPickaxeAbilityName(name)
-        } else if (ability.isAxeAbility() && currentAxeAbility != ability) {
-            currentAxeAbility = ability
-            ConfigHelper.setAxeAbilityName(name)
-        }
-    }
-
-    fun syncCooldown(type: String, abilityName: String?, timeSeconds: Long) {
+    fun syncCooldown(type: String, abilityName: String?, timeSeconds: Int) {
         when (type) {
             "Pickaxe" -> if (abilityName != "Pickobulus") pickaxeState.syncCooldown(timeSeconds)
             "Axe" -> axeState.syncCooldown(timeSeconds)

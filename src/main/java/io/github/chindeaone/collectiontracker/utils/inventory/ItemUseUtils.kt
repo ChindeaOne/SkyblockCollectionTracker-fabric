@@ -15,7 +15,7 @@ object ItemUseUtils {
         if (stack.isEmpty) return InteractionResult.PASS
 
         // Extract tooltips once
-        val tooltipLines = ItemUtils.getTooltipLines(stack, player, normalize = true)
+        val tooltipLines = ItemUtils.getTooltipLines(stack, true)
         
         AbilityItemParser.parse(tooltipLines)?.let { snap ->
             AbilityUtils.onItemUse(snap)

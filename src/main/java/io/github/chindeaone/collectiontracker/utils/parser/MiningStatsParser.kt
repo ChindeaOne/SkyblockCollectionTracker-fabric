@@ -3,10 +3,9 @@ package io.github.chindeaone.collectiontracker.utils.parser
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.enableMiningStatsOverlay
 import io.github.chindeaone.collectiontracker.config.miningStatsOverlayInMiningIslandsOnly
-import io.github.chindeaone.collectiontracker.config.professionalMS
 import io.github.chindeaone.collectiontracker.config.showDetailedMiningFortune
-import io.github.chindeaone.collectiontracker.config.strongArmMS
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
+import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortune
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser.lastDisplayedSpecificFortuneValue
 import io.github.chindeaone.collectiontracker.utils.tab.StatsWidget
@@ -123,12 +122,15 @@ object MiningStatsParser {
     private fun addMiningSpeedPerks(line: String, ctx: MiningContext) {
         val value = extractMiningSpeed(line)
 
-        val professional = professionalMS
-        val strongArm = strongArmMS
+        val profLevel = HotmData.professional.level
+        val strongArmLevel = HotmData.strongArm.level
+
+        val professionalSpeed = if (profLevel == 0) 0 else 50 + profLevel * 5
+        val strongArmSpeed = strongArmLevel * 5
 
         val total = when (ctx.blockType) {
-            "dwarven_metals" -> value + strongArm
-            "gemstones" -> value + professional
+            "dwarven_metals" -> value + strongArmSpeed
+            "gemstones" -> value + professionalSpeed
             else -> value
         }
 
@@ -200,7 +202,7 @@ private class MiningContext(
         val showDetailed = showDetailedMiningFortune
 
         // Show specific fortune if available
-        if (!specificFortuneName.isEmpty()) {
+        if (specificFortuneName.isNotEmpty()) {
             var base = "§a$specificFortuneName: §6$symbol$total"
             if (showDetailed && specificFortune != 0) {
                 base += " §7(§6$globalFortune §7+ $color$specificFortune§7)"
@@ -208,7 +210,7 @@ private class MiningContext(
             return base
         }
         // Fallback to last displayed specific fortune
-        if (!lastDisplayedSpecificFortune.isEmpty()) {
+        if (lastDisplayedSpecificFortune.isNotEmpty()) {
             var base = "§a$lastDisplayedSpecificFortune: §6$symbol$total"
             if (showDetailed && lastDisplayedSpecificFortuneValue != 0) {
                 base += " §7(§6$globalFortune §7+ $color$lastDisplayedSpecificFortuneValue§7)"

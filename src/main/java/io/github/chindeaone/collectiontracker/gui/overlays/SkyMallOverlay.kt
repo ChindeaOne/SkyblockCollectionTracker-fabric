@@ -4,7 +4,7 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.enableSkyMall
 import io.github.chindeaone.collectiontracker.config.skyMallInMiningIslandsOnly
 import io.github.chindeaone.collectiontracker.config.skyMallPosition
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentSkyMallBuff
+import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentMiningIsland
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping.miningIslands
 
@@ -17,7 +17,7 @@ class SkyMallOverlay : AbstractRotatingPerksOverlay() {
 
     override val buffPrefix get() = "§6Sky Mall"
 
-    override val currentBuff: String get() = currentSkyMallBuff
+    override val currentBuff: String get() = HotmData.skyMall.lastSkyMallBuff
 
     override val isIslandAllowed: Boolean get() = !skyMallInMiningIslandsOnly || miningIslands.contains(currentMiningIsland)
 }

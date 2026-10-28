@@ -9,6 +9,7 @@ import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.FetchVersions
 import io.github.chindeaone.collectiontracker.api.tokenapi.TokenManager
+import io.github.chindeaone.collectiontracker.config.hasHotxData
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import org.apache.logging.log4j.LogManager
@@ -95,6 +96,7 @@ object ServerUtils {
                 ColeweightFetcher.hasColeweightLb &&
                 EliteApiFetcher.hasFarmingweightTopColors &&
                 EliteApiFetcher.hasFarmingweightLb &&
-                FetchVersions.hasVersions
+                FetchVersions.hasVersions &&
+                hasHotxData
     }
 }

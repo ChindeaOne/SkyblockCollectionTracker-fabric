@@ -2,21 +2,23 @@ package io.github.chindeaone.collectiontracker.config.categories.foraging
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HotfConfig {
-    @ConfigOption(
-        name = "§aInfo",
-        desc = "§eThese settings don't need to be manually updated, unless they aren't being detected correctly."
-    )
-    @ConfigEditorInfoText
-    val info: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Center Of The Forest Level", desc = "")
-    @ConfigEditorSlider(minValue = 0f, maxValue = 5f, minStep = 1f)
+    var activeLoadoutName: String = "Heart of the Forest 1"
+
+    @Expose
+    var loadouts: LinkedHashMap<String, HotfLoadout> = linkedMapOf(
+        "Heart of the Forest 1" to HotfLoadout(),
+        "Heart of the Forest 2" to HotfLoadout(),
+        "Heart of the Forest 3" to HotfLoadout(),
+        "Heart of the Forest 4" to HotfLoadout(),
+        "Heart of the Forest 5" to HotfLoadout()
+    )
+
+    @Expose
     var cotfLevel: Int = 0
 
     @Expose

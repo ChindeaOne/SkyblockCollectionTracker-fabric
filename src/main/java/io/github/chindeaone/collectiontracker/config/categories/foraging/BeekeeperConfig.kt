@@ -16,9 +16,6 @@ class BeekeeperConfig {
     var enableBeekeeper: Boolean = false
 
     @Expose
-    var lastBeekeeperBuff: String = ""
-
-    @Expose
     @ConfigOption(
         name = "Foraging Islands Only",
         desc = "Show the Beekeeper display only on Foraging Islands."

@@ -75,15 +75,26 @@ class AbilityState {
         durationEndTimestamp = start + newDuration
     }
 
-    fun syncCooldown(timeSec: Long) {
+    fun syncCooldown(timeSec: Int) {
         val currentRemaining = remainingCooldown
-        val currentSec = currentRemaining.inWholeSeconds
+        val currentSec = currentRemaining.inWholeSeconds.toInt()
 
         if (currentSec != timeSec) {
             val millisOffset = (currentRemaining.inWholeMilliseconds % 1000).milliseconds
             val newCooldown = timeSec.seconds + millisOffset
             cooldownEndTimestamp = newCooldown.fromNow()
             cooldownInitialLag = ServerTickUtils.totalLagAdjustment
+        }
+    }
+
+    fun syncCooldownOnExpired() {
+        val remainingDuration = remainingDuration
+        durationStartTimestamp = null
+        durationEndTimestamp = null
+        durationInitialLag = Duration.ZERO
+
+        if (cooldownEndTimestamp != null) {
+            cooldownEndTimestamp = cooldownEndTimestamp!! - remainingDuration
         }
     }
 

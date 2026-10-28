@@ -71,9 +71,7 @@ object CommissionUtils {
         val commissionIndex = getCommissionIndex(slot) ?: return
         if (stack.isEmpty) return
 
-        val player = MinecraftUtils.player ?: return
-
-        val tooltipLines = ItemUtils.getTooltipLines(stack, player)
+        val tooltipLines = ItemUtils.getTooltipLines(stack)
 
         val name = findCommissionName(tooltipLines) ?: return
         val progress = findProgress(tooltipLines)
@@ -86,9 +84,9 @@ object CommissionUtils {
             val trimmed = line.trim()
             if (trimmed.isEmpty()) continue
 
-            for (type in CommissionParser.COMMISSIONS) {
-                if (trimmed.equals(type.name, ignoreCase = true)) {
-                    return type.name
+            for ((name) in CommissionParser.COMMISSIONS) {
+                if (trimmed.equals(name, ignoreCase = true)) {
+                    return name
                 }
             }
         }
@@ -281,13 +279,11 @@ object CommissionUtils {
     }
 
     private fun isCommissionScreen(screen: AbstractContainerScreen<*>): Boolean {
-        if (!enableCommissionsOverlay) return false
-        return screen.title.string.contains("Commissions", ignoreCase = true)
+        return enableCommissionsOverlay && screen.title.string.contains("Commissions", ignoreCase = true)
     }
 
     private fun shouldBlockNumberKeys(screen: AbstractContainerScreen<*>): Boolean {
-        if (!isCommissionScreen(screen)) return false
-        return enableCommissionsKeybinds
+        return isCommissionScreen(screen) && enableCommissionsKeybinds
     }
 
     private fun shouldHandleCommissionTracking(screen: AbstractContainerScreen<*>): Boolean {
@@ -297,12 +293,8 @@ object CommissionUtils {
     private fun isCompletedCommission(stack: ItemStack): Boolean {
         if (stack.isEmpty) return false
 
-        val player = MinecraftUtils.player ?: return false
+        val tooltipLines = ItemUtils.getTooltipLines(stack)
 
-        val tooltipLines = ItemUtils.getTooltipLines(stack, player)
-
-        return tooltipLines.any {
-            it.contains("COMPLETED", ignoreCase = true)
-        }
+        return tooltipLines.any { it.contains("COMPLETED", ignoreCase = true) }
     }
 }

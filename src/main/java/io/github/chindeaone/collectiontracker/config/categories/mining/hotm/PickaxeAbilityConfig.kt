@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.config.categories.mining
+package io.github.chindeaone.collectiontracker.config.categories.mining.hotm
 
 import com.google.gson.annotations.Expose
 import io.github.chindeaone.collectiontracker.config.categories.Misc
@@ -6,14 +6,6 @@ import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.notenoughupdates.moulconfig.annotations.*
 
 class PickaxeAbilityConfig {
-    @Expose
-    @ConfigOption(
-        name = "Cooldown Attribute Level",
-        desc = "§eNote: Doesn't need to be manually updated, unless it isn't being detected correctly."
-    )
-    @ConfigEditorSlider(minValue = 0f, maxValue = 10f, minStep = 1f)
-    var attributeLevel: Int = 0
-
     @Expose
     @ConfigOption(
         name = "Ability Display",
@@ -59,5 +51,5 @@ class PickaxeAbilityConfig {
     var pickaxeAbilityPosition: Position = Position(500, 150)
 
     @Expose
-    var abilityName: String = ""
+    var attributeLevel: Int = 0
 }

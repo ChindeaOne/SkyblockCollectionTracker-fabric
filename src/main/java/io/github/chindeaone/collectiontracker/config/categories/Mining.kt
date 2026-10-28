@@ -2,7 +2,7 @@ package io.github.chindeaone.collectiontracker.config.categories
 
 import com.google.gson.annotations.Expose
 import io.github.chindeaone.collectiontracker.config.categories.coleweight.ColeweightConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployableConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.ConsumableConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig

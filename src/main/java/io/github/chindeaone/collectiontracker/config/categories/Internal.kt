@@ -8,4 +8,7 @@ class Internal {
     @Expose
     @Suppress("unused")
     var configVersion: Int = ConfigMigrator.CURRENT_VERSION
+
+    @Expose
+    var hotxData: Boolean = false
 }

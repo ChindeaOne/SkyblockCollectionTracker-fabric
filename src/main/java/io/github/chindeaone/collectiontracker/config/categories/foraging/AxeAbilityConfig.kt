@@ -52,7 +52,4 @@ class AxeAbilityConfig {
     @Expose
     @ConfigLink(owner = AxeAbilityConfig::class, field = "displayAxeAbility")
     var axeAbilityPosition: Position = Position(500, 200)
-
-    @Expose
-    var abilityName: String = ""
 }

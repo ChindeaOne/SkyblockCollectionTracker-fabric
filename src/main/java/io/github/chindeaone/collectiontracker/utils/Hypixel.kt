@@ -9,6 +9,7 @@ import io.github.chindeaone.collectiontracker.api.collectionapi.FetchCollectionL
 import io.github.chindeaone.collectiontracker.api.collectionapi.FetchGemstoneList
 import io.github.chindeaone.collectiontracker.api.colors.FetchColors
 import io.github.chindeaone.collectiontracker.api.eliteapi.EliteApiFetcher
+import io.github.chindeaone.collectiontracker.api.hypixelapi.HypixelHotxFetcher
 import io.github.chindeaone.collectiontracker.api.npcpriceapi.FetchNpcPrices
 import io.github.chindeaone.collectiontracker.api.serverapi.FetchVersions
 import io.github.chindeaone.collectiontracker.api.serverapi.FetchRepoData
@@ -18,6 +19,7 @@ import io.github.chindeaone.collectiontracker.updater.UpdaterManager
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.hasCheckedUpdate
+import io.github.chindeaone.collectiontracker.config.hasHotxData
 import io.github.chindeaone.collectiontracker.config.updateStream
 import io.github.chindeaone.collectiontracker.config.updateType
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingHandler
@@ -174,6 +176,11 @@ object Hypixel {
         if (!EliteApiFetcher.hasFarmingweightLb) EliteApiFetcher.fetchFarmingweightLbTop()
         if (!EliteApiFetcher.hasFarmingweightTopColors) EliteApiFetcher.fetchFarmingweightTopColors()
         if (!FetchVersions.hasVersions) FetchVersions.fetchVersions()
+
+        // one-time fetch
+        if (!hasHotxData) {
+            HypixelHotxFetcher.fetchLoadoutData()
+        }
     }
 
     private fun onSkyblockLeave() {

@@ -5,6 +5,7 @@ import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Farming
 import io.github.chindeaone.collectiontracker.config.categories.Foraging
+import io.github.chindeaone.collectiontracker.config.categories.Internal
 import io.github.chindeaone.collectiontracker.config.categories.farmingweight.FarmingweightConfig
 import io.github.chindeaone.collectiontracker.config.categories.Mining
 import io.github.chindeaone.collectiontracker.config.categories.Misc
@@ -17,18 +18,20 @@ import io.github.chindeaone.collectiontracker.config.categories.farmingweight.Fa
 import io.github.chindeaone.collectiontracker.config.categories.foraging.AxeAbilityConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.BeekeeperConfig
 import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfConfig
+import io.github.chindeaone.collectiontracker.config.categories.foraging.HotfLoadout
 import io.github.chindeaone.collectiontracker.config.categories.foraging.LotteryConfig
 import io.github.chindeaone.collectiontracker.config.categories.milestones.CollectionMilestonesConfig
 import io.github.chindeaone.collectiontracker.config.categories.milestones.Milestone
 import io.github.chindeaone.collectiontracker.config.categories.milestones.SkillMilestonesConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.HotmConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.HotmConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.KeybindConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.LanternDeployableConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MineshaftRoutes
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.MiningRoutesConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.PickaxeAbilityConfig
-import io.github.chindeaone.collectiontracker.config.categories.mining.SkyMallConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.PickaxeAbilityConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.SkyMallConfig
 import io.github.chindeaone.collectiontracker.config.categories.mining.ConsumableConfig
+import io.github.chindeaone.collectiontracker.config.categories.mining.hotm.HotmLoadout
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.DwarvenMetalsRoutes
 import io.github.chindeaone.collectiontracker.config.categories.mining.routes.PureOresRoutes
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig
@@ -45,6 +48,7 @@ import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.parser.ConsumableParser.Consumables
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
+import kotlin.collections.component1
 
 /**
  * Global accessors for configs
@@ -87,7 +91,8 @@ val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
 
 // Mining Config Accessors
 val miningConfig: Mining get() = modConfig.mining
-val miningRoutesConfig: MiningRoutesConfig get() = miningConfig.miningRoutesConfig
+
+// Commissions Config Accessors
 val commissionsConfig: CommissionsConfig get() = miningConfig.commissionsConfig
 val enableCommissionsOverlay: Boolean get() = commissionsConfig.enableCommissionsOverlay
 val completionTitle: Boolean get() = commissionsConfig.completionTitle
@@ -95,23 +100,26 @@ val newCommissionTitle: Boolean get() = commissionsConfig.newCommissionTitle
 val enableCommissionsTracking: Boolean get() = commissionsConfig.enableCommissionsTracking
 val keybindConfig: KeybindConfig get() = commissionsConfig.keybindConfig
 val enableCommissionsKeybinds: Boolean get() = keybindConfig.enableCommissionsKeybinds
-val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
-val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
-val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
+
+// Deployable Config Accessors
 val lanternDeployableConfig: LanternDeployableConfig get() = miningConfig.lanternDeployableConfig
+val enableDeployable: Boolean get() = lanternDeployableConfig.enableDeployable
+val showDeployableTitle: Boolean get() = lanternDeployableConfig.showDeployableTitle
+val deployableOutOfRangeWarning : Boolean get() = lanternDeployableConfig.deployableOutOfRangeWarning
+
+// Consumable Config Accessors
 val consumableConfig: ConsumableConfig get() = miningConfig.consumableConfig
-val cotmLevel: Int get() = hotmConfig.cotmLevel
-val displayPickaxeAbility: Boolean get() = hotmConfig.pickaxeAbilityConfig.displayPickaxeAbility
-val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = hotmConfig.pickaxeAbilityConfig.indicator
-val pickaxeAbilityName: String get() = pickaxeAbilityConfig.abilityName
-val attributeLevel: Int get() = pickaxeAbilityConfig.attributeLevel
-val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
-val lastSkyMallBuff: String get() = skyMallConfig.lastSkyMallBuff
-val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIslandsOnly
-val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChatMessages
-val showPickaxeReadyAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeReadyAbilityTitle
-val showPickaxeExpiredAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeExpiredAbilityTitle
-val pickaxeAbilityInMiningIslandsOnly: Boolean get() = pickaxeAbilityConfig.pickaxeAbilityInMiningIslandsOnly
+val enableTempBuffTracker: Boolean get() = consumableConfig.enableConsumableTracker
+val showTempBuffExpiredTitle: Boolean get() = consumableConfig.showConsumableExpiredTitle
+
+// Mining Stats Config Accessors
+val miningStatsConfig: MiningStatsConfig get() = miningConfig.miningStatsConfig
+val enableMiningStatsOverlay: Boolean get() = miningStatsConfig.enableMiningStatsOverlay
+val showDetailedMiningFortune : Boolean get() = miningStatsConfig.showDetailedFortune
+val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsConfig.miningStatsOverlayInMiningIslandsOnly
+
+// Mining Routes Config Accessors
+val miningRoutesConfig: MiningRoutesConfig get() = miningConfig.miningRoutesConfig
 val mineshaftRoutesConfig: MineshaftRoutes get() = miningRoutesConfig.mineshaftRoutes
 val enableMineshaftRoutes: Boolean get() = mineshaftRoutesConfig.enableMineshaftRoutes
 val enableMineshaftSpawnRoutes: Boolean get() = mineshaftRoutesConfig.enableMineshaftSpawnRoutes
@@ -122,14 +130,35 @@ val dwarvenMetalRoutes: DwarvenMetalsRoutes.DwarvenMetalRoutes get() = dwarvenMe
 val pureOresRoutesConfig: PureOresRoutes get() = miningRoutesConfig.pureOresRoutes
 val enablePureOresRoutes: Boolean get() = pureOresRoutesConfig.enablePureOresRoutes
 val pureOresRoutes: PureOresRoutes.PureOreRoutes get() = pureOresRoutesConfig.selectedPureOresRoute
-val enableTempBuffTracker: Boolean get() = consumableConfig.enableConsumableTracker
-val showTempBuffExpiredTitle: Boolean get() = consumableConfig.showConsumableExpiredTitle
+
+// HOTM Config Accessors
+val hotmConfig: HotmConfig get() = miningConfig.hotmConfig
+val currentHotmLoadoutName: String get() = hotmConfig.activeLoadoutName
+val currentHotmLoadout: HotmLoadout
+    get() = hotmConfig.loadouts.getOrPut(currentHotmLoadoutName) {
+        HotmLoadout()
+    }
+val cotmLevel: Int get() = hotmConfig.cotmLevel
+
+val pickaxeAbilityConfig: PickaxeAbilityConfig get() = hotmConfig.pickaxeAbilityConfig
+val displayPickaxeAbility: Boolean get() = pickaxeAbilityConfig.displayPickaxeAbility
+val pickaxeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = pickaxeAbilityConfig.indicator
+val showPickaxeReadyAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeReadyAbilityTitle
+val showPickaxeExpiredAbilityTitle: Boolean get() = pickaxeAbilityConfig.showPickaxeExpiredAbilityTitle
+val pickaxeAbilityInMiningIslandsOnly: Boolean get() = pickaxeAbilityConfig.pickaxeAbilityInMiningIslandsOnly
+val attributeLevel: Int get() = pickaxeAbilityConfig.attributeLevel
+
+val skyMallConfig: SkyMallConfig get() = hotmConfig.skyMallConfig
+val enableSkyMall: Boolean get() = skyMallConfig.enableSkyMall
+val skyMallInMiningIslandsOnly: Boolean get() = skyMallConfig.skyMallInMiningIslandsOnly
+val disableSkyMallChatMessages: Boolean get() = skyMallConfig.disableSkyMallChatMessages
 
 // Coleweight Config Accessors
 val coleweightConfig: ColeweightConfig get() = miningConfig.coleweightConfig
 val coleweightColorConfig: ColeweightColorConfig get() = coleweightConfig.coleweightColorConfig
 val coleweightRankingInChat: Boolean get() = coleweightConfig.coleweightRankingInChat
 val coleweightRankInNameTag: Boolean get() = coleweightConfig.coleweightRankInNameTag
+val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
 val enableCustomCWColor: Boolean get() = coleweightColorConfig.enableCustomColor
 val customCWColor: ChromaColour get() = coleweightColorConfig.customColor
 val heatmapConfig: HeatmapConfig get() = coleweightConfig.heatmapConfig
@@ -139,43 +168,40 @@ val precisionMiningConfig: PrecisionMiningConfig get() = coleweightConfig.precis
 val enablePrecisionMiningHighlight: Boolean get() = precisionMiningConfig.enablePrecisionMiningHighlight
 val drawLineToPrecisionMining: Boolean get() = precisionMiningConfig.drawLineToPrecisionMining
 
-// Overlays
-val miningStatsConfig: MiningStatsConfig get() = miningConfig.miningStatsConfig
-val enableMiningStatsOverlay: Boolean get() = miningStatsConfig.enableMiningStatsOverlay
-val miningStatsOverlayInMiningIslandsOnly: Boolean get() = miningStatsConfig.miningStatsOverlayInMiningIslandsOnly
-val onlyOnMiningIslands: Boolean get() = coleweightConfig.onlyOnMiningIslands
-val showDetailedMiningFortune : Boolean get() = miningStatsConfig.showDetailedFortune
-val professionalMS: Int get() = hotmConfig.professionalMS
-val strongArmMS: Int get() = hotmConfig.strongArmMS
-val enableDeployable: Boolean get() = lanternDeployableConfig.enableDeployable
-val showDeployableTitle: Boolean get() = lanternDeployableConfig.showDeployableTitle
-val deployableOutOfRangeWarning : Boolean get() = lanternDeployableConfig.deployableOutOfRangeWarning
-
 // Foraging Config Accessors
 val foragingConfig: Foraging get() = modConfig.foraging
+
+// Foraging Stats Config Accessors
 val foragingStatsConfig: ForagingStatsConfig get() = foragingConfig.foragingStatsConfig
 val enableForagingStatsOverlay: Boolean get() = foragingStatsConfig.enableForagingStatsOverlay
 val foragingStatsOverlayInForagingIslandsOnly: Boolean get() = foragingStatsConfig.foragingStatsOverlayInForagingIslandsOnly
 val showDetailedForagingFortune: Boolean get() = foragingStatsConfig.showDetailedFortune
+
+// HOTF Config Accessors
 val hotfConfig: HotfConfig get() = foragingConfig.hotfConfig
-val axeAbilityConfig: AxeAbilityConfig get() = hotfConfig.axeAbilityConfig
+val currentHotfLoadoutName: String get() = hotfConfig.activeLoadoutName
+val currentHotfLoadout: HotfLoadout
+    get() = hotfConfig.loadouts.getOrPut(currentHotfLoadoutName) {
+        HotfLoadout()
+    }
 val cotfLevel: Int get() = hotfConfig.cotfLevel
-val axeAbilityName: String get() = axeAbilityConfig.abilityName
+
+val axeAbilityConfig: AxeAbilityConfig get() = hotfConfig.axeAbilityConfig
 val displayAxeAbility: Boolean get() = axeAbilityConfig.displayAxeAbility
 val axeAbilityDisplayIndicator: Misc.AbilityDisplayIndicator get() = axeAbilityConfig.indicator
-val lotteryConfig: LotteryConfig get() = hotfConfig.lotteryConfig
-val enableLottery: Boolean get() = lotteryConfig.enableLottery
-val lastLotteryBuff: String get() = lotteryConfig.lastLotteryBuff
-val lotteryInForagingIslandsOnly: Boolean get() = lotteryConfig.lotteryInForagingIslandsOnly
-val disableLotteryChatMessages: Boolean get() = lotteryConfig.disableLotteryChatMessages
-val beekeeperConfig: BeekeeperConfig get() = hotfConfig.beekeeperConfig
-val enableBeekeeper: Boolean get() = beekeeperConfig.enableBeekeeper
-val lastBeekeeperBuff: String get() = beekeeperConfig.lastBeekeeperBuff
-val beekeeperInForagingIslandsOnly: Boolean get() = beekeeperConfig.beekeeperInForagingIslandsOnly
-val disableBeekeeperChatMessages: Boolean get() = beekeeperConfig.disableBeekeeperChatMessages
 val showAxeReadyAbilityTitle: Boolean get() = axeAbilityConfig.showAxeReadyAbilityTitle
 val showAxeExpiredAbilityTitle: Boolean get() = axeAbilityConfig.showAxeExpiredAbilityTitle
 val axeAbilityInForagingIslandsOnly: Boolean get() = axeAbilityConfig.axeAbilityInForagingIslandsOnly
+
+val lotteryConfig: LotteryConfig get() = hotfConfig.lotteryConfig
+val enableLottery: Boolean get() = lotteryConfig.enableLottery
+val lotteryInForagingIslandsOnly: Boolean get() = lotteryConfig.lotteryInForagingIslandsOnly
+val disableLotteryChatMessages: Boolean get() = lotteryConfig.disableLotteryChatMessages
+
+val beekeeperConfig: BeekeeperConfig get() = hotfConfig.beekeeperConfig
+val enableBeekeeper: Boolean get() = beekeeperConfig.enableBeekeeper
+val beekeeperInForagingIslandsOnly: Boolean get() = beekeeperConfig.beekeeperInForagingIslandsOnly
+val disableBeekeeperChatMessages: Boolean get() = beekeeperConfig.disableBeekeeperChatMessages
 
 // Farming Config Accessors
 val farmingConfig: Farming get() = modConfig.farming
@@ -249,6 +275,10 @@ val timerNotifierInterval: Int get() = partyNotifierConfig.timerNotifierInterval
 val stopwatchNotifier: Boolean get() = partyNotifierConfig.stopwatchNotifier
 val stopwatchNotifierInterval: Int get() = partyNotifierConfig.stopwatchNotifierInterval
 
+// Internal Config Accessors
+val internalConfig: Internal get() = modConfig.internal
+val hasHotxData: Boolean get() = internalConfig.hotxData
+
 /**
  * Accessors for configs
  */
@@ -307,34 +337,16 @@ object ConfigHelper {
         leaderboardOverlay.skillLeaderboard = false
     }
 
-    fun setPickaxeAbilityName(name: String) {
-        if (pickaxeAbilityConfig.abilityName != name) {
-            pickaxeAbilityConfig.abilityName = name
-        }
-    }
-
     fun setAttributeLevel(level: Int) {
         pickaxeAbilityConfig.attributeLevel = level
-    }
-
-    fun setLastSkyMallBuff(buff: String) {
-        skyMallConfig.lastSkyMallBuff = buff
     }
 
     fun disableSkyMall() {
         skyMallConfig.enableSkyMall = false
     }
 
-    fun setLastLotteryBuff(buff: String) {
-        lotteryConfig.lastLotteryBuff = buff
-    }
-
     fun disableLottery() {
         lotteryConfig.enableLottery = false
-    }
-
-    fun setLastBeekeeperBuff(buff: String) {
-        beekeeperConfig.lastBeekeeperBuff = buff
     }
 
     fun disableBeekeeper() {
@@ -556,12 +568,6 @@ object ConfigHelper {
         return partyNotifierConfig.stopwatchNotifier
     }
 
-    fun setAxeAbilityName(name: String) {
-        if (axeAbilityConfig.abilityName != name) {
-            axeAbilityConfig.abilityName = name
-        }
-    }
-
     fun setConsumableDuration(buff: Consumables, duration: Long) {
         when (buff) {
             Consumables.FILET_O_FORTUNE -> consumableConfig.filetTime = duration
@@ -571,16 +577,58 @@ object ConfigHelper {
         }
     }
 
-    fun setProfessionalMS(level: Int) {
-        if (level == 0) {
-            hotmConfig.professionalMS = 0
-            return
-        }
-        hotmConfig.professionalMS = 50 + level * 5
+    fun switchHotmLoadout(name: String) {
+        hotmConfig.activeLoadoutName = name
+        hotmConfig.loadouts.getOrPut(name) { HotmLoadout() }
     }
 
-    fun setStrongArmMS(level: Int) {
-        hotmConfig.strongArmMS = level * 5
+    fun switchHotfLoadout(name: String) {
+        hotfConfig.activeLoadoutName = name
+        hotfConfig.loadouts.getOrPut(name) { HotfLoadout() }
+    }
+
+    fun renameHotmLoadout(slotIndex: Int, newName: String) {
+        val entries = hotmConfig.loadouts.entries.toList()
+        if (slotIndex !in entries.indices) return
+
+        val (oldName, loadout) = entries[slotIndex]
+        if (oldName == newName) return
+
+        if (hotmConfig.activeLoadoutName == oldName) {
+            hotmConfig.activeLoadoutName = newName
+        }
+
+        val updatedMap = LinkedHashMap<String, HotmLoadout>()
+        for ((index, entry) in entries.withIndex()) {
+            if (index == slotIndex) {
+                updatedMap[newName] = loadout
+            } else {
+                updatedMap[entry.key] = entry.value
+            }
+        }
+        hotmConfig.loadouts = updatedMap
+    }
+
+    fun renameHotfLoadout(slotIndex: Int, newName: String) {
+        val entries = hotfConfig.loadouts.entries.toList()
+        if (slotIndex !in entries.indices) return
+
+        val (oldName, loadout) = entries[slotIndex]
+        if (oldName == newName) return
+
+        if (hotfConfig.activeLoadoutName == oldName) {
+            hotfConfig.activeLoadoutName = newName
+        }
+
+        val updatedMap = LinkedHashMap<String, HotfLoadout>()
+        for ((index, entry) in entries.withIndex()) {
+            if (index == slotIndex) {
+                updatedMap[newName] = loadout
+            } else {
+                updatedMap[entry.key] = entry.value
+            }
+        }
+        hotfConfig.loadouts = updatedMap
     }
 
     fun setCotmLevel(level: Int) {
@@ -661,6 +709,10 @@ object ConfigHelper {
 
     fun saveLeaderboardPositions(map : Map<String, Int>) {
         leaderboardOverlay.leaderboardPositions = map
+    }
+
+    fun setHotxDataFetched(fetched: Boolean) {
+        internalConfig.hotxData = fetched
     }
 
     fun isConfigScreenOpen(): Boolean = MinecraftUtils.screen is MoulConfigScreenComponent

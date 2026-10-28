@@ -13,9 +13,11 @@ import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import io.github.chindeaone.collectiontracker.utils.ability.AbilityUtils
 import io.github.chindeaone.collectiontracker.utils.chat.TimeNotifierUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
+import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
+import io.github.chindeaone.collectiontracker.utils.hotx.RotatingPerk
 import io.github.chindeaone.collectiontracker.utils.inventory.ItemUseUtils
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
-import io.github.chindeaone.collectiontracker.utils.parser.container.ContainerParser
+import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
 import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 import io.github.chindeaone.collectiontracker.utils.parser.ForagingStatsParser
 import io.github.chindeaone.collectiontracker.utils.parser.MiningStatsParser
@@ -74,7 +76,7 @@ object ModLoader: ModInitializer {
             if (!HypixelUtils.isInSkyblock) return@register true
             if (actionBar) return@register true
 
-            ChatListener.dailyPerksUpdate(component)
+            RotatingPerk.formatRotatingBuffs(component) && HotmData.updateMayhemFromChat(component)
         }
 
         ClientReceiveMessageEvents.MODIFY_GAME.register { message, actionBar ->
@@ -127,6 +129,8 @@ object ModLoader: ModInitializer {
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             if (!HypixelUtils.isInSkyblock) return@register
 
+            ContainerParser.onScreenChanged(screen)
+
             if (screen is ChatScreen) {
                 ScreenMouseEvents.allowMouseClick(screen).register { _, event ->
                     for (overlay in OverlayManager.all()) {
@@ -137,7 +141,6 @@ object ModLoader: ModInitializer {
                     true
                 }
             }
-            ContainerParser.onScreenChanged(screen)
         }
     }
 

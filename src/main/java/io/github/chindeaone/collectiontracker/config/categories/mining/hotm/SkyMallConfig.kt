@@ -1,4 +1,4 @@
-package io.github.chindeaone.collectiontracker.config.categories.mining
+package io.github.chindeaone.collectiontracker.config.categories.mining.hotm
 
 import com.google.gson.annotations.Expose
 import io.github.chindeaone.collectiontracker.config.core.Position
@@ -14,9 +14,6 @@ class SkyMallConfig {
     )
     @ConfigEditorBoolean
     var enableSkyMall: Boolean = false
-
-    @Expose
-    var lastSkyMallBuff: String = ""
 
     @Expose
     @ConfigOption(

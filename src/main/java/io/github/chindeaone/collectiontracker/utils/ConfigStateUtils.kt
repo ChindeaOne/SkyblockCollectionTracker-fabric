@@ -19,8 +19,9 @@ import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import io.github.chindeaone.collectiontracker.utils.hotx.HotfData
+import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
 
 object ConfigStateUtils {
@@ -119,24 +120,23 @@ object ConfigStateUtils {
     }
 
     private fun checkSkyMallPerk() {
-        if (ChatListener.currentSkyMallBuff.isEmpty() && enableSkyMall) {
+        if (HotmData.skyMall.lastSkyMallBuff.isEmpty() && enableSkyMall) {
             ConfigHelper.disableSkyMall()
-            sendMessage("§cYou don't have the Sky Mall perk unlocked.")
+            sendMessage("§cDisabled the SKy Mall display due to an error while parsing the perk.")
         }
     }
 
     private fun checkLotteryPerk() {
-        if (ChatListener.currentLotteryBuff.isEmpty() && enableLottery) {
+        if (HotfData.lottery.lastLotteryBuff.isEmpty() && enableLottery) {
             ConfigHelper.disableLottery()
-            sendMessage("§cYou don't have the Lottery perk unlocked.")
-
+            sendMessage("§cDisabled the Lottery display due to an error while parsing the perk.")
         }
     }
 
     private fun checkBeekeeperPerk() {
-        if (ChatListener.currentBeekeeperBuff.isEmpty() && enableBeekeeper) {
+        if (HotfData.beekeeper.lastBeekeeperBuff.isEmpty() && enableBeekeeper) {
             ConfigHelper.disableBeekeeper()
-            sendMessage("§cYou don't have the Beekeeper perk unlocked.")
+            sendMessage("§cDisabled the Beekeeper display due to an error while parsing the perk.")
         }
     }
 

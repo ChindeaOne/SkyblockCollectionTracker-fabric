@@ -4,7 +4,7 @@ import io.github.chindeaone.collectiontracker.config.beekeeperInForagingIslandsO
 import io.github.chindeaone.collectiontracker.config.beekeeperPosition
 import io.github.chindeaone.collectiontracker.config.core.Position
 import io.github.chindeaone.collectiontracker.config.enableBeekeeper
-import io.github.chindeaone.collectiontracker.utils.chat.ChatListener.currentBeekeeperBuff
+import io.github.chindeaone.collectiontracker.utils.hotx.HotfData
 import io.github.chindeaone.collectiontracker.utils.world.ForagingMapping.foragingIslands
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker.currentForagingIsland
 
@@ -17,7 +17,7 @@ class BeekeeperOverlay : AbstractRotatingPerksOverlay() {
 
     override val buffPrefix get() = "§2Beekeeper"
 
-    override val currentBuff: String get() = currentBeekeeperBuff
+    override val currentBuff: String get() = HotfData.beekeeper.lastBeekeeperBuff
 
     override val isIslandAllowed: Boolean get() = !beekeeperInForagingIslandsOnly|| foragingIslands.contains(currentForagingIsland)
 }

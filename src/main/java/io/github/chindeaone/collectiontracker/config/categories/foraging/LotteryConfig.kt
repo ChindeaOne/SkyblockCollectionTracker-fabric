@@ -16,9 +16,6 @@ class LotteryConfig {
     var enableLottery: Boolean = false
 
     @Expose
-    var lastLotteryBuff: String = ""
-
-    @Expose
     @ConfigOption(
         name = "Foraging Islands Only",
         desc = "Show the Lottery display only on Foraging Islands."
