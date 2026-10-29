@@ -141,6 +141,7 @@ class SkillMilestoneOverlay: AbstractOverlay() {
         )
     }
 }
+
 val notifiedSkillMilestones = mutableSetOf<String>()
 
 fun clearNotifiedSkillMilestone(name: String) {

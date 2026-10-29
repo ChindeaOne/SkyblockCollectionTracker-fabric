@@ -38,7 +38,7 @@ object SkillParser {
             leaderboard
         )
         list.add("")
-        list.add("Uptime: ${SkillTrackingHandler.uptime}")
+        list.add("Uptime: ${ if (SkillTrackingHandler.isPaused) "${SkillTrackingHandler.uptime} (§7Paused)" else SkillTrackingHandler.uptime}")
     }
 
     fun updateTamingLines(list: MutableList<String>) {

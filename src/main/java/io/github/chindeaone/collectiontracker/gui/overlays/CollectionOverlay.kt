@@ -73,7 +73,7 @@ class CollectionOverlay : AbstractOverlay() {
         CollectionParser.updateTrackingLines(main)
         if (main.isNotEmpty()) {
             main.add("") // add separator line
-            main.add("Uptime: $uptime")
+            main.add("Uptime: ${if (TrackingHandler.isPaused) "$uptime (§7Paused)" else uptime}")
             if (!showExtra && isChatOpened) CollectionParser.addToggleableSettingsLines(main)
         }
 

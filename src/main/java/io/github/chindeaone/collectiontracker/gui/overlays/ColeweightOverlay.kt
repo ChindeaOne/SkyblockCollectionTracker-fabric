@@ -72,7 +72,8 @@ class ColeweightOverlay : AbstractOverlay() {
         if (timeAgo.isNotEmpty()) {
             newLines.add("Last updated: $timeAgo ago")
         }
-        newLines.add("Uptime: $uptime")
+
+        newLines.add("Uptime: ${if (ColeweightTrackingHandler.isPaused) "$uptime (§7Paused)" else uptime}")
 
         cachedLines = newLines
     }

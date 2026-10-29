@@ -72,7 +72,7 @@ class MultiCollectionOverlay : AbstractOverlay() {
 
         val newLines = mutableListOf<String>()
         CollectionParser.updateMultiTrackingLines(newLines, expandedCollections, isChatOpened)
-        newLines.add("Uptime: $uptime")
+        newLines.add("Uptime: ${if (MultiTrackingHandler.isMultiPaused) "$uptime (§7Paused)" else uptime}")
 
         if (isChatOpened) CollectionParser.addToggleableSettingsLines(newLines)
 

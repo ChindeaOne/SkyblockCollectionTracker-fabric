@@ -158,6 +158,7 @@ class CollectionMilestoneOverlay: AbstractOverlay() {
         )
     }
 }
+
 val notifiedMilestones = mutableSetOf<String>()
 
 fun clearNotifiedMilestone(name: String) {
