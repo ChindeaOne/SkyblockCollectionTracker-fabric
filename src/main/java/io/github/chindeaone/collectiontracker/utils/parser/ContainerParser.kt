@@ -22,14 +22,16 @@ object ContainerParser {
     var lastClick: EpochMark? = null
     val wasDown = HashMap<Int, Boolean>()
 
-    val pattern: Regex = Regex("""^\((\d+)/(\d+)\) Loadouts$""")
+    val loadoutPattern: Regex = Regex("""^\((\d+)/(\d+)\) Loadouts$""")
+    val activeEffectsPattern: Regex = Regex("""^\((\d+)/(\d+)\) Active Effects$""")
 
     enum class ScreenType {
         HOTM,
         HOTF,
         HOTM_SLOTS,
         HOTF_SLOTS,
-        LOADOUTS
+        LOADOUTS,
+        ACTIVE_EFFECTS
     }
 
     private var currentScreenType: ScreenType? = null
@@ -40,9 +42,11 @@ object ContainerParser {
         detachListener()
 
         val container = screen as? AbstractContainerScreen<*> ?: return
+
         onCommissionScreen(container)
         onHotxScreen(container)
         onLoadoutsScreen(container)
+        onActiveEffectsScreen(container)
     }
 
     private fun onHotxScreen(container: AbstractContainerScreen<*>) {
@@ -65,8 +69,15 @@ object ContainerParser {
     }
 
     private fun onLoadoutsScreen(container: AbstractContainerScreen<*>) {
-        if (container.title.string.matches(pattern)) {
-            currentScreenType = ScreenType.LOADOUTS // Fixed from currentScreenType
+        if (container.title.string.matches(loadoutPattern)) {
+            currentScreenType = ScreenType.LOADOUTS
+            currentScreen = container
+        }
+    }
+
+    private fun onActiveEffectsScreen(container: AbstractContainerScreen<*>) {
+        if (container.title.string.matches(activeEffectsPattern)) {
+            currentScreenType = ScreenType.ACTIVE_EFFECTS
             currentScreen = container
         }
     }
@@ -86,6 +97,7 @@ object ContainerParser {
             ScreenType.HOTM_SLOTS -> handleHotmSlots(screen)
             ScreenType.HOTF_SLOTS -> handleHotxSlots(screen)
             ScreenType.LOADOUTS -> handleLoadouts(screen)
+            ScreenType.ACTIVE_EFFECTS -> handleActiveEffects(screen)
             null -> return
         }
 
@@ -111,6 +123,10 @@ object ContainerParser {
     private fun handleLoadouts(screen: AbstractContainerScreen<*>) {
         HotfData.updateCurrentLoadout(screen, slotIndex = 9)
         HotmData.updateCurrentLoadout(screen, slotIndex = 18)
+    }
+
+    private fun handleActiveEffects(screen: AbstractContainerScreen<*>) {
+        ConsumableParser.updateDurationsFromScreen(screen)
     }
 
     fun parseCurrentLoadoutName(stack: ItemStack): String? {
