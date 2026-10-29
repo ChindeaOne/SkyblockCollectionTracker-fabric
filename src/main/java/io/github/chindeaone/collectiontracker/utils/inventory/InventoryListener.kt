@@ -1,8 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.inventory
 
-import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.riftTracking
 import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
@@ -11,127 +10,172 @@ import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.
 import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
+import net.minecraft.world.entity.item.ItemEntity
 
 object InventoryListener {
 
-    private val slotSkipMap = mutableMapOf<Int, Long>()
-    private val slotMatchHits = mutableMapOf<Int, Int>()
-    private val lastInventoryState = mutableMapOf<Int, Int>()
-    private val lastItemNames = mutableMapOf<Int, String>()
+    val PICKABLE_COLLECTIONS = setOf("wilted berberis", "caducous stem", "agaricus cap", "half-eaten carrot")
+
+    private data class InventorySnapshot(
+        val itemName: String,
+        val count: Int
+    )
+
+    private val lastInventory = mutableMapOf<Int, InventorySnapshot>()
+    private val pendingIgnoredPickups = mutableMapOf<String, Long>()
+    private val processedEntityIds = LinkedHashSet<Int>()
+
+    private var wasScreenOpen = false
+
+    private val isTrackingActive: Boolean
+        get() = TrackingHandler.isTracking || MultiTrackingHandler.isMultiTracking
+
+    private val isTrackingPaused: Boolean
+        get() = TrackingHandler.isPaused || MultiTrackingHandler.isMultiPaused
 
     fun onClientTick() {
-        if (ModLoader.clientTicks % 4L != 0L) return
+        if (!riftTracking || isTrackingPaused || !IslandTracker.isInRift || apiTracking) return
 
-        val isTracking = TrackingHandler.isTracking
-        val isMultiTracking = MultiTrackingHandler.isMultiTracking
-
-        if (!isTracking && !isMultiTracking || MinecraftUtils.screen != null) {
-            lastInventoryState.clear()
-            slotMatchHits.clear()
-            slotSkipMap.clear()
+        if (!isTrackingActive) {
+            clearInventoryState()
             return
         }
 
-        val isTrackingPaused = TrackingHandler.isPaused
-        val isMultiTrackingPaused = MultiTrackingHandler.isMultiPaused
+        if (MinecraftUtils.screen != null) {
+            wasScreenOpen = true
+            return
+        }
 
-        if (isTrackingPaused || isMultiTrackingPaused || !IslandTracker.isInRift || apiTracking) return
+        val currentSoloCollection = CollectionTracker.collection
+        val isSoloRift = TrackingHandler.isTracking && currentSoloCollection !in PICKABLE_COLLECTIONS
 
-        val player = MinecraftUtils.player ?: return
-        val inventory = player.inventory
-        val now = System.currentTimeMillis()
-
-        val currentSoloColl = CollectionTracker.collection
-        val isSoloRift = isTracking && CollectionsManager.isRiftCollection(currentSoloColl)
-
-        val multiRiftCollections = if (isMultiTracking) {
-            CollectionTracker.collectionList.filter { CollectionsManager.isRiftCollection(it) }
+        val multiRiftCollections = if (MultiTrackingHandler.isMultiTracking) {
+            CollectionTracker.collectionList.filterNot { it in PICKABLE_COLLECTIONS }
         } else emptyList()
 
         if (!isSoloRift && multiRiftCollections.isEmpty()) return
 
-        val multiGains = mutableMapOf<String, Long>()
-        var soloGainToProcess = 0L
+        val skipGains = wasScreenOpen || lastInventory.isEmpty()
+        wasScreenOpen = false
 
-        for (i in 0 until 36) {
-            val stack = inventory.getItem(i)
+        val multiGains = mutableMapOf<String, Long>()
+        var soloGain = 0L
+
+        for (slot in 0 until 36) {
+            val stack = MinecraftUtils.player?.inventory?.getItem(slot) ?: continue
+
             if (stack.isEmpty) {
-                lastInventoryState[i] = 0
-                slotMatchHits.remove(i)
-                slotSkipMap.remove(i)
-                lastItemNames.remove(i)
+                lastInventory.remove(slot)
                 continue
             }
 
-            val itemName = StringUtils.normalizeText(stack.hoverName.string)
-
-            val previousItemName = lastItemNames[i]
-            if (previousItemName != itemName) {
-                slotSkipMap.remove(i)
-                slotMatchHits.remove(i)
-                lastItemNames[i] = itemName
-            }
-
-            if ((slotSkipMap[i] ?: 0L) > now) continue
-
+            val itemName = normalizeItemName(stack.hoverName.string)
             val currentCount = stack.count
+            val previous = lastInventory[slot]
 
-            val isFirstTime = !lastInventoryState.containsKey(i)
-            val previousCount = lastInventoryState[i] ?: currentCount
-            val gainCount = if (isFirstTime) 0 else (currentCount - previousCount).coerceAtLeast(0)
-
-            var matchedAny = false
-
-            if (isSoloRift && matches(itemName, currentSoloColl)) {
-                matchedAny = true
-                val maxGain = maxGainForCollection(currentSoloColl)
-
-                if (gainCount in 1..maxGain) {
-                    soloGainToProcess += gainCount.toLong()
-                }
+            if (previous != null && previous.itemName != itemName) {
+                lastInventory[slot] = InventorySnapshot(itemName, currentCount)
+                continue
             }
 
-            for (coll in multiRiftCollections) {
-                if (matches(itemName, coll)) {
-                    matchedAny = true
-                    val maxGain = maxGainForCollection(coll)
+            val diff = currentCount - (previous?.count ?: 0)
 
-                    if (gainCount in 1..maxGain) {
-                        multiGains[coll] = (multiGains[coll] ?: 0L) + gainCount
+            if (!skipGains && diff > 0) {
+                val validGain = consumeIgnoredPickup(itemName, diff.toLong())
+
+                if (validGain == 1L) {
+                    if (isSoloRift && itemName.startsWith(currentSoloCollection)) {
+                        soloGain++
+                    }
+                    for (collection in multiRiftCollections) {
+                        if (itemName.startsWith(collection)) {
+                            multiGains[collection] = (multiGains[collection] ?: 0L) + 1L
+                        }
                     }
                 }
             }
-
-            if (matchedAny) {
-                slotMatchHits[i] = 0
-                lastInventoryState[i] = currentCount
-            } else {
-                val hits = (slotMatchHits[i] ?: 0) + 1
-                if (hits >= 5) {
-                    slotSkipMap[i] = now + 60_000L // skip for 1 min
-                    slotMatchHits[i] = 0
-                } else {
-                    slotMatchHits[i] = hits
-                }
-                lastInventoryState[i] = 0
-            }
+            lastInventory[slot] = InventorySnapshot(itemName, currentCount)
         }
+        pendingIgnoredPickups.clear()
 
-        if (soloGainToProcess > 0) {
-            TrackingRates.calculateRates(soloGainToProcess)
-        }
-        if (multiGains.isNotEmpty()) {
-            MultiTrackingRates.calculateMultiRates(multiGains)
+        if (soloGain > 0L) TrackingRates.calculateRates(soloGain)
+        if (multiGains.isNotEmpty()) MultiTrackingRates.calculateMultiRates(multiGains)
+    }
+
+    @JvmStatic
+    fun onItemPickup(entityId: Int, playerId: Int) {
+        if (!riftTracking ||!IslandTracker.isInRift || apiTracking) return
+
+        val player = MinecraftUtils.player ?: return
+        if (player.id != playerId) return
+        if (!isTrackingActive || isTrackingPaused) return
+
+        if (!shouldProcessEntity(entityId)) return
+
+        val level = MinecraftUtils.level ?: return
+        val entity = level.getEntity(entityId) as? ItemEntity ?: return
+        val stack = entity.item
+
+        if (stack.isEmpty) return
+
+        val itemName = normalizeItemName(stack.hoverName.string)
+        val count = stack.count.coerceAtLeast(1).toLong()
+
+        val pickableCollection = PICKABLE_COLLECTIONS.firstOrNull(itemName::startsWith)
+
+        if (pickableCollection != null) {
+            processPickableCollection(pickableCollection, count)
+        } else {
+            notifyNonPickablePickup(itemName, count)
         }
     }
 
-    private fun matches(itemName: String, collection: String): Boolean {
-        return itemName.startsWith(collection)
+    private fun consumeIgnoredPickup(itemName: String, gain: Long): Long {
+        val pending = pendingIgnoredPickups[itemName] ?: return gain
+        val ignored = minOf(gain, pending)
+        val remaining = pending - ignored
+
+        if (remaining > 0L) {
+            pendingIgnoredPickups[itemName] = remaining
+        } else {
+            pendingIgnoredPickups.remove(itemName)
+        }
+
+        return gain - ignored
     }
 
-    private fun maxGainForCollection(collection: String): Int =
-        when (collection) {
-            "half-eaten carrot" -> 8 // suppose max threshold
-            else -> 1
+    private fun shouldProcessEntity(entityId: Int): Boolean {
+        if (!processedEntityIds.add(entityId)) return false
+
+        if (processedEntityIds.size > 200) {
+            val oldestId = processedEntityIds.iterator().next()
+            processedEntityIds.remove(oldestId)
         }
+
+        return true
+    }
+
+    private fun processPickableCollection(collection: String, count: Long) {
+        if (TrackingHandler.isTracking && CollectionTracker.collection == collection) {
+            TrackingRates.calculateRates(count)
+        }
+
+        if (MultiTrackingHandler.isMultiTracking && collection in CollectionTracker.collectionList) {
+            MultiTrackingRates.calculateMultiRates(mapOf(collection to count))
+        }
+    }
+
+    private fun normalizeItemName(name: String): String =
+        StringUtils.normalizeText(name)
+
+    fun notifyNonPickablePickup(itemName: String, amount: Long) {
+        pendingIgnoredPickups[itemName] = (pendingIgnoredPickups[itemName] ?: 0L) + amount
+    }
+
+    fun clearInventoryState() {
+        wasScreenOpen = false
+        lastInventory.clear()
+        pendingIgnoredPickups.clear()
+        processedEntityIds.clear()
+    }
 }

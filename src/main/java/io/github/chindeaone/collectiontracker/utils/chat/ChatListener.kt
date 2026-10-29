@@ -2,6 +2,7 @@ package io.github.chindeaone.collectiontracker.utils.chat
 
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightManager
 import io.github.chindeaone.collectiontracker.coleweight.ColeweightUtils
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.riftTracking
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.apiTracking
 import io.github.chindeaone.collectiontracker.config.attributeLevel
@@ -63,7 +64,7 @@ object ChatListener {
 
         if (text.contains("Commission Complete")) commissionListener(text)
 
-        if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping")) {
+        if (text.startsWith("  THE RIFT IS COLLAPSING") || text.startsWith("Warping") || (text.startsWith("Evacuating") && riftTracking )) {
             TrackingHandler.pauseRiftTracking()
             MultiTrackingHandler.pauseMultiRiftTracking()
         }

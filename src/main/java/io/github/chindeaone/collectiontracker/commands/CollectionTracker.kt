@@ -24,6 +24,9 @@ object CollectionTracker {
     var isApiTracking = false
     var scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     var trackingTask: ScheduledFuture<*>? = null
+
+    var riftTracking = false
+
     private val logger: Logger = LogManager.getLogger(CollectionTracker::class.java)
 
     fun startTracking(coll: String) {
@@ -71,6 +74,10 @@ object CollectionTracker {
                 if (collection == "timite" || collection == "youngite" || collection == "obsolite") {
                     ChatUtils.sendMessage(" §8Note: Tracking $collection only tracks that item. For the full Timite collection use `/sct track youngite, timite, obsolite`, or track the variant(s) you mine.", false)
                 }
+            }
+
+            if (CollectionsManager.isRiftCollection(collection)) {
+                riftTracking = true
             }
 
             // Fetch bazaar data and leaderboard data asynchronously
@@ -134,6 +141,10 @@ object CollectionTracker {
                 return
             } else {
                 ChatUtils.sendMessage("§aMulti-tracking " + collectionList.joinToString(", ") + " collections.", true)
+            }
+
+            if (CollectionsManager.hasAnyRiftCollection()) {
+                riftTracking = true
             }
 
             // Fetch bazaar data asynchronously

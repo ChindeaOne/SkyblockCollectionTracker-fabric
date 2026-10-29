@@ -6,6 +6,7 @@ import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.riftTracking
 import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.getNextRankEntry
@@ -142,11 +143,14 @@ object TrackingRates {
         if (collectionSinceLastVal != 0L) collectionSinceLast = collectionSinceLastVal
 
         if (collectionSinceLastVal > 0) {
-            logger.info("[SCT]: Current collection for $collection (using sacks) is $currentCollection")
-            logger.info("[SCT]: Change in collection detected (using sacks). Old collection: ${currentCollection - collectionSinceLastVal}. New collection: $currentCollection")
-
             lastCollectionUpdate = EpochMark.now()
-            logger.info("[SCT]: Collection since last check is $collectionSinceLast.")
+
+            if (!riftTracking) {
+                logger.info("[SCT]: Current collection for $collection (using sacks) is $currentCollection")
+                logger.info("[SCT]: Change in collection detected (using sacks). Old collection: ${currentCollection - collectionSinceLastVal}. New collection: $currentCollection")
+
+                logger.info("[SCT]: Collection since last check is $collectionSinceLast.")
+            }
         }
 
         val uptime = TrackingHandler.uptimeInSeconds

@@ -15,6 +15,7 @@ import io.github.chindeaone.collectiontracker.config.enableSkyMall
 import io.github.chindeaone.collectiontracker.config.farmingweightRankingInChat
 import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
+import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
@@ -47,6 +48,7 @@ object TabData {
             DeployableTracker.reset()
             WaypointsUtils.reset()
             StatsWidget.clearStats()
+            InventoryListener.clearInventoryState()
             lastWorldSwitch = EpochMark.now()
         }
 

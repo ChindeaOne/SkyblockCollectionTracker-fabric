@@ -57,7 +57,7 @@ object ModLoader: ModInitializer {
     }
 
     private fun eventRegistration() {
-        ClientTickEvents.END_CLIENT_TICK.register {client ->
+        ClientTickEvents.END_CLIENT_TICK.register { client ->
             if (client.player == null || client.level == null) return@register
 
             Hypixel.onClientTick(client)

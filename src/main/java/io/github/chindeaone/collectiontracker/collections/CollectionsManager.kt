@@ -20,8 +20,8 @@ object CollectionsManager {
     }
 
     fun isCollection(collectionName: String): Boolean {
-        for (entry in collections.entries) {
-            if (entry.key != "Miscellaneous" && entry.value.contains(collectionName)) {
+        for ((key, value) in collections) {
+            if (key != "Miscellaneous" && value.contains(collectionName)) {
                 return true
             }
         }
@@ -39,13 +39,11 @@ object CollectionsManager {
 
     fun hasAnyRiftCollection(): Boolean {
         val riftCollections = collections.getOrDefault("Rift", mutableSetOf())
-
         return CollectionTracker.collectionList.stream().anyMatch { o: String? -> riftCollections.contains(o) }
     }
 
     fun hasAllRiftCollections(): Boolean {
         val riftCollections = collections.getOrDefault("Rift", mutableSetOf())
-
         return riftCollections.containsAll(CollectionTracker.collectionList)
     }
 

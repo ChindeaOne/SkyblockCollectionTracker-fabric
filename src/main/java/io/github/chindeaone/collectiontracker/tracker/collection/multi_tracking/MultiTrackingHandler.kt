@@ -2,8 +2,8 @@ package io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
-import io.github.chindeaone.collectiontracker.collections.CollectionsManager.hasAnyRiftCollection
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.riftTracking
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
 import io.github.chindeaone.collectiontracker.config.apiTracking
@@ -30,6 +30,7 @@ import io.github.chindeaone.collectiontracker.utils.PlayerData
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
+import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.network.chat.Component
@@ -176,6 +177,9 @@ object MultiTrackingHandler  {
 
         clearMaps()
         lastMultiCollectionUpdate = null
+
+        riftTracking = false
+        InventoryListener.clearInventoryState()
     }
 
     fun clearMaps() {
@@ -232,7 +236,7 @@ object MultiTrackingHandler  {
     fun resumeMultiRiftTracking() {
         if (!isMultiTracking || !isMultiPaused) return
 
-        if (!hasAnyRiftCollection()) {
+        if (!riftTracking) {
             logger.warn("[SCT]: Attempted to resume Rift multi tracking, but none of the tracked collections are Rift collections.")
             return
         }
@@ -247,7 +251,7 @@ object MultiTrackingHandler  {
     fun pauseMultiRiftTracking() {
         if (!isMultiTracking || isMultiPaused) return
 
-        if (!hasAnyRiftCollection()) {
+        if (!riftTracking) {
             logger.warn("[SCT]: Attempted to pause Rift multi tracking, but none of the tracked collections are Rift collections.")
             return
         }
@@ -281,8 +285,7 @@ object MultiTrackingHandler  {
         val lines = mutableListOf<Component>()
 
         val useBazaar = useBazaar
-        val allRiftCollections = CollectionsManager.hasAllRiftCollections()
-        val useMotes = !useBazaar && allRiftCollections
+        val useMotes = !useBazaar && riftTracking
 
         val variant = gemstoneVariant.toString()
         val suffix = CollectionParser.bazaarPriceTypeSuffix()

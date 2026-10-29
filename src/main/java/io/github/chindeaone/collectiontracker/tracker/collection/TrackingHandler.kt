@@ -3,10 +3,10 @@ package io.github.chindeaone.collectiontracker.tracker.collection
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType
-import io.github.chindeaone.collectiontracker.collections.CollectionsManager.isRiftCollection
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.riftTracking
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
 import io.github.chindeaone.collectiontracker.config.apiTracking
@@ -48,6 +48,7 @@ import io.github.chindeaone.collectiontracker.utils.NumbersUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
+import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.network.chat.Component
@@ -218,6 +219,9 @@ object TrackingHandler {
         nextRankAmount = -1L
         etaToNextRank = null
         collectionTillNextRank = -1L
+
+        riftTracking = false
+        InventoryListener.clearInventoryState()
     }
 
     private fun resetLowestHighestRates() {
@@ -272,7 +276,7 @@ object TrackingHandler {
     fun resumeRiftTracking() {
         if (!isTracking || !isPaused) return
 
-        if (!isRiftCollection(collection)) {
+        if (!riftTracking) {
             logger.warn("[SCT]: Attempted to resume Rift tracking, but current collection is not a Rift collection.")
             return
         }
@@ -287,7 +291,7 @@ object TrackingHandler {
     fun pauseRiftTracking() {
         if (!isTracking || isPaused) return
 
-        if (!isRiftCollection(collection)) {
+        if (!riftTracking) {
             logger.warn("[SCT]: Attempted to pause Rift tracking, but current collection is not a Rift collection.")
             return
         }
@@ -330,7 +334,7 @@ object TrackingHandler {
 
         if (!useBazaar) {
             val npcMoney: Long = moneyMade["NPC"] ?: 0L
-            if (isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
+            if (riftTracking && NpcPrices.getNpcPrice(collection) != 0) {
                 lines.add(Component.literal("   §6Motes: §f$${NumbersUtils.formatNumber(npcMoney)}   §6Rate: §f${NumbersUtils.formatNumber(moneyPerHourNPC)}/h"))
             } else if (NpcPrices.getNpcPrice(collection) != 0) {
                 lines.add(Component.literal("   §6Money (NPC): §f$${NumbersUtils.formatNumber(npcMoney)}   §6Rate: §f$${NumbersUtils.formatNumber(moneyPerHourNPC)}/h"))
@@ -382,14 +386,14 @@ object TrackingHandler {
         if (!useBazaar) {
             // NPC money extremes
             if (highestRatePerHourNPC > 0) {
-                if (isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
+                if (riftTracking && NpcPrices.getNpcPrice(collection) != 0) {
                     lines.add(Component.literal("   §6Best motes rate: §f${NumbersUtils.formatNumber(highestRatePerHourNPC)}/h"))
                 } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
                     Component.literal("   §6Best NPC money rate: §f$${NumbersUtils.formatNumber(highestRatePerHourNPC)}/h")
                 )
             }
             if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
-                if (isRiftCollection(collection) && NpcPrices.getNpcPrice(collection) != 0) {
+                if (riftTracking && NpcPrices.getNpcPrice(collection) != 0) {
                     lines.add(Component.literal("   §6Worst motes rate: §f${NumbersUtils.formatNumber(lowestRatePerHourNPC)}/h"))
                 } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal("   §6Worst NPC money rate: §f$${NumbersUtils.formatNumber(lowestRatePerHourNPC)}/h"))
             }
