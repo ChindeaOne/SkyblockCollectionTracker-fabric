@@ -641,7 +641,7 @@ object CollectionParser {
         val lastUpdate = MultiTrackingRates.lastMultiCollectionUpdate ?: return "Last updated: Calculating..."
         val totalSeconds = lastUpdate.timePassedSince()
 
-        return "Last updated${totalSeconds.formatCompact()} ago"
+        return "Last updated: ${totalSeconds.formatCompact()} ago"
     }
 
     fun addToggleableSettingsLines(list: MutableList<String>) {
