@@ -1,17 +1,10 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import io.github.chindeaone.collectiontracker.commands.SkillTracker
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.config.enableTamingTracking
-import io.github.chindeaone.collectiontracker.config.leaderboardPosition
-import io.github.chindeaone.collectiontracker.config.previousPosition
-import io.github.chindeaone.collectiontracker.config.skillLeaderboard
 import io.github.chindeaone.collectiontracker.config.skillPosition
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandler
-import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils
-import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.parser.SkillParser
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.drawOverlayFrame
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderSkillStringsWithTaming
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -57,139 +50,19 @@ class SkillOverlay : AbstractOverlay() {
 
         if (ModLoader.clientTicks % 5L != 0L) return
 
-        val currentSkill = SkillTracker.skillName
-        val currentSkillRank = SkillTrackingRates.currentSkillRank
-
-        val withTaming = enableTamingTracking && currentSkill != "Taming"
-        val currentTamingTotalXp = SkillTrackingRates.tamingXp + SkillTrackingRates.tamingXpGained
-        val currentTamingRank = SkillTrackingRates.currentTamingRank
-
-        val leaderboard = skillLeaderboard
-
         val skillLines = mutableListOf<String>()
-        val rankSuffix = formatRankSuffix(currentSkillRank, leaderboard)
-
-        skillLines.add("$currentSkill Level: ${NumbersUtils.formatNumber(SkillTrackingRates.skillLevel.toLong())}$rankSuffix")
-        skillLines.add("Total $currentSkill XP: ${StringUtils.formatNumber(SkillTrackingRates.totalSkillXp)}")
-        skillLines.add("XP (Session): ${StringUtils.formatNumber(SkillTrackingRates.skillXpGained)}")
-        skillLines.add("XP/h: ${StringUtils.formatNumber(SkillTrackingRates.skillPerHour)}")
-
-        addLeaderboardLines(
-            skillLines,
-            currentSkillRank,
-            SkillTrackingRates.nextSkillRankUsername,
-            SkillTrackingRates.nextSkillRankAmount,
-            SkillTrackingRates.tillNextSkillRank,
-            SkillTrackingRates.etaToNextSkillRank,
-            SkillTrackingRates.isNextSkillWiped,
-            SkillTrackingRates.previousSkillRankUsername,
-            SkillTrackingRates.previousSkillRankAmount,
-            SkillTrackingRates.abovePreviousSkillRankAmount,
-            SkillTrackingRates.isPreviousSkillWiped,
-            leaderboard
-        )
-        skillLines.add("")
-        skillLines.add("Uptime: ${SkillTrackingHandler.uptime}")
-
         val tamingLines = mutableListOf<String>()
-        if (withTaming) {
-            tamingLines.add("")
-            val tamingRankSuffix = formatRankSuffix(currentTamingRank, leaderboard)
 
-            tamingLines.add("Taming Level: ${NumbersUtils.formatNumber(SkillTrackingRates.tamingLevel.toLong())}$tamingRankSuffix")
-            tamingLines.add("Total Taming XP: ${StringUtils.formatNumber(currentTamingTotalXp)}")
-            tamingLines.add("XP (Session): ${StringUtils.formatNumber(SkillTrackingRates.tamingXpGained)}")
-            tamingLines.add("XP/h: ${StringUtils.formatNumber(SkillTrackingRates.tamingPerHour)}")
-
-            addLeaderboardLines(
-                tamingLines,
-                currentTamingRank,
-                SkillTrackingRates.nextTamingRankUsername,
-                SkillTrackingRates.nextTamingRankAmount,
-                SkillTrackingRates.tillNextTamingRank,
-                SkillTrackingRates.etaToNextTamingRank,
-                SkillTrackingRates.isNextTamingWiped,
-                SkillTrackingRates.previousTamingRankUsername,
-                SkillTrackingRates.previousTamingRankAmount,
-                SkillTrackingRates.abovePreviousTamingRankAmount,
-                SkillTrackingRates.isPreviousTamingWiped,
-                leaderboard
-            )
-        }
+        SkillParser.updateSkillLines(skillLines)
+        SkillParser.updateTamingLines(tamingLines)
 
         cachedSkillLines = skillLines
         cachedTamingLines = tamingLines
 
         cachedLines = buildList {
             addAll(skillLines)
-            if (withTaming && tamingLines.isNotEmpty()) {
+            if (tamingLines.isNotEmpty()) {
                 addAll(tamingLines)
-            }
-        }
-    }
-
-    private fun formatRankSuffix(rank: Int, leaderboardEnabled: Boolean): String {
-        if (!leaderboardEnabled || rank == -1) return ""
-        return if (rank == 10001) " [Too low]" else " [#$rank]"
-    }
-
-    private fun addLeaderboardLines(
-        list: MutableList<String>,
-        rank: Int,
-        nextUser: String?,
-        nextAmount: Long,
-        tillNext: Long,
-        eta: String?,
-        isNextWiped: Boolean,
-        previousUser: String?,
-        previousAmount: Long,
-        abovePrevious: Long,
-        isPreviousWiped: Boolean,
-        leaderboardEnabled: Boolean
-    ) {
-        if (!leaderboardEnabled) return
-
-        if (rank != 1) {
-            val customPos = leaderboardPosition
-            val posLabel = if (customPos) "Custom Position" else "Next Position"
-            val tillLabel = if (customPos) "Till Custom Position" else "Till Next Position"
-            val etaLabel = if (customPos) "ETA to Custom Position" else "ETA"
-
-            list.add("")
-
-            if (nextUser != null) {
-                val wipedSuffix = if (isNextWiped) "-wiped" else ""
-                list.add("$posLabel ($nextUser$wipedSuffix): ${NumbersUtils.formatNumber(nextAmount)}")
-                if (tillNext == -1L) {
-                    list.add("$tillLabel: Calculating...")
-                } else {
-                    list.add("$tillLabel: ${NumbersUtils.formatNumber(tillNext)}")
-                }
-                if (!eta.isNullOrEmpty()) {
-                    list.add("$etaLabel: $eta")
-                } else {
-                    list.add("$etaLabel: Calculating...")
-                }
-            } else {
-                list.add("$posLabel: Calculating...")
-                list.add("$tillLabel: Calculating...")
-                list.add("$etaLabel: Calculating...")
-            }
-        }
-
-        if (previousPosition) {
-            list.add("")
-            if (previousUser != null) {
-                val wipedSuffix = if (isPreviousWiped) "-wiped" else ""
-                list.add("Passed ($previousUser$wipedSuffix): ${NumbersUtils.formatNumber(previousAmount)}")
-            } else {
-                list.add("Passed: Calculating...")
-            }
-
-            if (abovePrevious == -1L) {
-                list.add("Difference: Calculating...")
-            } else {
-                list.add("Difference: ${NumbersUtils.formatNumber(abovePrevious)}")
             }
         }
     }
