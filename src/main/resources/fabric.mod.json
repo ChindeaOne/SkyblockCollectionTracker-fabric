@@ -28,7 +28,7 @@
 	"mixins": [
 		"mixins.sct.json"
 	],
-	"accessWidener": "skyblockcollectiontracker.accesswidener",
+	"accessWidener": "accesswideners/${aw_file}",
 	"depends": {
 		"fabricloader": ">=0.19.0",
 		"minecraft": "~${minecraft_version}",

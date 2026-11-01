@@ -94,20 +94,20 @@ repositories {
     }
 }
 
+val minecraft = stonecutter.current.version
+
+val accessWidener = when {
+    stonecutter.eval(minecraft, "26.3") -> "26.3.accesswidener"
+    stonecutter.eval(minecraft, "26.2") -> "26.2.accesswidener"
+    else -> "26.1.accesswidener"
+}
+
 loom {
-    accessWidenerPath.set(
-        rootProject.file("src/main/resources/skyblockcollectiontracker.accesswidener")
-    )
+    accessWidenerPath.set(rootProject.file("src/main/resources/accesswideners/$accessWidener"))
 }
 
 val shadowImpl: Configuration = configurations.create("shadowImpl") {
     configurations.implementation.get().extendsFrom(this)
-}
-
-fabricApi {
-    configureDataGeneration {
-        client.set(true)
-    }
 }
 
 dependencies {
@@ -143,7 +143,8 @@ kotlin {
 tasks.processResources {
     val expandProps = mapOf(
         "version" to project.version,
-        "minecraft_version" to sc.current.version
+        "minecraft_version" to stonecutter.current.version,
+        "aw_file" to accessWidener
     )
 
     inputs.properties(expandProps)
@@ -172,6 +173,8 @@ tasks.jar {
 }
 
 tasks.shadowJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     destinationDirectory.set(layout.buildDirectory.dir("libs"))
     archiveClassifier.set("")
 
@@ -187,6 +190,7 @@ tasks.shadowJar {
     configurations = listOf(shadowImpl)
 
     exclude("META-INF/versions/**")
+    exclude("META-INF/*.kotlin_module")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "io.github.chindeaone.collectiontracker.deps.moulconfig")
     relocate("io.github.chindeaone.modrinthautoupdater", "io.github.chindeaone.collectiontracker.deps.modrinthautoupdater")
