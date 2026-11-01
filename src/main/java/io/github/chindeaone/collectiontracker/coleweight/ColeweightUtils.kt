@@ -19,7 +19,7 @@ object ColeweightUtils {
 
     fun getColeweight(playerName: String = PlayerData.playerName, sendInChat: Boolean = true) {
         if (sendInChat) {
-            ChatUtils.sendMessage("§aFetching Coleweight for $playerName ...", true)
+            ChatUtils.sendMessage("§aFetching Coleweight for $playerName ...")
 
             if (isPlayerCached(playerName)) {
                 displayColeweight(playerName, ColeweightManager.storage)
@@ -55,11 +55,11 @@ object ColeweightUtils {
 
     fun getColeweightLeaderboard(position: Int) {
         if (position > 10_000) {
-            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 10000.", true)
+            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 10000.")
             return
         }
 
-        ChatUtils.sendMessage("§aFetching Top $position in Coleweight...", true)
+        ChatUtils.sendMessage("§aFetching Top $position in Coleweight...")
         ColeweightFetcher.fetchColeweightLeaderboard()
             .thenAccept { body ->
                 if (body == null) return@thenAccept
@@ -75,7 +75,7 @@ object ColeweightUtils {
 
         val fullMessage = Component.empty().append(rankComponent).append(" §b$playerName's Coleweight: ${storage.coleweight} (Top ${storage.percentage}%)")
 
-        ChatUtils.sendComponent(fullMessage, true)
+        ChatUtils.sendComponent(fullMessage)
     }
 
     private fun displayColeweightLeaderboard(position: Int) {
@@ -95,7 +95,7 @@ object ColeweightUtils {
             val message = Component.empty()
                 .append(getRankComponent(rank, isMe, entry.name))
                 .append(" §a${entry.name}: §b${entry.coleweight}")
-            ChatUtils.sendComponent(message, true)
+            ChatUtils.sendComponent(message)
         }
     }
 
@@ -116,21 +116,21 @@ object ColeweightUtils {
 
     fun setPlayerCustomColor(playerName: String, hexColor: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
-            ChatUtils.sendMessage("§cYou cannot set a custom color for yourself like this. Use the feature in `/sct`.", true)
+            ChatUtils.sendMessage("§cYou cannot set a custom color for yourself like this. Use the feature in `/sct`.")
             return
         }
         ConfigHelper.setColeweightCustomColor(playerName, hexColor)
         val color: Component = ColorUtils.coloredText(hexColor)
-        ChatUtils.sendComponent(Component.empty().append("§aCustom color for ").append(playerName).append("§a set to ").append(color).append("§a."), true)
+        ChatUtils.sendComponent(Component.empty().append("§aCustom color for ").append(playerName).append("§a set to ").append(color).append("§a."))
     }
 
     fun removePlayerCustomColor(playerName: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
-            ChatUtils.sendMessage("§cYou cannot remove a custom color for yourself like this. Use the feature in `/sct`.", true)
+            ChatUtils.sendMessage("§cYou cannot remove a custom color for yourself like this. Use the feature in `/sct`.")
             return
         }
         ConfigHelper.removeColeweightCustomColor(playerName)
-        ChatUtils.sendMessage("§aCustom color for $playerName removed.", true)
+        ChatUtils.sendMessage("§aCustom color for $playerName removed.")
     }
 
     fun setGlobalColor(color: String) {
@@ -139,16 +139,16 @@ object ColeweightUtils {
 
         val top10Cw = ColeweightManager.storage.leaderboard.take(10)
         if (top10Cw.none { it.name.equals(playerName, ignoreCase = true) }) {
-            ChatUtils.sendMessage("§cYou must be in the top 10 of the Coleweight leaderboard to set a global color.", true)
+            ChatUtils.sendMessage("§cYou must be in the top 10 of the Coleweight leaderboard to set a global color.")
             return
         }
 
         ColeweightFetcher.setGlobalColor(playerName,uuid, color)
             .thenAccept { success ->
                 if (success) {
-                    ChatUtils.sendComponent(Component.empty().append("§aGlobal color set to ").append(ColorUtils.coloredText(color)).append("."), true)
+                    ChatUtils.sendComponent(Component.empty().append("§aGlobal color set to ").append(ColorUtils.coloredText(color)).append("."))
                 } else {
-                    ChatUtils.sendMessage("§cFailed to set global Coleweight color.", true)
+                    ChatUtils.sendMessage("§cFailed to set global Coleweight color.")
                 }
             }
     }

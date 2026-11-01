@@ -47,14 +47,14 @@ object ConfigStateUtils {
 
         if (trackingActive && !CollectionTracker.isApiTracking && apiTracking) {
             ConfigHelper.setApiTracking(CollectionTracker.isApiTracking)
-            sendMessage("§cCan't enable API tracking while tracking is active!", true)
+            sendMessage("§cCan't enable API tracking while tracking is active!")
         }
     }
 
     private fun checkCollectionLeaderboard() {
         if (TrackingHandler.isTracking  && collectionLeaderboard && !TrackingHandler.leaderboardTrackingInitialized) {
             ConfigHelper.disableCollectionLeaderboardTracking()
-            sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true)
+            sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!")
         }
     }
 
@@ -66,7 +66,7 @@ object ConfigStateUtils {
             !MultiTrackingHandler.leaderboardTrackingInitialized) {
 
             ConfigHelper.disableCollectionLeaderboardTracking()
-            sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!", true)
+            sendMessage("§cCan't enable collection leaderboard mid tracking. Enable this before tracking a collection!")
         }
     }
 

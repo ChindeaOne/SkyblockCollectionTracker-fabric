@@ -32,7 +32,7 @@ object TokenFetcher {
                         logger.error("[SCT]: Failed to fetch token, response code: ${response.statusCode()}")
 
                         if (notify) {
-                            sendMessage("§cFailed to fetch token.", true)
+                            sendMessage("§cFailed to fetch token.")
                         }
 
                         null
@@ -41,7 +41,7 @@ object TokenFetcher {
 
                         logger.info("[SCT]: Successfully fetched token")
                         if (notify) {
-                            sendMessage("§aSuccessfully fetched a new token.", true)
+                            sendMessage("§aSuccessfully fetched a new token.")
                         }
 
                         json["token"].asString

@@ -38,7 +38,7 @@ class StopwatchOverlay : AbstractOverlay() {
 
     fun startStopwatch() {
         if (stopwatchRunning && !stopwatchPaused) {
-            sendMessage("§cStopwatch is already running!", true)
+            sendMessage("§cStopwatch is already running!")
             return
         }
 
@@ -47,20 +47,20 @@ class StopwatchOverlay : AbstractOverlay() {
         stopwatchRunning = true
         stopwatchPaused = false
 
-        sendMessage("§aStopwatch started!", true)
+        sendMessage("§aStopwatch started!")
         TimeNotifierUtils.resetStopwatchNotifier()
     }
 
     fun stopStopwatch() {
         if (!stopwatchRunning) {
-            sendMessage("§cStopwatch is not running!", true)
+            sendMessage("§cStopwatch is not running!")
             return
         }
 
         val startTime = stopwatchStartTime ?: return
         val elapsed = if (stopwatchPaused) stopwatchElapsed else stopwatchElapsed + startTime.timePassedSince()
 
-        sendMessage("§cStopwatch stopped at §e" + elapsed.formatCompact() + "§c!", true)
+        sendMessage("§cStopwatch stopped at §e" + elapsed.formatCompact() + "§c!")
 
         stopwatchStartTime = null
         stopwatchElapsed = Duration.ZERO
@@ -71,7 +71,7 @@ class StopwatchOverlay : AbstractOverlay() {
 
     fun pauseStopwatch() {
         if (!stopwatchRunning) {
-            sendMessage("§cStopwatch is not running!", true)
+            sendMessage("§cStopwatch is not running!")
             return
         }
 
@@ -80,11 +80,11 @@ class StopwatchOverlay : AbstractOverlay() {
         if (!stopwatchPaused) {
             stopwatchElapsed += startTime.timePassedSince()
             stopwatchPaused = true
-            sendMessage("§eStopwatch paused!", true)
+            sendMessage("§eStopwatch paused!")
         } else {
             stopwatchStartTime = EpochMark.now()
             stopwatchPaused = false
-            sendMessage("§aStopwatch resumed!", true)
+            sendMessage("§aStopwatch resumed!")
         }
     }
 

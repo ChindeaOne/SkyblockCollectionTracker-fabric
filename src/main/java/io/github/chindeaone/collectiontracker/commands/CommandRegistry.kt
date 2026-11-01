@@ -101,7 +101,7 @@ object CommandRegistry {
 
                     if (page != null) {
                         if (page < 1) {
-                            ChatUtils.sendMessage("§cPage number must be at least 1.", true)
+                            ChatUtils.sendMessage("§cPage number must be at least 1.")
                         } else {
                             CollectionList.sendCollectionList(page)
                         }
@@ -110,7 +110,7 @@ object CommandRegistry {
                         val categoryPage = CollectionList.getPageForCategory(arg)
 
                         if (categoryPage == null) {
-                            ChatUtils.sendMessage("§cUnknown category.", true)
+                            ChatUtils.sendMessage("§cUnknown category.")
                         } else {
                             CollectionList.sendCollectionList(categoryPage)
                         }
@@ -123,7 +123,7 @@ object CommandRegistry {
         // sct track <collection(s)/skill> -> general command covering both collection and skill tracking
         .then(ClientCommands.literal("track")
             .executes {
-                ChatUtils.sendMessage("Usage: /sct track <collection/skill>", true)
+                ChatUtils.sendMessage("Usage: /sct track <collection/skill>")
                 1
             }
             .then(ClientCommands.argument("targets", StringArgumentType.greedyString())
@@ -185,7 +185,7 @@ object CommandRegistry {
         // sct stop any tracker
         .then(ClientCommands.literal("stop")
             .executes {
-                ChatUtils.sendMessage("Usage: /sct stop <collection/skill>", true)
+                ChatUtils.sendMessage("Usage: /sct stop <collection/skill>")
                 1
             }
             .then(ClientCommands.argument("type", StringArgumentType.word())
@@ -197,11 +197,11 @@ object CommandRegistry {
                             when {
                                 MultiTrackingHandler.isMultiTracking -> MultiTrackingHandler.stopMultiTrackingManual()
                                 TrackingHandler.isTracking -> TrackingHandler.stopTrackingManual()
-                                else -> ChatUtils.sendMessage("§cNo collection is currently being tracked.", true)
+                                else -> ChatUtils.sendMessage("§cNo collection is currently being tracked.")
                             }
                         }
                         "skill" -> SkillTrackingHandler.stopTrackingManual()
-                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.", true)
+                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.")
                     }
                     1
                 }
@@ -210,7 +210,7 @@ object CommandRegistry {
         // sct pause any tracker
         .then(ClientCommands.literal("pause")
             .executes {
-                ChatUtils.sendMessage("Usage: /sct pause <collection/skill>", true)
+                ChatUtils.sendMessage("Usage: /sct pause <collection/skill>")
                 1
             }
             .then(ClientCommands.argument("type", StringArgumentType.word())
@@ -222,11 +222,11 @@ object CommandRegistry {
                             when {
                                 MultiTrackingHandler.isMultiTracking -> MultiTrackingHandler.pauseMultiTracking()
                                 TrackingHandler.isTracking -> TrackingHandler.pauseTracking()
-                                else -> ChatUtils.sendMessage("§cNo collection is currently being tracked.", true)
+                                else -> ChatUtils.sendMessage("§cNo collection is currently being tracked.")
                             }
                         }
                         "skill" -> SkillTrackingHandler.pauseTracking()
-                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.", true)
+                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.")
                     }
                     1
                 }
@@ -236,7 +236,7 @@ object CommandRegistry {
         // sct resume any tracker
         .then(ClientCommands.literal("resume")
             .executes {
-                ChatUtils.sendMessage("Usage: /sct resume <collection/skill>", true)
+                ChatUtils.sendMessage("Usage: /sct resume <collection/skill>")
                 1
             }
             .then(ClientCommands.argument("type", StringArgumentType.word())
@@ -248,11 +248,11 @@ object CommandRegistry {
                             when {
                                 MultiTrackingHandler.isMultiPaused -> MultiTrackingHandler.resumeMultiTracking()
                                 TrackingHandler.isPaused -> TrackingHandler.resumeTracking()
-                                else -> ChatUtils.sendMessage("§cNo collection is currently paused.", true)
+                                else -> ChatUtils.sendMessage("§cNo collection is currently paused.")
                             }
                         }
                         "skill" -> SkillTrackingHandler.resumeTracking()
-                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.", true)
+                        else -> ChatUtils.sendMessage("§cInvalid type. Use 'collection' or 'skill'.")
                     }
                     1
                 }
@@ -262,7 +262,7 @@ object CommandRegistry {
         // sct restart any tracker
         .then(ClientCommands.literal("restart")
             .executes {
-                ChatUtils.sendMessage("Usage: /sct restart <collection/skill>", true)
+                ChatUtils.sendMessage("Usage: /sct restart <collection/skill>")
                 1
             }
             .then(ClientCommands.argument("type", StringArgumentType.word())
@@ -361,16 +361,16 @@ object CommandRegistry {
                                 val formattedHex = if (color.startsWith("#")) color else "#$color"
 
                                 if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$".toRegex())) {
-                                    ChatUtils.sendMessage("§cInvalid color format.", true)
+                                    ChatUtils.sendMessage("§cInvalid color format.")
                                     return@executes 1
                                 }
 
                                 if (target.equals("global", ignoreCase = true)) {
                                     ColeweightUtils.setGlobalColor(formattedHex)
-                                    ChatUtils.sendMessage("§aGlobal coleweight color set to $formattedHex", true)
+                                    ChatUtils.sendMessage("§aGlobal coleweight color set to $formattedHex")
                                 } else {
                                     ColeweightUtils.setPlayerCustomColor(target, formattedHex)
-                                    ChatUtils.sendMessage("§aColeweight color for $target set to $formattedHex", true)
+                                    ChatUtils.sendMessage("§aColeweight color for $target set to $formattedHex")
                                 }
                                 1
                             }
@@ -464,7 +464,7 @@ object CommandRegistry {
             )
             .then(ClientCommands.literal("lb")
                 .executes {
-                    ChatUtils.sendMessage("Usage: /sct fw lb <length>.", true)
+                    ChatUtils.sendMessage("Usage: /sct fw lb <length>.")
                     1
                 }
                 .then(ClientCommands.argument("position", IntegerArgumentType.integer())
@@ -478,7 +478,7 @@ object CommandRegistry {
             // sct fw color set <ign> <color>
             .then(ClientCommands.literal("color")
                 .executes {
-                    ChatUtils.sendMessage("Usage: /sct fw color set <player name> <hex color>.", true)
+                    ChatUtils.sendMessage("Usage: /sct fw color set <player name> <hex color>.")
                     1
                 }
                 .then(ClientCommands.literal("set")
@@ -502,17 +502,17 @@ object CommandRegistry {
                                 val formattedHex = if (color.startsWith("#")) color else "#$color"
 
                                 if (!formattedHex.matches("^#?[0-9a-fA-F]{6}$".toRegex())) {
-                                    ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.", true)
+                                    ChatUtils.sendMessage("§cInvalid color format. Use hex format like #RRGGBB.")
                                     return@executes 1
                                 }
 
                                 // 3. Handle the logic internally based on the "target" string
                                 if (target.equals("global", ignoreCase = true)) {
                                     FarmingweightUtils.setGlobalColor(formattedHex)
-                                    ChatUtils.sendMessage("§aGlobal farmingweight color set to $formattedHex", true)
+                                    ChatUtils.sendMessage("§aGlobal farmingweight color set to $formattedHex")
                                 } else {
                                     FarmingweightUtils.setPlayerCustomColor(target, formattedHex)
-                                    ChatUtils.sendMessage("§aFarmingweight color for $target set to $formattedHex", true)
+                                    ChatUtils.sendMessage("§aFarmingweight color for $target set to $formattedHex")
                                 }
                                 1
                             }
@@ -521,7 +521,7 @@ object CommandRegistry {
                 )
                 .then(ClientCommands.literal("remove")
                     .executes {
-                        ChatUtils.sendMessage("Usage: /sct fw color remove <player name>.", true)
+                        ChatUtils.sendMessage("Usage: /sct fw color remove <player name>.")
                         1
                     }
                     .then(ClientCommands.argument("player name", StringArgumentType.string())
@@ -555,7 +555,7 @@ object CommandRegistry {
                         val seconds = NumbersUtils.parseToSeconds(time).seconds
 
                         if (seconds.isNegative()) {
-                            ChatUtils.sendMessage("§cInvalid time format. Use formats like '1h30m', '45s', or '90'.", true)
+                            ChatUtils.sendMessage("§cInvalid time format. Use formats like '1h30m', '45s', or '90'.")
                             return@executes 1
                         }
 
@@ -694,7 +694,7 @@ object CommandRegistry {
                 if (!canUseCommand()) return@executes 0
 
                 CommissionsTracker.reset()
-                ChatUtils.sendMessage("§aCommissions tracker has been reset.", true)
+                ChatUtils.sendMessage("§aCommissions tracker has been reset.")
                 1
             }
         )
@@ -833,7 +833,7 @@ object CommandRegistry {
 
     private fun checkIfInSkyblock(): Boolean {
         if (!HypixelUtils.isInSkyblock) {
-            ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!", true)
+            ChatUtils.sendMessage("§cYou must be on Hypixel Skyblock to use this command!")
             return false
         }
         return true
@@ -841,7 +841,7 @@ object CommandRegistry {
 
     private fun checkIfServerIsOnline(): Boolean {
         if (!ServerUtils.serverStatus) {
-            ChatUtils.sendMessage("§cThe API server is currently offline. Please try again later.", true)
+            ChatUtils.sendMessage("§cThe API server is currently offline. Please try again later.")
             return false
         }
         return true

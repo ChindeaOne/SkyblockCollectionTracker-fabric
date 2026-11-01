@@ -17,7 +17,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleMiningStats")
                         .executes {
                             val enabled = ConfigHelper.toggleMiningStats()
-                            ChatUtils.sendMessage("§eMining stats overlay " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eMining stats overlay " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -25,7 +25,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleMiningStatsOnlyOnMiningIslands")
                         .executes {
                             val enabled = ConfigHelper.toggleMiningStatsOnlyOnMiningIslands()
-                            ChatUtils.sendMessage("§eMining stats overlay in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eMining stats overlay in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -33,7 +33,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("togglePickaxeAbility")
                         .executes {
                             val enabled = ConfigHelper.togglePickaxeAbility()
-                            ChatUtils.sendMessage("§ePickaxe ability display " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§ePickaxe ability display " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -41,7 +41,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("togglePickaxeAbilityOnlyOnMiningIslands")
                         .executes {
                             val enabled = ConfigHelper.togglePickaxeAbilityOnlyOnMiningIslands()
-                            ChatUtils.sendMessage("§ePickaxe ability display in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§ePickaxe ability display in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -49,7 +49,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("togglePickaxeAbilityReadyTitle")
                         .executes {
                             val enabled = ConfigHelper.togglePickaxeAbilityReadyTitle()
-                            ChatUtils.sendMessage("§ePickaxe ability ready title "+ if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§ePickaxe ability ready title "+ if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -57,7 +57,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("togglePickaxeAbilityExpiredTitle")
                         .executes {
                             val enabled = ConfigHelper.togglePickaxeAbilityExpiredTitle()
-                            ChatUtils.sendMessage("§ePickaxe ability expired title "+ if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§ePickaxe ability expired title "+ if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -65,7 +65,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleSkyMall")
                         .executes {
                             val enabled = ConfigHelper.toggleSkyMall()
-                            ChatUtils.sendMessage("§eSky Mall " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eSky Mall " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -73,7 +73,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleSkyMallOnlyOnMiningIslands")
                         .executes {
                             val enabled = ConfigHelper.toggleSkyMallOnlyOnMiningIslands()
-                            ChatUtils.sendMessage("§eSky Mall in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eSky Mall in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -81,7 +81,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleSkyMallChatMessages")
                         .executes {
                             val enabled = ConfigHelper.toggleSkyMallChatMessages()
-                            ChatUtils.sendMessage("§eSky Mall chat messages " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eSky Mall chat messages " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -89,7 +89,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleCommissionsOverlay")
                         .executes {
                             val enabled = ConfigHelper.toggleCommissionsOverlay()
-                            ChatUtils.sendMessage("§eCommissions overlay " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eCommissions overlay " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -97,7 +97,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleCommissionsTracking")
                         .executes {
                             val enabled = ConfigHelper.toggleCommissionsTracking()
-                            ChatUtils.sendMessage("§eCommissions tracking sub-overlay " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eCommissions tracking sub-overlay " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -105,7 +105,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleCommissionsKeybinds")
                         .executes {
                             val enabled = ConfigHelper.toggleCommissionsKeybinds()
-                            ChatUtils.sendMessage("§eCommissions keybinds " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eCommissions keybinds " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -113,7 +113,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleTempBuffTracker")
                         .executes {
                             val enabled = ConfigHelper.toggleTempBuffTracker()
-                            ChatUtils.sendMessage("§eTemporary buff tracker " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eTemporary buff tracker " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -121,7 +121,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleTempBuffExpiredTitle")
                         .executes {
                             val enabled = ConfigHelper.toggleTempBuffExpiredTitle()
-                            ChatUtils.sendMessage("§eTemporary buff expired title " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eTemporary buff expired title " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -131,7 +131,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleForagingStats")
                         .executes {
                             val enabled = ConfigHelper.toggleForagingStats()
-                            ChatUtils.sendMessage("§eForaging stats overlay " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eForaging stats overlay " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -139,7 +139,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleForagingStatsOnlyOnForagingIslands")
                         .executes {
                             val enabled = ConfigHelper.toggleForagingStatsOnlyOnForagingIslands()
-                            ChatUtils.sendMessage("§eForaging stats overlay in foraging islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eForaging stats overlay in foraging islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -147,7 +147,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleAxeAbility")
                         .executes {
                             val enabled = ConfigHelper.toggleAxeAbility()
-                            ChatUtils.sendMessage("§eAxe ability display " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eAxe ability display " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -155,7 +155,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleAxeAbilityOnlyOnForagingIslands")
                         .executes {
                             val enabled = ConfigHelper.toggleAxeAbilityOnlyOnForagingIslands()
-                            ChatUtils.sendMessage("§eAxe ability display in foraging islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eAxe ability display in foraging islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -163,7 +163,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleAxeAbilityReadyTitle")
                         .executes {
                             val enabled = ConfigHelper.toggleAxeAbilityReadyTitle()
-                            ChatUtils.sendMessage("§eAxe ability ready title " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eAxe ability ready title " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -171,7 +171,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleAxeAbilityExpiredTitle")
                         .executes {
                             val enabled = ConfigHelper.toggleAxeAbilityExpiredTitle()
-                            ChatUtils.sendMessage("§eAxe ability expired title " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eAxe ability expired title " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -179,7 +179,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleLottery")
                         .executes {
                             val enabled = ConfigHelper.toggleLottery()
-                            ChatUtils.sendMessage("§eLottery " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eLottery " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -187,7 +187,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleLotteryOnlyOnForagingIslands")
                         .executes {
                             val enabled = ConfigHelper.toggleLotteryOnlyOnForagingIslands()
-                            ChatUtils.sendMessage("§eLottery in foraging islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eLottery in foraging islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -195,7 +195,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleLotteryChatMessages")
                         .executes {
                             val enabled = ConfigHelper.toggleLotteryChatMessages()
-                            ChatUtils.sendMessage("§eLottery chat messages " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eLottery chat messages " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -203,7 +203,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleBeekeeper")
                         .executes {
                             val enabled = ConfigHelper.toggleBeekeeper()
-                            ChatUtils.sendMessage("§eBeekeeper " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eBeekeeper " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -211,7 +211,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleBeekeeperOnlyOnForagingIslands")
                         .executes {
                             val enabled = ConfigHelper.toggleBeekeeperOnlyOnForagingIslands()
-                            ChatUtils.sendMessage("§eBeekeeper in foraging islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eBeekeeper in foraging islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -219,7 +219,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleBeekeeperChatMessages")
                         .executes {
                             val enabled = ConfigHelper.toggleBeekeeperChatMessages()
-                            ChatUtils.sendMessage("§eBeekeeper chat messages " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eBeekeeper chat messages " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -227,7 +227,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleColeweightRankingInChat")
                         .executes {
                             val enabled = ConfigHelper.toggleColeweightRankingInChat()
-                            ChatUtils.sendMessage("§eColeweight ranking in chat " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eColeweight ranking in chat " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -235,7 +235,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleColeweightRankInNameTag")
                         .executes {
                             val enabled = ConfigHelper.toggleColeweightRankInNameTag()
-                            ChatUtils.sendMessage("§eColeweight rank in name tag " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eColeweight rank in name tag " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -243,7 +243,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleColeweightOnlyOnMiningIslands")
                         .executes {
                             val enabled = ConfigHelper.toggleColeweightOnlyOnMiningIslands()
-                            ChatUtils.sendMessage("§eColeweight rank in name tag in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eColeweight rank in name tag in mining islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -251,7 +251,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleFarmingweightRankingInChat")
                         .executes {
                             val enabled = ConfigHelper.toggleFarmingweightRankingInChat()
-                            ChatUtils.sendMessage("§eFarmingweight ranking in chat " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eFarmingweight ranking in chat " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -259,7 +259,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleFarmingweightRankInNameTag")
                         .executes {
                             val enabled = ConfigHelper.toggleFarmingweightRankInNameTag()
-                            ChatUtils.sendMessage("§eFarmingweight rank in name tag " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eFarmingweight rank in name tag " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -267,7 +267,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleFarmingweightOnlyOnFarmingIslands")
                         .executes {
                             val enabled = ConfigHelper.toggleFarmingweightOnlyOnFarmingIslands()
-                            ChatUtils.sendMessage("§eFarmingweight rank in name tag in farming islands only " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eFarmingweight rank in name tag in farming islands only " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -275,7 +275,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleHeatmap")
                         .executes {
                             val enabled = ConfigHelper.toggleHeatmap()
-                            ChatUtils.sendMessage("§eHeatmap " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eHeatmap " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -283,7 +283,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleCollectionLeaderboard")
                         .executes {
                             val enabled = ConfigHelper.toggleCollectionLeaderboard()
-                            ChatUtils.sendMessage("§eCollection leaderboard " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eCollection leaderboard " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -291,7 +291,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleSkillLeaderboard")
                         .executes {
                             val enabled = ConfigHelper.toggleSkillLeaderboard()
-                            ChatUtils.sendMessage("§eSkill leaderboard " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eSkill leaderboard " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -299,7 +299,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleCollectionMilestones")
                         .executes {
                             val enabled = ConfigHelper.toggleCollectionMilestones()
-                            ChatUtils.sendMessage("§eCollection milestones " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eCollection milestones " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -307,7 +307,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleCollectionMilestonesTitleNotification")
                         .executes {
                             val enabled = ConfigHelper.toggleCollectionMilestonesTitleNotification()
-                            ChatUtils.sendMessage("§eCollection milestones title notification " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eCollection milestones title notification " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -315,7 +315,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleCollectionMilestonesSoundNotification")
                         .executes {
                             val enabled = ConfigHelper.toggleCollectionMilestonesSoundNotification()
-                            ChatUtils.sendMessage("§eCollection milestones sound notification " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eCollection milestones sound notification " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -323,7 +323,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleSkillMilestones")
                         .executes {
                             val enabled = ConfigHelper.toggleSkillMilestones()
-                            ChatUtils.sendMessage("§eSkill milestones " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eSkill milestones " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -331,7 +331,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleSkillMilestonesTitleNotification")
                         .executes {
                             val enabled = ConfigHelper.toggleSkillMilestonesTitleNotification()
-                            ChatUtils.sendMessage("§eSkill milestones title notification " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eSkill milestones title notification " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -339,7 +339,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleSkillMilestonesSoundNotification")
                         .executes {
                             val enabled = ConfigHelper.toggleSkillMilestonesSoundNotification()
-                            ChatUtils.sendMessage("§eSkill milestones sound notification " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eSkill milestones sound notification " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -347,7 +347,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleTimerNotifier")
                         .executes {
                             val enabled = ConfigHelper.toggleTimerNotifier()
-                            ChatUtils.sendMessage("§eTimer notifier " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eTimer notifier " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )
@@ -355,7 +355,7 @@ object ConfigCommandRegistry {
                     ClientCommands.literal("toggleStopwatchNotifier")
                         .executes {
                             val enabled = ConfigHelper.toggleStopwatchNotifier()
-                            ChatUtils.sendMessage("§eStopwatch notifier " + if (enabled) "§aenabled." else "§cdisabled.", true)
+                            ChatUtils.sendMessage("§eStopwatch notifier " + if (enabled) "§aenabled." else "§cdisabled.")
                             1
                         }
                 )

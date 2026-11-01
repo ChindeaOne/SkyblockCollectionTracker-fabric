@@ -146,7 +146,7 @@ object Hypixel {
                         }
                         About.UpdateType.MANUAL -> {
                             val url = ModrinthData.getModLink()
-                            ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e.", true)
+                            ChatUtils.sendMessage("§eA new version for SkyblockCollectionTracker found: §a${RepoUtils.latestVersion}§e.")
                             ChatUtils.sendClickableLinkComponent("§eClick here to manually download it.", "§eOpens the Modrinth page in your browser.", url)
                         }
                     }

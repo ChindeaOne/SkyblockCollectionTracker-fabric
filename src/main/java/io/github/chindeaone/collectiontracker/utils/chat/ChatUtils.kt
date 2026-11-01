@@ -182,7 +182,7 @@ object ChatUtils {
         val message = Component.empty()
 
         fun appendLine(component: Component) {
-            if (!message.string.isEmpty()) {
+            if (message.string.isNotEmpty()) {
                 message.append(Component.literal("\n"))
             }
             message.append(component)

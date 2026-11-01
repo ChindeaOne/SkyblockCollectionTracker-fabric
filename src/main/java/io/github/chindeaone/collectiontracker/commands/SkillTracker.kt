@@ -20,13 +20,13 @@ object SkillTracker {
     fun startTracking(skill: String) {
         try {
             if (isTracking) {
-                ChatUtils.sendMessage("§cAlready tracking a skill.", true)
+                ChatUtils.sendMessage("§cAlready tracking a skill.")
                 return
             }
 
             skillName = skill
             if (!SkillUtils.isValidSkill(skillName)) {
-                ChatUtils.sendMessage("§4$skillName skill is not a real skill!", true)
+                ChatUtils.sendMessage("§4$skillName skill is not a real skill!")
                 skillName = ""
                 return
             }
@@ -41,7 +41,7 @@ object SkillTracker {
                     .thenRun(SkillTrackingHandler::startTracking)
         } catch (e: Exception) {
             logger.error("An error occurred while starting skill tracking: ", e)
-            ChatUtils.sendMessage("§cAn error occurred while starting skill tracking. Please try again later.", true)
+            ChatUtils.sendMessage("§cAn error occurred while starting skill tracking. Please try again later.")
         }
     }
 }

@@ -22,7 +22,7 @@ object SkillApiFetcher {
                 when (response.statusCode()) {
                     200 -> processSkillsResponse(response)
                     404 -> {
-                        ChatUtils.sendMessage("§eSkill API disabled in game or Hypixel API is down. Setting skill values manually...", true)
+                        ChatUtils.sendMessage("§eSkill API disabled in game or Hypixel API is down. Setting skill values manually...")
                         logger.warn("[SCT]: Skill API disabled in game.")
                     }
                     else -> logger.error("[SCT]: Failed to fetch skill data. HTTP ${response.statusCode()}")

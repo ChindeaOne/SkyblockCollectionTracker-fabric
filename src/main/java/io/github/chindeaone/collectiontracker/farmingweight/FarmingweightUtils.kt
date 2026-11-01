@@ -18,7 +18,7 @@ object FarmingweightUtils {
     private val COOLDOWN_DURATION = 5.minutes
 
     fun getFarmingweightRank(playerName: String) {
-        ChatUtils.sendMessage("§aFetching Farming Weight for $playerName ...", true)
+        ChatUtils.sendMessage("§aFetching Farming Weight for $playerName ...")
 
         if (isPlayerCached(playerName)) {
             displayFarmingweight(playerName, FarmingweightManager.storage)
@@ -60,11 +60,11 @@ object FarmingweightUtils {
 
     fun getFarmingweightLeaderboard(position: Int) {
         if (position > 100_000) {
-            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 100000.", true)
+            ChatUtils.sendMessage("§cRequested leaderboard length exceeds the maximum limit of 100000.")
             return
         }
 
-        ChatUtils.sendMessage("§aFetching Top $position in Farming Weight...", true)
+        ChatUtils.sendMessage("§aFetching Top $position in Farming Weight...")
         EliteApiFetcher.fetchFarmingweightLeaderboard().thenAccept { body ->
             if (body == null) return@thenAccept
             FarmingweightManager.updateFarmingweightLb(body, false)
@@ -78,7 +78,7 @@ object FarmingweightUtils {
         val rankComp = getRankComponent(storage.rank, isMe, playerName)
         val fullMessage = Component.empty().append(rankComp).append(" §e$playerName's Farming Weight: ${storage.weight}")
 
-        ChatUtils.sendComponent(fullMessage, true)
+        ChatUtils.sendComponent(fullMessage)
     }
 
     private fun displayFarmingweightLeaderboard(position: Int) {
@@ -98,7 +98,7 @@ object FarmingweightUtils {
             val message = Component.empty()
                 .append(getRankComponent(rank, isMe, entry.name))
                 .append(" §a${entry.name}: §b${entry.weight}")
-            ChatUtils.sendComponent(message, true)
+            ChatUtils.sendComponent(message)
         }
     }
 
@@ -117,21 +117,21 @@ object FarmingweightUtils {
 
     fun setPlayerCustomColor(playerName: String, hexColor: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
-            ChatUtils.sendMessage("§cYou cannot set a custom color for yourself like this. Use the feature in `/sct`.", true)
+            ChatUtils.sendMessage("§cYou cannot set a custom color for yourself like this. Use the feature in `/sct`.")
             return
         }
         ConfigHelper.setFarmingweightCustomColor(playerName, hexColor)
         val color: Component = ColorUtils.coloredText(hexColor)
-        ChatUtils.sendComponent(Component.empty().append("§aCustom color for ").append(playerName).append("§a set to ").append(color).append("§a."), true)
+        ChatUtils.sendComponent(Component.empty().append("§aCustom color for ").append(playerName).append("§a set to ").append(color).append("§a."))
     }
 
     fun removePlayerCustomColor(playerName: String) {
         if (playerName.equals(PlayerData.playerName, ignoreCase = true)) {
-            ChatUtils.sendMessage("§cYou cannot remove a custom color for yourself like this. Use the feature in `/sct`.", true)
+            ChatUtils.sendMessage("§cYou cannot remove a custom color for yourself like this. Use the feature in `/sct`.")
             return
         }
         ConfigHelper.removeFarmingweightColor(playerName)
-        ChatUtils.sendMessage("§aCustom color for $playerName removed.", true)
+        ChatUtils.sendMessage("§aCustom color for $playerName removed.")
     }
 
     fun setGlobalColor(color: String) {
@@ -140,16 +140,16 @@ object FarmingweightUtils {
 
         val top10Fw = FarmingweightManager.storage.leaderboard.take(10)
         if (top10Fw.none { it.name.equals(playerName, ignoreCase = true) }) {
-            ChatUtils.sendMessage("§cYou must be in the top 10 of the Farming Weight leaderboard to set a global color.", true)
+            ChatUtils.sendMessage("§cYou must be in the top 10 of the Farming Weight leaderboard to set a global color.")
             return
         }
 
         EliteApiFetcher.setGlobalColor(playerName, uuid, color)
             .thenAccept { success ->
                 if (success) {
-                    ChatUtils.sendComponent(Component.empty().append("§aGlobal color set to ").append(ColorUtils.coloredText(color)).append("."), true)
+                    ChatUtils.sendComponent(Component.empty().append("§aGlobal color set to ").append(ColorUtils.coloredText(color)).append("."))
                 } else {
-                    ChatUtils.sendMessage("§cFailed to set global Farming Weight color.", true)
+                    ChatUtils.sendMessage("§cFailed to set global Farming Weight color.")
                 }
             }
     }

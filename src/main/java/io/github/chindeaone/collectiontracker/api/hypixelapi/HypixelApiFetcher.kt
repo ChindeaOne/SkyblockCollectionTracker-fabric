@@ -21,7 +21,7 @@ object HypixelApiFetcher {
                     200 -> response.body()
 
                     404 -> {
-                        ChatUtils.sendMessage("§eCollection API disabled in game or Hypixel API is down. Setting collection values manually...", true)
+                        ChatUtils.sendMessage("§eCollection API disabled in game or Hypixel API is down. Setting collection values manually...")
                         logger.warn("[SCT]: Collection API disabled in game.")
                         null
                     }
@@ -45,7 +45,7 @@ object HypixelApiFetcher {
                     200 -> response.body()
 
                     404 -> {
-                        ChatUtils.sendMessage("§eCollection API disabled in game or Hypixel API is down. Setting collection values manually...", true)
+                        ChatUtils.sendMessage("§eCollection API disabled in game or Hypixel API is down. Setting collection values manually...")
                         logger.warn("[SCT]: Collection API disabled in game.")
                         null
                     }
