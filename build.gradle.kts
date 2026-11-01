@@ -1,5 +1,3 @@
-import sct.GitVersion
-
 plugins {
     id("com.gradleup.shadow") version "9.6.1"
     id("net.fabricmc.fabric-loom")
@@ -8,8 +6,8 @@ plugins {
     kotlin("plugin.power-assert") version "2.4.21"
 }
 
-val gitVersion = objects.newInstance(GitVersion::class)
-version = gitVersion.setVersionfromGit(project)
+val gitVersion = objects.newInstance(sct.GitVersion::class)
+version = gitVersion.versionProvider(rootDir).get()
 
 group = project.property("maven_group").toString()
 
@@ -94,17 +92,12 @@ repositories {
     }
 }
 
-val minecraft = stonecutter.current.version
+val accessWidener = rootProject.file("src/main/resources/skyblockcollectiontracker.accesswidener")
+val loomCache = rootProject.file(".gradle/loom-cache/${project.name}")
 
-val accessWidener = when {
-    stonecutter.eval(minecraft, "26.3") -> "26.3.accesswidener"
-    stonecutter.eval(minecraft, "26.2") -> "26.2.accesswidener"
-    else -> "26.1.accesswidener"
-}
-
-loom {
-    accessWidenerPath.set(rootProject.file("src/main/resources/accesswideners/$accessWidener"))
-}
+loom.accessWidenerPath.set(
+    sc.process(accessWidener, loomCache.resolve(accessWidener.name).path)
+)
 
 val shadowImpl: Configuration = configurations.create("shadowImpl") {
     configurations.implementation.get().extendsFrom(this)
@@ -143,8 +136,7 @@ kotlin {
 tasks.processResources {
     val expandProps = mapOf(
         "version" to project.version,
-        "minecraft_version" to stonecutter.current.version,
-        "aw_file" to accessWidener
+        "minecraft_version" to sc.current.version
     )
 
     inputs.properties(expandProps)
