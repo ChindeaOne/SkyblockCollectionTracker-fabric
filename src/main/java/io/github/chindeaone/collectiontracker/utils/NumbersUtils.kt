@@ -5,48 +5,45 @@ import java.util.Locale
 
 object NumbersUtils {
 
-    private val UNITS = arrayOf("", "k", "M", "B", "T")
+    fun formatLong(value: Long): String {
+        if (!formattedValues) {
+            return String.format(Locale.US, "%,d", value)
+        }
 
-    fun formatValue(value: Long): String {
-        if (value < 1000) {
+        if (value < 1000L) {
             return value.toString()
         }
 
-        return formatAbbreviated(value.toDouble())
+        return formatCompact(value.toDouble())
     }
 
-    fun formatNumber(number: Long): String {
+    fun formatDouble(value: Double): String {
         if (!formattedValues) {
-            return String.format(Locale.ROOT, "%,d", number)
+            val formatted = String.format(Locale.US, "%,.2f", value)
+            return if (formatted.endsWith(".00")) formatted.removeSuffix(".00") else formatted
         }
 
-        return formatValue(number)
+        return if (value < 1000.0) {
+            val formatted = String.format(Locale.US, "%,.2f", value)
+            if (formatted.endsWith(".00")) formatted.removeSuffix(".00") else formatted
+        } else {
+            formatCompact(value)
+        }
     }
 
-    fun formatFloat(number: Float): String {
-        if (!formattedValues) {
-            return String.format(Locale.ROOT, "%,.2f", number)
-        }
-
-        if (number < 1000) {
-            return String.format(Locale.ROOT, "%.2f", number)
-        }
-
-        return formatAbbreviated(number.toDouble())
-    }
-
-    private fun formatAbbreviated(number: Double): String {
-        var num = number
+    private fun formatCompact(number: Double): String {
+        val units = arrayOf("", "k", "M", "B", "T")
+        var v = number
         var index = 0
 
-        while (num >= 1000.0 && index < UNITS.size - 1) {
-            num /= 1000.0
+        while (v >= 1000.0 && index < units.size - 1) {
+            v /= 1000.0
             index++
         }
 
-        return String.format(Locale.ROOT, "%.2f", num)
+        return String.format(Locale.US, "%.2f", v)
             .trimEnd('0')
-            .trimEnd('.') + UNITS[index]
+            .trimEnd('.') + units[index]
     }
 
     fun parseToSeconds(input: String): Long {

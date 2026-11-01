@@ -1,6 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils
 
 import io.github.chindeaone.collectiontracker.config.precision
+import java.util.Locale
 
 object StringUtils {
 
@@ -96,22 +97,15 @@ object StringUtils {
     }
 
     fun formatTimeInSeconds(time: Double): String {
-        val precision = precision
-        val formatString = "%." + precision + "fs"
-        return String.format(formatString, time)
+        val formatString = "%.${precision}fs"
+        return String.format(Locale.US, formatString, time)
     }
 
-    private fun formatUnit(amount: Long, unit: String): String {
-        return when {
-            amount > 1L -> "$amount ${unit}s"
-            amount == 1L -> "$amount $unit"
-            else -> "$amount $unit"
-        }
-    }
+    private fun formatUnit(amount: Long, unit: String): String = "$amount $unit${if (amount != 1L) "s" else ""}"
 
-    fun formatFloat(value: Float): String = if (value > 0) NumbersUtils.formatFloat(value) else "Calculating..."
+    fun formatDouble(value: Double): String = if (value > 0) NumbersUtils.formatDouble(value) else "Calculating..."
 
-    fun formatNumber(value: Long): String = if (value > 0) NumbersUtils.formatNumber(value) else "Calculating..."
+    fun formatLong(value: Long): String = if (value > 0) NumbersUtils.formatLong(value) else "Calculating..."
 
     fun String.toLevel(): Int = when (uppercase()) {
         "I" -> 1
