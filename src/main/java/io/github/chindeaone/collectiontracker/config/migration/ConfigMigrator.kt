@@ -6,7 +6,7 @@ import io.github.chindeaone.collectiontracker.utils.ability.Ability
 
 object ConfigMigrator {
 
-    const val CURRENT_VERSION = 5
+    const val CURRENT_VERSION = 6
 
     fun migrate(config: JsonObject): Boolean {
         val oldVersion = config
@@ -24,6 +24,7 @@ object ConfigMigrator {
                 3 -> migrateToVersion3(config)
                 4 -> migrateToVersion4(config)
                 5 -> migrateToVersion5(config)
+                6 -> migrateToVersion6(config)
             }
         }
 
@@ -238,6 +239,16 @@ object ConfigMigrator {
             }
             hotf.addProperty("activeLoadoutName", "Heart of the Forest 1")
             hotf.add("loadouts", loadouts)
+        }
+    }
+
+    /**
+     * Changed `gemstoneVariant` to `gemstoneTier`
+     */
+    private fun migrateToVersion6(config: JsonObject) {
+        val bazaar = config.getAsJsonObject("bazaar")
+        bazaar?.remove("gemstoneVariant")?.let {
+            bazaar.addProperty("gemstoneTier", it.asString)
         }
     }
 }

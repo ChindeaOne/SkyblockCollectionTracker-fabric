@@ -18,10 +18,10 @@ object SkillParser {
         val leaderboard = skillLeaderboard
         val rankSuffix = formatRankSuffix(currentSkillRank, leaderboard)
 
-        list.add("$currentSkill Level: ${NumbersUtils.formatNumber(SkillTrackingRates.skillLevel.toLong())}$rankSuffix")
-        list.add("Total $currentSkill XP: ${StringUtils.formatNumber(SkillTrackingRates.totalSkillXp)}")
-        list.add("XP (Session): ${StringUtils.formatNumber(SkillTrackingRates.skillXpGained)}")
-        list.add("XP/h: ${StringUtils.formatNumber(SkillTrackingRates.skillPerHour)}")
+        list.add("$currentSkill Level: ${NumbersUtils.formatLong(SkillTrackingRates.skillLevel.toLong())}$rankSuffix")
+        list.add("Total $currentSkill XP: ${StringUtils.formatLong(SkillTrackingRates.totalSkillXp)}")
+        list.add("XP (Session): ${StringUtils.formatLong(SkillTrackingRates.skillXpGained)}")
+        list.add("XP/h: ${StringUtils.formatLong(SkillTrackingRates.skillPerHour)}")
 
         addLeaderboardLines(
             list,
@@ -52,10 +52,10 @@ object SkillParser {
         val tamingRankSuffix = formatRankSuffix(currentTamingRank, leaderboard)
 
         list.add("")
-        list.add("Taming Level: ${NumbersUtils.formatNumber(SkillTrackingRates.tamingLevel.toLong())}$tamingRankSuffix")
-        list.add("Total Taming XP: ${StringUtils.formatNumber(currentTamingTotalXp)}")
-        list.add("XP (Session): ${StringUtils.formatNumber(SkillTrackingRates.tamingXpGained)}")
-        list.add("XP/h: ${StringUtils.formatNumber(SkillTrackingRates.tamingPerHour)}")
+        list.add("Taming Level: ${NumbersUtils.formatLong(SkillTrackingRates.tamingLevel.toLong())}$tamingRankSuffix")
+        list.add("Total Taming XP: ${StringUtils.formatLong(currentTamingTotalXp)}")
+        list.add("XP (Session): ${StringUtils.formatLong(SkillTrackingRates.tamingXpGained)}")
+        list.add("XP/h: ${StringUtils.formatLong(SkillTrackingRates.tamingPerHour)}")
 
         addLeaderboardLines(
             list,
@@ -104,11 +104,11 @@ object SkillParser {
 
             if (nextUser != null) {
                 val wipedSuffix = if (isNextWiped) "-wiped" else ""
-                list.add("$posLabel ($nextUser$wipedSuffix): ${NumbersUtils.formatNumber(nextAmount)}")
+                list.add("$posLabel ($nextUser$wipedSuffix): ${NumbersUtils.formatLong(nextAmount)}")
                 if (tillNext == -1L) {
                     list.add("$tillLabel: Calculating...")
                 } else {
-                    list.add("$tillLabel: ${NumbersUtils.formatNumber(tillNext)}")
+                    list.add("$tillLabel: ${NumbersUtils.formatLong(tillNext)}")
                 }
                 if (!eta.isNullOrEmpty()) {
                     list.add("$etaLabel: $eta")
@@ -126,7 +126,7 @@ object SkillParser {
             list.add("")
             if (previousUser != null) {
                 val wipedSuffix = if (isPreviousWiped) "-wiped" else ""
-                list.add("Passed ($previousUser$wipedSuffix): ${NumbersUtils.formatNumber(previousAmount)}")
+                list.add("Passed ($previousUser$wipedSuffix): ${NumbersUtils.formatLong(previousAmount)}")
             } else {
                 list.add("Passed: Calculating...")
             }
@@ -134,7 +134,7 @@ object SkillParser {
             if (abovePrevious == -1L) {
                 list.add("Difference: Calculating...")
             } else {
-                list.add("Difference: ${NumbersUtils.formatNumber(abovePrevious)}")
+                list.add("Difference: ${NumbersUtils.formatLong(abovePrevious)}")
             }
         }
     }

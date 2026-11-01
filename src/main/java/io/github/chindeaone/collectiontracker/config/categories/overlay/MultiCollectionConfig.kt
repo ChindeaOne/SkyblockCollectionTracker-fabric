@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MultiCollectionConfig {
+
     enum class TrackingOptions(private val displayName: String) {
         COLLECTION("Collection"),
         COLLECTION_RATE("Collection Rate"),
@@ -15,9 +16,7 @@ class MultiCollectionConfig {
         MONEY_RATE("Money Rate"),
         MONEY_MADE("Money Made");
 
-        override fun toString(): String {
-            return displayName
-        }
+        override fun toString(): String = displayName
     }
 
     @Suppress("unused")

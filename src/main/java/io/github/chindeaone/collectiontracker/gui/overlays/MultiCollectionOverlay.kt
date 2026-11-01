@@ -1,6 +1,10 @@
 package io.github.chindeaone.collectiontracker.gui.overlays
 
 import io.github.chindeaone.collectiontracker.ModLoader
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager.CollectionTier
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager.GemstoneTier
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarPriceType
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarType
 import io.github.chindeaone.collectiontracker.config.ConfigHelper
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.changeBazaarPrice
 import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaar
@@ -8,10 +12,11 @@ import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaarType
 import io.github.chindeaone.collectiontracker.config.bazaarConfig
 import io.github.chindeaone.collectiontracker.config.bazaarPriceType
 import io.github.chindeaone.collectiontracker.config.bazaarType
-import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
+import io.github.chindeaone.collectiontracker.config.collectionGemstoneTier
+import io.github.chindeaone.collectiontracker.config.collectionTier
 import io.github.chindeaone.collectiontracker.config.core.Position
-import io.github.chindeaone.collectiontracker.config.gemstoneVariant
+import io.github.chindeaone.collectiontracker.config.gemstoneTier
 import io.github.chindeaone.collectiontracker.config.multiOverlayPosition
 import io.github.chindeaone.collectiontracker.config.trackingOptions
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
@@ -85,7 +90,7 @@ class MultiCollectionOverlay : AbstractOverlay() {
         if (cleanLine.startsWith("[+] ") || cleanLine.startsWith("[-] ")) {
             val content = cleanLine.substring(4)
 
-            val collName = if (content.startsWith("Gemstone")) {
+            val collName = if (content.startsWith("Gemstone") && !cleanLine.contains("Tier")) {
                 "gemstone"
             } else {
                 content.substringBefore(":").trim { it <= ' ' }.lowercase().replace(' ', '_')
@@ -99,7 +104,7 @@ class MultiCollectionOverlay : AbstractOverlay() {
             return
         }
 
-        if (cleanLine.startsWith("Gemstone")) {
+        if (cleanLine.startsWith("Gemstone") && !cleanLine.contains("Tier")) {
             val collName = "gemstone"
             if (expandedCollections.contains(collName)) {
                 expandedCollections.remove(collName)
@@ -110,11 +115,13 @@ class MultiCollectionOverlay : AbstractOverlay() {
         }
 
         when {
+            line.contains("Collection Tier") -> cycleCollectionTier()
+            line.contains("Gemstone Tier") -> cycleCollectionGemstoneTier()
             line.contains("Stats") -> cycleStats()
-            line.contains("Prices") -> setBazaar(!bazaarConfig.useBazaar)
-            line.contains(gemstoneVariant.toString()) -> cycleGemstoneVariant()
-            line.contains("version") -> changeEnchantedType()
-            line.contains("Instant") -> changeBazaarPriceType()
+            line.contains("Price Source") -> setBazaar(!bazaarConfig.useBazaar)
+            line.contains(gemstoneTier.toString()) -> cycleGemstoneTier()
+            line.contains("Price Tier") -> changeEnchantedType()
+            line.contains("Bazaar Price") -> changeBazaarPriceType()
         }
     }
 
@@ -134,6 +141,18 @@ class MultiCollectionOverlay : AbstractOverlay() {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
     }
 
+    private fun cycleCollectionTier() {
+        val variants = CollectionTier.entries.toTypedArray()
+        val nextOrdinal = (collectionTier.ordinal + 1) % variants.size
+        ConfigHelper.setCollectionTier(variants[nextOrdinal])
+    }
+
+    private fun cycleCollectionGemstoneTier() {
+        val tiers = GemstoneTier.entries.toTypedArray()
+        val nextOrdinal = (collectionGemstoneTier.ordinal + 1) % tiers.size
+        ConfigHelper.setCollectionGemstoneTier(tiers[nextOrdinal])
+    }
+
     private fun cycleStats() {
         val options = MultiCollectionConfig.TrackingOptions.entries
         val currentStat = trackingOptions
@@ -141,19 +160,19 @@ class MultiCollectionOverlay : AbstractOverlay() {
         ConfigHelper.setMultiTrackingOption(options[nextIndex])
     }
 
-    private fun cycleGemstoneVariant() {
-        val variants = Bazaar.GemstoneVariant.entries
-        val current = gemstoneVariant
+    private fun cycleGemstoneTier() {
+        val variants = GemstoneTier.entries
+        val current = gemstoneTier
         val nextIndex = (current.ordinal + 1) % variants.size
-        ConfigHelper.setGemstoneVariant(variants[nextIndex])
+        ConfigHelper.setGemstoneTier(variants[nextIndex])
     }
 
     private fun changeEnchantedType() {
-        setBazaarType(if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) Bazaar.BazaarType.SUPER_ENCHANTED_VERSION else Bazaar.BazaarType.ENCHANTED_VERSION)
+        setBazaarType(if (bazaarType == BazaarType.ENCHANTED_VERSION) BazaarType.SUPER_ENCHANTED_VERSION else BazaarType.ENCHANTED_VERSION)
     }
 
     private fun changeBazaarPriceType() {
-        changeBazaarPrice(if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) Bazaar.BazaarPriceType.INSTANT_SELL else Bazaar.BazaarPriceType.INSTANT_BUY)
+        changeBazaarPrice(if (bazaarPriceType == BazaarPriceType.INSTANT_BUY) BazaarPriceType.INSTANT_SELL else BazaarPriceType.INSTANT_BUY)
     }
 
     companion object {

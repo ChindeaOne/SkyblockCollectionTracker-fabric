@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class CollectionConfig {
+
     enum class OverlayText(private val text: String) {
         COLLECTION("§aGold collection§f: 200.000M"),
         COLLECTION_SESSION("§aGold collection (session)§f: 10.000M"),
@@ -18,15 +19,13 @@ class CollectionConfig {
         COLLECTION_SINCE_LAST("§aCollected since last§f: 200k"),
         COLLECTION_SINCE_LAST_TIMER("§aLast collection§f: 20 seconds ago");
 
-        override fun toString(): String {
-            return text
-        }
+        override fun toString(): String = text
     }
 
     @Expose
     @ConfigOption(name = "Overlay Text", desc = "Drag the lines of text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var statsText: MutableList<OverlayText> = mutableListOf<OverlayText>(
+    var statsText: MutableList<OverlayText> = mutableListOf(
         OverlayText.COLLECTION,
         OverlayText.COLLECTION_SESSION,
         OverlayText.COLL_PER_HOUR,
@@ -45,13 +44,10 @@ class CollectionConfig {
     var showExtraStats: Boolean = false
 
     enum class OverlayExtraText(private val text: String) {
-        BAZAAR_PRICE_TYPE("§aPrice type§f: Instant Sell"),
-        BAZAAR_ITEM("§aItem/Variant§f: Enchanted gold"),
-        BAZAAR_PRICE("§aItem/Variant price§f: 100k");
+        BAZAAR_ITEM("§aItem§f: Enchanted gold"),
+        BAZAAR_PRICE("§aItem price§f: 100k");
 
-        override fun toString(): String {
-            return text
-        }
+        override fun toString(): String = text
     }
 
     @Expose
@@ -61,7 +57,6 @@ class CollectionConfig {
     )
     @ConfigEditorDraggableList
     var extraStatsText: MutableList<OverlayExtraText> = mutableListOf(
-        OverlayExtraText.BAZAAR_PRICE_TYPE,
         OverlayExtraText.BAZAAR_ITEM,
         OverlayExtraText.BAZAAR_PRICE
     )

@@ -3,7 +3,9 @@ package io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager.GemstoneTier
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarPriceType
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
@@ -13,12 +15,13 @@ import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardMana
 import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.floor
 
 object MultiTrackingRates {
 
     // Collection tracking data
     val collectionAmounts = ConcurrentHashMap<String, Long>()
-    val collectionPerHour = ConcurrentHashMap<String, Long>()
+    val collectionRate = ConcurrentHashMap<String, Long>()
     val collectionMade = ConcurrentHashMap<String, Long>()
     val sessionStartCollections = ConcurrentHashMap<String, Long>()
     val lastApiCollections = ConcurrentHashMap<String, Long>()
@@ -27,14 +30,22 @@ object MultiTrackingRates {
     // Track seen gemstones to only render them if they've been received from chat
     val seenGemstones: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
-    // Money tracking data
-    // NPC
-    val moneyPerHourNPC = ConcurrentHashMap<String, Long>()
+    // NPC Money Tracking
     val moneyMadeNPC = ConcurrentHashMap<String, Long>()
+    val moneyRateNPC = ConcurrentHashMap<String, Long>()
 
-    // Bazaar
-    val moneyMadeBazaar = ConcurrentHashMap<String, Long>()
-    val moneyPerHourBazaar = ConcurrentHashMap<String, Long>()
+    // Bazaar Money Tracking (per tier and per price type)
+    val baseMoneyMade = ConcurrentHashMap<String, ConcurrentHashMap<BazaarPriceType, Long>>()
+    val baseMoneyRate = ConcurrentHashMap<String, ConcurrentHashMap<BazaarPriceType, Long>>()
+
+    val enchantedMoneyMade = ConcurrentHashMap<String, ConcurrentHashMap<BazaarPriceType, Long>>()
+    val enchantedMoneyRate = ConcurrentHashMap<String, ConcurrentHashMap<BazaarPriceType, Long>>()
+
+    val superEnchantedMoneyMade = ConcurrentHashMap<String, ConcurrentHashMap<BazaarPriceType, Long>>()
+    val superEnchantedMoneyRate = ConcurrentHashMap<String, ConcurrentHashMap<BazaarPriceType, Long>>()
+
+    val gemstoneMoneyMade = ConcurrentHashMap<String, ConcurrentHashMap<GemstoneTier, ConcurrentHashMap<BazaarPriceType, Long>>>()
+    val gemstoneMoneyRate = ConcurrentHashMap<String, ConcurrentHashMap<GemstoneTier, ConcurrentHashMap<BazaarPriceType, Long>>>()
 
     // Leaderboard tracking data
     @Volatile var playerCurrentRank = -1
@@ -60,10 +71,9 @@ object MultiTrackingRates {
                 // Initialize NPC money maps for gemstones
                 if (coll == "gemstone") {
                     GemstonesManager.gemstones.forEach { gemstoneType ->
-                        val gemstoneKey = gemstoneType.lowercase()
-                        GemstonePrices.multiGemstoneRecipes[gemstoneKey]?.keys?.forEach { tier ->
-                            val keyPrefix = ("${gemstoneType}_$tier").uppercase()
-                            moneyPerHourNPC.putIfAbsent(keyPrefix, 0L)
+                        GemstoneTier.entries.forEach { tier ->
+                            val keyPrefix = ("${gemstoneType}_${tier.name}").uppercase()
+                            moneyRateNPC.putIfAbsent(keyPrefix, 0L)
                             moneyMadeNPC.putIfAbsent(keyPrefix, 0L)
                         }
                     }
@@ -117,13 +127,13 @@ object MultiTrackingRates {
 
         collectionAmounts[coll] = currentCollection
         collectionMade[coll] = collectedSinceStart
-        collectionPerHour[coll] = if (uptime > 0) (collectedSinceStart / (uptime / 3600.0)).toLong() else 0L
+        collectionRate[coll] = if (uptime > 0) (collectedSinceStart / (uptime / 3600.0)).toLong() else 0L
 
         if (coll != "gemstone") {
             // NPC Prices
-            val priceNPC = NpcPrices.getNpcPrice(coll)
-            moneyPerHourNPC[coll] = if (uptime > 0) (priceNPC * collectedSinceStart / (uptime / 3600.0)).toLong() else 0L
-            moneyMadeNPC[coll] = (priceNPC * collectedSinceStart)
+            val npcPrice = NpcPrices.getNpcPrice(coll)
+            moneyRateNPC[coll] = if (uptime > 0) (npcPrice * collectedSinceStart / (uptime / 3600.0)).toLong() else 0L
+            moneyMadeNPC[coll] = npcPrice * collectedSinceStart
 
             // Bazaar Prices
             if (BazaarCollectionsManager.hasBazaarData) updateBazaarRates(coll, collectedSinceStart, uptime)
@@ -150,7 +160,7 @@ object MultiTrackingRates {
             collectionTillNextRank = nextRankAmount - currentGemstoneAmount
             isNextWiped = nextEntry.wiped
 
-            val currentRate = collectionPerHour["gemstone"] ?: 0L
+            val currentRate = collectionRate["gemstone"] ?: 0L
             if (currentRate > 0) {
                 val seconds = (collectionTillNextRank / (currentRate / 3600.0)).toLong()
                 etaToNextRank = StringUtils.formatCompactTime(seconds)
@@ -180,16 +190,21 @@ object MultiTrackingRates {
     }
 
     private fun updateBazaarRates(coll: String, collectedSinceStart: Long, uptime: Long) {
+        if (uptime <= 0) return
+
         val type = CollectionsManager.multiCollectionTypes[coll] ?: return
         when (type) {
             "normal" -> {
-                val buyPrice = BazaarPrices.multiNormalInstantBuy[coll] ?: 0f
-                val sellPrice = BazaarPrices.multiNormalInstantSell[coll] ?: 0f
+                val buyPrice = BazaarPrices.multiBaseInstantBuy[coll] ?: 0f
+                val sellPrice = BazaarPrices.multiBaseInstantSell[coll] ?: 0f
 
-                moneyPerHourBazaar["${coll}_normal_INSTANT_BUY"] = if (uptime > 0) (buyPrice * (collectedSinceStart / 160.0) / (uptime / 3600.0)).toLong() else 0L
-                moneyPerHourBazaar["${coll}_normal_INSTANT_SELL"] = if (uptime > 0) (sellPrice * (collectedSinceStart / 160.0) / (uptime / 3600.0)).toLong() else 0L
-                moneyMadeBazaar["${coll}_normal_INSTANT_BUY"] = (buyPrice * collectedSinceStart).toLong()
-                moneyMadeBazaar["${coll}_normal_INSTANT_SELL"] = (sellPrice * collectedSinceStart).toLong()
+                val rateMap = baseMoneyRate.computeIfAbsent(coll) { ConcurrentHashMap() }
+                val madeMap = baseMoneyMade.computeIfAbsent(coll) { ConcurrentHashMap() }
+
+                rateMap[BazaarPriceType.INSTANT_BUY] = floor(buyPrice * collectedSinceStart  / (uptime / 3600.0)).toLong()
+                rateMap[BazaarPriceType.INSTANT_SELL] = floor(sellPrice * collectedSinceStart  / (uptime / 3600.0)).toLong()
+                madeMap[BazaarPriceType.INSTANT_BUY] = floor(buyPrice * collectedSinceStart).toLong()
+                madeMap[BazaarPriceType.INSTANT_SELL] = floor(sellPrice * collectedSinceStart).toLong()
             }
             "enchanted" -> {
                 val enchantedRecipe = BazaarCollectionsManager.multiEnchantedRecipes[coll]
@@ -198,10 +213,13 @@ object MultiTrackingRates {
                 val eBuyPrice = BazaarPrices.multiEnchantedInstantBuy[coll] ?: 0f
                 val eSellPrice = BazaarPrices.multiEnchantedInstantSell[coll] ?: 0f
 
-                moneyPerHourBazaar["${coll}_Enchanted version_INSTANT_BUY"] = if (uptime > 0) (eBuyPrice * (collectedSinceStart / enchantedDivisor) / (uptime / 3600.0)).toLong() else 0L
-                moneyPerHourBazaar["${coll}_Enchanted version_INSTANT_SELL"] = if (uptime > 0) (eSellPrice * (collectedSinceStart / enchantedDivisor) / (uptime / 3600.0)).toLong() else 0L
-                moneyMadeBazaar["${coll}_Enchanted version_INSTANT_BUY"] = (eBuyPrice * (collectedSinceStart / enchantedDivisor)).toLong()
-                moneyMadeBazaar["${coll}_Enchanted version_INSTANT_SELL"] = (eSellPrice * (collectedSinceStart / enchantedDivisor)).toLong()
+                val enchRateMap = enchantedMoneyRate.computeIfAbsent(coll) { ConcurrentHashMap() }
+                val enchMadeMap = enchantedMoneyMade.computeIfAbsent(coll) { ConcurrentHashMap() }
+
+                enchRateMap[BazaarPriceType.INSTANT_BUY] = floor(eBuyPrice * (collectedSinceStart / enchantedDivisor) / (uptime / 3600.0)).toLong()
+                enchRateMap[BazaarPriceType.INSTANT_SELL] = floor(eSellPrice * (collectedSinceStart / enchantedDivisor) / (uptime / 3600.0)).toLong()
+                enchMadeMap[BazaarPriceType.INSTANT_BUY] = floor(eBuyPrice * (collectedSinceStart / enchantedDivisor)).toLong()
+                enchMadeMap[BazaarPriceType.INSTANT_SELL] = floor(eSellPrice * (collectedSinceStart / enchantedDivisor)).toLong()
 
                 val seBuyPrice = BazaarPrices.multiSuperEnchantedInstantBuy[coll] ?: 0f
                 val seSellPrice = BazaarPrices.multiSuperEnchantedInstantSell[coll] ?: 0f
@@ -210,10 +228,13 @@ object MultiTrackingRates {
                     val superEnchantedRecipe = BazaarCollectionsManager.multiSuperEnchantedRecipes[coll]
                     val superDivisor = superEnchantedRecipe?.values?.firstOrNull()?.toDouble() ?: 1.0
 
-                    moneyPerHourBazaar["${coll}_Super Enchanted version_INSTANT_BUY"] = if (uptime > 0) (seBuyPrice * (collectedSinceStart / superDivisor) / (uptime / 3600.0)).toLong() else 0L
-                    moneyPerHourBazaar["${coll}_Super Enchanted version_INSTANT_SELL"] = if (uptime > 0) (seSellPrice * (collectedSinceStart / superDivisor) / (uptime / 3600.0)).toLong() else 0L
-                    moneyMadeBazaar["${coll}_Super Enchanted version_INSTANT_BUY"] = (seBuyPrice * (collectedSinceStart / superDivisor)).toLong()
-                    moneyMadeBazaar["${coll}_Super Enchanted version_INSTANT_SELL"] = (seSellPrice * (collectedSinceStart / superDivisor)).toLong()
+                    val seRateMap = superEnchantedMoneyRate.computeIfAbsent(coll) { ConcurrentHashMap() }
+                    val seMadeMap = superEnchantedMoneyMade.computeIfAbsent(coll) { ConcurrentHashMap() }
+
+                    seRateMap[BazaarPriceType.INSTANT_BUY] = floor(seBuyPrice * (collectedSinceStart / superDivisor) / (uptime / 3600.0)).toLong()
+                    seRateMap[BazaarPriceType.INSTANT_SELL] = floor(seSellPrice * (collectedSinceStart / superDivisor) / (uptime / 3600.0)).toLong()
+                    seMadeMap[BazaarPriceType.INSTANT_BUY] = floor(seBuyPrice * (collectedSinceStart / superDivisor)).toLong()
+                    seMadeMap[BazaarPriceType.INSTANT_SELL] = floor(seSellPrice * (collectedSinceStart / superDivisor)).toLong()
                 }
             }
         }
@@ -221,18 +242,16 @@ object MultiTrackingRates {
 
     private fun updateGemstoneDetailedRates(gemstoneType: String, collectedSinceStart: Long, uptime: Long) {
         val gemstoneKey = gemstoneType.lowercase()
-        val gemstoneRecipes = GemstonePrices.multiGemstoneRecipes[gemstoneKey] ?: emptyMap()
 
         // NPC Prices
-        val basePriceNPC = NpcPrices.getNpcPrice(gemstoneKey)
+        val baseNpcPrice = NpcPrices.getNpcPrice(gemstoneKey)
 
-        for (variant in gemstoneRecipes.keys) {
-            val tier = variant.split('_')[0].uppercase()
-            val keyPrefix = "${gemstoneType.uppercase()}_$tier"
-
-            if (basePriceNPC != -1) {
-                moneyPerHourNPC[keyPrefix] = if (uptime > 0) (basePriceNPC * collectedSinceStart / (uptime / 3600.0)).toLong() else 0L
-                moneyMadeNPC[keyPrefix] = (basePriceNPC * collectedSinceStart)
+        if (baseNpcPrice != -1) {
+            for (tier in GemstoneTier.entries) {
+                val keyPrefix = "${gemstoneType.uppercase()}_${tier.name}"
+                val multiplier = tier.recipeAmount.toDouble()
+                moneyRateNPC[keyPrefix] = if (uptime > 0) floor(baseNpcPrice * multiplier * collectedSinceStart / (uptime / 3600.0)).toLong() else 0L
+                moneyMadeNPC[keyPrefix] = floor(baseNpcPrice * multiplier * collectedSinceStart).toLong()
             }
         }
 
@@ -241,19 +260,60 @@ object MultiTrackingRates {
             val gemstoneBuyPrices = GemstonePrices.multiGemstoneInstantBuyPrices[gemstoneKey] ?: emptyMap()
             val gemstoneSellPrices = GemstonePrices.multiGemstoneInstantSellPrices[gemstoneKey] ?: emptyMap()
 
-            for (tier in gemstoneRecipes.keys) {
-                val buyPrice = gemstoneBuyPrices[tier] ?: 0f
-                val sellPrice = gemstoneSellPrices[tier] ?: 0f
-                val recipe = gemstoneRecipes[tier]?.toDouble() ?: 1.0
+            val collRateMap = gemstoneMoneyRate.computeIfAbsent(gemstoneType) { ConcurrentHashMap() }
+            val collMadeMap = gemstoneMoneyMade.computeIfAbsent(gemstoneType) { ConcurrentHashMap() }
 
-                val tierName = tier.split('_')[0].uppercase()
-                val keyPrefix = "${gemstoneType.uppercase()}_$tierName"
+            for (tier in GemstoneTier.entries) {
+                val buyPrice = gemstoneBuyPrices[tier.name] ?: 0f
+                val sellPrice = gemstoneSellPrices[tier.name] ?: 0f
+                val divisor = tier.recipeAmount.toDouble()
 
-                moneyPerHourBazaar["${keyPrefix}_INSTANT_BUY"] = if (uptime > 0) (buyPrice * (collectedSinceStart / recipe) / (uptime / 3600.0)).toLong() else 0L
-                moneyPerHourBazaar["${keyPrefix}_INSTANT_SELL"] = if (uptime > 0) (sellPrice * (collectedSinceStart / recipe) / (uptime / 3600.0)).toLong() else 0L
-                moneyMadeBazaar["${keyPrefix}_INSTANT_BUY"] = (buyPrice * (collectedSinceStart / recipe)).toLong()
-                moneyMadeBazaar["${keyPrefix}_INSTANT_SELL"] = (sellPrice * (collectedSinceStart / recipe)).toLong()
+                val tierRateMap = collRateMap.computeIfAbsent(tier) { ConcurrentHashMap() }
+                val tierMadeMap = collMadeMap.computeIfAbsent(tier) { ConcurrentHashMap() }
+
+                tierRateMap[BazaarPriceType.INSTANT_BUY] = if (uptime > 0) floor(buyPrice * (collectedSinceStart / divisor) / (uptime / 3600.0)).toLong() else 0L
+                tierRateMap[BazaarPriceType.INSTANT_SELL] = if (uptime > 0) floor(sellPrice * (collectedSinceStart / divisor) / (uptime / 3600.0)).toLong() else 0L
+
+                tierMadeMap[BazaarPriceType.INSTANT_BUY] = floor(buyPrice * (collectedSinceStart / divisor)).toLong()
+                tierMadeMap[BazaarPriceType.INSTANT_SELL] = floor(sellPrice * (collectedSinceStart / divisor)).toLong()
             }
         }
+    }
+
+    fun clearCollectionData() {
+        collectionAmounts.clear()
+        collectionRate.clear()
+        collectionMade.clear()
+        sessionStartCollections.clear()
+        lastApiCollections.clear()
+        lastMultiCollectionUpdate = null
+        seenGemstones.clear()
+    }
+
+    fun clearAllMoneyMaps() {
+        moneyRateNPC.clear()
+        moneyMadeNPC.clear()
+        baseMoneyMade.clear()
+        baseMoneyRate.clear()
+        enchantedMoneyMade.clear()
+        enchantedMoneyRate.clear()
+        superEnchantedMoneyMade.clear()
+        superEnchantedMoneyRate.clear()
+        gemstoneMoneyMade.clear()
+        gemstoneMoneyRate.clear()
+        seenGemstones.clear()
+    }
+
+    fun clearLeaderboardData() {
+        playerCurrentRank = -1
+        nextRankUsername = null
+        nextRankAmount = -1L
+        etaToNextRank = null
+        collectionTillNextRank = -1L
+        isNextWiped = false
+        previousRankUsername = null
+        previousRankAmount = -1L
+        collectionAbovePreviousRankAmount = -1L
+        isPreviousWiped = false
     }
 }

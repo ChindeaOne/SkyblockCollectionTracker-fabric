@@ -11,7 +11,7 @@ import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrack
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.coleweightSinceLast
 import io.github.chindeaone.collectiontracker.tracker.coleweight.ColeweightTrackingRates.lastColeweightUpdate
 import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatCompact
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatFloat
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatDouble
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -63,10 +63,10 @@ class ColeweightOverlay : AbstractOverlay() {
         } else ""
 
         val newLines = mutableListOf(
-            "Coleweight: ${StringUtils.formatFloat(coleweightAmount)}",
-            "CW (Session): ${StringUtils.formatFloat(coleweightGained)}",
-            "CW/h: ${StringUtils.formatFloat(coleweightPerHour)}",
-            "Since Last: ${formatFloat(coleweightSinceLast)}"
+            "Coleweight: ${StringUtils.formatDouble(coleweightAmount)}",
+            "CW (Session): ${StringUtils.formatDouble(coleweightGained)}",
+            "CW/h: ${StringUtils.formatDouble(coleweightPerHour)}",
+            "Since Last: ${formatDouble(coleweightSinceLast)}"
         )
 
         if (timeAgo.isNotEmpty()) {

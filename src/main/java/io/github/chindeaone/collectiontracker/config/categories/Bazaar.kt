@@ -1,28 +1,14 @@
 package io.github.chindeaone.collectiontracker.config.categories
 
 import com.google.gson.annotations.Expose
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager.GemstoneTier
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarPriceType
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarType
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class Bazaar {
-    enum class BazaarPriceType {
-        INSTANT_SELL,
-        INSTANT_BUY
-    }
-
-    enum class BazaarType {
-        ENCHANTED_VERSION,
-        SUPER_ENCHANTED_VERSION
-    }
-
-    enum class GemstoneVariant {
-        ROUGH,
-        FLAWED,
-        FINE,
-        FLAWLESS,
-        PERFECT
-    }
 
     @Expose
     @ConfigOption(
@@ -54,5 +40,5 @@ class Bazaar {
         desc = "Select the variant you want to use for pricing."
     )
     @ConfigEditorDropdown
-    var gemstoneVariant: GemstoneVariant = GemstoneVariant.FINE // Default to FINE
+    var gemstoneTier: GemstoneTier = GemstoneTier.FINE // Default to FINE
 }

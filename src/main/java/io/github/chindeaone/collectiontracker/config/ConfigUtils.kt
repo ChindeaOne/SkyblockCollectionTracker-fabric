@@ -1,6 +1,10 @@
 package io.github.chindeaone.collectiontracker.config
 
 import io.github.chindeaone.collectiontracker.SkyblockCollectionTracker
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager.CollectionTier
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager.GemstoneTier
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarPriceType
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarType
 import io.github.chindeaone.collectiontracker.config.categories.About
 import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.Farming
@@ -84,10 +88,10 @@ val hasCheckedUpdate: Boolean get() = aboutConfig.hasCheckedUpdate
 
 // Bazaar Config Accessors
 val bazaarConfig: Bazaar get() = modConfig.bazaar
-val bazaarPriceType: Bazaar.BazaarPriceType get() = bazaarConfig.bazaarPriceType
+val bazaarPriceType: BazaarPriceType get() = bazaarConfig.bazaarPriceType
 val useBazaar: Boolean get() = bazaarConfig.useBazaar
-val bazaarType: Bazaar.BazaarType get() = bazaarConfig.bazaarType
-val gemstoneVariant: Bazaar.GemstoneVariant get() = bazaarConfig.gemstoneVariant
+val bazaarType: BazaarType get() = bazaarConfig.bazaarType
+val gemstoneTier: GemstoneTier get() = bazaarConfig.gemstoneTier
 
 // Mining Config Accessors
 val miningConfig: Mining get() = modConfig.mining
@@ -219,6 +223,9 @@ val apiTracking: Boolean get() = trackingConfig.apiTracking
 val overlayTextColor: Boolean get() = trackingConfig.overlayTextColor
 val formattedValues: Boolean get() = trackingConfig.formattedValues
 val collectionConfig: CollectionConfig get() = trackingConfig.collectionConfig
+val collectionTier: CollectionTier get() = trackingConfig.collectionTier
+val collectionGemstoneTier: GemstoneTier get() = trackingConfig.collectionGemstoneTier
+
 val statsText: List<CollectionConfig.OverlayText> get() = collectionConfig.statsText
 val extraStatsText: List<CollectionConfig.OverlayExtraText> get() = collectionConfig.extraStatsText
 val showExtraStats: Boolean get() = collectionConfig.showExtraStats
@@ -305,7 +312,7 @@ object ConfigAccess {
  */
 object ConfigHelper {
 
-    fun setBazaarType(type: Bazaar.BazaarType) {
+    fun setBazaarType(type: BazaarType) {
         bazaarConfig.bazaarType = type
     }
 
@@ -651,15 +658,15 @@ object ConfigHelper {
         multiCollectionOverlay.trackingOptions = option
     }
 
-    fun setGemstoneVariant(variant: Bazaar.GemstoneVariant) {
-        bazaarConfig.gemstoneVariant = variant
+    fun setGemstoneTier(tier: GemstoneTier) {
+        bazaarConfig.gemstoneTier = tier
     }
 
     fun setShowExtraStats(show: Boolean) {
         collectionConfig.showExtraStats = show
     }
 
-    fun changeBazaarPrice(type: Bazaar.BazaarPriceType) {
+    fun changeBazaarPrice(type: BazaarPriceType) {
         bazaarConfig.bazaarPriceType = type
     }
 
@@ -713,6 +720,14 @@ object ConfigHelper {
 
     fun setHotxDataFetched(fetched: Boolean) {
         internalConfig.hotxData = fetched
+    }
+
+    fun setCollectionTier(tier: CollectionTier) {
+        trackingConfig.collectionTier = tier
+    }
+
+    fun setCollectionGemstoneTier(tier: GemstoneTier) {
+        trackingConfig.collectionGemstoneTier = tier
     }
 
     fun isConfigScreenOpen(): Boolean = MinecraftUtils.screen is MoulConfigScreenComponent

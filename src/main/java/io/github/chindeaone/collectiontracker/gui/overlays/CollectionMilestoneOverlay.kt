@@ -113,8 +113,8 @@ class CollectionMilestoneOverlay: AbstractOverlay() {
 
     private fun formatMilestone(name: String, milestone: Milestone, currentAmount: Long): String {
         val formattedName = StringUtils.formatCollectionName(name)
-        val formattedCurrentAmount = NumbersUtils.formatNumber(currentAmount)
-        val formattedTargetAmount = NumbersUtils.formatNumber(milestone.target)
+        val formattedCurrentAmount = NumbersUtils.formatLong(currentAmount)
+        val formattedTargetAmount = NumbersUtils.formatLong(milestone.target)
 
         if (currentAmount < milestone.target) {
             return "$formattedName: $formattedCurrentAmount / $formattedTargetAmount"

@@ -44,7 +44,7 @@ class CollectionScreen(private val collectionList: List<String>, private val onC
 
                 values.forEach { (name, value) ->
                     val displayName = StringUtils.formatCollectionName(name).toColor()
-                    val formattedValue = NumbersUtils.formatNumber(value)
+                    val formattedValue = NumbersUtils.formatLong(value)
                     val component = Component.literal(" §7- §f")
                         .append(displayName)
                         .append(": §a$formattedValue")

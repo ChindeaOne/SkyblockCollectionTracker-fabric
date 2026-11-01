@@ -122,7 +122,7 @@ object LeaderboardManager {
         }
 
         // Custom position
-        if (leaderboardPosition && !leaderboardPositions.isEmpty()) {
+        if (leaderboardPosition && leaderboardPositions.isNotEmpty()) {
             val position = leaderboardPositions["gemstone"]
 
             if (position != null) {
@@ -146,7 +146,7 @@ object LeaderboardManager {
         }
 
         // Custom position
-        if (leaderboardPosition && !leaderboardPositions.isEmpty()) {
+        if (leaderboardPosition && leaderboardPositions.isNotEmpty()) {
             val position = leaderboardPositions[skill.lowercase()]
 
             if (position != null) {
@@ -187,7 +187,7 @@ object LeaderboardManager {
 
     fun getNextRankEntry(): LeaderboardEntry? {
         // Custom position
-        if (leaderboardPosition && !leaderboardPositions.isEmpty()) {
+        if (leaderboardPosition && leaderboardPositions.isNotEmpty()) {
             val position = leaderboardPositions[CollectionTracker.collection]
 
             if (position != null) {

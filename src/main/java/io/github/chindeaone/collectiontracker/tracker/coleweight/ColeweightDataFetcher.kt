@@ -45,7 +45,7 @@ object ColeweightDataFetcher {
                 }
 
                 try {
-                    val coleweight = JsonParser.parseString(data).asJsonObject.get("coleweight").asFloat
+                    val coleweight = JsonParser.parseString(data).asJsonObject.get("coleweight").asDouble
 
                     logger.info("[SCT]: Coleweight data fetched successfully: $coleweight")
                     ColeweightTrackingRates.calculateRates(coleweight)

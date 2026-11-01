@@ -1,14 +1,28 @@
 package io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
+import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager.multiEnchantedRecipes
+import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager.multiSuperEnchantedRecipes
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
-import io.github.chindeaone.collectiontracker.commands.CollectionTracker
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager.CollectionTier
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager.multiCollectionTypes
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager.GemstoneTier
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarType
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarPriceType
+import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.riftTracking
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
 import io.github.chindeaone.collectiontracker.config.apiTracking
+import io.github.chindeaone.collectiontracker.config.bazaarPriceType
+import io.github.chindeaone.collectiontracker.config.bazaarType
+import io.github.chindeaone.collectiontracker.config.collectionGemstoneTier
 import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
-import io.github.chindeaone.collectiontracker.config.gemstoneVariant
+import io.github.chindeaone.collectiontracker.config.collectionTier
+import io.github.chindeaone.collectiontracker.config.gemstoneTier
 import io.github.chindeaone.collectiontracker.config.multiDetailedSummary
 import io.github.chindeaone.collectiontracker.config.multiTrackingSummary
 import io.github.chindeaone.collectiontracker.config.summaryStats
@@ -18,20 +32,20 @@ import io.github.chindeaone.collectiontracker.gui.overlays.MultiCollectionOverla
 import io.github.chindeaone.collectiontracker.gui.overlays.saveMilestonesProgress
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiDataFetcher.clearCollectionCache
-import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates.lastMultiCollectionUpdate
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
 import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatClock
 import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatInWords
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatDouble
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatLong
 import io.github.chindeaone.collectiontracker.utils.PlayerData
+import io.github.chindeaone.collectiontracker.utils.StringUtils.formatBazaarItemName
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
-import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
@@ -175,24 +189,14 @@ object MultiTrackingHandler  {
             trackingTask = null
         }
 
-        clearMaps()
-        lastMultiCollectionUpdate = null
+        MultiTrackingRates.clearCollectionData()
+        MultiTrackingRates.clearAllMoneyMaps()
+        MultiTrackingRates.clearLeaderboardData()
 
         riftTracking = false
         InventoryListener.clearInventoryState()
-    }
 
-    fun clearMaps() {
-        MultiTrackingRates.collectionAmounts.clear()
-        MultiTrackingRates.collectionPerHour.clear()
-        MultiTrackingRates.collectionMade.clear()
-        MultiTrackingRates.sessionStartCollections.clear()
-        MultiTrackingRates.lastApiCollections.clear()
-        MultiTrackingRates.moneyPerHourNPC.clear()
-        MultiTrackingRates.moneyMadeNPC.clear()
-        MultiTrackingRates.moneyMadeBazaar.clear()
-        MultiTrackingRates.moneyPerHourBazaar.clear()
-        MultiTrackingRates.seenGemstones.clear()
+        collectionList.clear()
     }
 
     fun pauseMultiTracking() {
@@ -279,20 +283,27 @@ object MultiTrackingHandler  {
     val multiUptime: String
         get() = totalMultiUptime.formatClock()
 
-    fun sendMultiRates() {
-        MultiTrackingRates.updateRates()
 
+
+    private fun sendMultiRates() {
         val lines = mutableListOf<Component>()
+        val collectionLines = mutableListOf<Component>()
+        val gemstoneLines = mutableListOf<Component>()
 
-        val useBazaar = useBazaar
-        val useMotes = !useBazaar && riftTracking
+        val trackedCollections = collectionList
+        val summaryStatsName = summaryStats.name
 
-        val variant = gemstoneVariant.toString()
-        val suffix = CollectionParser.bazaarPriceTypeSuffix()
-        val bazaarSuffix = if (useBazaar) if (suffix.contains("BUY")) "Instant Buy" else "Instant Sell" else ""
-        val typeKey = CollectionParser.bazaarTypeKey()
+        val shouldUseBazaar = useBazaar
+        val useMotes = !shouldUseBazaar && riftTracking
 
-        val pricingLabel = if (useBazaar) bazaarSuffix else if (useMotes) "NPC / Motes" else "NPC"
+        val priceType = bazaarPriceType
+        val pricingGemstoneTier = if (shouldUseBazaar) gemstoneTier else GemstoneTier.ROUGH
+
+        val pricingLabel = when {
+            shouldUseBazaar -> priceType.toString()
+            useMotes -> "NPC / Motes"
+            else -> "NPC"
+        }
 
         var totalMoneyMade = 0L
         var totalMoneyRate = 0L
@@ -300,62 +311,66 @@ object MultiTrackingHandler  {
         var totalGemstoneMoneyMade = 0L
         var totalGemstoneMoneyRate = 0L
 
-        val trackedCollections = CollectionTracker.collectionList
-        val collectionLines = mutableListOf<Component>()
-
-        val summaryStatsName = summaryStats.name
-
-        // Non gemstone collections
+        // Non-gemstone collections
         for (coll in trackedCollections) {
             if (coll == "gemstone") continue
 
-            val collName = formatCollectionName(coll)
-            val formattedName = collName.toColor()
+            val effectiveBazaarType = getMultiSummaryBazaarType(coll)
 
-            val currentMoney: Long
-            val currentRate: Long
-
-            if (!useBazaar) {
-                currentMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(coll, 0L)
-                currentRate = MultiTrackingRates.moneyPerHourNPC.getOrDefault(coll, 0L)
-            } else {
-                val type = CollectionsManager.multiCollectionTypes[coll]
-                val key = when (type) {
-                    "normal" -> "${coll}_normal$suffix"
-                    "enchanted" -> "${coll}_${typeKey}$suffix"
-                    else -> ""
-                }
-
-                currentMoney = MultiTrackingRates.moneyMadeBazaar.getOrDefault(key, 0L)
-                currentRate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault(key, 0L)
-            }
+            val formattedName = formatCollectionName(coll).toColor()
+            val (currentMoney, currentRate) = getMultiSummaryMoney(coll, shouldUseBazaar)
 
             totalMoneyMade += currentMoney
             totalMoneyRate += currentRate
 
             val collectionMade = MultiTrackingRates.collectionMade[coll] ?: 0L
-            val collectionRate = MultiTrackingRates.collectionPerHour[coll] ?: 0L
+            val collectionRate = MultiTrackingRates.collectionRate[coll] ?: 0L
 
-            val line = Component.literal("   ").append(formattedName).append("§r: ")
+            val (compactedAmount, compactSuffix) =
+                getMultiSummaryCompactedCollection(collectionMade, coll)
+            val (compactedRate, _) =
+                getMultiSummaryCompactedCollection(collectionRate, coll)
+
+            val isEnchantedCollection = multiCollectionTypes[coll] == "enchanted"
+
+            val line = Component.literal("   ").append(formattedName)
+            line.append("§r: ")
 
             when (summaryStatsName) {
-                "COLLECTION" -> line.append("§f${NumbersUtils.formatNumber(collectionMade)} §7(${NumbersUtils.formatNumber(collectionRate)}/h)")
+                "COLLECTION" -> {
+                    line.append(
+                        "§f${formatDouble(compactedAmount)} " +
+                                "§7(${formatDouble(compactedRate)}/h)"
+                    )
+
+                    if (compactSuffix.isNotEmpty()) {
+                        line.append(" §7[$compactSuffix]")
+                    }
+                }
 
                 "MONEY" -> {
-                    if (useMotes) {
-                        line.append("§d${NumbersUtils.formatNumber(currentMoney)} Motes §7(${NumbersUtils.formatNumber(currentRate)} Motes/h)")
-                    } else {
-                        line.append("§a$${NumbersUtils.formatNumber(currentMoney)} §7($${NumbersUtils.formatNumber(currentRate)}/h)")
+                    line.append(getMultiSummaryMoneyText(currentMoney, currentRate, useMotes))
+
+                    if (shouldUseBazaar && isEnchantedCollection) {
+                        line.append(" §7[$effectiveBazaarType]")
                     }
                 }
 
                 "BOTH" -> {
-                    line.append("§f${NumbersUtils.formatNumber(collectionMade)} §7(${NumbersUtils.formatNumber(collectionRate)}/h)   ")
+                    line.append(
+                        "§f${formatDouble(compactedAmount)} " +
+                                "§7(${formatDouble(compactedRate)}/h)"
+                    )
 
-                    if (useMotes) {
-                        line.append("§d${NumbersUtils.formatNumber(currentMoney)} Motes §7(${NumbersUtils.formatNumber(currentRate)} Motes/h)")
-                    } else {
-                        line.append("§a$${NumbersUtils.formatNumber(currentMoney)} §7($${NumbersUtils.formatNumber(currentRate)}/h)")
+                    if (compactSuffix.isNotEmpty()) {
+                        line.append(" §7[$compactSuffix]")
+                    }
+
+                    line.append("   ")
+                    line.append(getMultiSummaryMoneyText(currentMoney, currentRate, useMotes))
+
+                    if (shouldUseBazaar && isEnchantedCollection) {
+                        line.append(" §7[$effectiveBazaarType]")
                     }
                 }
 
@@ -363,47 +378,63 @@ object MultiTrackingHandler  {
             }
 
             collectionLines.add(line)
+
+            if (shouldUseBazaar && summaryStatsName != "COLLECTION") {
+                addMultiSummaryItemPrice(collectionLines, coll)
+            }
         }
 
         // Gemstones
-        val gemstoneLines = mutableListOf<Component>()
-
         if (trackedCollections.contains("gemstone")) {
             for (gemstone in MultiTrackingRates.seenGemstones) {
-                val name = formatCollectionName(gemstone)
-                val formattedName = name.toColor()
+                val formattedName = formatCollectionName(gemstone).toColor()
 
-                val gemMoney: Long
-                val gemRate: Long
-
-                val keyPrefix = ("${gemstone}_$variant").uppercase()
-
-                if (!useBazaar) {
-                    gemMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(keyPrefix, 0L)
-                    gemRate = MultiTrackingRates.moneyPerHourNPC.getOrDefault(keyPrefix, 0L)
-                } else {
-                    val key = keyPrefix + suffix
-                    gemMoney = MultiTrackingRates.moneyMadeBazaar.getOrDefault(key, 0L)
-                    gemRate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault(key, 0L)
-                }
+                val (gemMoney, gemRate) =
+                    getMultiSummaryMoney(gemstone, shouldUseBazaar)
 
                 totalGemstoneMoneyMade += gemMoney
                 totalGemstoneMoneyRate += gemRate
 
                 val amount = MultiTrackingRates.collectionMade[gemstone] ?: 0L
-                val rate = MultiTrackingRates.collectionPerHour[gemstone] ?: 0L
+                val rate = MultiTrackingRates.collectionRate[gemstone] ?: 0L
 
-                val line = Component.literal("    - ").append(formattedName).append(": ")
+                val (compactedAmount, _) =
+                    getMultiSummaryCompactedCollection(amount, gemstone)
+                val (compactedRate, _) =
+                    getMultiSummaryCompactedCollection(rate, gemstone)
+
+                val line = Component.literal("    - ").append(formattedName)
+                line.append("§r: ")
 
                 when (summaryStatsName) {
-                    "COLLECTION" -> line.append("§f${NumbersUtils.formatNumber(amount)} §7(${NumbersUtils.formatNumber(rate)}/h)")
+                    "COLLECTION" -> {
+                        line.append(
+                            "§f${formatDouble(compactedAmount)} " +
+                                    "§7(${formatDouble(compactedRate)}/h)"
+                        )
+                    }
 
-                    "MONEY" -> line.append("§a$${NumbersUtils.formatNumber(gemMoney)} §7($${NumbersUtils.formatNumber(gemRate)}/h)")
+                    "MONEY" -> {
+                        line.append(getMultiSummaryMoneyText(gemMoney, gemRate, useMotes))
+                    }
 
-                    "BOTH" -> line.append("§f${NumbersUtils.formatNumber(amount)} §7(${NumbersUtils.formatNumber(rate)}/h)   §a$${NumbersUtils.formatNumber(gemMoney)} §7($${NumbersUtils.formatNumber(gemRate)}/h)")
+                    "BOTH" -> {
+                        line.append(
+                            "§f${formatDouble(compactedAmount)} " +
+                                    "§7(${formatDouble(compactedRate)}/h)   "
+                        )
+
+                        line.append(getMultiSummaryMoneyText(gemMoney, gemRate, useMotes))
+                    }
+
+                    else -> continue
                 }
 
                 gemstoneLines.add(line)
+
+                if (shouldUseBazaar && multiDetailedSummary && summaryStatsName != "COLLECTION") {
+                    addMultiSummaryItemPrice(gemstoneLines, gemstone)
+                }
             }
 
             totalMoneyMade += totalGemstoneMoneyMade
@@ -411,13 +442,21 @@ object MultiTrackingHandler  {
         }
 
         if (summaryStatsName == "MONEY" || summaryStatsName == "BOTH") {
-            if (totalMoneyMade > 0) {
+            if (totalMoneyMade > 0L || totalMoneyRate > 0L) {
                 val totalLine = Component.literal("   ")
 
                 if (useMotes) {
-                    totalLine.append("§eTotal Motes: §f${NumbersUtils.formatNumber(totalMoneyMade)}   §eRate: §f${NumbersUtils.formatNumber(totalMoneyRate)} Motes/h   §ePricing: §f$pricingLabel")
+                    totalLine.append(
+                        "§eTotal Motes: §f${formatLong(totalMoneyMade)}   " +
+                                "§eRate: §f${formatLong(totalMoneyRate)} Motes/h   " +
+                                "§ePricing: §f$pricingLabel"
+                    )
                 } else {
-                    totalLine.append("§eTotal Profit: §f$${NumbersUtils.formatNumber(totalMoneyMade)}   §eRate: §f$${NumbersUtils.formatNumber(totalMoneyRate)}/h   §ePricing: §f$pricingLabel")
+                    totalLine.append(
+                        "§eTotal Profit: §f$${formatLong(totalMoneyMade)}   " +
+                                "§eRate: §f$${formatLong(totalMoneyRate)}/h   " +
+                                "§ePricing: §f$pricingLabel"
+                    )
                 }
 
                 lines.add(totalLine)
@@ -428,36 +467,242 @@ object MultiTrackingHandler  {
         lines.addAll(collectionLines)
 
         if (trackedCollections.contains("gemstone")) {
-            val summaryLine = Component.literal("   Gemstones (${variant.lowercase()}): ").withColor(ColorUtils.collectionColors["gemstone"] ?: Colors.LIGHT_PURPLE.color)
+            val summaryLine = Component.literal("   Gemstones: ")
+                .withColor(
+                    ColorUtils.collectionColors["gemstone"]
+                        ?: Colors.LIGHT_PURPLE.color
+                )
+
+            val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
+            val totalRate = MultiTrackingRates.collectionRate["gemstone"] ?: 0L
+
+            val (compactedAmount, _) =
+                getMultiSummaryCompactedCollection(totalColl, "gemstone")
+            val (compactedRate, _) =
+                getMultiSummaryCompactedCollection(totalRate, "gemstone")
 
             when (summaryStatsName) {
                 "COLLECTION" -> {
-                    val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
-                    val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
-
-                    summaryLine.append("§f${NumbersUtils.formatNumber(totalColl)} §7(${NumbersUtils.formatNumber(totalRate)}/h)")
+                    summaryLine.append(
+                        "§f${formatDouble(compactedAmount)} " +
+                                "§7(${formatDouble(compactedRate)}/h) " +
+                                "§8[${collectionGemstoneTier.displayName}]"
+                    )
                 }
 
-                "MONEY" -> summaryLine.append("§a$${NumbersUtils.formatNumber(totalGemstoneMoneyMade)} §7($${NumbersUtils.formatNumber(totalGemstoneMoneyRate)}/h)")
+                "MONEY" -> {
+                    summaryLine.append(
+                        getMultiSummaryMoneyText(
+                            totalGemstoneMoneyMade,
+                            totalGemstoneMoneyRate,
+                            useMotes
+                        )
+                    )
+
+                    if (pricingGemstoneTier != GemstoneTier.ROUGH) {
+                        summaryLine.append(" §8[${pricingGemstoneTier.displayName}]")
+                    }
+                }
 
                 "BOTH" -> {
-                    val totalColl = MultiTrackingRates.collectionMade["gemstone"] ?: 0L
-                    val totalRate = MultiTrackingRates.collectionPerHour["gemstone"] ?: 0L
+                    summaryLine.append(
+                        "§f${formatDouble(compactedAmount)} " +
+                                "§7(${formatDouble(compactedRate)}/h) " +
+                                "§8[${collectionGemstoneTier.displayName}]   "
+                    )
 
                     summaryLine.append(
-                        "§f${NumbersUtils.formatNumber(totalColl)} §7(${NumbersUtils.formatNumber(totalRate)}/h)   §a$${NumbersUtils.formatNumber(totalGemstoneMoneyMade)} §7($${NumbersUtils.formatNumber(totalGemstoneMoneyRate)}/h)"
+                        getMultiSummaryMoneyText(
+                            totalGemstoneMoneyMade,
+                            totalGemstoneMoneyRate,
+                            useMotes
+                        )
                     )
+
+                    if (pricingGemstoneTier != GemstoneTier.ROUGH) {
+                        summaryLine.append(" §7[${pricingGemstoneTier.displayName}]")
+                    }
                 }
             }
 
             lines.add(summaryLine)
 
-            if (multiDetailedSummary) lines.addAll(gemstoneLines)
+            if (multiDetailedSummary) {
+                lines.addAll(gemstoneLines)
+            }
         }
 
         lines.add(Component.empty())
-        lines.add(Component.literal("   §7Elapsed time: §f${multiUptimeInWords}"))
+        lines.add(Component.literal("   §7Elapsed time: §f$multiUptimeInWords"))
 
         ChatUtils.sendSummary("§e§lMulti-Tracking Summary", lines)
+    }
+
+    private fun getMultiSummaryItemPrice(coll: String): Float? {
+        if (GemstonesManager.checkIfGemstone(coll)) {
+            val prices = when (bazaarPriceType) {
+                BazaarPriceType.INSTANT_BUY -> GemstonePrices.multiGemstoneInstantBuyPrices
+                BazaarPriceType.INSTANT_SELL -> GemstonePrices.multiGemstoneInstantSellPrices
+            }
+
+            return prices[coll.lowercase()]?.get(gemstoneTier.name)
+        }
+
+        return when (multiCollectionTypes[coll]) {
+            "normal" -> when (bazaarPriceType) {
+                BazaarPriceType.INSTANT_BUY -> BazaarPrices.multiBaseInstantBuy[coll]
+                BazaarPriceType.INSTANT_SELL -> BazaarPrices.multiBaseInstantSell[coll]
+            }
+
+            "enchanted" -> when (getMultiSummaryBazaarType(coll)) {
+                BazaarType.ENCHANTED_VERSION -> when (bazaarPriceType) {
+                    BazaarPriceType.INSTANT_BUY -> BazaarPrices.multiEnchantedInstantBuy[coll]
+                    BazaarPriceType.INSTANT_SELL -> BazaarPrices.multiEnchantedInstantSell[coll]
+                }
+
+                BazaarType.SUPER_ENCHANTED_VERSION -> when (bazaarPriceType) {
+                    BazaarPriceType.INSTANT_BUY -> BazaarPrices.multiSuperEnchantedInstantBuy[coll]
+                    BazaarPriceType.INSTANT_SELL -> BazaarPrices.multiSuperEnchantedInstantSell[coll]
+                }
+            }
+
+            else -> null
+        }
+    }
+
+    private fun getMultiSummaryMoney(coll: String, shouldUseBazaar: Boolean): Pair<Long, Long> {
+        val priceType = bazaarPriceType
+
+        if (!shouldUseBazaar) {
+            val key = if (GemstonesManager.checkIfGemstone(coll)) {
+                "${coll}_${GemstoneTier.ROUGH}".uppercase()
+            } else {
+                coll
+            }
+
+            return Pair(
+                MultiTrackingRates.moneyMadeNPC.getOrDefault(key, 0L),
+                MultiTrackingRates.moneyRateNPC.getOrDefault(key, 0L)
+            )
+        }
+
+        if (GemstonesManager.checkIfGemstone(coll)) {
+            return Pair(
+                MultiTrackingRates.gemstoneMoneyMade[coll]
+                    ?.get(gemstoneTier)
+                    ?.get(priceType) ?: 0L,
+                MultiTrackingRates.gemstoneMoneyRate[coll]
+                    ?.get(gemstoneTier)
+                    ?.get(priceType) ?: 0L
+            )
+        }
+
+        return when (multiCollectionTypes[coll]) {
+            "normal" -> Pair(
+                MultiTrackingRates.baseMoneyMade[coll]?.get(priceType) ?: 0L,
+                MultiTrackingRates.baseMoneyRate[coll]?.get(priceType) ?: 0L
+            )
+
+            "enchanted" -> {
+                val madeMap = when (getMultiSummaryBazaarType(coll)) {
+                    BazaarType.ENCHANTED_VERSION -> MultiTrackingRates.enchantedMoneyMade[coll]
+                    BazaarType.SUPER_ENCHANTED_VERSION -> MultiTrackingRates.superEnchantedMoneyMade[coll]
+                }
+
+                val rateMap = when (getMultiSummaryBazaarType(coll)) {
+                    BazaarType.ENCHANTED_VERSION -> MultiTrackingRates.enchantedMoneyRate[coll]
+                    BazaarType.SUPER_ENCHANTED_VERSION -> MultiTrackingRates.superEnchantedMoneyRate[coll]
+                }
+
+                Pair(madeMap?.get(priceType) ?: 0L, rateMap?.get(priceType) ?: 0L)
+            }
+
+            else -> Pair(0L, 0L)
+        }
+    }
+
+    private fun getMultiSummaryCompactedCollection(amount: Long, coll: String): Pair<Double, String> {
+        if (coll == "gemstone" || GemstonesManager.checkIfGemstone(coll)) {
+            val tier = collectionGemstoneTier
+            return Pair(amount / tier.recipeAmount.toDouble(), tier.displayName)
+        }
+
+        return when (getMultiSummaryCollectionTier(coll)) {
+            CollectionTier.BASE -> Pair(amount.toDouble(), "")
+
+            CollectionTier.ENCHANTED -> {
+                val recipeAmount = multiEnchantedRecipes[coll]
+                    ?.values
+                    ?.firstOrNull()
+                    ?.toLong()
+                    ?: 1L
+
+                Pair(amount / recipeAmount.toDouble(), CollectionTier.ENCHANTED.toString())
+            }
+
+            CollectionTier.SUPER_ENCHANTED -> {
+                val recipeAmount = multiSuperEnchantedRecipes[coll]
+                    ?.values
+                    ?.firstOrNull()
+                    ?.toLong()
+                    ?: 1L
+
+                Pair(amount / recipeAmount.toDouble(), CollectionTier.SUPER_ENCHANTED.toString())
+            }
+        }
+    }
+
+    private fun getMultiSummaryMoneyText(made: Long, rate: Long, useMotes: Boolean): String {
+        return if (useMotes) {
+            "${formatLong(made)} motes §7(${formatLong(rate)} motes/h)"
+        } else {
+            "$${formatLong(made)} §7($${formatLong(rate)}/h)"
+        }
+    }
+
+    private fun addMultiSummaryItemPrice(lines: MutableList<Component>, coll: String) {
+        val itemPrice = getMultiSummaryItemPrice(coll)
+
+        val priceText = itemPrice
+            ?.takeIf { it > 0f }
+            ?.let { "$${formatLong(it.toLong())}" }
+            ?: "Unknown price"
+
+        val itemName = getMultiSummaryItemName(coll)
+
+        lines.add(Component.literal("        §6Item price: §f$priceText (§7$itemName§f)"))
+    }
+
+    private fun getMultiSummaryItemName(coll: String): String? {
+        if (GemstonesManager.checkIfGemstone(coll)) {
+            return "${gemstoneTier.displayName} ${formatCollectionName(coll)}"
+        }
+
+        return when (multiCollectionTypes[coll]) {
+            "normal" -> formatCollectionName(coll)
+
+            "enchanted" -> {
+                val recipes = when (getMultiSummaryBazaarType(coll)) {
+                    BazaarType.ENCHANTED_VERSION -> multiEnchantedRecipes
+                    BazaarType.SUPER_ENCHANTED_VERSION -> multiSuperEnchantedRecipes
+                }
+
+                recipes[coll]?.keys?.firstOrNull()?.let { formatBazaarItemName(it) }
+            }
+
+            else -> null
+        }
+    }
+
+    private fun getMultiSummaryBazaarType(coll: String): BazaarType {
+        return if (bazaarType == BazaarType.SUPER_ENCHANTED_VERSION && multiSuperEnchantedRecipes[coll].isNullOrEmpty()) {
+            BazaarType.ENCHANTED_VERSION
+        } else bazaarType
+    }
+
+    private fun getMultiSummaryCollectionTier(coll: String): CollectionTier {
+        return if (collectionTier == CollectionTier.SUPER_ENCHANTED && multiSuperEnchantedRecipes[coll].isNullOrEmpty()) {
+            CollectionTier.ENCHANTED
+        } else collectionTier
     }
 }

@@ -14,7 +14,7 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingRates
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatLong
 import io.github.chindeaone.collectiontracker.utils.SkillUtils
 import io.github.chindeaone.collectiontracker.utils.SoundUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
@@ -96,8 +96,8 @@ class SkillMilestoneOverlay: AbstractOverlay() {
     }
 
     private fun formatMilestone(name: String, milestone: Milestone, currentAmount: Long): String {
-        val formattedCurrentAmount = NumbersUtils.formatNumber(currentAmount)
-        val formattedTargetAmount = NumbersUtils.formatNumber(milestone.target)
+        val formattedCurrentAmount = formatLong(currentAmount)
+        val formattedTargetAmount = formatLong(milestone.target)
 
         if (currentAmount < milestone.target) {
             return "$name: $formattedCurrentAmount / $formattedTargetAmount"

@@ -4,16 +4,16 @@ import io.github.chindeaone.collectiontracker.gui.overlays.ColeweightOverlay
 import io.github.chindeaone.collectiontracker.utils.EpochMark
 
 object ColeweightTrackingRates {
-    var coleweightAmount: Float = 0f
-    var coleweightGained: Float = 0f
-    var coleweightPerHour: Float = 0f
-    var coleweightSinceLast: Float = 0f
+    var coleweightAmount: Double = 0.0
+    var coleweightGained: Double = 0.0
+    var coleweightPerHour: Double = 0.0
+    var coleweightSinceLast: Double = 0.0
     var lastColeweightUpdate: EpochMark? = null
 
-    private var startColeweight: Float = -1f
+    private var startColeweight: Double = -1.0
 
-    fun calculateRates(currentValue: Float) {
-        if (startColeweight == -1f) {
+    fun calculateRates(currentValue: Double) {
+        if (startColeweight == -1.0) {
             startColeweight = currentValue
             coleweightAmount = currentValue
             lastColeweightUpdate = EpochMark.now()
@@ -28,18 +28,18 @@ object ColeweightTrackingRates {
         val uptime = ColeweightTrackingHandler.uptimeInSeconds
 
         coleweightPerHour = if (uptime > 0) {
-            (coleweightGained / (uptime / 3600.0)).toFloat()
-        } else 0f
+            (coleweightGained / (uptime / 3600.0))
+        } else 0.0
 
         if (!ColeweightOverlay.trackingDirty) ColeweightOverlay.trackingDirty = true
     }
 
     fun reset() {
-        coleweightAmount = 0f
-        coleweightGained = 0f
-        coleweightPerHour = 0f
-        coleweightSinceLast = 0f
+        coleweightAmount = 0.0
+        coleweightGained = 0.0
+        coleweightPerHour = 0.0
+        coleweightSinceLast = 0.0
         lastColeweightUpdate = null
-        startColeweight = -1f
+        startColeweight = -1.0
     }
 }

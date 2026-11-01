@@ -34,9 +34,7 @@ object SacksTrackingManager {
         val normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.enchantedRecipe, false, collectionName)
         val normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.superEnchantedRecipe, true, collectionName)
 
-        for (entry in sacksDetails.entries) {
-            val itemName = entry.key
-            val amount = entry.value
+        for ((itemName, amount) in sacksDetails) {
 
             val enchantedMultiplier = normalizedEnchantedMap[itemName]
             val superEnchantedMultiplier = normalizedSuperEnchantedMap[itemName]
@@ -79,9 +77,7 @@ object SacksTrackingManager {
             val normalizedEnchantedMap = normalizeMap(BazaarCollectionsManager.multiEnchantedRecipes.getOrDefault(coll, mapOf()), false, coll)
             val normalizedSuperEnchantedMap = normalizeMap(BazaarCollectionsManager.multiSuperEnchantedRecipes.getOrDefault(coll, mapOf()), true, coll)
 
-            for (entry in sacksDetails.entries) {
-                val itemName = entry.key
-                val amount = entry.value
+            for ((itemName, amount) in sacksDetails) {
 
                 if ("enchanted" == type) {
                     val enchantedMultiplier = normalizedEnchantedMap[itemName]

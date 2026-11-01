@@ -58,9 +58,8 @@ object MultiDataFetcher {
                 val jsonData = JsonParser.parseString(data).asJsonObject
                 val newMap = mutableMapOf<String, Long>()
 
-                for (entry in jsonData.entrySet()) {
-                    val collectionName = entry.key
-                    val collectionValue = entry.value.asLong
+                for ((collectionName, value) in jsonData.entrySet()) {
+                    val collectionValue = value.asLong
                     newMap[collectionName] = collectionValue
                 }
                 map = newMap

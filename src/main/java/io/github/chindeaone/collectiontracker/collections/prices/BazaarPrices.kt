@@ -3,15 +3,30 @@ package io.github.chindeaone.collectiontracker.collections.prices
 import com.google.gson.JsonParser
 
 object BazaarPrices {
-    var normalInstantBuy: Float = 0.0f
-    var normalInstantSell: Float = 0.0f
+
+    enum class BazaarPriceType(private val displayName: String) {
+        INSTANT_SELL("Instant Sell"),
+        INSTANT_BUY("Instant Buy");
+
+        override fun toString(): String = displayName
+    }
+
+    enum class BazaarType(private val displayName: String, val shortName: String) {
+        ENCHANTED_VERSION("Enchanted", "ench"),
+        SUPER_ENCHANTED_VERSION("Super Enchanted", "super ench");
+
+        override fun toString(): String = displayName
+    }
+
+    var baseInstantBuy: Float = 0.0f
+    var baseInstantSell: Float = 0.0f
     var enchantedInstantBuy: Float = 0.0f
     var enchantedInstantSell: Float = 0.0f
     var superEnchantedInstantBuy: Float = 0.0f
     var superEnchantedInstantSell: Float = 0.0f
 
-    val multiNormalInstantBuy: MutableMap<String, Float> = mutableMapOf()
-    val multiNormalInstantSell: MutableMap<String, Float> = mutableMapOf()
+    val multiBaseInstantBuy: MutableMap<String, Float> = mutableMapOf()
+    val multiBaseInstantSell: MutableMap<String, Float> = mutableMapOf()
     val multiEnchantedInstantBuy: MutableMap<String, Float> = mutableMapOf()
     val multiEnchantedInstantSell: MutableMap<String, Float> = mutableMapOf()
     val multiSuperEnchantedInstantBuy: MutableMap<String, Float> = mutableMapOf()
@@ -22,10 +37,10 @@ object BazaarPrices {
 
         if (type == "normal") {
             // normal: { "ITEM_ID": { "INSTANT_BUY": 25498.465, "INSTANT_SELL": 24380.9 } }
-            for (entry in jsonObject.entrySet()) {
-                val prices = entry.value.getAsJsonObject()
-                normalInstantBuy = prices.get("INSTANT_BUY").asFloat
-                normalInstantSell = prices.get("INSTANT_SELL").asFloat
+            for ((_, value) in jsonObject.entrySet()) {
+                val prices = value.getAsJsonObject()
+                baseInstantBuy = prices.get("INSTANT_BUY").asFloat
+                baseInstantSell = prices.get("INSTANT_SELL").asFloat
                 break // Should only be one item
             }
         } else if (type == "enchanted") {
@@ -56,10 +71,10 @@ object BazaarPrices {
         val jsonObject = JsonParser.parseString(json).getAsJsonObject()
 
         if (type == "normal") {
-            for (entry in jsonObject.entrySet()) {
-                val prices = entry.value.getAsJsonObject()
-                multiNormalInstantBuy[collection] = prices.get("INSTANT_BUY").asFloat
-                multiNormalInstantSell[collection] = prices.get("INSTANT_SELL").asFloat
+            for ((_, value) in jsonObject.entrySet()) {
+                val prices = value.getAsJsonObject()
+                multiBaseInstantBuy[collection] = prices.get("INSTANT_BUY").asFloat
+                multiBaseInstantSell[collection] = prices.get("INSTANT_SELL").asFloat
                 break
             }
         } else if (type == "enchanted") {
@@ -86,15 +101,15 @@ object BazaarPrices {
     }
 
     fun resetPrices() {
-        normalInstantBuy = 0.0f
-        normalInstantSell = 0.0f
+        baseInstantBuy = 0.0f
+        baseInstantSell = 0.0f
         enchantedInstantBuy = 0.0f
         enchantedInstantSell = 0.0f
         superEnchantedInstantBuy = 0.0f
         superEnchantedInstantSell = 0.0f
 
-        multiNormalInstantBuy.clear()
-        multiNormalInstantSell.clear()
+        multiBaseInstantBuy.clear()
+        multiBaseInstantSell.clear()
         multiEnchantedInstantBuy.clear()
         multiEnchantedInstantSell.clear()
         multiSuperEnchantedInstantBuy.clear()

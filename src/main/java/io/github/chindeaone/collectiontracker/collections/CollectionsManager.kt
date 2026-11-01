@@ -1,9 +1,20 @@
 package io.github.chindeaone.collectiontracker.collections
 
-import io.github.chindeaone.collectiontracker.commands.CollectionTracker
-
 object CollectionsManager {
+
+    enum class CollectionTier(private val displayName: String, val shortName: String) {
+        BASE("Base", "base"),
+        ENCHANTED("Enchanted", "ench"),
+        SUPER_ENCHANTED("Super Enchanted", "super ench");
+
+        override fun toString(): String = displayName
+    }
+
     var collections = linkedMapOf<String, Set<String>>()
+
+    val collectionList: List<String>
+        get() = collections.values.flatten()
+
     var collectionSource: String? = null
     var collectionType: String? = null
 
@@ -28,24 +39,14 @@ object CollectionsManager {
         return false
     }
 
-    val collectionList: List<String>
-        get() = collections.values.flatten()
+    fun isRiftCollection(collectionName: String): Boolean =
+        collections.getOrDefault("Rift", emptySet()).contains(collectionName)
 
-    fun isRiftCollection(collectionName: String): Boolean {
-        return collections
-            .getOrDefault("Rift", mutableSetOf())
-            .contains(collectionName)
-    }
+    fun isAnyRiftTracked(list: Collection<String>): Boolean =
+        list.any(::isRiftCollection)
 
-    fun hasAnyRiftCollection(): Boolean {
-        val riftCollections = collections.getOrDefault("Rift", mutableSetOf())
-        return CollectionTracker.collectionList.stream().anyMatch { o: String? -> riftCollections.contains(o) }
-    }
-
-    fun hasAllRiftCollections(): Boolean {
-        val riftCollections = collections.getOrDefault("Rift", mutableSetOf())
-        return riftCollections.containsAll(CollectionTracker.collectionList)
-    }
+    fun isAnyNonRiftTracked(list: Collection<String>): Boolean =
+        list.any { !isRiftCollection(it) }
 
     fun resetCollections() {
         collectionSource = null

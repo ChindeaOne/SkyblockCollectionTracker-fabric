@@ -58,7 +58,7 @@ abstract class BaseMilestoneScreen(oldScreen: AbstractContainerScreen<*>?): Base
         milestones.forEach { (name, milestone) ->
             val entry = Entry(
                 name,
-                NumbersUtils.formatValue(milestone.target),
+                NumbersUtils.formatLong(milestone.target),
                 milestone.isTotal
             )
 

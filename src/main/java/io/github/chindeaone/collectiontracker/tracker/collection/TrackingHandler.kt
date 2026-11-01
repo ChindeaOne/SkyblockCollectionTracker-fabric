@@ -2,7 +2,13 @@ package io.github.chindeaone.collectiontracker.tracker.collection
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager.CollectionTier
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager.GemstoneTier
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarPriceType
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarType
+import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
@@ -10,9 +16,13 @@ import io.github.chindeaone.collectiontracker.commands.CollectionTracker.riftTra
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.scheduler
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.trackingTask
 import io.github.chindeaone.collectiontracker.config.apiTracking
+import io.github.chindeaone.collectiontracker.config.bazaarPriceType
+import io.github.chindeaone.collectiontracker.config.bazaarType
 import io.github.chindeaone.collectiontracker.config.collectionConfig
+import io.github.chindeaone.collectiontracker.config.collectionGemstoneTier
 import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
-import io.github.chindeaone.collectiontracker.config.gemstoneVariant
+import io.github.chindeaone.collectiontracker.config.collectionTier
+import io.github.chindeaone.collectiontracker.config.gemstoneTier
 import io.github.chindeaone.collectiontracker.config.useBazaar
 import io.github.chindeaone.collectiontracker.gui.OverlayManager.setTrackingOverlayRendering
 import io.github.chindeaone.collectiontracker.gui.overlays.CollectionOverlay
@@ -20,36 +30,21 @@ import io.github.chindeaone.collectiontracker.gui.overlays.saveMilestonesProgres
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearAllCache
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.clearCollectionCache
 import io.github.chindeaone.collectiontracker.tracker.collection.DataFetcher.fetchData
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.highestCollectionPerHour
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.highestRatePerHourNPC
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lowestCollectionPerHour
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lowestRatePerHourNPC
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lowestRatesPerHourBazaar
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.highestRatesPerHourBazaar
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionMade
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionPerHour
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.moneyMade
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.moneyPerHourBazaar
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.moneyPerHourNPC
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.nextRankAmount
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.nextRankUsername
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.playerCurrentRank
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.etaToNextRank
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lastApiCollection
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.sacksCollectionGained
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.sessionStartCollection
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.lastCollectionUpdate
-import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionTillNextRank
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.collectionRate
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.moneyRateNPC
+import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates.moneyMadeNPC
 import io.github.chindeaone.collectiontracker.utils.EpochMark
 import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatClock
 import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatInWords
 import io.github.chindeaone.collectiontracker.utils.Hypixel.server
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatDouble
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatLong
 import io.github.chindeaone.collectiontracker.utils.StringUtils
+import io.github.chindeaone.collectiontracker.utils.StringUtils.formatBazaarItemName
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils.sendMessage
 import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
-import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.toColor
 import net.minecraft.network.chat.Component
 import org.apache.logging.log4j.LogManager
@@ -200,37 +195,14 @@ object TrackingHandler {
             trackingTask = null
         }
 
-        // Reset collection tracking
-        lastApiCollection = -1L
-        sacksCollectionGained = 0L
-        sessionStartCollection = -1L
-        lastCollectionUpdate = null
-
-        // Clear profit map
-        moneyPerHourBazaar.clear()
-        moneyMade.clear()
-
-        // Reset highest/lowest rates
-        resetLowestHighestRates()
-
-        // Reset leaderboard tracking
-        playerCurrentRank = -1
-        nextRankUsername = null
-        nextRankAmount = -1L
-        etaToNextRank = null
-        collectionTillNextRank = -1L
+        TrackingRates.clearCollectionData()
+        TrackingRates.clearAllMoneyMaps()
+        TrackingRates.clearLeaderboardData()
 
         riftTracking = false
         InventoryListener.clearInventoryState()
-    }
 
-    private fun resetLowestHighestRates() {
-        highestCollectionPerHour = 0
-        lowestCollectionPerHour = Long.MAX_VALUE
-        highestRatePerHourNPC = 0
-        lowestRatePerHourNPC = Long.MAX_VALUE
-        lowestRatesPerHourBazaar.clear()
-        highestRatesPerHourBazaar.clear()
+        collection = ""
     }
 
     fun pauseTracking() {
@@ -320,115 +292,190 @@ object TrackingHandler {
         get() = totalUptime.formatClock()
 
     private fun sendRates() {
-        TrackingRates.updateRates()
-
         val collectionDisplay = StringUtils.formatCollectionName(collection)
-
         val lines: MutableList<Component> = mutableListOf()
-        lines.add(Component.literal("   §aCollection tracked: §f").append(collectionDisplay.toColor()))
-        lines.add(Component.literal("   §b${collectionDisplay} Made: §f${NumbersUtils.formatNumber(collectionMade)}   §bRate: §f${NumbersUtils.formatNumber(collectionPerHour)}/h"))
 
-        val useBazaar = useBazaar
-        val typeKey = CollectionParser.bazaarTypeKey()
-        val suffix = CollectionParser.bazaarPriceTypeSuffix()
+        lines.add(Component.literal("   §aCollection tracked: §f").append(collectionDisplay.toColor()))
+
+        val convertedMade = compactCollection(collectionMade)
+        val convertedRate= compactCollection(collectionRate)
+
+        val collectionTierName = when (collectionType) {
+            "gemstone" -> collectionGemstoneTier.displayName.takeUnless { collectionGemstoneTier == GemstoneTier.ROUGH }
+
+            "enchanted" -> {
+                val effectiveTier = getEffectiveCollectionTier()
+                effectiveTier.takeUnless { it == CollectionTier.BASE }?.shortName
+            }
+
+            else -> null
+        }
+
+        val collectionLabel = collectionTierName?.let { "Collection Made ($it)" } ?: "Collection Made"
+
+        lines.add(Component.literal("   §b$collectionLabel: §f${formatDouble(convertedMade)}   " + "§bRate: §f${formatDouble(convertedRate)}/h"))
 
         if (!useBazaar) {
-            val npcMoney: Long = moneyMade["NPC"] ?: 0L
-            if (riftTracking && NpcPrices.getNpcPrice(collection) != 0) {
-                lines.add(Component.literal("   §6Motes: §f$${NumbersUtils.formatNumber(npcMoney)}   §6Rate: §f${NumbersUtils.formatNumber(moneyPerHourNPC)}/h"))
-            } else if (NpcPrices.getNpcPrice(collection) != 0) {
-                lines.add(Component.literal("   §6Money (NPC): §f$${NumbersUtils.formatNumber(npcMoney)}   §6Rate: §f$${NumbersUtils.formatNumber(moneyPerHourNPC)}/h"))
+            val npcMoney = moneyMadeNPC
+
+            if (NpcPrices.getNpcPrice(collection) != 0) {
+                if (riftTracking) {
+                    lines.add(Component.literal("   §6Motes Made: §f$${formatLong(npcMoney)}   " + "§6Rate: §f$${formatLong(moneyRateNPC)}/h"))
+                } else {
+                    lines.add(Component.literal("   §6Money Made (NPC): §f$${formatLong(npcMoney)}   " + "§6Rate: §f$${formatLong(moneyRateNPC)}/h"))
+                }
             }
         } else {
+            val priceType = bazaarPriceType
+
             when (collectionType) {
                 "normal" -> {
-                    val bazMoney = moneyMade.getOrDefault("$collectionType$suffix", 0L)
-                    val bazRate = moneyPerHourBazaar.getOrDefault("$collectionType$suffix", 0L)
-                    lines.add(Component.literal("   §6Money (Bazaar): §f$${NumbersUtils.formatNumber(bazMoney)}   §6Rate: §f$${NumbersUtils.formatNumber(bazRate)}/h"))
+                    val bazMoney = TrackingRates.baseMoneyMade[priceType] ?: 0L
+                    val bazRate = TrackingRates.baseMoneyRate[priceType] ?: 0L
+
+                    lines.add(Component.literal("   §6Money Made (Bazaar): §f$${formatLong(bazMoney)}   " + "§6Rate: §f$${formatLong(bazRate)}/h"))
                 }
 
                 "enchanted" -> {
-                    val money = moneyMade.getOrDefault("$typeKey$suffix", 0L)
-                    val rate = moneyPerHourBazaar.getOrDefault("$typeKey$suffix", 0L)
-                    lines.add(Component.literal("   §6Money (Bazaar): §f$${NumbersUtils.formatNumber(money)}  §6Rate: §f$${NumbersUtils.formatNumber(rate)}/h"))
+                    val effectiveBazaarType = getEffectiveBazaarType()
+
+                    val bazMoney = if (effectiveBazaarType == BazaarType.ENCHANTED_VERSION) {
+                        TrackingRates.enchantedMoneyMade[priceType] ?: 0L
+                    } else {
+                        TrackingRates.superEnchantedMoneyMade[priceType] ?: 0L
+                    }
+
+                    val bazRate = if (effectiveBazaarType == BazaarType.ENCHANTED_VERSION) {
+                        TrackingRates.enchantedMoneyRate[priceType] ?: 0L
+                    } else {
+                        TrackingRates.superEnchantedMoneyRate[priceType] ?: 0L
+                    }
+
+                    lines.add(Component.literal("   §6Money Made (Bazaar - ${effectiveBazaarType.shortName}): §f$${formatLong(bazMoney)}   " + "§6Rate: §f$${formatLong(bazRate)}/h"))
                 }
 
                 "gemstone" -> {
-                    val gemstoneVariant = gemstoneVariant
+                    val tier = gemstoneTier
 
-                    val gMoney = moneyMade.getOrDefault("$gemstoneVariant$suffix", 0L)
-                    val gRate = moneyPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
-                    lines.add(Component.literal("   §6Money (Bazaar): §f$${NumbersUtils.formatNumber(gMoney)}  §6Rate: §f$${NumbersUtils.formatNumber(gRate)}/h"))
+                    val gMoney = TrackingRates.gemstoneMoneyMade[tier]?.get(priceType) ?: 0L
+                    val gRate = TrackingRates.gemstoneMoneyRate[tier]?.get(priceType) ?: 0L
+
+                    lines.add(Component.literal("   §6Money Made (${tier.displayName}): §f$${formatLong(gMoney)}   " + "§6Rate: §f$${formatLong(gRate)}/h"))
                 }
             }
-        }
 
-        lines.add(Component.literal("   §7Elapsed time: §f${uptimeInWords}"))
+            getBazaarItemName(collectionDisplay)?.let { itemName ->
+                lines.add(Component.empty())
+                lines.add(Component.literal("   §6Pricing based on: §f$itemName §7($priceType)"))
 
-        // If no collection update, skip best/worst rates
-        if (collectionMade == 0L) {
-            ChatUtils.sendSummary("§e§lTracking Summary", lines)
-            return
-        }
+                val itemPrice = getBazaarItemPrice()
 
-        lines.add(Component.empty())
-        lines.add(Component.literal("   §eBest/Worst Rates:"))
-        lines.add(Component.empty())
-
-        // Collection extremes
-        if (highestCollectionPerHour > 0) {
-            lines.add(Component.literal("   §6Best collection rate: §f${NumbersUtils.formatNumber(highestCollectionPerHour)} coll/h"))
-        }
-        if (lowestCollectionPerHour > 0 && lowestCollectionPerHour < Long.MAX_VALUE) {
-            lines.add(Component.literal("   §6Worst collection rate: §f${NumbersUtils.formatNumber(lowestCollectionPerHour)} coll/h"))
-        }
-
-        if (!useBazaar) {
-            // NPC money extremes
-            if (highestRatePerHourNPC > 0) {
-                if (riftTracking && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(Component.literal("   §6Best motes rate: §f${NumbersUtils.formatNumber(highestRatePerHourNPC)}/h"))
-                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(
-                    Component.literal("   §6Best NPC money rate: §f$${NumbersUtils.formatNumber(highestRatePerHourNPC)}/h")
+                lines.add(
+                    Component.literal("   §6Item price: §f${itemPrice?.let {
+                        if (it == 0f) "Unknown price"
+                        else "$${formatLong(it.toLong())}" 
+                    } ?: "Unknown price"}")
                 )
             }
-            if (lowestRatePerHourNPC > 0 && lowestRatePerHourNPC < Long.MAX_VALUE) {
-                if (riftTracking && NpcPrices.getNpcPrice(collection) != 0) {
-                    lines.add(Component.literal("   §6Worst motes rate: §f${NumbersUtils.formatNumber(lowestRatePerHourNPC)}/h"))
-                } else if (NpcPrices.getNpcPrice(collection) != 0) lines.add(Component.literal("   §6Worst NPC money rate: §f$${NumbersUtils.formatNumber(lowestRatePerHourNPC)}/h"))
-            }
+        }
+
+        lines.add(Component.empty())
+        lines.add(Component.literal("   §7Elapsed time: §f$uptimeInWords"))
+
+        ChatUtils.sendSummary("§e§lTracking Summary", lines)
+    }
+
+    private fun getEffectiveBazaarType(): BazaarType {
+        return if (bazaarType == BazaarType.SUPER_ENCHANTED_VERSION && BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
+            BazaarType.ENCHANTED_VERSION
         } else {
-            // Bazaar extremes per variant
-            if (!moneyPerHourBazaar.isEmpty()) {
-                when (collectionType) {
-                    "normal" -> {
-                        val low = lowestRatesPerHourBazaar.getOrDefault("normal$suffix", 0L)
-                        val high = highestRatesPerHourBazaar.getOrDefault("normal$suffix", 0L)
+            bazaarType
+        }
+    }
 
-                        lines.add(Component.literal("   §6Best money rate: §f$${NumbersUtils.formatNumber(high)}/h"))
-                        lines.add(Component.literal("   §6Worst money rate: §f$${NumbersUtils.formatNumber(low)}/h"))
+    private fun getEffectiveCollectionTier(): CollectionTier {
+        return if (collectionTier == CollectionTier.SUPER_ENCHANTED && BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
+            CollectionTier.ENCHANTED
+        } else {
+            collectionTier
+        }
+    }
+
+    private fun compactCollection(amount: Long): Double {
+        return when (collectionType) {
+            "gemstone" -> {
+                val divisor = collectionGemstoneTier.recipeAmount.toDouble()
+                amount / divisor
+            }
+
+            "enchanted" -> {
+                when (getEffectiveCollectionTier()) {
+                    CollectionTier.BASE -> amount.toDouble()
+
+                    CollectionTier.ENCHANTED -> {
+                        val craftCost = BazaarCollectionsManager.enchantedRecipe.values.firstOrNull()?.toDouble() ?: 160.0
+                        amount / craftCost
                     }
 
-                    "enchanted" -> {
-                        val low = lowestRatesPerHourBazaar.getOrDefault("$typeKey$suffix", 0L)
-                        val high = highestRatesPerHourBazaar.getOrDefault("$typeKey$suffix", 0L)
-
-                        lines.add(Component.literal("   §6Best money rate: §f$${NumbersUtils.formatNumber(high)}/h"))
-                        lines.add(Component.literal("   §6Worst money rate: §f$${NumbersUtils.formatNumber(low)}/h"))
-                    }
-
-                    "gemstone" -> {
-                        val gemstoneVariant = gemstoneVariant
-
-                        val low = lowestRatesPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
-                        val high = highestRatesPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
-
-                        lines.add(Component.literal("   §6Best money rate: §f$${NumbersUtils.formatNumber(high)}/h"))
-                        lines.add(Component.literal("   §6Worst money rate: §f$${NumbersUtils.formatNumber(low)}/h"))
+                    CollectionTier.SUPER_ENCHANTED -> {
+                        val craftCost = BazaarCollectionsManager.superEnchantedRecipe.values.firstOrNull()?.toDouble() ?: 25600.0
+                        amount / craftCost
                     }
                 }
             }
+
+            else -> amount.toDouble()
         }
-        ChatUtils.sendSummary("§e§lTracking Summary", lines)
+    }
+
+    private fun getBazaarItemName(collectionDisplay: String): String? {
+        return when (collectionType) {
+            "enchanted" -> {
+                val recipe = when (getEffectiveBazaarType()) {
+                    BazaarType.ENCHANTED_VERSION -> BazaarCollectionsManager.enchantedRecipe
+                    BazaarType.SUPER_ENCHANTED_VERSION -> BazaarCollectionsManager.superEnchantedRecipe
+                }
+
+                recipe.keys.firstOrNull()?.let { formatBazaarItemName(it) }
+            }
+
+            "gemstone" -> "${gemstoneTier.displayName} $collectionDisplay"
+
+            else -> null
+        }
+    }
+
+    private fun getBazaarItemPrice(): Float? {
+        return when (collectionType) {
+            "enchanted" -> {
+                when (getEffectiveBazaarType()) {
+                    BazaarType.ENCHANTED_VERSION -> {
+                        if (bazaarPriceType == BazaarPriceType.INSTANT_BUY) {
+                            BazaarPrices.enchantedInstantBuy
+                        } else {
+                            BazaarPrices.enchantedInstantSell
+                        }
+                    }
+
+                    BazaarType.SUPER_ENCHANTED_VERSION -> {
+                        if (bazaarPriceType == BazaarPriceType.INSTANT_BUY) {
+                            BazaarPrices.superEnchantedInstantBuy
+                        } else {
+                            BazaarPrices.superEnchantedInstantSell
+                        }
+                    }
+                }
+            }
+
+            "gemstone" -> {
+                if (bazaarPriceType == BazaarPriceType.INSTANT_BUY) {
+                    GemstonePrices.getInstantBuyPrice(gemstoneTier)
+                } else {
+                    GemstonePrices.getInstantSellPrice(gemstoneTier)
+                }
+            }
+
+            else -> null
+        }
     }
 }

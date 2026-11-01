@@ -2,22 +2,27 @@ package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.collections.BazaarCollectionsManager
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager
+import io.github.chindeaone.collectiontracker.collections.CollectionsManager.CollectionTier
 import io.github.chindeaone.collectiontracker.collections.CollectionsManager.collectionType
 import io.github.chindeaone.collectiontracker.collections.GemstonesManager
+import io.github.chindeaone.collectiontracker.collections.GemstonesManager.GemstoneTier
 import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarPriceType
+import io.github.chindeaone.collectiontracker.collections.prices.BazaarPrices.BazaarType
 import io.github.chindeaone.collectiontracker.collections.prices.GemstonePrices
 import io.github.chindeaone.collectiontracker.collections.prices.NpcPrices
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collection
 import io.github.chindeaone.collectiontracker.commands.CollectionTracker.collectionList
-import io.github.chindeaone.collectiontracker.config.ConfigHelper.setBazaarType
+import io.github.chindeaone.collectiontracker.commands.CollectionTracker.riftTracking
 import io.github.chindeaone.collectiontracker.config.bazaarPriceType
 import io.github.chindeaone.collectiontracker.config.bazaarType
-import io.github.chindeaone.collectiontracker.config.categories.Bazaar
 import io.github.chindeaone.collectiontracker.config.categories.overlay.CollectionConfig
 import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCollectionConfig
+import io.github.chindeaone.collectiontracker.config.collectionGemstoneTier
 import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
+import io.github.chindeaone.collectiontracker.config.collectionTier
 import io.github.chindeaone.collectiontracker.config.extraStatsText
-import io.github.chindeaone.collectiontracker.config.gemstoneVariant
+import io.github.chindeaone.collectiontracker.config.gemstoneTier
 import io.github.chindeaone.collectiontracker.config.leaderboardPosition
 import io.github.chindeaone.collectiontracker.config.previousPosition
 import io.github.chindeaone.collectiontracker.config.showExtraStats
@@ -27,9 +32,11 @@ import io.github.chindeaone.collectiontracker.config.useBazaar
 import io.github.chindeaone.collectiontracker.tracker.collection.LeaderboardManager.isEmpty
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.TrackingRates
+import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingHandler
 import io.github.chindeaone.collectiontracker.tracker.collection.multi_tracking.MultiTrackingRates
 import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.formatCompact
-import io.github.chindeaone.collectiontracker.utils.NumbersUtils
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatDouble
+import io.github.chindeaone.collectiontracker.utils.NumbersUtils.formatLong
 import io.github.chindeaone.collectiontracker.utils.StringUtils
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatBazaarItemName
 import io.github.chindeaone.collectiontracker.utils.StringUtils.formatCollectionName
@@ -42,8 +49,8 @@ object CollectionParser {
             when (id) {
                 CollectionConfig.OverlayText.COLLECTION -> addIfNotNull(list, handleCollection())
                 CollectionConfig.OverlayText.COLLECTION_SESSION -> addIfNotNull(list, handleCollectionSession())
-                CollectionConfig.OverlayText.COLL_PER_HOUR -> addIfNotNull(list, handleCollectionPerHour())
-                CollectionConfig.OverlayText.MONEY_PER_HOUR -> addIfNotNull(list, handleMoneyPerHour())
+                CollectionConfig.OverlayText.COLL_PER_HOUR -> addIfNotNull(list, handleCollectionRate())
+                CollectionConfig.OverlayText.MONEY_PER_HOUR -> addIfNotNull(list, handleMoneyRate())
                 CollectionConfig.OverlayText.MONEY_MADE -> addIfNotNull(list, handleMoneyMade())
                 CollectionConfig.OverlayText.COLLECTION_SINCE_LAST -> addIfNotNull(list, handleCollectionSinceLast())
                 CollectionConfig.OverlayText.COLLECTION_SINCE_LAST_TIMER -> addIfNotNull(list, handleCollectionSinceLastTimer())
@@ -66,13 +73,13 @@ object CollectionParser {
 
         if (leaderboardPosition) {
             if (TrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
-            if (TrackingRates.isNextWiped) return "Custom Position (${TrackingRates.nextRankUsername}-wiped): ${NumbersUtils.formatNumber(TrackingRates.nextRankAmount)}"
-            return "Custom Position (${TrackingRates.nextRankUsername}): ${NumbersUtils.formatNumber(TrackingRates.nextRankAmount)}"
+            if (TrackingRates.isNextWiped) return "Custom Position (${TrackingRates.nextRankUsername}-wiped): ${formatLong(TrackingRates.nextRankAmount)}"
+            return "Custom Position (${TrackingRates.nextRankUsername}): ${formatLong(TrackingRates.nextRankAmount)}"
         }
 
         if (TrackingRates.nextRankUsername == null) return "Next Position: Calculating..."
-        if (TrackingRates.isNextWiped) return "Next Position (${TrackingRates.nextRankUsername}-wiped): ${NumbersUtils.formatNumber(TrackingRates.nextRankAmount)}"
-        return "Next Position (${TrackingRates.nextRankUsername}): ${NumbersUtils.formatNumber(TrackingRates.nextRankAmount)}"
+        if (TrackingRates.isNextWiped) return "Next Position (${TrackingRates.nextRankUsername}-wiped): ${formatLong(TrackingRates.nextRankAmount)}"
+        return "Next Position (${TrackingRates.nextRankUsername}): ${formatLong(TrackingRates.nextRankAmount)}"
     }
 
     private fun handleCollectionTillNextRank(): String? {
@@ -80,11 +87,11 @@ object CollectionParser {
 
         if (leaderboardPosition) {
             if (TrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
-            return "Till Custom Position: ${NumbersUtils.formatNumber(TrackingRates.collectionTillNextRank)}"
+            return "Till Custom Position: ${formatLong(TrackingRates.collectionTillNextRank)}"
         }
 
         if (TrackingRates.collectionTillNextRank == -1L) return "Till Next Position: Calculating..."
-        return "Till Next Position: ${NumbersUtils.formatNumber(TrackingRates.collectionTillNextRank)}"
+        return "Till Next Position: ${formatLong(TrackingRates.collectionTillNextRank)}"
     }
 
     private fun handleEta(): String? {
@@ -103,15 +110,15 @@ object CollectionParser {
         if (isEmpty() || !previousPosition) return null
 
         if (TrackingRates.previousRankUsername == null) return "Passed: Calculating..."
-        if (TrackingRates.isPreviousWiped) return "Passed (${TrackingRates.previousRankUsername}-wiped): ${NumbersUtils.formatNumber(TrackingRates.previousRankAmount)}"
-        return "Passed (${TrackingRates.previousRankUsername}): ${NumbersUtils.formatNumber(TrackingRates.previousRankAmount)}"
+        if (TrackingRates.isPreviousWiped) return "Passed (${TrackingRates.previousRankUsername}-wiped): ${formatLong(TrackingRates.previousRankAmount)}"
+        return "Passed (${TrackingRates.previousRankUsername}): ${formatLong(TrackingRates.previousRankAmount)}"
     }
 
     private fun handleCollectionAbovePreviousRank(): String? {
         if (isEmpty() || !previousPosition) return null
 
         if (TrackingRates.collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
-        return "Difference: ${NumbersUtils.formatNumber(TrackingRates.collectionAbovePreviousRankAmount)}"
+        return "Difference: ${formatLong(TrackingRates.collectionAbovePreviousRankAmount)}"
     }
 
     private fun handleMultiNextPosition(): String? {
@@ -119,13 +126,13 @@ object CollectionParser {
 
         if (leaderboardPosition) {
             if (MultiTrackingRates.nextRankAmount == -1L) return "Custom Position: Calculating..."
-            if (MultiTrackingRates.isNextWiped) return "Custom Position (${MultiTrackingRates.nextRankUsername}-wiped): ${NumbersUtils.formatNumber(MultiTrackingRates.nextRankAmount)}"
-            return "Custom Position (${MultiTrackingRates.nextRankUsername}): ${NumbersUtils.formatNumber(MultiTrackingRates.nextRankAmount)}"
+            if (MultiTrackingRates.isNextWiped) return "Custom Position (${MultiTrackingRates.nextRankUsername}-wiped): ${formatLong(MultiTrackingRates.nextRankAmount)}"
+            return "Custom Position (${MultiTrackingRates.nextRankUsername}): ${formatLong(MultiTrackingRates.nextRankAmount)}"
         }
 
         if (MultiTrackingRates.nextRankUsername == null) return "Next Position: Calculating..."
-        if (MultiTrackingRates.isNextWiped) return "Next Position (${MultiTrackingRates.nextRankUsername}-wiped): ${NumbersUtils.formatNumber(MultiTrackingRates.nextRankAmount)}"
-        return "Next Position (${MultiTrackingRates.nextRankUsername}): ${NumbersUtils.formatNumber(MultiTrackingRates.nextRankAmount)}"
+        if (MultiTrackingRates.isNextWiped) return "Next Position (${MultiTrackingRates.nextRankUsername}-wiped): ${formatLong(MultiTrackingRates.nextRankAmount)}"
+        return "Next Position (${MultiTrackingRates.nextRankUsername}): ${formatLong(MultiTrackingRates.nextRankAmount)}"
     }
 
     private fun handleMultiCollectionTillNextRank(): String? {
@@ -133,11 +140,11 @@ object CollectionParser {
 
         if (leaderboardPosition) {
             if (MultiTrackingRates.collectionTillNextRank == -1L) return "Till Custom Position: Calculating..."
-            return "Till Custom Position: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionTillNextRank)}"
+            return "Till Custom Position: ${formatLong(MultiTrackingRates.collectionTillNextRank)}"
         }
 
         if (MultiTrackingRates.collectionTillNextRank == -1L) return "Till Next Position: Calculating..."
-        return "Till Next Position: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionTillNextRank)}"
+        return "Till Next Position: ${formatLong(MultiTrackingRates.collectionTillNextRank)}"
     }
 
     private fun handleMultiEta(): String? {
@@ -156,15 +163,15 @@ object CollectionParser {
         if (isEmpty() || !previousPosition) return null
 
         if (MultiTrackingRates.previousRankUsername == null) return "Passed: Calculating..."
-        if (MultiTrackingRates.isPreviousWiped) return "Passed (${MultiTrackingRates.previousRankUsername}-wiped): ${NumbersUtils.formatNumber(MultiTrackingRates.previousRankAmount)}"
-        return "Passed (${MultiTrackingRates.previousRankUsername}): ${NumbersUtils.formatNumber(MultiTrackingRates.previousRankAmount)}"
+        if (MultiTrackingRates.isPreviousWiped) return "Passed (${MultiTrackingRates.previousRankUsername}-wiped): ${formatLong(MultiTrackingRates.previousRankAmount)}"
+        return "Passed (${MultiTrackingRates.previousRankUsername}): ${formatLong(MultiTrackingRates.previousRankAmount)}"
     }
 
     private fun handleMultiCollectionAbovePreviousRank(): String? {
         if (isEmpty() || !previousPosition) return null
 
         if (MultiTrackingRates.collectionAbovePreviousRankAmount == -1L) return "Difference: Calculating..."
-        return "Difference: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionAbovePreviousRankAmount)}"
+        return "Difference: ${formatLong(MultiTrackingRates.collectionAbovePreviousRankAmount)}"
     }
 
     private fun addIfNotNull(list: MutableList<String>, line: String?) {
@@ -178,129 +185,77 @@ object CollectionParser {
             rankSuffix = if (TrackingRates.playerCurrentRank == 10001) " [Too low]"
             else " [#${TrackingRates.playerCurrentRank}]"
         }
-        return if (TrackingRates.collectionAmount >= 0)
-            "${formatCollectionName(collection)} : ${NumbersUtils.formatNumber(TrackingRates.collectionAmount)}$rankSuffix"
-        else
-            "${formatCollectionName(collection)} : Calculating..."
+
+        if (TrackingRates.collectionAmount <= 0) return "${formatCollectionName(collection)}: Calculating...$rankSuffix"
+        return "${formatCollectionName(collection)}: ${formatLong(TrackingRates.collectionAmount)}$rankSuffix"
     }
 
-    private fun handleCollectionSession(): String =
-        if (TrackingRates.collectionMade > 0)
-            "${formatCollectionName(collection)} (session): ${NumbersUtils.formatNumber(TrackingRates.collectionMade)}"
-        else
-            "${formatCollectionName(collection)} (session): Calculating..."
+    private fun handleCollectionSession(): String {
+        if (TrackingRates.collectionMade <= 0) return "${formatCollectionName(collection)} (session): Calculating..."
 
-    private fun handleCollectionPerHour(): String =
-        if (TrackingRates.collectionPerHour > 0)
-            "Coll/h: ${NumbersUtils.formatNumber(TrackingRates.collectionPerHour)}"
-        else
-            "Coll/h: Calculating..."
+        val (convertedAmount, indicator) = getCompactedCollection(TrackingRates.collectionMade)
+        val formatted = formatDouble(convertedAmount)
 
-    private fun handleMoneyPerHour(): String? {
-        if (collectionType == null) return null // no collection type (probably rift collection)
+        return "${formatCollectionName(collection)} (session): $formatted$indicator"
+    }
+
+    private fun handleCollectionRate(): String {
+        if (TrackingRates.collectionRate <= 0) return "Coll/h: Calculating..."
+
+        val (convertedRate, indicator) = getCompactedCollection(TrackingRates.collectionRate)
+        val formatted = formatDouble(convertedRate)
+
+        return "Coll/h: $formatted$indicator"
+    }
+
+    private fun handleMoneyRate(): String? {
+        if (collectionType == null) return null
 
         val hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0
 
-        if (!useBazaar && hasNpcPrice) {
-            if (!TrackingRates.moneyMade.containsKey("NPC")) {
-                return "$/h (NPC): Calculating..."
+        if (!useBazaar) {
+            if (!hasNpcPrice) return null
+
+            if (TrackingRates.moneyRateNPC <= 0L) {
+                return if (riftTracking) "Motes/h: Calculating..." else "$/h (NPC): Calculating..."
+            }
+            if (riftTracking) {
+                return "Motes/h: ${StringUtils.formatLong(TrackingRates.moneyRateNPC)}"
             }
 
-            val localMoneyPerHourNPC: Long = TrackingRates.moneyPerHourNPC
-            if (CollectionsManager.isRiftCollection(collection)) {
-                // Use motes instead of money for rift collections
-                return "Motes/h: ${StringUtils.formatNumber(localMoneyPerHourNPC)}"
-            }
-            return "$/h (NPC): ${StringUtils.formatNumber(localMoneyPerHourNPC)}"
+            return "$/h (NPC): ${StringUtils.formatLong(TrackingRates.moneyRateNPC)}"
         }
 
-        if (!useBazaar) return null
-
-        val localMoneyPerHour: Long
-        val suffix = bazaarPriceTypeSuffix()
-        when (collectionType) {
-            "normal" -> {
-                localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("$collectionType$suffix", 0L)
-                return "$/h (Bazaar): ${StringUtils.formatNumber(localMoneyPerHour)}"
-            }
-
-            "enchanted" -> {
-                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
-                    localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("Enchanted version$suffix", 0L)
-                    return "$/h (Bazaar): ${StringUtils.formatNumber(localMoneyPerHour)}"
-                } else {
-                    localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("Super Enchanted version$suffix", -1L)
-                    if (localMoneyPerHour == -1L) {
-                        setBazaarType(Bazaar.BazaarType.ENCHANTED_VERSION)
-                        return null
-                    } else return "$/h (Bazaar): ${StringUtils.formatNumber(localMoneyPerHour)}"
-                }
-            }
-
-            "gemstone" -> {
-                localMoneyPerHour = TrackingRates.moneyPerHourBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
-                return "$/h (Bazaar): ${StringUtils.formatNumber(localMoneyPerHour)}"
-            }
-
-            else -> return null
-        }
+        val money = getSingleBazaarRate()
+        return "$/h (Bazaar): ${StringUtils.formatLong(money)}${if (money > 0L) getMoneyDisplayLabel() else ""}"
     }
 
     private fun handleMoneyMade(): String? {
-        if (collectionType == null) return null // no collection type (probably rift collection)
+        if (collectionType == null) return null
 
         val hasNpcPrice = NpcPrices.getNpcPrice(collection) != 0
 
-        if (!useBazaar && hasNpcPrice) {
-            if (!TrackingRates.moneyMade.containsKey("NPC")) {
-                return "$/h (NPC): Calculating..."
+        if (!useBazaar) {
+            if (!hasNpcPrice) return null
+
+            if (TrackingRates.moneyMadeNPC == 0L) {
+                return if (riftTracking) "Motes made: Calculating..." else "$ made (NPC): Calculating..."
+            }
+            if (riftTracking) {
+                return "Motes made: ${StringUtils.formatLong(TrackingRates.moneyMadeNPC)}"
             }
 
-            val localMoneyMadeNPC = TrackingRates.moneyMade.getOrDefault("NPC", 0L)
-            if (CollectionsManager.isRiftCollection(collection)) {
-                // Use motes instead of money for rift collections
-                return "Motes made: ${StringUtils.formatNumber(localMoneyMadeNPC)}"
-            }
-            return "$ made (NPC): ${StringUtils.formatNumber(localMoneyMadeNPC)}"
+            return "$ made (NPC): ${StringUtils.formatLong(TrackingRates.moneyMadeNPC)}"
         }
 
-        if (!useBazaar) return null
-
-        val localMoneyMade: Long
-        val suffix = bazaarPriceTypeSuffix()
-        when (collectionType) {
-            "normal" -> {
-                localMoneyMade = TrackingRates.moneyMade.getOrDefault("$collectionType$suffix", 0L)
-                return "$ made (Bazaar): ${StringUtils.formatNumber(localMoneyMade)}"
-            }
-
-            "enchanted" -> {
-                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
-                    localMoneyMade = TrackingRates.moneyMade.getOrDefault("Enchanted version$suffix", 0L)
-                    return "$ made (Bazaar): ${StringUtils.formatNumber(localMoneyMade)}"
-                } else {
-                    localMoneyMade = TrackingRates.moneyMade.getOrDefault("Super Enchanted version$suffix", -1L)
-                    if (localMoneyMade == -1L) {
-                        setBazaarType(Bazaar.BazaarType.ENCHANTED_VERSION)
-                        return null
-                    } else return "$ made (Bazaar): ${StringUtils.formatNumber(localMoneyMade)}"
-                }
-            }
-
-            "gemstone" -> {
-                localMoneyMade = TrackingRates.moneyMade.getOrDefault("$gemstoneVariant$suffix", 0L)
-                return "$ made (Bazaar): ${StringUtils.formatNumber(localMoneyMade)}"
-            }
-
-            else -> return null
-        }
+        val money = getSingleBazaarMade()
+        return "$ made (Bazaar): ${StringUtils.formatLong(money)}${if (money > 0L) getMoneyDisplayLabel() else ""}"
     }
 
-    private fun handleCollectionSinceLast(): String =
-        if (TrackingRates.collectionSinceLast > 0)
-            "${formatCollectionName(collection)} since last: ${NumbersUtils.formatNumber(TrackingRates.collectionSinceLast)}"
-        else
-            "${formatCollectionName(collection)} since last: Calculating..."
+    private fun handleCollectionSinceLast(): String {
+        if (TrackingRates.collectionSinceLast <= 0) return "${formatCollectionName(collection)} since last: Calculating..."
+        return "${formatCollectionName(collection)} since last: ${formatLong(TrackingRates.collectionSinceLast)}"
+    }
 
     private fun handleCollectionSinceLastTimer(): String {
         val lastUpdate = TrackingRates.lastCollectionUpdate ?: return "Last updated: Calculating..."
@@ -311,35 +266,26 @@ object CollectionParser {
 
     // Only if it has bazaar data and is enabled
     fun updateTrackingExtraLines(list: MutableList<String>) {
-        list.add("§6§lExtra Stats:")
+        list.add("§6§lBazaar Info:")
         for (id in extraStatsText) {
             when (id) {
-                CollectionConfig.OverlayExtraText.BAZAAR_PRICE_TYPE -> addIfNotNull(list, handleBazaarPriceType())
                 CollectionConfig.OverlayExtraText.BAZAAR_ITEM -> addIfNotNull(list, handleBazaarItem())
                 CollectionConfig.OverlayExtraText.BAZAAR_PRICE -> addIfNotNull(list, handleBazaarPrice())
             }
         }
     }
 
-    private fun handleBazaarPriceType(): String =
-        when (bazaarPriceType) {
-            Bazaar.BazaarPriceType.INSTANT_BUY -> "Price type: Instant Buy"
-            Bazaar.BazaarPriceType.INSTANT_SELL -> "Price type: Instant Sell"
-        }
-
     private fun handleBazaarItem(): String? {
         when (collectionType) {
             "enchanted" -> {
-                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
-                    return "Bazaar item: ${formatBazaarItemName(BazaarCollectionsManager.enchantedRecipe.keys.iterator().next())}"
-                } else {
-                    if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
-                        setBazaarType(Bazaar.BazaarType.ENCHANTED_VERSION)
-                        return null
-                    } else return "Bazaar item: ${formatBazaarItemName(BazaarCollectionsManager.superEnchantedRecipe.keys.iterator().next())}"
+                val recipe = when (getEffectiveBazaarType()) {
+                    BazaarType.ENCHANTED_VERSION -> BazaarCollectionsManager.enchantedRecipe
+                    BazaarType.SUPER_ENCHANTED_VERSION -> BazaarCollectionsManager.superEnchantedRecipe
                 }
+
+                return recipe.keys.firstOrNull()?.let { "Bazaar item: ${formatBazaarItemName(it)}" }
             }
-            "gemstone" -> return "Bazaar variant: $gemstoneVariant"
+            "gemstone" -> return "Bazaar item: $gemstoneTier"
             else -> return null
         }
     }
@@ -347,35 +293,21 @@ object CollectionParser {
     private fun handleBazaarPrice(): String? {
         when (collectionType) {
             "enchanted" -> {
-                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
-                    val price =
-                        if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) BazaarPrices.enchantedInstantBuy else BazaarPrices.enchantedInstantSell
-                    if (price == 0f) {
-                        return "Item price: Unknown price"
-                    }
-                    return "Item price: ${NumbersUtils.formatNumber(price.toLong())}"
-                } else {
-                    if (BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
-                        setBazaarType(Bazaar.BazaarType.ENCHANTED_VERSION)
-                        return null
-                    } else {
-                        val price =
-                            if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) BazaarPrices.superEnchantedInstantBuy else BazaarPrices.superEnchantedInstantSell
-                        if (price == 0f) {
-                            return "Item price: Unknown price"
-                        }
-                        return "Item price: ${NumbersUtils.formatNumber(price.toLong())}"
-                    }
+                val effectiveBazaarType = getEffectiveBazaarType()
+                val price = when (effectiveBazaarType) {
+                    BazaarType.ENCHANTED_VERSION -> if (bazaarPriceType == BazaarPriceType.INSTANT_BUY) BazaarPrices.enchantedInstantBuy else BazaarPrices.enchantedInstantSell
+                    BazaarType.SUPER_ENCHANTED_VERSION -> if (bazaarPriceType == BazaarPriceType.INSTANT_BUY) BazaarPrices.superEnchantedInstantBuy else BazaarPrices.superEnchantedInstantSell
                 }
+
+                if (price == 0f) return "Item price: Unknown price"
+                return "Item price: ${formatLong(price.toLong())}"
             }
 
             "gemstone" -> {
-                val price = if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) GemstonePrices.getInstantBuyPrice(gemstoneVariant.toString())
-                else GemstonePrices.getInstantSellPrice(gemstoneVariant.toString())
+                val price = if (bazaarPriceType == BazaarPriceType.INSTANT_BUY) GemstonePrices.getInstantBuyPrice(gemstoneTier) else GemstonePrices.getInstantSellPrice(gemstoneTier)
+                if (price == 0f) return "Item price: Unknown price"
 
-                if (price == 0f) return "Variant price: Unknown price"
-
-                return "Variant price: ${NumbersUtils.formatNumber(price.toLong())}"
+                return "Item price: ${formatLong(price.toLong())}"
             }
 
             else -> return null
@@ -390,87 +322,111 @@ object CollectionParser {
                 val showingCollection = trackingOptions == MultiCollectionConfig.TrackingOptions.COLLECTION
                 val prefix = if (showPrefixes && !showingCollection) (if (mainExpanded) "§e[-]§r " else "§e[+]§r ") else ""
 
-                if (mainExpanded) {
-                    list.add("${prefix}Gemstones: ")
+                val totalLine = when (trackingOptions) {
+                    MultiCollectionConfig.TrackingOptions.COLLECTION -> handleMultiCollection("gemstone")
+                    MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleMultiCollectionRate("gemstone")
+                    MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleMultiCollectionSession("gemstone")
+                    MultiCollectionConfig.TrackingOptions.MONEY_RATE -> handleMultiMoneyRate("gemstone")
+                    MultiCollectionConfig.TrackingOptions.MONEY_MADE -> handleMultiMoneyMade("gemstone")
+                }
 
-                    GemstonePrices.multiGemstoneRecipes.forEach { (type: String?) ->
-                        if (MultiTrackingRates.seenGemstones.contains(type)) {
-                            val line = when (trackingOptions) {
-                                MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleCollectionPerHourMulti(type!!)
-                                MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleCollectionSessionMulti(type!!)
-                                MultiCollectionConfig.TrackingOptions.MONEY_RATE -> handleMoneyPerHourMulti(type!!)
-                                MultiCollectionConfig.TrackingOptions.MONEY_MADE -> handleMoneyMadeMulti(type!!)
-                            }
-                            list.add("  $line")
+                if (mainExpanded) {
+                    list.add("${prefix}${totalLine.replaceFirst("Gemstone", "Gemstones")}")
+                    MultiTrackingRates.seenGemstones.forEach { gem ->
+                        val line = when (trackingOptions) {
+                            MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleMultiCollectionRate(gem, addIndicator = false)
+                            MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleMultiCollectionSession(gem, addIndicator = false)
+                            MultiCollectionConfig.TrackingOptions.MONEY_RATE -> handleMultiMoneyRate(gem)
+                            MultiCollectionConfig.TrackingOptions.MONEY_MADE -> handleMultiMoneyMade(gem)
                         }
+                        list.add("  $line")
                     }
                 } else {
-                    val line = when (trackingOptions) {
-                        MultiCollectionConfig.TrackingOptions.COLLECTION -> handleCollectionMulti("gemstone")
-                        MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleCollectionPerHourMulti("gemstone")
-                        MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleCollectionSessionMulti("gemstone")
-                        MultiCollectionConfig.TrackingOptions.MONEY_RATE -> handleMoneyPerHourMulti("gemstone")
-                        MultiCollectionConfig.TrackingOptions.MONEY_MADE -> handleMoneyMadeMulti("gemstone")
-                    }
-                    list.add("$prefix$line")
+                    list.add("$prefix$totalLine")
                 }
                 continue
             }
 
             val line = when (trackingOptions) {
-                MultiCollectionConfig.TrackingOptions.COLLECTION -> handleCollectionMulti(coll)
-                MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleCollectionPerHourMulti(coll)
-                MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleCollectionSessionMulti(coll)
-                MultiCollectionConfig.TrackingOptions.MONEY_RATE -> handleMoneyPerHourMulti(coll)
-                MultiCollectionConfig.TrackingOptions.MONEY_MADE -> handleMoneyMadeMulti(coll)
+                MultiCollectionConfig.TrackingOptions.COLLECTION -> handleMultiCollection(coll)
+                MultiCollectionConfig.TrackingOptions.COLLECTION_RATE -> handleMultiCollectionRate(coll)
+                MultiCollectionConfig.TrackingOptions.COLLECTION_MADE -> handleMultiCollectionSession(coll)
+                MultiCollectionConfig.TrackingOptions.MONEY_RATE -> handleMultiMoneyRate(coll)
+                MultiCollectionConfig.TrackingOptions.MONEY_MADE -> handleMultiMoneyMade(coll)
             }
             list.add(line)
         }
 
         handleMultiLeaderboard(list)
 
-        val suffix = bazaarPriceTypeSuffix()
-        val typeKey = bazaarTypeKey()
-        val variant = gemstoneVariant.toString()
-
-        val useBazaar = useBazaar
-
         when (trackingOptions) {
             MultiCollectionConfig.TrackingOptions.MONEY_RATE -> {
-                if (!useBazaar) {
-                    val total = MultiTrackingRates.moneyPerHourNPC.entries
-                        .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
+                val total = if (!useBazaar) {
+                    MultiTrackingRates.moneyRateNPC.entries
+                        .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_${gemstoneTier}")) }
                         .sumOf { it.value }
-                    list.add("")
-                    if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes/h: ${NumbersUtils.formatNumber(total)}")
-                    else list.add("§eOverall $/h (NPC): ${NumbersUtils.formatNumber(total)}")
                 } else {
-                    val total = MultiTrackingRates.moneyPerHourBazaar.entries
-                        .filter { (key, value) -> value > 0 && key.endsWith(suffix) }
-                        .filter { (key) -> key.contains("_normal") || key.contains("_$typeKey") || key.contains("_$variant") }
-                        .sumOf { it.value }
-                    list.add("")
-                    list.add("§eOverall $/h (Bazaar): ${NumbersUtils.formatNumber(total)}")
+                    val normalAndEnchanted = collectionList
+                        .filterNot { it == "gemstone" }
+                        .sumOf { coll ->
+                            when (CollectionsManager.multiCollectionTypes[coll]) {
+                                "normal" -> MultiTrackingRates.baseMoneyRate[coll]?.get(bazaarPriceType) ?: 0L
+                                "enchanted" -> {
+                                    val map = if (getEffectiveBazaarType(coll) == BazaarType.ENCHANTED_VERSION) {
+                                        MultiTrackingRates.enchantedMoneyRate[coll]
+                                    } else {
+                                        MultiTrackingRates.superEnchantedMoneyRate[coll]
+                                    }
+                                    map?.get(bazaarPriceType) ?: 0L
+                                }
+                                else -> 0L
+                            }
+                        }
+
+                    val gemstoneTotal = if (collectionList.contains("gemstone")) {
+                        MultiTrackingRates.seenGemstones.sumOf { gem -> getMultiGemstoneBazaarRate(gem) }
+                    } else 0L
+
+                    normalAndEnchanted + gemstoneTotal
                 }
+                list.add("")
+                list.add("§eOverall $/h (Bazaar): ${formatLong(total)}")
             }
 
             MultiCollectionConfig.TrackingOptions.MONEY_MADE -> {
-                if (!useBazaar) {
-                    val total = MultiTrackingRates.moneyMadeNPC.entries
-                        .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_$variant")) }
+                val total = if (!useBazaar) {
+                    MultiTrackingRates.moneyMadeNPC.entries
+                        .filter { (key, value) -> value > 0 && (!key.contains('_') || key.endsWith("_${gemstoneTier}")) }
                         .sumOf { it.value }
-                    list.add("")
-                    if (CollectionsManager.hasAllRiftCollections()) list.add("§eOverall Motes made: ${NumbersUtils.formatNumber(total)}")
-                    else list.add("§eOverall $ made (NPC): ${NumbersUtils.formatNumber(total)}")
                 } else {
-                    val total = MultiTrackingRates.moneyMadeBazaar.entries
-                        .filter { (key, value) -> value > 0 && (key.endsWith(suffix)) }
-                        .filter { (key) -> key.contains("_normal") || key.contains("_$typeKey") || key.contains("_$variant") }
-                        .sumOf { it.value }
-                    list.add("")
-                    list.add("§eOverall $ made (Bazaar): ${NumbersUtils.formatNumber(total)}")
+                    val normalAndEnchanted = collectionList
+                        .filterNot { it == "gemstone" }
+                        .sumOf { coll ->
+                            when (CollectionsManager.multiCollectionTypes[coll]) {
+                                "normal" -> MultiTrackingRates.baseMoneyMade[coll]?.get(bazaarPriceType) ?: 0L
+                                "enchanted" -> {
+                                    val map = if (getEffectiveBazaarType(coll) == BazaarType.ENCHANTED_VERSION) {
+                                        MultiTrackingRates.enchantedMoneyMade[coll]
+                                    } else {
+                                        MultiTrackingRates.superEnchantedMoneyMade[coll]
+                                    }
+                                    map?.get(bazaarPriceType) ?: 0L
+                                }
+                                else -> 0L
+                            }
+                        }
+
+                    val gemstoneTotal = if (collectionList.contains("gemstone")) {
+                        MultiTrackingRates.seenGemstones.sumOf { gem -> getMultiGemstoneBazaarMade(gem) }
+                    } else 0L
+
+                    normalAndEnchanted + gemstoneTotal
                 }
+
+                list.add("")
+                list.add("§eOverall $ made (Bazaar): ${formatLong(total)}")
             }
+
             else -> {}
         }
 
@@ -478,148 +434,101 @@ object CollectionParser {
         list.add(handleMultiCollectionSinceLastTimer())
     }
 
-    private fun handleCollectionMulti(coll: String): String {
+    private fun handleMultiCollection(coll: String): String {
         var rankSuffix = ""
         if ("gemstone" == coll && collectionLeaderboard && MultiTrackingRates.playerCurrentRank != -1) {
             rankSuffix = if (MultiTrackingRates.playerCurrentRank == 10001) " [Too low]"
             else " [#${MultiTrackingRates.playerCurrentRank}]"
         }
+
         return if (MultiTrackingRates.collectionAmounts.getOrDefault(coll, -1L) >= 0)
-            "${formatCollectionName(coll)}: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionAmounts.getOrDefault(coll, 0L))}$rankSuffix"
+            "${formatCollectionName(coll)}: ${formatLong(MultiTrackingRates.collectionAmounts.getOrDefault(coll, 0L))}$rankSuffix"
         else
             "${formatCollectionName(coll)}: Calculating..."
     }
 
-    private fun handleCollectionSessionMulti(coll: String): String =
-        if (MultiTrackingRates.collectionMade.getOrDefault(coll, -1L) > 0)
-            "${formatCollectionName(coll)} (session): ${NumbersUtils.formatNumber(MultiTrackingRates.collectionMade.getOrDefault(coll, 0L))}"
-        else
-            "${formatCollectionName(coll)} (session): Calculating..."
-
-    private fun handleCollectionPerHourMulti(coll: String): String =
-        if (MultiTrackingRates.collectionPerHour.getOrDefault(coll, -1L) > 0)
-            "${formatCollectionName(coll)} Coll/h: ${NumbersUtils.formatNumber(MultiTrackingRates.collectionPerHour.getOrDefault(coll, 0L))}"
-        else
-            "${formatCollectionName(coll)} Coll/h: Calculating..."
-
-    private fun handleMoneyPerHourMulti(coll: String): String {
-        val useBazaar = useBazaar
-        val suffix = bazaarPriceTypeSuffix()
-        val variant = gemstoneVariant.toString()
-
-        if ("gemstone" == coll) {
-            var totalRate: Long = 0
-
-            for (gem in MultiTrackingRates.seenGemstones) {
-                totalRate += if (useBazaar) {
-                    MultiTrackingRates.moneyPerHourBazaar.getOrDefault("${gem}_${variant}".uppercase() + suffix, 0L)
-                } else {
-                    MultiTrackingRates.moneyPerHourNPC.getOrDefault("${gem}_${variant}".uppercase(), 0L)
-                }
-            }
-            return "Gemstone $/h (${if (useBazaar) "Bazaar" else "NPC"}): ${StringUtils.formatNumber(totalRate)}"
+    private fun handleMultiCollectionSession(coll: String, addIndicator: Boolean = true): String {
+        if (MultiTrackingRates.collectionMade.getOrDefault(coll, -1L) <= 0) {
+            return "${formatCollectionName(coll)} (session): Calculating..."
         }
 
-        if (!useBazaar) {
-            var key: String = coll
-            if (MultiTrackingRates.seenGemstones.contains(coll)) {
-                val variant = gemstoneVariant.toString()
-                key = (coll + "_" + variant).uppercase()
-            }
+        val (convertAmount, indicator) = getCompactedCollection(MultiTrackingRates.collectionMade.getOrDefault(coll, 0L), coll)
+        val formatted = formatDouble(convertAmount)
 
-            val npcRate = MultiTrackingRates.moneyPerHourNPC.getOrDefault(key, -1L)
-            if (CollectionsManager.isRiftCollection(coll)) {
-                return "${formatCollectionName(coll)} Motes/h: ${StringUtils.formatNumber(npcRate)}"
-            }
-            return "${formatCollectionName(coll)} $/h (NPC): ${StringUtils.formatNumber(npcRate)}"
-        } else {
-            var actualColl: String = coll
-            var gemstoneVariant: String? = null
-
-            if (MultiTrackingRates.seenGemstones.contains(coll)) {
-                actualColl = "gemstone"
-                gemstoneVariant = ("${coll}_${variant}").uppercase()
-            }
-
-            if (gemstoneVariant != null) {
-                val rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault(gemstoneVariant + suffix, 0L)
-                return "${formatCollectionName(coll)} $/h (Bazaar): ${StringUtils.formatNumber(rate)}"
-            }
-
-            val type = CollectionsManager.multiCollectionTypes[actualColl]
-
-            if (type != null) {
-                var rate: Long = 0
-                when (type) {
-                    "normal" -> rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault("${actualColl}_normal$suffix", 0L)
-                    "enchanted" -> rate = MultiTrackingRates.moneyPerHourBazaar.getOrDefault("${actualColl}_${bazaarTypeKey()}$suffix", 0L)
-                }
-
-                return "${formatCollectionName(coll)} $/h (Bazaar): ${StringUtils.formatNumber(rate)}"
-            } else {
-                return "${formatCollectionName(coll)} $/h (Bazaar): Calculating..."
-            }
+        val suffix = when {
+            coll == "gemstone" && addIndicator -> indicator
+            GemstonesManager.checkIfGemstone(coll) -> ""
+            addIndicator -> indicator
+            else -> ""
         }
+
+        return "${formatCollectionName(coll)} (session): $formatted$suffix"
     }
 
-    private fun handleMoneyMadeMulti(coll: String): String {
+    private fun handleMultiCollectionRate(coll: String, addIndicator: Boolean = true): String {
+        if (MultiTrackingRates.collectionRate.getOrDefault(coll, -1L) <= 0) {
+            return "${formatCollectionName(coll)} Coll/h: Calculating..."
+        }
+
+        val (convertedRate, indicator) = getCompactedCollection(MultiTrackingRates.collectionRate.getOrDefault(coll, 0L), coll)
+        val formatted = formatDouble(convertedRate)
+
+        val suffix = when {
+            coll == "gemstone" && addIndicator -> indicator
+            GemstonesManager.checkIfGemstone(coll) -> ""
+            addIndicator -> indicator
+            else -> ""
+        }
+
+        return "${formatCollectionName(coll)} Coll/h: $formatted$suffix"
+    }
+
+    private fun handleMultiMoneyRate(coll: String): String {
         val useBazaar = useBazaar
-        val suffix = bazaarPriceTypeSuffix()
-        val variant = gemstoneVariant.toString()
-
         if ("gemstone" == coll) {
-            var totalMoney: Long = 0
-
-            for (gem in MultiTrackingRates.seenGemstones) {
-                totalMoney += if (useBazaar) {
-                    MultiTrackingRates.moneyMadeBazaar.getOrDefault(("${gem}_$variant").uppercase() + suffix, 0L)
-                } else {
-                    MultiTrackingRates.moneyMadeNPC.getOrDefault(("${gem}_$variant").uppercase(), 0L)
-                }
+            val total = if (useBazaar) {
+                MultiTrackingRates.seenGemstones.sumOf { gem -> getMultiGemstoneBazaarRate(gem) }
+            } else {
+                MultiTrackingRates.seenGemstones.sumOf { gem -> getMultiGemstoneNpcRate(gem) }
             }
-            return "Gemstone $ made (${if (useBazaar) "Bazaar" else "NPC"}): ${StringUtils.formatNumber(totalMoney)}"
+            return "Gemstone $/h (${if (useBazaar) "Bazaar" else "NPC"}): ${StringUtils.formatLong(total)}${getMoneyDisplayLabel(coll)}"
         }
 
         if (!useBazaar) {
-            var key: String = coll
-            if (MultiTrackingRates.seenGemstones.contains(coll)) {
-                val variant: String = gemstoneVariant.toString()
-                key = (coll + "_" + variant).uppercase()
+            val key = if (MultiTrackingRates.seenGemstones.contains(coll)) "${coll}_${GemstoneTier.ROUGH}".uppercase() else coll
+            val npcRate = MultiTrackingRates.moneyRateNPC.getOrDefault(key, -1L)
+            if (riftTracking) {
+                return "${formatCollectionName(coll)} Motes/h: ${StringUtils.formatLong(npcRate)}"
             }
-
-            val npcMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(key, -1L)
-            if (CollectionsManager.isRiftCollection(coll)) {
-                return "${formatCollectionName(coll)} Motes made: ${StringUtils.formatNumber(npcMoney)}"
-            }
-            return "${formatCollectionName(coll)} $ made (NPC): ${StringUtils.formatNumber(npcMoney)}"
-        } else {
-            var actualColl: String = coll
-            var gemstoneVariant: String? = null
-
-            if (MultiTrackingRates.seenGemstones.contains(coll)) {
-                actualColl = "gemstone"
-                gemstoneVariant = ("${coll}_$variant").uppercase()
-            }
-
-            if (gemstoneVariant != null) {
-                val money = MultiTrackingRates.moneyMadeBazaar.getOrDefault("$gemstoneVariant$suffix", 0L)
-                return "${formatCollectionName(coll)} $ made (Bazaar): ${StringUtils.formatNumber(money)}"
-            }
-
-            val type = CollectionsManager.multiCollectionTypes[actualColl]
-
-            if (type != null) {
-                var money: Long = 0
-                when (type) {
-                    "normal" -> money = MultiTrackingRates.moneyMadeBazaar.getOrDefault("${actualColl}_normal$suffix", 0L)
-                    "enchanted" -> money = MultiTrackingRates.moneyMadeBazaar.getOrDefault("${actualColl}_${bazaarTypeKey()}$suffix", 0L)
-                }
-
-                return "${formatCollectionName(coll)} $ made (Bazaar): ${StringUtils.formatNumber(money)}"
-            } else {
-                return "${formatCollectionName(coll)} $ made (Bazaar): Calculating..."
-            }
+            return "${formatCollectionName(coll)} $/h (NPC): ${StringUtils.formatLong(npcRate)}"
         }
+
+        val rate = getMultiBazaarRate(coll)
+        return "${formatCollectionName(coll)} $/h (Bazaar): ${StringUtils.formatLong(rate)}${getMoneyDisplayLabel(coll)}"
+    }
+
+    private fun handleMultiMoneyMade(coll: String): String {
+        val useBazaar = useBazaar
+        if ("gemstone" == coll) {
+            val total = if (useBazaar) {
+                MultiTrackingRates.seenGemstones.sumOf { gem -> getMultiGemstoneBazaarMade(gem) }
+            } else {
+                MultiTrackingRates.seenGemstones.sumOf { gem -> getMultiGemstoneNpcMade(gem) }
+            }
+            return "Gemstone $ made (${if (useBazaar) "Bazaar" else "NPC"}): ${StringUtils.formatLong(total)}${getMoneyDisplayLabel(coll)}"
+        }
+
+        if (!useBazaar) {
+            val key = if (MultiTrackingRates.seenGemstones.contains(coll)) "${coll}_${GemstoneTier.ROUGH}".uppercase() else coll
+            val npcMoney = MultiTrackingRates.moneyMadeNPC.getOrDefault(key, -1L)
+            if (riftTracking) {
+                return "${formatCollectionName(coll)} Motes made: ${StringUtils.formatLong(npcMoney)}"
+            }
+            return "${formatCollectionName(coll)} $ made (NPC): ${StringUtils.formatLong(npcMoney)}"
+        }
+
+        val money = getMultiBazaarMade(coll)
+        return "${formatCollectionName(coll)} $ made (Bazaar): ${StringUtils.formatLong(money)}${getMoneyDisplayLabel(coll)}"
     }
 
     private fun handleMultiLeaderboard(list: MutableList<String>) {
@@ -646,39 +555,223 @@ object CollectionParser {
 
     fun addToggleableSettingsLines(list: MutableList<String>) {
         list.add("")
-        list.add("§e${(if (useBazaar) "[Bazaar Prices]" else "[NPC Prices]")}")
+
+        if (MultiTrackingHandler.isMultiTracking) {
+            list.add("§eStats: [$trackingOptions]")
+            list.add("")
+        }
+
+        if (MultiTrackingHandler.isMultiTracking) {
+            if (collectionList.contains("gemstone")) {
+                list.add("§eGemstone Tier: [${collectionGemstoneTier}]")
+            }
+            if (collectionList.any { it != "gemstone" }) {
+                list.add("§eCollection Tier: [${collectionTier}]")
+            }
+        } else {
+            if (GemstonesManager.checkIfGemstone(collection)) {
+                list.add("§eGemstone Tier: [${collectionGemstoneTier}]")
+            } else {
+                list.add("§eCollection Tier: [${collectionTier}]")
+            }
+        }
+
+        list.add("§ePrice Source: ${(if (useBazaar) "[Bazaar]" else "[NPC]")}")
+        list.add("")
 
         if (useBazaar) {
+            list.add("§eBazaar Price: [Instant ${(if (bazaarPriceType == BazaarPriceType.INSTANT_BUY) "Buy" else "Sell")}]")
+
             if (collectionList.contains("gemstone") || GemstonesManager.checkIfGemstone(collection)) {
-                list.add("§e[$gemstoneVariant]")
+                list.add("§eGemstone Price Tier: [${gemstoneTier}]")
             }
             if ("enchanted" == collectionType || CollectionsManager.multiCollectionTypes.containsValue("enchanted")) {
-                if (bazaarType == Bazaar.BazaarType.ENCHANTED_VERSION) {
-                    list.add("§e[Enchanted version]")
-                } else {
-                    list.add("§e[Super Enchanted version]")
-                }
+                list.add("§eCollection Price Tier: [${bazaarType}]")
             }
-            list.add("§e[Instant ${(if (bazaarPriceType == Bazaar.BazaarPriceType.INSTANT_BUY) "Buy" else "Sell")}]")
 
             if (TrackingHandler.isTracking) {
                 list.add("${(if (showExtraStats) "§a" else "§e")}[Extra Stats]")
-            } else {
-                val option = trackingOptions.toString()
-                list.add("§e[$option Stats]")
             }
         }
     }
 
-    fun bazaarPriceTypeSuffix(): String =
-        when (bazaarPriceType) {
-            Bazaar.BazaarPriceType.INSTANT_BUY -> "_INSTANT_BUY"
-            Bazaar.BazaarPriceType.INSTANT_SELL -> "_INSTANT_SELL"
+    private fun getSingleBazaarRate(): Long {
+        return when (collectionType) {
+            "normal" -> TrackingRates.baseMoneyRate[bazaarPriceType] ?: 0L
+            "enchanted" -> {
+                val map = if (getEffectiveBazaarType() == BazaarType.ENCHANTED_VERSION) {
+                    TrackingRates.enchantedMoneyRate
+                } else {
+                    TrackingRates.superEnchantedMoneyRate
+                }
+                map[bazaarPriceType] ?: 0L
+            }
+            "gemstone" -> TrackingRates.gemstoneMoneyRate[gemstoneTier]?.get(bazaarPriceType) ?: 0L
+            else -> 0L
+        }
+    }
+
+    private fun getSingleBazaarMade(): Long {
+        return when (collectionType) {
+            "normal" -> TrackingRates.baseMoneyMade[bazaarPriceType] ?: 0L
+            "enchanted" -> {
+                val map = if (getEffectiveBazaarType() == BazaarType.ENCHANTED_VERSION) {
+                    TrackingRates.enchantedMoneyMade
+                } else {
+                    TrackingRates.superEnchantedMoneyMade
+                }
+                map[bazaarPriceType] ?: 0L
+            }
+            "gemstone" -> TrackingRates.gemstoneMoneyMade[gemstoneTier]?.get(bazaarPriceType) ?: 0L
+            else -> 0L
+        }
+    }
+
+    private fun getMultiBazaarRate(coll: String): Long {
+        if (GemstonesManager.checkIfGemstone(coll)) {
+            return MultiTrackingRates.gemstoneMoneyRate[coll]?.get(gemstoneTier)?.get(bazaarPriceType) ?: 0L
         }
 
-    fun bazaarTypeKey(): String =
-        when (bazaarType) {
-            Bazaar.BazaarType.ENCHANTED_VERSION -> "Enchanted version"
-            Bazaar.BazaarType.SUPER_ENCHANTED_VERSION -> "Super Enchanted version"
+        return when (CollectionsManager.multiCollectionTypes[coll]) {
+            "normal" -> MultiTrackingRates.baseMoneyRate[coll]?.get(bazaarPriceType) ?: 0L
+            "enchanted" -> {
+                val map = if (getEffectiveBazaarType(coll) == BazaarType.ENCHANTED_VERSION) {
+                    MultiTrackingRates.enchantedMoneyRate[coll]
+                } else {
+                    MultiTrackingRates.superEnchantedMoneyRate[coll]
+                }
+                map?.get(bazaarPriceType) ?: 0L
+            }
+            else -> 0L
         }
+    }
+
+    private fun getMultiBazaarMade(coll: String): Long {
+        if (GemstonesManager.checkIfGemstone(coll)) {
+            return MultiTrackingRates.gemstoneMoneyMade[coll]?.get(gemstoneTier)?.get(bazaarPriceType) ?: 0L
+        }
+
+        return when (CollectionsManager.multiCollectionTypes[coll]) {
+            "normal" -> MultiTrackingRates.baseMoneyMade[coll]?.get(bazaarPriceType) ?: 0L
+            "enchanted" -> {
+                val map = if (getEffectiveBazaarType(coll) == BazaarType.ENCHANTED_VERSION) {
+                    MultiTrackingRates.enchantedMoneyMade[coll]
+                } else {
+                    MultiTrackingRates.superEnchantedMoneyMade[coll]
+                }
+                map?.get(bazaarPriceType) ?: 0L
+            }
+            else -> 0L
+        }
+    }
+
+    private fun getEffectiveBazaarType(coll: String? = null): BazaarType {
+        if (bazaarType != BazaarType.SUPER_ENCHANTED_VERSION) return bazaarType
+
+        return if (coll != null) {
+            val type = CollectionsManager.multiCollectionTypes[coll]
+            if (type == "enchanted" && BazaarCollectionsManager.multiSuperEnchantedRecipes[coll].isNullOrEmpty()) {
+                BazaarType.ENCHANTED_VERSION
+            } else {
+                bazaarType
+            }
+        } else {
+            if (collectionType == "enchanted" && BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
+                BazaarType.ENCHANTED_VERSION
+            } else {
+                bazaarType
+            }
+        }
+    }
+
+    private fun getEffectiveCollectionTier(coll: String? = null): CollectionTier {
+        if (collectionTier != CollectionTier.SUPER_ENCHANTED) return collectionTier
+
+        return if (coll != null) {
+            val type = CollectionsManager.multiCollectionTypes[coll]
+            if (type == "enchanted" && BazaarCollectionsManager.multiSuperEnchantedRecipes[coll].isNullOrEmpty()) {
+                CollectionTier.ENCHANTED
+            } else {
+                collectionTier
+            }
+        } else {
+            if (collectionType == "enchanted" && BazaarCollectionsManager.superEnchantedRecipe.isEmpty()) {
+                CollectionTier.ENCHANTED
+            } else {
+                collectionTier
+            }
+        }
+    }
+
+    private fun getMultiGemstoneNpcRate(gem: String): Long =
+        MultiTrackingRates.moneyRateNPC.getOrDefault("${gem}_${GemstoneTier.ROUGH}".uppercase(), 0L)
+
+    private fun getMultiGemstoneNpcMade(gem: String): Long =
+        MultiTrackingRates.moneyMadeNPC.getOrDefault("${gem}_${GemstoneTier.ROUGH}".uppercase(), 0L)
+
+    private fun getMultiGemstoneBazaarRate(gem: String): Long =
+        MultiTrackingRates.gemstoneMoneyRate[gem]?.get(gemstoneTier)?.get(bazaarPriceType) ?: 0L
+
+    private fun getMultiGemstoneBazaarMade(gem: String): Long =
+        MultiTrackingRates.gemstoneMoneyMade[gem]?.get(gemstoneTier)?.get(bazaarPriceType) ?: 0L
+
+    private fun getCompactedCollection(amount: Long, coll: String? = null): Pair<Double, String> {
+        val targetCollection = coll ?: collection
+
+        val type = if (coll != null) {
+            CollectionsManager.multiCollectionTypes[coll]
+        } else {
+            collectionType
+        }
+
+        if (coll == "gemstone" || GemstonesManager.checkIfGemstone(targetCollection)) {
+            val tier = collectionGemstoneTier
+            val divisor = tier.recipeAmount.toDouble()
+
+            return Pair(amount.toDouble() / divisor, " (${tier.displayName.lowercase()})")
+        }
+
+        if (type != "enchanted") return Pair(amount.toDouble(), "")
+
+        return when (getEffectiveCollectionTier(coll)) {
+            CollectionTier.BASE -> Pair(amount.toDouble(), "")
+
+            CollectionTier.ENCHANTED -> {
+                val craftCost = if (coll != null) {
+                    BazaarCollectionsManager.multiEnchantedRecipes[coll]?.values?.firstOrNull()?.toDouble() ?: 160.0
+                } else {
+                    BazaarCollectionsManager.enchantedRecipe.values.firstOrNull()?.toDouble() ?: 160.0
+                }
+
+                Pair(amount.toDouble() / craftCost, " (${CollectionTier.ENCHANTED.shortName})")
+            }
+
+            CollectionTier.SUPER_ENCHANTED -> {
+                val craftCost = if (coll != null) {
+                    BazaarCollectionsManager.multiSuperEnchantedRecipes[coll]?.values?.firstOrNull()?.toDouble() ?: 25600.0
+                } else {
+                    BazaarCollectionsManager.superEnchantedRecipe.values.firstOrNull()?.toDouble() ?: 25600.0
+                }
+
+                Pair(amount.toDouble() / craftCost, " (${CollectionTier.SUPER_ENCHANTED.shortName})")
+            }
+        }
+    }
+
+    private fun getMoneyDisplayLabel(coll: String? = null): String {
+        val targetCollection = coll ?: collection
+
+        if (targetCollection == "gemstone") {
+            return if (gemstoneTier == GemstoneTier.ROUGH) "" else " (${gemstoneTier.displayName.lowercase()})"
+        }
+
+        if (GemstonesManager.checkIfGemstone(targetCollection)) {
+            return ""
+        }
+
+        val type = if (coll != null) CollectionsManager.multiCollectionTypes[coll] else collectionType
+        if (type != "enchanted") return ""
+
+        return " (${getEffectiveBazaarType(coll).shortName})"
+    }
 }
