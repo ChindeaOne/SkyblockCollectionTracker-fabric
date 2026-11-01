@@ -1,18 +1,18 @@
 package io.github.chindeaone.collectiontracker.mixins.chroma;
 
 //? if 26.1 {
-import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
+/*import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
 import com.mojang.blaze3d.buffers.GpuBuffer;
-//?}
+*///?}
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaText;
-import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
-import io.github.chindeaone.collectiontracker.utils.rendering.CustomPipelines;
+import io.github.chindeaone.collectiontracker.utils.render.ChromaText;
+import io.github.chindeaone.collectiontracker.utils.render.ChromaRenderer;
+import io.github.chindeaone.collectiontracker.utils.render.CustomPipelines;
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.renderer.state.gui.GlyphRenderState;
@@ -54,9 +54,9 @@ public class GuiChromaMixin {
             //? if 26.3 {
             //"executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;II)V"
             //?} else if 26.2 {
-            //"executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V"
+            "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V"
             //?} else {
-            "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V"
+            //"executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V"
             //?}
             ,at = @At("HEAD")
     )
@@ -64,13 +64,13 @@ public class GuiChromaMixin {
         Supplier<String> label,
         RenderTarget mainRenderTarget,
         //? if > 26.1 {
-        //GpuBufferSlice dynamicTransforms,
+        GpuBufferSlice dynamicTransforms,
         //?} else {
-        GpuBufferSlice fogBuffer,
+        /*GpuBufferSlice fogBuffer,
         GpuBufferSlice dynamicTransforms,
         GpuBuffer indexBuffer,
         IndexType indexType,
-        //?}
+        *///?}
         int startIndex,
         int endIndex,
         CallbackInfo ci
@@ -90,9 +90,9 @@ public class GuiChromaMixin {
             GuiRenderer.Draw draw,
             RenderPass renderPass,
             //? if 26.1
-            GpuBuffer indexBuffer,
+            //GpuBuffer indexBuffer,
             //? if 26.1
-            IndexType indexType,
+            //IndexType indexType,
             CallbackInfo ci
     ) {
         RenderPipeline pipeline = draw.pipeline();
