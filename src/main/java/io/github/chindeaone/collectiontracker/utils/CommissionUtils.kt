@@ -42,7 +42,11 @@ import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 import java.util.Collections
 import java.util.WeakHashMap
+//? if < 26.3 {
 import org.lwjgl.glfw.GLFW
+//? } else {
+//import org.lwjgl.sdl.SDLMouse
+//? }
 import kotlin.time.Duration.Companion.milliseconds
 
 object CommissionUtils {
@@ -114,12 +118,8 @@ object CommissionUtils {
     fun onClientTick(client: Minecraft) {
         val screen = ContainerParser.currentCommissionScreen ?: return
 
-        ContainerParser.openedAt?.let {
-            if (it.timePassedSince() < CLICK_DEBOUNCE) return
-        }
-        ContainerParser.lastClick?.let {
-            if (it.timePassedSince() < CLICK_DEBOUNCE) return
-        }
+        ContainerParser.openedAt?.let { if (it.timePassedSince() < CLICK_DEBOUNCE) return }
+        ContainerParser.lastClick?.let { if (it.timePassedSince() < CLICK_DEBOUNCE) return }
 
         val pressedIndex = resolveCommissionIndex(client) ?: return
 
@@ -183,15 +183,26 @@ object CommissionUtils {
         return null
     }
 
+    @Suppress("unused")
     private fun isKeyDown(client: Minecraft, keyCode: Int): Boolean {
         if (keyCode == 0) return false
+        //? if < 26.3 {
         val window = client.window
+        //? }
 
         return if (keyCode < 0) {
             val mouseButton = keyCode + 100
+            //? if < 26.3 {
             GLFW.glfwGetMouseButton(window.handle(), mouseButton) == GLFW.GLFW_PRESS
+            //? } else {
+            //(SDLMouse.SDL_GetMouseState(null, null) and (1 shl (mouseButton - 1))) != 0
+            //? }
         } else {
+            //? if < 26.3 {
             InputConstants.isKeyDown(window, keyCode)
+            //? } else {
+            // InputConstants.isKeyDown(keyCode)
+            //? }
         }
     }
 

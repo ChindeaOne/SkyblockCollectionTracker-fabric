@@ -6,6 +6,8 @@ import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import io.github.chindeaone.collectiontracker.utils.blue
 import io.github.chindeaone.collectiontracker.utils.green
 import io.github.chindeaone.collectiontracker.utils.red
+//? if 26.3
+//import net.minecraft.client.renderer.DynamicGpuDataStorage
 import net.minecraft.client.renderer.DynamicUniformStorage
 import java.nio.ByteBuffer
 
@@ -15,6 +17,9 @@ class ChromaUniform : AutoCloseable {
     private val storage = DynamicUniformStorage<ChromaUniformData>(
         "SCT Chroma UBO",
         uniformSize,
+        //? if 26.3 {
+        //128,
+        //? }
         2
     )
 
@@ -24,7 +29,7 @@ class ChromaUniform : AutoCloseable {
         startColor: Int,
         endColor: Int
     ): GpuBufferSlice {
-        return storage.writeUniform(
+        return /*? if 26.3 {*//*storage.writeData(*//*? }  else {*/ storage.writeUniform( /*?}*/
             ChromaUniformData(
                 timeOffset,
                 mode,
@@ -47,7 +52,12 @@ class ChromaUniform : AutoCloseable {
         val mode: Int, // 0 = chroma, 1 = prefix gradient
         val startColor: Int,
         val endColor: Int
-    ) : DynamicUniformStorage.DynamicUniform {
+    ):  /*? if 26.3 {*//*
+        DynamicGpuDataStorage.DynamicGpuData
+        *//*?} else {*/
+         DynamicUniformStorage.DynamicUniform
+        //?}
+        {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
                 .putFloat(timeOffset)

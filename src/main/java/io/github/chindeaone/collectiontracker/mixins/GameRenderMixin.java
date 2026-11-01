@@ -1,8 +1,8 @@
 package io.github.chindeaone.collectiontracker.mixins;
 
-//? if 26.2
-//import io.github.chindeaone.collectiontracker.utils.render.ChromaRenderer;
-import io.github.chindeaone.collectiontracker.utils.render.WorldRenderer;
+//? if >= 26.2
+//import io.github.chindeaone.collectiontracker.utils.rendering.ChromaRenderer;
+import io.github.chindeaone.collectiontracker.utils.rendering.WorldRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +18,7 @@ public class GameRenderMixin {
     }
 
     // Luna the savior for this one
-    //? if 26.2 {
+    //? if >= 26.2 {
     /*@Inject(
             method = "render",
             at = @At(

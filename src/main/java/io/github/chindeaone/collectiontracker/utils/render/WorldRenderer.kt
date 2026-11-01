@@ -3,42 +3,44 @@
  */
 package io.github.chindeaone.collectiontracker.utils.render
 
-import com.mojang.blaze3d.buffers.GpuBuffer
-import com.mojang.blaze3d.buffers.GpuBufferSlice
-import com.mojang.blaze3d.pipeline.RenderPipeline
-/*? if 26.2 {*//*
-import com.mojang.blaze3d.systems.RenderPass
-*//*?}*/
-import com.mojang.blaze3d.systems.RenderSystem
-/*? if 26.2 {*//*
-import net.minecraft.client.renderer.StagedVertexBuffer
-import org.joml.Matrix4fStack
-import java.util.Optional
-*//*?} else {*/
-import com.mojang.blaze3d.textures.GpuTextureView
-import com.mojang.blaze3d.vertex.BufferBuilder
-import com.mojang.blaze3d.vertex.ByteBufferBuilder
-import com.mojang.blaze3d.vertex.MeshData
-import com.mojang.blaze3d.vertex.VertexFormat
-import net.minecraft.client.renderer.MappableRingBuffer
-import org.joml.Matrix4f
-import org.joml.Vector3f
-import org.lwjgl.system.MemoryUtil
-import java.nio.ByteBuffer
-import java.util.OptionalInt
-/*?}*/
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.rendertype.RenderType
 import org.joml.Vector4f
 import java.util.OptionalDouble
+//? if 26.1 {
+import com.mojang.blaze3d.vertex.BufferBuilder
+import com.mojang.blaze3d.vertex.ByteBufferBuilder
+import com.mojang.blaze3d.vertex.MeshData
+import net.minecraft.client.renderer.MappableRingBuffer
+import org.joml.Matrix4f
+import org.joml.Vector3f
+import java.nio.ByteBuffer
+import java.util.OptionalInt
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.buffers.GpuBuffer
+import com.mojang.blaze3d.buffers.GpuBufferSlice
+import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.textures.GpuTextureView
+import com.mojang.blaze3d.vertex.VertexFormat
+import org.lwjgl.system.MemoryUtil
+//? }
+//? if >= 26.2 {
+/*import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.buffers.GpuBuffer
+import com.mojang.blaze3d.buffers.GpuBufferSlice
+import net.minecraft.client.renderer.StagedVertexBuffer
+import com.mojang.blaze3d.systems.RenderPass
+import com.mojang.blaze3d.systems.RenderSystem
+import java.util.Optional
+*///? }
 
 object WorldRenderer {
 
     private val client: Minecraft = Minecraft.getInstance()
 
-    /*? if 26.2 {*//*
+    /*? if >= 26.2 {*//*
     private val vertexBuffer = StagedVertexBuffer({ "SkyblockCollectionTracker Renderer Vertex Buffer" }, RenderType.SMALL_BUFFER_SIZE)
 
     private var previousPipeline: RenderPipeline? = null
@@ -67,7 +69,7 @@ object WorldRenderer {
         return getBuffer(
             pipeline = pipeline,
             textureSetup = TextureSetup.noTexture(),
-            alphaMultiplier = 1f/*? if 26.2 {*//*,
+            alphaMultiplier = 1f/*? if >= 26.2 {*//*,
             instanceCount = 1,
             uniform = null*//*?}*/
         )
@@ -77,7 +79,7 @@ object WorldRenderer {
         return getBuffer(
             pipeline = pipeline,
             textureSetup = textureSetup,
-            alphaMultiplier = 1f/*? if 26.2 {*//*,
+            alphaMultiplier = 1f/*? if >= 26.2 {*//*,
             instanceCount = 1,
             uniform = null*//*?}*/
         )
@@ -86,11 +88,11 @@ object WorldRenderer {
     fun getBuffer(
         pipeline: RenderPipeline,
         textureSetup: TextureSetup,
-        alphaMultiplier: Float/*? if 26.2 {*//*,
+        alphaMultiplier: Float/*? if >= 26.2 {*//*,
         instanceCount: Int,
         uniform: UniformBinding?*//*?}*/
     ): VertexConsumer {
-        /*? if 26.2 {*//*
+        /*? if >= 26.2 {*//*
         val needsNewDraw = previousDraw == null ||
                 pipeline != previousPipeline ||
                 textureSetup != previousTextureSetup ||
@@ -147,7 +149,7 @@ object WorldRenderer {
         /*?}*/
     }
 
-    /*? if 26.2 {*//*
+    /*? if >= 26.2 {*//*
     fun prepare() {
         previousDraw = null
         previousPipeline = null
@@ -159,7 +161,7 @@ object WorldRenderer {
     *//*?}*/
 
     fun executeDraws() {
-        /*? if 26.2 {*//*
+        /*? if >= 26.2 {*//*
         if (draws.isEmpty()) {
             prepare()
             return
@@ -204,7 +206,7 @@ object WorldRenderer {
         /*?}*/
     }
 
-    /*? if 26.2 {*//*
+    /*? if >= 26.2 {*//*
     private fun dispatchDraws() {
         applyViewOffsetZLayering()
 
@@ -244,7 +246,13 @@ object WorldRenderer {
             return
         }
 
-        renderPass.setPipeline(draw.pipeline)
+        //? if 26.3 {
+        /*renderPass.setPipeline(
+            RenderSystem.getCompiledPipeline(draw.pipeline)
+        )
+        *///? } else {
+         renderPass.setPipeline(draw.pipeline)
+        //? }
 
         renderPass.setUniform(
             "DynamicTransforms",
@@ -256,15 +264,27 @@ object WorldRenderer {
         }
 
         draw.textureSetup.texure0()?.let { texture ->
+            //? if 26.3 {
+            //renderPass.setUniform("Sampler0", texture, draw.textureSetup.sampler0())
+            //? } else {
             renderPass.bindTexture("Sampler0", texture, draw.textureSetup.sampler0())
+            //? }
         }
 
         draw.textureSetup.texure1()?.let { texture ->
+            //? if 26.3 {
+            //renderPass.setUniform("Sampler1", texture, draw.textureSetup.sampler1())
+            //? } else {
             renderPass.bindTexture("Sampler1", texture, draw.textureSetup.sampler1())
+            //? }
         }
 
         draw.textureSetup.texure2()?.let { texture ->
-            renderPass.bindTexture("Sampler2", texture, draw.textureSetup.sampler2())
+            //? if 26.3 {
+            //renderPass.setUniform("Sampler2", texture, draw.textureSetup.sampler2())
+            //? } else {
+             renderPass.bindTexture("Sampler2", texture, draw.textureSetup.sampler2())
+            //? }
         }
 
         renderPass.setVertexBuffer(0, executeInfo.vertexBuffer().slice())
@@ -469,21 +489,20 @@ object WorldRenderer {
     private fun setupDynamicTransforms(alphaMultiplier: Float): GpuBufferSlice {
         return RenderSystem.getDynamicUniforms()
             .writeTransform(
-                /*? if 26.2 {*//*
-                RenderSystem.getModelViewMatrixCopy(),
+                //? if >= 26.2 {
+                /*RenderSystem.getModelViewMatrixCopy(),
                 Vector4f(1f, 1f, 1f, alphaMultiplier)
-                *//*?} else {*/
-
+                *///?} else {
                 RenderSystem.getModelViewMatrix(),
                 Vector4f(1f, 1f, 1f, alphaMultiplier),
                 modelOffset,
                 textureMatrix
-                /*?}*/
+                //?}
             )
     }
 
     private fun applyViewOffsetZLayering() {
-        val modelViewStack/*? if 26.2 {*//*: Matrix4fStack*//*?}*/ = RenderSystem.getModelViewStack()
+        val modelViewStack = RenderSystem.getModelViewStack()
 
         modelViewStack.pushMatrix()
         RenderSystem.getProjectionType().applyLayeringTransform(modelViewStack, 1f)
@@ -495,7 +514,7 @@ object WorldRenderer {
 
     @JvmStatic
     fun close() {
-        /*? if 26.2 {*//*
+        /*? if >= 26.2 {*//*
         vertexBuffer.close()
         *//*?} else {*/
 
@@ -514,7 +533,7 @@ object WorldRenderer {
         /*?}*/
     }
 
-    /*? if !26.2 {*/
+    /*? if < 26.2 {*/
 
     private data class BatchKey(
         val pipeline: RenderPipeline,
@@ -535,10 +554,11 @@ object WorldRenderer {
         val textureSetup: TextureSetup,
         val alphaMultiplier: Float
     )
+
     /*?}*/
 
     private data class Draw(
-        /*? if 26.2 {*//*
+        /*? if >= 26.2 {*//*
         val draw: StagedVertexBuffer.Draw,
         val pipeline: RenderPipeline,
         val textureSetup: TextureSetup,
@@ -557,7 +577,7 @@ object WorldRenderer {
         /*?}*/
     )
 
-    /*? if 26.2 {*//*
+    /*? if >= 26.2 {*//*
     data class UniformBinding(
         val name: String,
         val buffer: GpuBuffer

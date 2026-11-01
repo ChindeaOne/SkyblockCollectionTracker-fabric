@@ -85,9 +85,9 @@ object ContainerParser {
     fun onClientTick(client: Minecraft) {
         val screen = currentScreen ?: return
 
-        if (client./*? if 26.2 {*/ /*gui.screen() *//*?} else {*/ screen /*?}*/ !== screen) {
-            currentScreen = null
-            currentScreenType = null
+        if (MinecraftUtils.screen !== screen) {
+            currentHotxScreen = null
+            currentHotxType = null
             return
         }
 

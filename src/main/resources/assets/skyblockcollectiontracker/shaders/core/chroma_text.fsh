@@ -1,5 +1,12 @@
 #version 150
 
+//? if 26.3
+//#extension GL_ARB_separate_shader_objects : require
+
+//~ if 26.3 'in vec4 vertexColor;' -> 'layout(location = 0) in vec4 vertexColor;' as _
+//~ if 26.3 'in vec2 texCoord0;' -> 'layout(location = 1) in vec2 texCoord0;' as _
+//~ if 26.3 'out vec4 fragColor;' -> 'layout(location = 0) out vec4 fragColor;' as _
+
 in vec4 vertexColor;
 in vec2 texCoord0;
 

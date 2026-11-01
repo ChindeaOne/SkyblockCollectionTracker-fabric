@@ -27,7 +27,6 @@ import io.github.chindeaone.collectiontracker.utils.parser.CollectionParser
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.drawOverlayFrame
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils.renderMultiTrackingStringsWithColor
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.concurrent.Volatile
 
 class MultiCollectionOverlay : AbstractOverlay() {
@@ -43,10 +42,10 @@ class MultiCollectionOverlay : AbstractOverlay() {
     override fun render(context: GuiGraphicsExtractor) {
         if (!isEnabled || !trackingDirty) return
 
-        val mainLines = lines
-        if (mainLines.isEmpty()) return
+        val lines = lines
+        if (lines.isEmpty()) return
 
-        drawOverlayFrame(context, position) { renderMultiTrackingStringsWithColor(context, mainLines) }
+        drawOverlayFrame(context, position) { renderMultiTrackingStringsWithColor(context, lines) }
     }
 
     override fun updateDimensions() {
@@ -73,7 +72,7 @@ class MultiCollectionOverlay : AbstractOverlay() {
         MultiTrackingRates.updateRates()
 
         val uptime = MultiTrackingHandler.multiUptime
-        val isChatOpened = MinecraftUtils.screen is ChatScreen
+        val isChatOpened = MinecraftUtils.isChatScreenOpen()
 
         val newLines = mutableListOf<String>()
         CollectionParser.updateMultiTrackingLines(newLines, expandedCollections, isChatOpened)

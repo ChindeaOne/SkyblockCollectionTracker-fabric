@@ -1,7 +1,5 @@
 package io.github.chindeaone.collectiontracker.utils.render
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice
-import com.mojang.blaze3d.systems.RenderPass
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.customCWColor
 import io.github.chindeaone.collectiontracker.config.customFWColor
