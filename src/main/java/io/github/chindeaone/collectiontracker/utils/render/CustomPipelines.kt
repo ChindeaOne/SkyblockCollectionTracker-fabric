@@ -12,11 +12,11 @@ import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.CompareOp
 import com.mojang.blaze3d.shaders.UniformType
 //? if >= 26.2 {
-/*import com.mojang.blaze3d.PrimitiveTopology
+import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.BindGroupLayout
 import net.minecraft.client.renderer.BindGroupLayouts
-*///? } else {
-import com.mojang.blaze3d.vertex.VertexFormat
+//? } else {
+//import com.mojang.blaze3d.vertex.VertexFormat
 //? }
 
 object CustomPipelines {
@@ -29,26 +29,28 @@ object CustomPipelines {
         LINE_THROUGH_WALLS = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
                 .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/line_through_walls"))
+                .withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
                 .withDepthStencilState(Optional.empty())
                 .build()
         )
         HIGHLIGHT = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                 .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/highlight"))
+                .withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
                 .withDepthStencilState(
                     Optional.of(
                         DepthStencilState(
-                            CompareOp./*? if 26.2 {*/ /*GREATER_THAN_OR_EQUAL *//*?} else {*/ LESS_THAN_OR_EQUAL /*?}*/,
+                            CompareOp./*? if 26.2 {*/ GREATER_THAN_OR_EQUAL /*?} else {*/ /*LESS_THAN_OR_EQUAL *//*?}*/,
                             false
                         )
                     ))
                 .build()
         )
         CHROMA_TEXT = RenderPipelines.register(
-            RenderPipeline.builder(/*? if 26.1 {*/ RenderPipelines.MATRICES_PROJECTION_SNIPPET /*?}*/)
+            RenderPipeline.builder(/*? if 26.1 {*/ /*RenderPipelines.MATRICES_PROJECTION_SNIPPET *//*?}*/)
                 .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/chroma_text"))
                 //? if !26.1 {
-                /*.withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).apply {
+                .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).apply {
                     withPrimitiveTopology(PrimitiveTopology.QUADS)
                     withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
                     withVertexShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
@@ -65,22 +67,22 @@ object CustomPipelines {
                         .build()
                     )
                 }
-                *///? } else {
-                .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).apply {
+                //? } else {
+                /*.withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).apply {
                     withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
                     withVertexShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
                     withFragmentShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
                     withSampler("Sampler0")
                     withUniform("SctChromaUniforms", UniformType.UNIFORM_BUFFER)
                 }
-                //? }
+                *///? }
                 .build()
         )
         PREFIX_GRADIENT_TEXT = RenderPipelines.register(
-            RenderPipeline.builder(/*? if 26.1 {*/ RenderPipelines.MATRICES_PROJECTION_SNIPPET /*?}*/)
+            RenderPipeline.builder(/*? if 26.1 {*/ /*RenderPipelines.MATRICES_PROJECTION_SNIPPET *//*?}*/)
                 .withLocation(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "pipeline/prefix_gradient_text"))
                 //? if !26.1 {
-                /*.withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).apply {
+                .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR).apply {
                     withPrimitiveTopology(PrimitiveTopology.QUADS)
                     withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
                     withVertexShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
@@ -97,15 +99,15 @@ object CustomPipelines {
                         .build()
                     )
                 }
-                *///? } else {
-                .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).apply {
+                //? } else {
+                /*.withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS).apply {
                     withColorTargetState(ColorTargetState(BlendFunction.TRANSLUCENT))
                     withVertexShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
                     withFragmentShader(Identifier.fromNamespaceAndPath(SkyblockCollectionTracker.MODID, "core/chroma_text"))
                     withSampler("Sampler0")
                     withUniform("SctChromaUniforms", UniformType.UNIFORM_BUFFER)
                 }
-                //? }
+                *///? }
                 .build()
         )
     }
