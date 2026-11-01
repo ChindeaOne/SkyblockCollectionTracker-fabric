@@ -16,7 +16,7 @@ object DwarvenHeatmap {
     private data class HeatmapHighlight(val pos: BlockPos, val color: Int)
 
     private val trackedBlocks = setOf(
-        Blocks./*? if >= 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/,
+        Blocks./*? if >= 26.2 {*/ DYED_TERRACOTTA.brown /*?} else {*/ /*BROWN_TERRACOTTA *//*?}*/,
         Blocks.SMOOTH_RED_SANDSTONE,
         Blocks.CLAY
     )
@@ -59,15 +59,15 @@ object DwarvenHeatmap {
     fun render(context: LevelRenderContext) {
         val camera = context.levelState().cameraRenderState
 
-        for (highlight in cachedHighlights) {
-            BlockOutline.renderBlockHighlight(highlight.pos, camera, highlight.color)
+        for ((pos, color) in cachedHighlights) {
+            BlockOutline.renderBlockHighlight(pos, camera, color)
         }
     }
 
     private fun priorityColor(block: Block): Int {
         return when (block) {
             Blocks.SMOOTH_RED_SANDSTONE, Blocks.CLAY -> Colors.DARK_GREEN.color
-            Blocks./*? if >= 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/ -> Colors.GREEN.color
+            Blocks./*? if >= 26.2 {*/ DYED_TERRACOTTA.brown /*?} else {*/ /*BROWN_TERRACOTTA *//*?}*/ -> Colors.GREEN.color
             else -> Colors.GREEN.color
         }
     }
@@ -75,7 +75,7 @@ object DwarvenHeatmap {
     private fun isBlockExposed(world: ClientLevel, pos: BlockPos): Boolean {
         fun isNotSolid(pos: BlockPos): Boolean {
             val state = world.getBlockState(pos)
-            return state.isAir || state.block == Blocks.SNOW || state.block == Blocks./*? if >= 26.2 {*/ /*CARPET.lightGray *//*?} else {*/ LIGHT_GRAY_CARPET /*?}*/
+            return state.isAir || state.block == Blocks.SNOW || state.block == Blocks./*? if >= 26.2 {*/ CARPET.lightGray /*?} else {*/ /*LIGHT_GRAY_CARPET *//*?}*/
         }
 
         if (isNotSolid(pos.above())) return true

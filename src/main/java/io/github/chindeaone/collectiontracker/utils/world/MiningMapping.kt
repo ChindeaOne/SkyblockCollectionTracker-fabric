@@ -126,40 +126,40 @@ object MiningMapping {
         Blocks.PRISMARINE to "dwarven_metals", // mithril
         Blocks.PRISMARINE_BRICKS to "dwarven_metals", // mithril
         Blocks.DARK_PRISMARINE to "dwarven_metals", // mithril
-        Blocks./*? if 26.2 {*/ /*WOOL.lightBlue *//*?} else {*/ LIGHT_BLUE_WOOL /*?}*/ to "dwarven_metals", // mithril
-        Blocks./*? if 26.2 {*/ /*WOOL.gray *//*?} else {*/ LIGHT_BLUE_WOOL /*?}*/ to "dwarven_metals", // mithril
+        Blocks./*? if >= 26.2 {*/ WOOL.lightBlue /*?} else {*/ /*LIGHT_BLUE_WOOL *//*?}*/ to "dwarven_metals", // mithril
+        Blocks./*? if >= 26.2 {*/ WOOL.gray /*?} else {*/ /*LIGHT_BLUE_WOOL *//*?}*/ to "dwarven_metals", // mithril
         Blocks.POLISHED_DIORITE to "dwarven_metals", // titanium
         Blocks.PACKED_ICE to "dwarven_metals", // glacite
-        Blocks./*? if 26.2 {*/ /*DYED_TERRACOTTA.brown *//*?} else {*/ BROWN_TERRACOTTA /*?}*/ to "dwarven_metals", // umber
+        Blocks./*? if >= 26.2 {*/ DYED_TERRACOTTA.brown /*?} else {*/ /*BROWN_TERRACOTTA *//*?}*/ to "dwarven_metals", // umber
         Blocks.SMOOTH_RED_SANDSTONE to "dwarven_metals", // umber
         Blocks.TERRACOTTA to "dwarven_metals", // umber
         Blocks.INFESTED_COBBLESTONE to "dwarven_metals", // tungsten
         Blocks.CLAY to "dwarven_metals", // tungsten
 
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.orange *//*?} else {*/ ORANGE_STAINED_GLASS /*?}*/ to "gemstones", // amber
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.orange *//*?} else {*/ ORANGE_STAINED_GLASS_PANE /*?}*/ to "gemstones", // amber
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.lightBlue *//*?} else {*/ LIGHT_BLUE_STAINED_GLASS /*?}*/ to "gemstones", // sapphire
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.lightBlue *//*?} else {*/ LIGHT_BLUE_STAINED_GLASS_PANE /*?}*/ to "gemstones", // sapphire
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.purple *//*?} else {*/ PURPLE_STAINED_GLASS /*?}*/ to "gemstones", // amethyst
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.purple *//*?} else {*/ PURPLE_STAINED_GLASS_PANE /*?}*/ to "gemstones", // amethyst
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.red *//*?} else {*/ RED_STAINED_GLASS /*?}*/ to "gemstones", // ruby
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.red *//*?} else {*/ RED_STAINED_GLASS_PANE /*?}*/ to "gemstones", // ruby
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.lime *//*?} else {*/ LIME_STAINED_GLASS /*?}*/ to "gemstones", // jade
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.lime *//*?} else {*/ LIME_STAINED_GLASS_PANE /*?}*/ to "gemstones", // jade
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.yellow *//*?} else {*/ YELLOW_STAINED_GLASS /*?}*/ to "gemstones", // topaz
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.yellow *//*?} else {*/ YELLOW_STAINED_GLASS_PANE /*?}*/ to "gemstones", // topaz
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.white *//*?} else {*/ WHITE_STAINED_GLASS /*?}*/ to "gemstones", // opal
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.white *//*?} else {*/ WHITE_STAINED_GLASS_PANE /*?}*/ to "gemstones", // opal
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.magenta *//*?} else {*/ MAGENTA_STAINED_GLASS /*?}*/ to "gemstones", // jasper
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.magenta *//*?} else {*/ MAGENTA_STAINED_GLASS_PANE /*?}*/ to "gemstones", // jasper
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.blue *//*?} else {*/ BLUE_STAINED_GLASS /*?}*/ to "gemstones", // aquamarine
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.blue *//*?} else {*/ BLUE_STAINED_GLASS_PANE /*?}*/ to "gemstones", // aquamarine
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.green *//*?} else {*/ GREEN_STAINED_GLASS /*?}*/ to "gemstones", // peridot
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.green *//*?} else {*/ GREEN_STAINED_GLASS_PANE /*?}*/ to "gemstones", // peridot
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.black *//*?} else {*/ BLACK_STAINED_GLASS /*?}*/ to "gemstones", // onyx
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.black *//*?} else {*/ BLACK_STAINED_GLASS_PANE /*?}*/ to "gemstones", // onyx
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS.brown *//*?} else {*/ BROWN_STAINED_GLASS /*?}*/ to "gemstones", // citrine
-        Blocks./*? if 26.2 {*/ /*STAINED_GLASS_PANE.brown *//*?} else {*/ BROWN_STAINED_GLASS_PANE /*?}*/ to "gemstones" // citrine
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.orange /*?} else {*/ /*ORANGE_STAINED_GLASS *//*?}*/ to "gemstones", // amber
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.orange /*?} else {*/ /*ORANGE_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // amber
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.lightBlue /*?} else {*/ /*LIGHT_BLUE_STAINED_GLASS *//*?}*/ to "gemstones", // sapphire
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.lightBlue /*?} else {*/ /*LIGHT_BLUE_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // sapphire
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.purple /*?} else {*/ /*PURPLE_STAINED_GLASS *//*?}*/ to "gemstones", // amethyst
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.purple /*?} else {*/ /*PURPLE_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // amethyst
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.red/*?} else {*/ /*RED_STAINED_GLASS *//*?}*/ to "gemstones", // ruby
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.red/*?} else {*/ /*RED_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // ruby
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.lime /*?} else {*/ /*LIME_STAINED_GLASS *//*?}*/ to "gemstones", // jade
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.lime /*?} else {*/ /*LIME_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // jade
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.yellow/*?} else {*/ /*YELLOW_STAINED_GLASS *//*?}*/ to "gemstones", // topaz
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.yellow/*?} else {*/ /*YELLOW_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // topaz
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.white /*?} else {*/ /*WHITE_STAINED_GLASS *//*?}*/ to "gemstones", // opal
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.white /*?} else {*/ /*WHITE_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // opal
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.magenta/*?} else {*/ /*MAGENTA_STAINED_GLASS *//*?}*/ to "gemstones", // jasper
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.magenta/*?} else {*/ /*MAGENTA_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // jasper
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.blue /*?} else {*/ /*BLUE_STAINED_GLASS *//*?}*/ to "gemstones", // aquamarine
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.blue /*?} else {*/ /*BLUE_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // aquamarine
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.green/*?} else {*/ /*GREEN_STAINED_GLASS *//*?}*/ to "gemstones", // peridot
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.green/*?} else {*/ /*GREEN_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // peridot
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.black/*?} else {*/ /*BLACK_STAINED_GLASS *//*?}*/ to "gemstones", // onyx
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.black/*?} else {*/ /*BLACK_STAINED_GLASS_PANE *//*?}*/ to "gemstones", // onyx
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS.brown/*?} else {*/ /*BROWN_STAINED_GLASS *//*?}*/ to "gemstones", // citrine
+        Blocks./*? if >= 26.2 {*/ STAINED_GLASS_PANE.brown/*?} else {*/ /*BROWN_STAINED_GLASS_PANE *//*?}*/ to "gemstones" // citrine
     )
 
     // In mineshafts, they are changed from infested cobble to regular cobble

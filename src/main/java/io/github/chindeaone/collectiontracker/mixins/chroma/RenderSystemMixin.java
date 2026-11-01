@@ -3,19 +3,19 @@ package io.github.chindeaone.collectiontracker.mixins.chroma;
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.Mixin;
 //? if 26.1 {
-import org.spongepowered.asm.mixin.injection.At;
+/*import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import io.github.chindeaone.collectiontracker.utils.render.ChromaRenderer;
-//? }
+*///? }
 
 @Mixin(RenderSystem.class)
 public class RenderSystemMixin {
 
     //? if 26.1 {
-    @Inject(method = "flipFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DynamicUniforms;reset()V"))
+    /*@Inject(method = "flipFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DynamicUniforms;reset()V"))
     private static void sct$clearChromaUniforms(CallbackInfo ci) {
         ChromaRenderer.clearChromaUniforms();
     }
-    //?}
+    *///?}
 }

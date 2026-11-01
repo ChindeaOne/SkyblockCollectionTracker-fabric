@@ -109,7 +109,7 @@ object ModLoader: ModInitializer {
             if (!RenderSystem.isOnRenderThread()) return@register
 
             try {
-                /*? if 26.2 {*/ /*WorldRenderer.prepare() *//*?}*/
+                /*? if 26.2 {*/ WorldRenderer.prepare() /*?}*/
                 BlockOutline.renderWaypoint(context)
                 DwarvenHeatmap.render(context)
                 PrecisionMining.render(context)
@@ -164,7 +164,7 @@ object ModLoader: ModInitializer {
             DeployableTracker.onClientTick(client)
             InventoryListener.onClientTick()
             ConfigStateUtils.onClientTick()
-            ContainerParser.onClientTick(client)
+            ContainerParser.onClientTick()
             MiningStatsParser.onClientTick()
             ForagingStatsParser.onClientTick()
             TimeNotifierUtils.onClientTick()

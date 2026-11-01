@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.rendertype.RenderType
 import org.joml.Vector4f
 import java.util.OptionalDouble
 //? if 26.1 {
-import com.mojang.blaze3d.vertex.BufferBuilder
+/*import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.ByteBufferBuilder
 import com.mojang.blaze3d.vertex.MeshData
 import net.minecraft.client.renderer.MappableRingBuffer
@@ -25,22 +25,22 @@ import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.vertex.VertexFormat
 import org.lwjgl.system.MemoryUtil
-//? }
+*///? }
 //? if >= 26.2 {
-/*import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import net.minecraft.client.renderer.StagedVertexBuffer
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import java.util.Optional
-*///? }
+//? }
 
 object WorldRenderer {
 
     private val client: Minecraft = Minecraft.getInstance()
 
-    /*? if >= 26.2 {*//*
+    /*? if >= 26.2 {*/
     private val vertexBuffer = StagedVertexBuffer({ "SkyblockCollectionTracker Renderer Vertex Buffer" }, RenderType.SMALL_BUFFER_SIZE)
 
     private var previousPipeline: RenderPipeline? = null
@@ -49,7 +49,7 @@ object WorldRenderer {
     private var previousInstanceCount: Int = 1
     private var previousUniform: UniformBinding? = null
     private var previousDraw: StagedVertexBuffer.Draw? = null
-    *//*?} else {*/
+    /*?} else {*//*
 
     private val generalAllocator = ByteBufferBuilder(RenderType.SMALL_BUFFER_SIZE)
     private val allocators = HashMap<BatchKey, ByteBufferBuilder>()
@@ -61,7 +61,7 @@ object WorldRenderer {
     private val vertexBuffers = HashMap<VertexFormat, MappableRingBuffer>()
 
     private val preparedDraws = ArrayList<PreparedDraw>()
-    /*?}*/
+    *//*?}*/
 
     private val draws = ArrayList<Draw>()
 
@@ -69,9 +69,9 @@ object WorldRenderer {
         return getBuffer(
             pipeline = pipeline,
             textureSetup = TextureSetup.noTexture(),
-            alphaMultiplier = 1f/*? if >= 26.2 {*//*,
+            alphaMultiplier = 1f/*? if >= 26.2 {*/,
             instanceCount = 1,
-            uniform = null*//*?}*/
+            uniform = null/*?}*/
         )
     }
 
@@ -79,20 +79,20 @@ object WorldRenderer {
         return getBuffer(
             pipeline = pipeline,
             textureSetup = textureSetup,
-            alphaMultiplier = 1f/*? if >= 26.2 {*//*,
+            alphaMultiplier = 1f/*? if >= 26.2 {*/,
             instanceCount = 1,
-            uniform = null*//*?}*/
+            uniform = null/*?}*/
         )
     }
 
     fun getBuffer(
         pipeline: RenderPipeline,
         textureSetup: TextureSetup,
-        alphaMultiplier: Float/*? if >= 26.2 {*//*,
+        alphaMultiplier: Float/*? if >= 26.2 {*/,
         instanceCount: Int,
-        uniform: UniformBinding?*//*?}*/
+        uniform: UniformBinding?/*?}*/
     ): VertexConsumer {
-        /*? if >= 26.2 {*//*
+        /*? if >= 26.2 {*/
         val needsNewDraw = previousDraw == null ||
                 pipeline != previousPipeline ||
                 textureSetup != previousTextureSetup ||
@@ -128,7 +128,7 @@ object WorldRenderer {
         return vertexBuffer.getVertexBuilder(
             requireNotNull(previousDraw) { "Expected previousDraw to be set before getting vertex builder" }
         )
-        *//*?} else {*/
+        /*?} else {*//*
 
         val key = BatchKey(pipeline, textureSetup, alphaMultiplier)
 
@@ -146,10 +146,10 @@ object WorldRenderer {
         batchedDraws[key] = BatchedDraw(bufferBuilder, pipeline, textureSetup, alphaMultiplier)
 
         return bufferBuilder
-        /*?}*/
+        *//*?}*/
     }
 
-    /*? if >= 26.2 {*//*
+    /*? if >= 26.2 {*/
     fun prepare() {
         previousDraw = null
         previousPipeline = null
@@ -158,10 +158,10 @@ object WorldRenderer {
         previousInstanceCount = 1
         previousUniform = null
     }
-    *//*?}*/
+    /*?}*/
 
     fun executeDraws() {
-        /*? if >= 26.2 {*//*
+        /*? if >= 26.2 {*/
         if (draws.isEmpty()) {
             prepare()
             return
@@ -176,7 +176,7 @@ object WorldRenderer {
             draws.clear()
             prepare()
         }
-        *//*?} else {*/
+        /*?} else {*//*
 
         if (batchedDraws.isEmpty()) {
             return
@@ -203,21 +203,18 @@ object WorldRenderer {
             preparedDraws.clear()
             draws.clear()
         }
-        /*?}*/
+        *//*?}*/
     }
 
-    /*? if >= 26.2 {*//*
+    /*? if >= 26.2 {*/
     private fun dispatchDraws() {
         applyViewOffsetZLayering()
 
         try {
             val mainRenderTarget = client.gameRenderer.mainRenderTarget()
 
-            val colorTexture = mainRenderTarget.getColorTextureView()
-                ?: error("Main render target color texture view is null")
-
-            val depthTexture = mainRenderTarget.getDepthTextureView()
-                ?: error("Main render target depth texture view is null")
+            val colorTexture = mainRenderTarget.getColorTextureView() ?: error("Main render target color texture view is null")
+            val depthTexture = mainRenderTarget.getDepthTextureView() ?: error("Main render target depth texture view is null")
 
             RenderSystem.getDevice()
                 .createCommandEncoder()
@@ -298,7 +295,7 @@ object WorldRenderer {
             0
         )
     }
-    *//*?} else {*/
+    /*?} else {*//*
 
     private fun endBatches() {
         for (draw in batchedDraws.values) {
@@ -484,20 +481,20 @@ object WorldRenderer {
     private fun getMainDepthTexture(): GpuTextureView {
         return client.mainRenderTarget.depthTextureView ?: error("Main depth texture view is null")
     }
-    /*?}*/
+    *//*?}*/
 
     private fun setupDynamicTransforms(alphaMultiplier: Float): GpuBufferSlice {
         return RenderSystem.getDynamicUniforms()
             .writeTransform(
                 //? if >= 26.2 {
-                /*RenderSystem.getModelViewMatrixCopy(),
+                RenderSystem.getModelViewMatrixCopy(),
                 Vector4f(1f, 1f, 1f, alphaMultiplier)
-                *///?} else {
-                RenderSystem.getModelViewMatrix(),
+                //?} else {
+                /*RenderSystem.getModelViewMatrix(),
                 Vector4f(1f, 1f, 1f, alphaMultiplier),
                 modelOffset,
                 textureMatrix
-                //?}
+                *///?}
             )
     }
 
@@ -514,9 +511,9 @@ object WorldRenderer {
 
     @JvmStatic
     fun close() {
-        /*? if >= 26.2 {*//*
+        /*? if >= 26.2 {*/
         vertexBuffer.close()
-        *//*?} else {*/
+        /*?} else {*//*
 
         generalAllocator.close()
 
@@ -530,10 +527,10 @@ object WorldRenderer {
 
         allocators.clear()
         vertexBuffers.clear()
-        /*?}*/
+        *//*?}*/
     }
 
-    /*? if < 26.2 {*/
+    /*? if < 26.2 {*//*
 
     private data class BatchKey(
         val pipeline: RenderPipeline,
@@ -555,17 +552,17 @@ object WorldRenderer {
         val alphaMultiplier: Float
     )
 
-    /*?}*/
+    *//*?}*/
 
     private data class Draw(
-        /*? if >= 26.2 {*//*
+        /*? if >= 26.2 {*/
         val draw: StagedVertexBuffer.Draw,
         val pipeline: RenderPipeline,
         val textureSetup: TextureSetup,
         val alphaMultiplier: Float,
         val instanceCount: Int,
         val uniform: UniformBinding?
-        *//*?} else {*/
+        /*?} else {*//*
 
         val builtBuffer: MeshData,
         val vertices: GpuBuffer,
@@ -574,13 +571,13 @@ object WorldRenderer {
         val pipeline: RenderPipeline,
         val textureSetup: TextureSetup,
         val alphaMultiplier: Float
-        /*?}*/
+        *//*?}*/
     )
 
-    /*? if >= 26.2 {*//*
+    /*? if >= 26.2 {*/
     data class UniformBinding(
         val name: String,
         val buffer: GpuBuffer
     )
-    *//*?}*/
+    /*?}*/
 }

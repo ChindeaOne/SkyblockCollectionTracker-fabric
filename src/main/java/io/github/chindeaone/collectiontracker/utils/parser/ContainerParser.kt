@@ -1,11 +1,11 @@
 package io.github.chindeaone.collectiontracker.utils.parser
 
 import io.github.chindeaone.collectiontracker.utils.EpochMark
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.hotx.HotfData
 import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
 import io.github.chindeaone.collectiontracker.utils.inventory.ItemUtils
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -82,12 +82,11 @@ object ContainerParser {
         }
     }
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         val screen = currentScreen ?: return
 
         if (MinecraftUtils.screen !== screen) {
-            currentHotxScreen = null
-            currentHotxType = null
+            currentScreen = null
             return
         }
 
