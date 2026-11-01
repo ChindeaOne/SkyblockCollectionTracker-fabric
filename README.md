@@ -37,12 +37,12 @@
 <details>
 <summary><strong>Collection & Profit Tracker</strong></summary>
 
-- Tracks collection progress and profit using sack messages, via `/sct track <collection>`.
+- Track collection progress and profit using sack messages, via `/sct track <collection>`.
 - Supports multi-tracking via `/sct track <collection1> <collection2> ...`.
-- Provides an option to track via Hypixel's API instead of sacks.
-- Configurable overlay lines showing collection progress and profit rates.
-- Supports both NPC and Bazaar prices for profit calculations.
-- Detailed session summary at the end (best/worst rates, elapsed time, profit, etc.).
+- Option to track via Hypixel's API instead of sacks.
+- NPC and Bazaar prices for profit calculations.
+- Option to display enchanted/super enchanted/gemstone tier instead of base collection(s).
+- Option to show a detailed session summary at the end.
 - Provides leaderboard tracking for all collections, with data from Elite API.
 - `/sct collections` for all available collections.
 
@@ -51,22 +51,23 @@
 <details>
 <summary><strong>Skill Tracker</strong></summary>
 
-- Tracks all skills, displaying current XP, level, and rates.
-- Uses Hypixel’s API for non‑maxed skills; live in‑game XP messages for maxed skills.
-- Additional tracking for Taming.
+- Tracks all skills, displaying current XP, level and rates.
+- Uses Hypixel’s API for non‑maxed skills and live in‑game XP messages for maxed skills.
+- Additional tracking for Taming, only using Hypixel's API.
 
 </details>
 
 <details>
-<summary><strong>Coleweight Modern</strong></summary>
+<summary><strong>Coleweight Port</strong></summary>
 
 - Ported commands like `/sct cw find` or `/sct cw lb`, as well as `/sct cw detailed` for more info.
 - Ported Coleweight chat ranks and the option to display them on Mining Islands only.
-- Ported Dwarven Heatmap, with adjustable opacity.
+- Ported Dwarven Heatmap for Umber and Tungsten.
 - Ported Precision Mining highlight.
 - Ported `/sct timer <set|pause|resume|stop>` command.
 - Ported `/sct stopwatch <start|pause|resume|stop>` command.
 - Tracks Coleweight with `/sct cw track`.
+- Detailed Coleweight profiler with `/sct cw profile`.
 
 </details>
 
@@ -75,6 +76,7 @@
 
 - Provides commands like `/sct fw find` and `/sct fw lb` to access farming weight data from Elite API.
 - Displays farming weight rank in chat for the top 1000 players, with customizable rank colors.
+- Detailed farming weight profiler with `/sct fw profile`.
 
 </details>
 
@@ -98,17 +100,18 @@
 </details>
 
 <details>
-<summary><strong>Better Pickaxe/Axe Ability Cooldown</strong></summary>
+<summary><strong>Pickaxe/Axe Ability Cooldown</strong></summary>
 
-- Shows current pickaxe/axe ability and remaining duration while active.
-- Cooldown updates live based on COTM/COTF, drill parts, and pet swaps.
+- Shows current pickaxe/axe ability, cooldown and duration while active.
+  - by default, it shows only the cooldown
 - Configurable title alert when the ability is ready or expired.
 - Configurable indicators for ability duration and cooldown.
+- Duration updates for MSB as per latest update.
 
 </details>
 
 <details>
-<summary><strong>Better Sky Mall/Lottery/Beekeeper</strong></summary>
+<summary><strong>Sky Mall/Lottery/Beekeeper</strong></summary>
 
 - Shows current Sky Mall/Lottery/Beekeeper buffs and their remaining time.
 - Compacts chat messages.
@@ -130,14 +133,16 @@
 - Displays ordered waypoints in mineshafts, only for jasper and crystal mineshafts.
 - Displays ordered waypoints for mineshaft spawning routes.
 - Displays ordered waypoints for dwarven metal and pure ore routes.
-- All routes used are from Mining Cult.
+- All routes provided from the Mining Cult.
 
 </details>
 
 <details>
-<summary><strong>Temporary Buff Tracker</strong></summary>
+<summary><strong>Mining Consumable Tracker</strong></summary>
 
-- Tracks temporary mining buffs like refined dark cacao truffle or filet o' fortune.
+- Tracks consumables like fiesta flask or filet o' fortune.
+- Configurable title alert when the consumable has expired.
+- Time is updated when opening the Active Effects menu (/effects).
 
 </details>
 

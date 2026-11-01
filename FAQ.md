@@ -38,11 +38,10 @@
 **Q: Why does my pickaxe/axe ability notification appear too early?**  
 **A:** This can happen if:
 - Your lobby is lagging.
-- Your Core/Center of the Mountain/Forest level is configured incorrectly.
 - Hypixel changed an ability's cooldown or duration.
-- A new cooldown reduction method isn't supported by the current version of the SCT.
+- A new cooldown reduction method that isn't supported by the current version of the SCT.
 
-You can reduce inaccurate timers by enabling **Server Lag Protection** under **Misc**.
+You can reduce inaccurate timers by enabling **Server Lag Protection** under **Misc**, which updates the remaining cooldown when you right click while off-cooldown.
 
 ---
 

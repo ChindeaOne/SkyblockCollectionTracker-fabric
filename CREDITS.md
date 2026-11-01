@@ -1,5 +1,3 @@
-# Credits & Acknowledgments
-
 ### Inspiration & Learning
 - **Ninjune** – Project inspiration and [Coleweight mod](https://www.chattriggers.com/modules/v/Coleweight)
 - **nea89** – [Mod Guide](https://moddev.nea.moe) for general mod development practices
@@ -9,7 +7,8 @@
 ### Libraries
 - **Moulberry and nea89** – [MoulConfig](https://notenoughupdates.org/MoulConfig/) for configuration GUI
 
-### APIs & Data
+### External API Used
+- **Hypixel** – [Hypixel API](https://api.hypixel.net/) for player data (obviously)
 - **Ninjune** – [Coleweight API](https://ninjune.dev/) for coleweight data
 - **Kaeso** – [Elite API](https://api.eliteskyblock.com/) for farming weight and leaderboards
 - **Coflnet** – [SkyCofl](https://sky.coflnet.com/wiki/api) for auction house data
