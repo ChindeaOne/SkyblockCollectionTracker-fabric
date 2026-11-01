@@ -37,11 +37,17 @@ jobs:
           ./gradlew stonecutterSwitchTo26.2 --no-daemon --stacktrace
           ./gradlew :26.2:clean :26.2:build --no-daemon --stacktrace --no-build-cache
 
+      - name: Build 26.3
+        run: |
+          ./gradlew stonecutterSwitchTo26.3 --no-daemon --stacktrace
+          ./gradlew :26.3:clean :26.3:build --no-daemon --stacktrace --no-build-cache
+
       - name: Create Draft Release
         run: |
           gh release create "${{ github.ref_name }}" \
             versions/26.1/build/libs/*.jar \
             versions/26.2/build/libs/*.jar \
+            versions/26.3/build/libs/*.jar \
             --draft \
             --title "SkyblockCollectionTracker ${{ github.ref_name }}"
         env:
