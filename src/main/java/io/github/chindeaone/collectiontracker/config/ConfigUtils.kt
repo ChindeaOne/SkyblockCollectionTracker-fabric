@@ -227,7 +227,6 @@ val collectionTier: CollectionTier get() = trackingConfig.collectionTier
 val collectionGemstoneTier: GemstoneTier get() = trackingConfig.collectionGemstoneTier
 
 val statsText: List<CollectionConfig.OverlayText> get() = collectionConfig.statsText
-val extraStatsText: List<CollectionConfig.OverlayExtraText> get() = collectionConfig.extraStatsText
 val showExtraStats: Boolean get() = collectionConfig.showExtraStats
 
 // Leaderboard Tracking Config Accessors

@@ -43,24 +43,6 @@ class CollectionConfig {
     @ConfigEditorBoolean
     var showExtraStats: Boolean = false
 
-    enum class OverlayExtraText(private val text: String) {
-        BAZAAR_ITEM("§aItem§f: Enchanted gold"),
-        BAZAAR_PRICE("§aItem price§f: 100k");
-
-        override fun toString(): String = text
-    }
-
-    @Expose
-    @ConfigOption(
-        name = "Overlay Extra Text",
-        desc = "Drag the lines of text to change the appearance of the extra stats of the overlay.\n§eNote: Doesn't work if 'Extra Stats' is disabled!"
-    )
-    @ConfigEditorDraggableList
-    var extraStatsText: MutableList<OverlayExtraText> = mutableListOf(
-        OverlayExtraText.BAZAAR_ITEM,
-        OverlayExtraText.BAZAAR_PRICE
-    )
-
     @Expose
     @ConfigOption(
         name = "Tracking Summary",

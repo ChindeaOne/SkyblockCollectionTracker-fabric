@@ -21,7 +21,6 @@ import io.github.chindeaone.collectiontracker.config.categories.overlay.MultiCol
 import io.github.chindeaone.collectiontracker.config.collectionGemstoneTier
 import io.github.chindeaone.collectiontracker.config.collectionLeaderboard
 import io.github.chindeaone.collectiontracker.config.collectionTier
-import io.github.chindeaone.collectiontracker.config.extraStatsText
 import io.github.chindeaone.collectiontracker.config.gemstoneTier
 import io.github.chindeaone.collectiontracker.config.leaderboardPosition
 import io.github.chindeaone.collectiontracker.config.previousPosition
@@ -267,12 +266,8 @@ object CollectionParser {
     // Only if it has bazaar data and is enabled
     fun updateTrackingExtraLines(list: MutableList<String>) {
         list.add("§6§lBazaar Info:")
-        for (id in extraStatsText) {
-            when (id) {
-                CollectionConfig.OverlayExtraText.BAZAAR_ITEM -> addIfNotNull(list, handleBazaarItem())
-                CollectionConfig.OverlayExtraText.BAZAAR_PRICE -> addIfNotNull(list, handleBazaarPrice())
-            }
-        }
+        addIfNotNull(list, handleBazaarItem())
+        addIfNotNull(list, handleBazaarPrice())
     }
 
     private fun handleBazaarItem(): String? {
