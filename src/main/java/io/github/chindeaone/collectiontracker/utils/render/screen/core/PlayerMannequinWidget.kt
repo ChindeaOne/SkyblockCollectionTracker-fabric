@@ -17,7 +17,7 @@ import kotlin.math.floor
 
 class PlayerMannequinWidget(profile: GameProfile, nameTag: Component, width: Int, height: Int) : AbstractWidget(0, 0, width, height, Component.empty()) {
 
-    private val mannequin = PlayerMannequin(profile, nameTag)
+    private val mannequin = PlayerMannequin(profile, nameTag).apply { id = -1}
     private val renderer = MinecraftUtils.entityRenderDispatcher.getRenderer(mannequin) as AvatarRenderer
     private val renderState = AvatarRenderState()
 

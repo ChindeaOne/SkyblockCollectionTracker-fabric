@@ -6,8 +6,7 @@ object GameProfileUtils {
 
     private val profiles = mutableMapOf<String, GameProfile>()
 
-    fun getProfile(playerName: String): GameProfile? =
-        profiles[playerName]
+    fun getProfile(playerName: String): GameProfile? = profiles[playerName]
 
     fun addProfile(playerName: String, profile: GameProfile) {
         profiles[playerName] = profile
