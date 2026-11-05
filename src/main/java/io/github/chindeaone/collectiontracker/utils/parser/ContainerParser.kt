@@ -23,7 +23,7 @@ object ContainerParser {
     val wasDown = HashMap<Int, Boolean>()
 
     val loadoutPattern: Regex = Regex("""^\((\d+)/(\d+)\) Loadouts$""")
-    val activeEffectsPattern: Regex = Regex("""^\((\d+)/(\d+)\) Active Effects$""")
+    val activeEffectsPattern: Regex = Regex("""^(?:\((\d+)/(\d+)\) )?Active Effects$""")
 
     enum class ScreenType {
         HOTM,
