@@ -14,9 +14,6 @@ stonecutter handlers {
 stonecutter {
     parameters {
         replacements {
-            string(current.parsed < "26.2") {
-                replace("\"createForGrayscaleTexture\"", "\"createForIntensityTexture\"")
-            }
             string(current.parsed < "26.3") {
                 replace("com.mojang.renderpearl.api.buffers.GpuBufferSlice", "com.mojang.blaze3d.buffers.GpuBufferSlice")
                 replace("com.mojang.renderpearl.api.buffers.GpuBuffer", "com.mojang.blaze3d.buffers.GpuBuffer")
@@ -31,15 +28,10 @@ stonecutter {
                 replace("com.mojang.renderpearl.api.pipeline.UniformType", "com.mojang.blaze3d.shaders.UniformType")
                 replace("com.mojang.renderpearl.api.commands.RenderPass", "com.mojang.blaze3d.systems.RenderPass")
                 replace("DynamicGpuDataStorageMapped", "DynamicUniformStorage")
-
-                replace(
-                    "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;",
-                    "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;"
-                )
-                replace(
-                    "Lcom/mojang/renderpearl/api/commands/RenderPass;setPipeline(Lcom/mojang/renderpearl/api/pipeline/CompiledRenderPipeline;)V",
-                    "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
-                )
+                replace("renderpearl/api/pipeline/RenderPipeline", "blaze3d/pipeline/RenderPipeline")
+                replace("renderpearl/api/commands/RenderPass", "blaze3d/systems/RenderPass")
+                replace("(Lcom/mojang/renderpearl/api/pipeline/CompiledRenderPipeline;)", "(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)")
+                replace("renderpearl/api/buffers/GpuBufferSlice", "blaze3d/buffers/GpuBufferSlice")
 
                 replace("#include", "#moj_import")
             }

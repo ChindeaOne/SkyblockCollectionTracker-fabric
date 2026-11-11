@@ -51,12 +51,6 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Build for 26.1
-      - name: "Stonecutter: set active to 26.1"
-        run: ./gradlew stonecutterSwitchTo26.1 --no-daemon --stacktrace
-      - name: Build 26.1
-        run: ./gradlew :26.1:clean :26.1:build --no-daemon --stacktrace --no-build-cache
-
       # Build for 26.2
       - name: "Stonecutter: set active to 26.2"
         run: ./gradlew stonecutterSwitchTo26.2 --no-daemon --stacktrace
@@ -75,7 +69,6 @@ jobs:
         with:
           name: "Multi-version Development Build"
           path: |
-            versions/26.1/build/libs/*.jar
             versions/26.2/build/libs/*.jar
             versions/26.3/build/libs/*.jar
           if-no-files-found: error

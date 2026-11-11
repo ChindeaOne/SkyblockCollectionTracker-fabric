@@ -10,7 +10,6 @@
     "chroma.GuiChromaMixin",
     "chroma.TextBuilderMixin",
     "chroma.GlyphTypesMixin",
-    "chroma.RenderSystemMixin",
     "AbstractContainerMenuMixin",
     "EntityRendererMixin",
     "AvatarRenderMixin"

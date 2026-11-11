@@ -13,12 +13,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - build-version: "26.1"
-            game-versions: |
-              26.1
-              26.1.1
-              26.1.2
-
           - build-version: "26.2"
             game-versions: |
               26.2

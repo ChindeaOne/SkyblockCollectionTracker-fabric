@@ -1,9 +1,5 @@
 package io.github.chindeaone.collectiontracker.mixins.chroma;
 
-//? if 26.1 {
-/*import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-*///?}
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderPass;
@@ -49,28 +45,11 @@ public class GuiChromaMixin {
         return original.call(state);
     }
 
-    @Inject(
-            method =
-            //? if 26.3 {
-            //"executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;II)V"
-            //?} else if 26.2 {
-            "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V"
-            //?} else {
-            //"executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V"
-            //?}
-            ,at = @At("HEAD")
-    )
+    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V",at = @At("HEAD"))
     public void sct$prepareChromaUniforms(
         Supplier<String> label,
         RenderTarget mainRenderTarget,
-        //? if > 26.1 {
         GpuBufferSlice dynamicTransforms,
-        //?} else {
-        /*GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransforms,
-        GpuBuffer indexBuffer,
-        IndexType indexType,
-        *///?}
         int startIndex,
         int endIndex,
         CallbackInfo ci
@@ -82,17 +61,12 @@ public class GuiChromaMixin {
             method = "executeDraw",
             at = @At(
                     value = "INVOKE",
-                    target =
-                    "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
+                    target = "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V"
             )
     )
     private void sct$bindChromaUniformPerDraw(
             GuiRenderer.Draw draw,
             RenderPass renderPass,
-            //? if 26.1
-            //GpuBuffer indexBuffer,
-            //? if 26.1
-            //IndexType indexType,
             CallbackInfo ci
     ) {
         RenderPipeline pipeline = draw.pipeline();
