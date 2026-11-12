@@ -6,7 +6,6 @@ import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.SkyblockTimeUtils.toRealSeconds
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.world.scores.DisplaySlot
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -30,11 +29,10 @@ object ScoreboardUtils {
 
     var checkTime: Boolean = true
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         if (ModLoader.clientTicks % 4L != 0L) return
 
-        val world = client.level ?: return
-        val scoreboard = world.scoreboard
+        val scoreboard = MinecraftUtils.level?.scoreboard ?: return
         val objective = scoreboard.getDisplayObjective(DisplaySlot.BY_ID.apply(1))
 
         if (objective == null) {
@@ -125,9 +123,8 @@ object ScoreboardUtils {
         return SkyblockTimeUtils.skyblockTimeInMinutes(normalizedHour, minute)
     }
 
-    fun checkScoreboard(client: Minecraft): Boolean? {
-        val world = client.level ?: return null
-        val objective = world.scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR) ?: return null
+    fun checkScoreboard(): Boolean? {
+        val objective = MinecraftUtils.level?.scoreboard?.getDisplayObjective(DisplaySlot.SIDEBAR) ?: return null
         val displayName = objective.displayName.string
 
         val scoreboardTitle = displayName.removeColor()

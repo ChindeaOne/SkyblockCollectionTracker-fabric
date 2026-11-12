@@ -38,7 +38,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import net.fabricmc.fabric.api.event.player.UseItemCallback
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.resources.Identifier
 import net.minecraft.world.InteractionResult
@@ -60,10 +59,10 @@ object ModLoader: ModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register { client ->
             if (client.player == null || client.level == null) return@register
 
-            Hypixel.onClientTick(client)
+            Hypixel.onClientTick()
 
             if (!HypixelUtils.isInSkyblock) return@register
-            TickDispatcher.onEndClientTick(client)
+            TickDispatcher.onEndClientTick()
         }
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> Hypixel.onDisconnect() }
@@ -151,24 +150,24 @@ object ModLoader: ModInitializer {
     var clientTicks = 0L
 
     private object TickDispatcher {
-        fun onEndClientTick(client: Minecraft) {
+        fun onEndClientTick() {
             clientTicks++
 
             // Call every onTick here
             SkyblockCollectionTracker.onClientTick()
-            CommissionUtils.onClientTick(client)
-            TabData.onClientTick(client)
-            BlockWatcher.onClientTick(client)
-            DwarvenHeatmap.onClientTick(client)
-            ScoreboardUtils.onClientTick(client)
-            DeployableTracker.onClientTick(client)
+            CommissionUtils.onClientTick()
+            TabData.onClientTick()
+            BlockWatcher.onClientTick()
+            DwarvenHeatmap.onClientTick()
+            ScoreboardUtils.onClientTick()
+            DeployableTracker.onClientTick()
             InventoryListener.onClientTick()
             ConfigStateUtils.onClientTick()
             ContainerParser.onClientTick()
             MiningStatsParser.onClientTick()
             ForagingStatsParser.onClientTick()
             TimeNotifierUtils.onClientTick()
-            AbilityUtils.onClientTick(client)
+            AbilityUtils.onClientTick()
         }
     }
 }

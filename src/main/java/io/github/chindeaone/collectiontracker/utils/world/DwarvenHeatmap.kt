@@ -3,9 +3,9 @@ package io.github.chindeaone.collectiontracker.utils.world
 import io.github.chindeaone.collectiontracker.ModLoader
 import io.github.chindeaone.collectiontracker.config.enableHeatmap
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.ScoreboardUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Block
@@ -23,7 +23,7 @@ object DwarvenHeatmap {
 
     private var cachedHighlights: List<HeatmapHighlight> = emptyList()
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         if (ModLoader.clientTicks % 4L != 0L) return
 
         if (!enableHeatmap || !ScoreboardUtils.isColdStatRelevant()) {
@@ -31,8 +31,8 @@ object DwarvenHeatmap {
             return
         }
 
-        val world = client.level ?: return
-        val player = client.player ?: return
+        val world = MinecraftUtils.level ?: return
+        val player = MinecraftUtils.player ?: return
         val playerPos = player.blockPosition()
 
         val mutablePos = BlockPos.MutableBlockPos()

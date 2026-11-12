@@ -2,8 +2,8 @@ package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.config.enablePrecisionMiningHighlight
 import io.github.chindeaone.collectiontracker.utils.Colors
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
-import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.phys.AABB
@@ -25,8 +25,7 @@ object PrecisionMining {
             return
         }
 
-        val mc = Minecraft.getInstance()
-        if (!mc.options.keyAttack.isDown) {
+        if (!MinecraftUtils.options.keyAttack.isDown) {
             isLooking = false
             activeParticlePos = null
             return

@@ -7,7 +7,7 @@ import io.github.chindeaone.collectiontracker.config.customCWColor
 import io.github.chindeaone.collectiontracker.config.customFWColor
 import io.github.chindeaone.collectiontracker.utils.ColorUtils
 import io.github.chindeaone.collectiontracker.utils.Colors
-import net.minecraft.client.Minecraft
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 
 object ChromaRenderer {
 
@@ -16,7 +16,7 @@ object ChromaRenderer {
     var prefixGradientSlice: GpuBufferSlice? = null
 
     private fun computeTimeOffset(mode: Int): Float {
-        val ticks = ModLoader.clientTicks + Minecraft.getInstance().deltaTracker.getGameTimeDeltaPartialTick(true)
+        val ticks = ModLoader.clientTicks + MinecraftUtils.deltaTracker.getGameTimeDeltaPartialTick(true)
 
         val rotation: Long = if (mode == 0) {
             val cw = customCWColor.timeForFullRotationInMillis.toLong()

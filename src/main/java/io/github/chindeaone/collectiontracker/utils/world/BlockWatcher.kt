@@ -1,7 +1,7 @@
 package io.github.chindeaone.collectiontracker.utils.world
 
 import io.github.chindeaone.collectiontracker.ModLoader
-import net.minecraft.client.Minecraft
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
@@ -15,11 +15,11 @@ object BlockWatcher {
     var precisionMiningBlockType: String = ""
 
     // Check the block the player is looking at
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         if (ModLoader.clientTicks % 2L != 0L) return
 
-        val level = client.level ?: return
-        val hitResult = client.hitResult
+        val level = MinecraftUtils.level ?: return
+        val hitResult = MinecraftUtils.hitResult
 
         (hitResult as? BlockHitResult)?.let { blockHit ->
             val pos = blockHit.blockPos

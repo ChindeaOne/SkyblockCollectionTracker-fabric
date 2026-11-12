@@ -33,7 +33,6 @@ import io.github.chindeaone.collectiontracker.utils.tab.CommissionWidget
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -115,13 +114,13 @@ object CommissionUtils {
         keybindCancelEvent()
     }
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         val screen = ContainerParser.currentCommissionScreen ?: return
 
         ContainerParser.openedAt?.let { if (it.timePassedSince() < CLICK_DEBOUNCE) return }
         ContainerParser.lastClick?.let { if (it.timePassedSince() < CLICK_DEBOUNCE) return }
 
-        val pressedIndex = resolveCommissionIndex(client) ?: return
+        val pressedIndex = resolveCommissionIndex() ?: return
 
         val slotIndex = getContainerSlot(pressedIndex) ?: return
 
@@ -169,12 +168,12 @@ object CommissionUtils {
         return layout.indexOf(slot).takeIf { it != -1 }
     }
 
-    private fun resolveCommissionIndex(client: Minecraft): Int? {
+    private fun resolveCommissionIndex(): Int? {
         for (i in keybinds.indices) {
             val keyCode = keybinds[i]
             if (keyCode == 0) continue
 
-            val downNow = isKeyDown(client, keyCode)
+            val downNow = isKeyDown(keyCode)
             val downBefore = ContainerParser.wasDown[keyCode] == true
             ContainerParser.wasDown[keyCode] = downNow
 
@@ -184,10 +183,10 @@ object CommissionUtils {
     }
 
     @Suppress("unused")
-    private fun isKeyDown(client: Minecraft, keyCode: Int): Boolean {
+    private fun isKeyDown(keyCode: Int): Boolean {
         if (keyCode == 0) return false
         //? if < 26.3 {
-        val window = client.window
+        val window = MinecraftUtils.window
         //? }
 
         return if (keyCode < 0) {

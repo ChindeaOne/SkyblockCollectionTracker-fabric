@@ -8,7 +8,6 @@ import io.github.chindeaone.collectiontracker.utils.EpochMark.Companion.fromNow
 import io.github.chindeaone.collectiontracker.utils.StringUtils.removeColor
 import io.github.chindeaone.collectiontracker.utils.render.RenderUtils
 import io.github.chindeaone.collectiontracker.utils.world.EntityUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.math.abs
@@ -23,14 +22,11 @@ object DeployableTracker {
 
     private val trackedDeployables = mutableListOf<MiningDeployable>()
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         if (!enableDeployable) return
         if (ModLoader.clientTicks % 5L != 0L) return
 
-        val level = client.level ?: return
-        val player = client.player ?: return
-
-        EntityUtils.getArmorStandsAroundPlayer(level, player.position(), 30.0).forEach { addDeployables(it) }
+        EntityUtils.getArmorStandsAroundPlayer().forEach { addDeployables(it) }
 
         val current = getBestDeployable()
         val previous = activeDeployable

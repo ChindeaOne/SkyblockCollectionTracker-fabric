@@ -29,7 +29,6 @@ import io.github.chindeaone.collectiontracker.tracker.skills.SkillTrackingHandle
 import io.github.chindeaone.collectiontracker.updater.ModrinthData
 import io.github.chindeaone.collectiontracker.utils.ServerUtils.serverStatus
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
-import net.minecraft.client.Minecraft
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -54,10 +53,10 @@ object Hypixel {
         if (ColeweightTrackingHandler.isTracking) ColeweightTrackingHandler.pauseTracking()
     }
 
-    private fun checkMinecraftServer(client: Minecraft) {
+    private fun checkMinecraftServer() {
         var hypixel = false
 
-        client.connection?.serverBrand()?.let {
+        MinecraftUtils.connection?.serverBrand()?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true
             }
@@ -66,12 +65,12 @@ object Hypixel {
         server = hypixel
     }
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         if (!HypixelUtils.isInHypixel) {
-            checkMinecraftServer(client)
+            checkMinecraftServer()
         }
 
-        val isNowOnSkyblock = ScoreboardUtils.checkScoreboard(client) ?: return
+        val isNowOnSkyblock = ScoreboardUtils.checkScoreboard() ?: return
         val wasOnSkyblock = skyblock
 
         if (wasOnSkyblock == isNowOnSkyblock) return

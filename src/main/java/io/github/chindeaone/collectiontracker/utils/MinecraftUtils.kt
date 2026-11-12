@@ -49,6 +49,16 @@ object MinecraftUtils {
 
     val isDebugHudVisible get() = mc.debugEntries.isOverlayVisible
 
+    val hitResult get() = mc.hitResult
+
+    val connection get() = mc.connection
+
+    val gameRenderer get() = mc.gameRenderer
+
+    val deltaTracker get() = mc.deltaTracker
+
+    val soundManager get() = mc.soundManager
+
     val screen get() = mc.gui.screen()
 
     fun isChatScreenOpen(): Boolean {

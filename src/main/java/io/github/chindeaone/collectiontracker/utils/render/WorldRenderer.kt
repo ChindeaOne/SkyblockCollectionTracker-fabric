@@ -4,7 +4,6 @@
 package io.github.chindeaone.collectiontracker.utils.render
 
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.rendertype.RenderType
 import org.joml.Vector4f
@@ -15,11 +14,10 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice
 import net.minecraft.client.renderer.StagedVertexBuffer
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import java.util.Optional
 
 object WorldRenderer {
-
-    private val client: Minecraft = Minecraft.getInstance()
 
     private val vertexBuffer = StagedVertexBuffer({ "SkyblockCollectionTracker Renderer Vertex Buffer" }, RenderType.SMALL_BUFFER_SIZE)
 
@@ -126,7 +124,7 @@ object WorldRenderer {
         applyViewOffsetZLayering()
 
         try {
-            val mainRenderTarget = client.gameRenderer.mainRenderTarget()
+            val mainRenderTarget = MinecraftUtils.gameRenderer.mainRenderTarget()
 
             val colorTexture = mainRenderTarget.getColorTextureView() ?: error("Main render target color texture view is null")
             val depthTexture = mainRenderTarget.getDepthTextureView() ?: error("Main render target depth texture view is null")

@@ -20,7 +20,6 @@ import io.github.chindeaone.collectiontracker.utils.inventory.InventoryListener
 import io.github.chindeaone.collectiontracker.utils.world.deployable.DeployableTracker
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.WaypointsUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.multiplayer.PlayerInfo
 
@@ -34,10 +33,10 @@ object TabData {
         { it.team?.name ?: "" }, { it.profile.name }
     )
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         if (ModLoader.clientTicks % 4L != 0L) return
 
-        val currentWorld = client.level
+        val currentWorld = MinecraftUtils.level
         if (currentWorld == null) {
             world = null
             return
@@ -66,7 +65,7 @@ object TabData {
             !coleweightRankingInChat &&
             !farmingweightRankingInChat) return
 
-        val newTab = readTab(client) ?: return
+        val newTab = readTab() ?: return
         if (newTab.isEmpty()) return
         if (newTab == tabCache) return
 
@@ -78,8 +77,8 @@ object TabData {
         StatsWidget.onTabUpdate()
     }
 
-    private fun readTab(client: Minecraft): List<String>? {
-        val player = client.player ?: return null
+    private fun readTab(): List<String>? {
+        val player = MinecraftUtils.player ?: return null
         val connection = player.connection
 
         val tabOverlay = MinecraftUtils.tabList
