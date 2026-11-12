@@ -3,13 +3,13 @@ package io.github.chindeaone.collectiontracker.utils.ability
 import io.github.chindeaone.collectiontracker.config.attributeLevel
 import io.github.chindeaone.collectiontracker.config.cotfLevel
 import io.github.chindeaone.collectiontracker.config.cotmLevel
+import io.github.chindeaone.collectiontracker.utils.MinecraftUtils
 import io.github.chindeaone.collectiontracker.utils.hotx.HotfData
 import io.github.chindeaone.collectiontracker.utils.hotx.HotmData
 import io.github.chindeaone.collectiontracker.utils.inventory.ItemUtils
 import io.github.chindeaone.collectiontracker.utils.parser.AbilityItemParser
 import io.github.chindeaone.collectiontracker.utils.world.IslandTracker
 import io.github.chindeaone.collectiontracker.utils.world.MiningMapping
-import net.minecraft.client.Minecraft
 import kotlin.collections.contains
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -99,11 +99,11 @@ object AbilityUtils {
         return finalDuration.seconds
     }
 
-    fun onClientTick(client: Minecraft) {
+    fun onClientTick() {
         // only for MSB
         if (!pickaxeState.isActive || HotmData.currentPickaxeAbility != Ability.MINING_SPEED_BOOST) return
 
-        val player = client.player ?: return
+        val player = MinecraftUtils.player ?: return
         val stack = player.mainHandItem
 
         val tooltips = if (stack.isEmpty) emptyList() else ItemUtils.getTooltipLines(stack, true)
@@ -167,7 +167,12 @@ object AbilityUtils {
 
                     when (fallbackType) {
                         FallbackType.READY -> {
-                            if (!pickaxeState.isReady && !pickaxeState.wasRecentlyUsed) {
+                            if (pickaxeState.recentlyUsed) {
+                                pickaxeState.clearUsed()
+                                return
+                            }
+
+                            if (!pickaxeState.isReady) {
                                 pickaxeState.reset()
                             }
                         }
@@ -179,7 +184,9 @@ object AbilityUtils {
                         }
 
                         FallbackType.USED -> {
-                            if (!pickaxeState.isReady) {
+                            pickaxeState.markUsed()
+
+                            if (!pickaxeState.isActive && !pickaxeState.isReady) {
                                 val snap = pendingPickaxeSnap ?: return
 
                                 triggerPickaxeAbility(snap, forced = true)
@@ -187,7 +194,9 @@ object AbilityUtils {
                             }
                         }
 
-                        FallbackType.CHANGED -> {}
+                        FallbackType.CHANGED -> {
+                            HotmData.currentPickaxeAbility = ability // why not
+                        }
                     }
                 } else if (ability.axeAbility) {
                     if (HotfData.currentAxeAbility != ability) {
@@ -196,7 +205,12 @@ object AbilityUtils {
 
                     when (fallbackType) {
                         FallbackType.READY -> {
-                            if (!axeState.isReady && !axeState.wasRecentlyUsed) {
+                            if (axeState.recentlyUsed) {
+                                axeState.clearUsed()
+                                return
+                            }
+
+                            if (!axeState.isReady) {
                                 axeState.reset()
                             }
                         }
@@ -208,15 +222,18 @@ object AbilityUtils {
                         }
 
                         FallbackType.USED -> {
-                            if (!axeState.isReady) {
+                            axeState.markUsed()
+
+                            if (!axeState.isActive && !axeState.isReady) {
                                 triggerAxeAbility(forced = true)
                             }
                         }
 
-                        FallbackType.CHANGED -> {}
+                        FallbackType.CHANGED -> {
+                            HotfData.currentAxeAbility = ability
+                        }
                     }
                 }
-
             }
         }
     }
