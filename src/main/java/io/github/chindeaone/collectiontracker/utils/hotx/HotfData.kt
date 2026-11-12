@@ -8,6 +8,7 @@ import io.github.chindeaone.collectiontracker.config.categories.foraging.Lottery
 import io.github.chindeaone.collectiontracker.config.cotfLevel
 import io.github.chindeaone.collectiontracker.config.currentHotfLoadout
 import io.github.chindeaone.collectiontracker.config.currentHotfLoadoutName
+import io.github.chindeaone.collectiontracker.config.hotfConfig
 import io.github.chindeaone.collectiontracker.utils.ability.Ability
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
@@ -76,6 +77,10 @@ object HotfData {
             }
             HotxPerkState.UNKNOWN -> lottery.lastLotteryBuff = ""
         }
+
+        for (loadouts in hotfConfig.loadouts.values) {
+            loadouts.lottery.lastLotteryBuff = lottery.lastLotteryBuff
+        }
     }
 
     private fun updateBeekeeper(stack: ItemStack) {
@@ -91,6 +96,10 @@ object HotfData {
                 beekeeper.lastBeekeeperBuff = if (effect.isNullOrBlank()) "§cUnknown" else effect
             }
             HotxPerkState.UNKNOWN -> beekeeper.lastBeekeeperBuff = ""
+        }
+
+        for (loadouts in hotfConfig.loadouts.values) {
+            loadouts.beekeeper.lastBeekeeperBuff = beekeeper.lastBeekeeperBuff
         }
     }
 

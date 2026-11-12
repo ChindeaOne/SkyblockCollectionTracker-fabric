@@ -10,6 +10,7 @@ import io.github.chindeaone.collectiontracker.config.compactMayhem
 import io.github.chindeaone.collectiontracker.config.cotmLevel
 import io.github.chindeaone.collectiontracker.config.currentHotmLoadout
 import io.github.chindeaone.collectiontracker.config.currentHotmLoadoutName
+import io.github.chindeaone.collectiontracker.config.hotmConfig
 import io.github.chindeaone.collectiontracker.utils.ability.Ability
 import io.github.chindeaone.collectiontracker.utils.chat.ChatUtils
 import io.github.chindeaone.collectiontracker.utils.parser.ContainerParser
@@ -88,6 +89,10 @@ object HotmData {
                 skyMall.lastSkyMallBuff = if (effect.isNullOrBlank()) "§cUnknown" else effect
             }
             HotxPerkState.UNKNOWN -> skyMall.lastSkyMallBuff = ""
+        }
+
+        for (loadout in hotmConfig.loadouts.values) {
+            loadout.skyMall.lastSkyMallBuff = skyMall.lastSkyMallBuff
         }
     }
 
