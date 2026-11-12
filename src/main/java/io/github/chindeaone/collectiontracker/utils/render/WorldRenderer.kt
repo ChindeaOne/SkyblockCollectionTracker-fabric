@@ -156,13 +156,8 @@ object WorldRenderer {
             return
         }
 
-        //? if 26.3 {
-        /*renderPass.setPipeline(
-            RenderSystem.getCompiledPipeline(draw.pipeline)
-        )
-        *///? } else {
+        //~ if 26.3 'draw.pipeline' -> 'RenderSystem.getCompiledPipeline(draw.pipeline)'
         renderPass.setPipeline(draw.pipeline)
-        //? }
 
         renderPass.setUniform(
             "DynamicTransforms",
@@ -173,28 +168,17 @@ object WorldRenderer {
             renderPass.setUniform(uniform.name, uniform.buffer)
         }
 
+        //~ if 26.3 'bindTexture' -> 'setUniform' as _
         draw.textureSetup.texure0()?.let { texture ->
-            //? if 26.3 {
-            //renderPass.setUniform("Sampler0", texture, draw.textureSetup.sampler0())
-            //? } else {
             renderPass.bindTexture("Sampler0", texture, draw.textureSetup.sampler0())
-            //? }
         }
 
         draw.textureSetup.texure1()?.let { texture ->
-            //? if 26.3 {
-            //renderPass.setUniform("Sampler1", texture, draw.textureSetup.sampler1())
-            //? } else {
             renderPass.bindTexture("Sampler1", texture, draw.textureSetup.sampler1())
-            //? }
         }
 
         draw.textureSetup.texure2()?.let { texture ->
-            //? if 26.3 {
-            //renderPass.setUniform("Sampler2", texture, draw.textureSetup.sampler2())
-            //? } else {
             renderPass.bindTexture("Sampler2", texture, draw.textureSetup.sampler2())
-            //? }
         }
 
         renderPass.setVertexBuffer(0, executeInfo.vertexBuffer().slice())

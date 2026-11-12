@@ -41,11 +41,8 @@ import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 import java.util.Collections
 import java.util.WeakHashMap
-//? if < 26.3 {
+//~ if 26.3 'glfw.GLFW' -> 'sdl.SDLMouse'
 import org.lwjgl.glfw.GLFW
-//? } else {
-//import org.lwjgl.sdl.SDLMouse
-//? }
 import kotlin.time.Duration.Companion.milliseconds
 
 object CommissionUtils {
@@ -191,17 +188,14 @@ object CommissionUtils {
 
         return if (keyCode < 0) {
             val mouseButton = keyCode + 100
-            //? if < 26.3 {
+            //? if 26.2 {
             GLFW.glfwGetMouseButton(window.handle(), mouseButton) == GLFW.GLFW_PRESS
             //? } else {
-            //(SDLMouse.SDL_GetMouseState(null, null) and (1 shl (mouseButton - 1))) != 0
-            //? }
+            /*(SDLMouse.SDL_GetMouseState(null, null) and (1 shl (mouseButton - 1))) != 0
+            *///? }
         } else {
-            //? if < 26.3 {
+            //~ if 26.3 'window, keyCode' -> 'keyCode'
             InputConstants.isKeyDown(window, keyCode)
-            //? } else {
-             //InputConstants.isKeyDown(keyCode)
-            //? }
         }
     }
 

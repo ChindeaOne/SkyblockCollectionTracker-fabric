@@ -18,8 +18,8 @@ class ChromaUniform : AutoCloseable {
         "SCT Chroma UBO",
         uniformSize,
         //? if 26.3 {
-        //128,
-        //? }
+        /*128,
+        *///? }
         2
     )
 
@@ -29,7 +29,8 @@ class ChromaUniform : AutoCloseable {
         startColor: Int,
         endColor: Int
     ): GpuBufferSlice {
-        return /*? if 26.3 {*//*storage.writeData(*//*? }  else {*/ storage.writeUniform( /*?}*/
+        //~ if 26.3 'writeUniform' -> 'writeData'
+        return storage.writeUniform(
             ChromaUniformData(
                 timeOffset,
                 mode,
@@ -52,11 +53,8 @@ class ChromaUniform : AutoCloseable {
         val mode: Int, // 0 = chroma, 1 = prefix gradient
         val startColor: Int,
         val endColor: Int
-    ):  /*? if 26.3 {*//*
-        DynamicGpuDataStorage.DynamicGpuData
-        *//*?} else {*/
-         DynamicUniformStorage.DynamicUniform
-        //?}
+    ):  //~ if 26.3 'DynamicUniformStorage.DynamicUniform' -> 'DynamicGpuDataStorage.DynamicGpuData'
+        DynamicUniformStorage.DynamicUniform
         {
         override fun write(buffer: ByteBuffer) {
             Std140Builder.intoBuffer(buffer)
